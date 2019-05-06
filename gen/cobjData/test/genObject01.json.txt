@@ -1,0 +1,184 @@
+{
+    "object":{
+        name:"$P",
+        inheritsFrom:[obj], 
+        properties: [
+            {name:priority, type:uint16_t, class:private, gen:[both,internal], internal:true},
+            {name:str, dataName:pStr, type:"ASTR_DATA", pointer:1, class:public, 
+                        gen:[both,internal], internal:true},
+            {name:size, type:uint32_t, class:public, gen:[get,internal]},
+            {name:superVtbl, type:"OBJ_DATA *", class:public, gen:get}
+        ],
+        methods: {
+            Alloc:{
+                type:class, 
+                class:public,
+                parms:null, 
+                data:[
+                        {name:this, type="$Q_DATA", init:OBJ_NIL},
+                        {name:cbSize, type=uint32_t, init:"sizeof($Q_DATA)"},
+                ],
+                body:{
+                    init:null,
+                    stmts:["this = obj_Alloc( cbSize );"]
+                },
+                returns:{name:this, type:"$Q_DATA *"}
+            },
+            ClassQueryInfo:{
+                type:class, 
+                class:public, 
+                parms:[
+                        {name:objId, type="OBJ_ID"},
+                        {name:type, type="uint32_t"},
+                        {name:pData, type="void *"},
+                ], 
+                data:[
+                        {name:this, type="$Q_CLASS_DATA", init:objId},
+                        {name:pStr, type="char *", type_mod=const init:pData},
+                        {name:pVoid, type="void *", init:"NULL"},
+                ],
+                body:{
+                    init:[
+                        "if (OBJ_NIL == this) {",
+                        "\treturn NULL;",
+                        "}"
+                    ],
+                    stmts:[
+                        "switch (type) {",
+                        "",
+                        "\tcase OBJ_QUERYINFO_TYPE_CLASS_OBJECT:",
+                        "\t\treturn this;",
+                        "\t\tbreak;",
+                        "",
+                        "\t// Query for an address to specific data within the object.",
+                        "\t// This should be used very sparingly since it breaks the",
+                        "\t// object's encapsulation.",
+                        "\tcase OBJ_QUERYINFO_TYPE_DATA_PTR:",
+                        "\t\tswitch (*pStr) {",
+                        "",
+                        "\t\t\tcase 'C':",
+                        "\t\t\t\tif (str_Compare("ClassInfo", (char *)pStr) == 0) {",
+                        "\t\t\t\t\treturn (void *)&$P_Info;",
+                        "\t\t\t\t}",
+                        "\t\t\t\tbreak;",
+                        "",
+                        "\t\t\tdefault:",
+                        "\t\t\t\tbreak;",
+                        "\t\t}",
+                        "\t\tbreak;",
+                        "",
+                        "\tcase OBJ_QUERYINFO_TYPE_INFO:",
+                        "\t\treturn (void *)obj_getInfo(this);",
+                        "\t\tbreak;",
+                        "",
+                        "\tcase OBJ_QUERYINFO_TYPE_METHOD:",
+                        "\t\tswitch (*pStr) {",
+                        "",
+                        "\t\t\tcase 'N':",
+                        "\t\t\t\tif (str_Compare("New", (char *)pStr) == 0) {",
+                        "\t\t\t\t\treturn $P_New;",
+                        "\t\t\t}",
+                        "\t\t\tbreak;",
+                        "",
+                        "\t\t\tcase 'W':",
+                        "\t\t\t\tif (str_Compare("WhoAmI", (char *)pStr) == 0) {",
+                        "\t\t\t\t\treturn $P_ClassWhoAmI;",
+                        "\t\t\t}",
+                        "\t\t\tbreak;",
+                        "",
+                        "\t\t\tdefault:",
+                        "\t\t\t\tbreak;",
+                        "",
+                        "\t\t}",
+                        "\t\tbreak;",
+                        "",
+                        "\t\tdefault:",
+                        "\t\t\tbreak;",
+                        "",
+                        "\t}",
+                    ]
+                },
+                returns:{name:pVoid, type:"void *"}
+            },
+            New:{
+                type:class, 
+                class:public, 
+                parms:null, 
+                data:[
+                        {name:this, type="$Q_DATA", init:OBJ_NIL},
+                ],
+                body:{
+                    init:null,
+                    stmts:["this = obj_Alloc( cbSize );"]
+                },
+                returns:{name:this, type:"$Q_DATA *"}
+            },
+            ClassGetSingleton:{
+                type:class, 
+                class:public,
+                cond:["singleton"], 
+                parms:[
+                        {name:objId, type="OBJ_ID"}
+                ], 
+                data:[
+                        {name:this, type="$Q_CLASS_DATA", init:objId},
+                ],
+                body:{
+                    init:[
+                        "if (OBJ_NIL == this) {",
+                        "\tthis = &$P_ClassObj;",
+                        "}",
+                    ],
+                    stmts:["this = obj_Alloc( cbSize );"]
+                },
+                returns:{name:"(OBJ_ID)($P_ClassObj.pSingleton)", type:"$Q_DATA *"}
+            },
+            ClassSetSingleton:{
+                type:class, 
+                class:public,
+                cond:["singleton"], 
+                parms:[
+                        {name:objId, type="OBJ_ID"},
+                        {name:pValue, type="$Q_DATA"}
+                ], 
+                data:[
+                        {name:this, type="$Q_CLASS_DATA", init:objId},
+                        {name:pLock, type="PSXLOCK_DATA", init:OBJ_NIL},
+                        {name:fRc, type="bool"},
+                ],
+                body:{
+                    init:[
+                        "if (OBJ_NIL == this) {",
+                        "\tthis = &$P_ClassObj;",
+                        "}",
+                        "pLock = psxLock_New();",
+                        "if (OBJ_NIL == pLock) {",
+                        "\tDEBUG_BREAK();",
+                        "\treturn false;",
+                        "}"
+                        "fRc = psxLock_Lock(pLock);",
+                        "if (!fRc) {",
+                        "\tDEBUG_BREAK();",
+                        "\tobj_Release(pLock);",
+                        "\tpLock = OBJ_NIL;",
+                        "\treturn false;",
+                        "}"
+                    ],
+                    stmts:[
+                        "obj_Retain(pValue);",
+                        "if ($P_ClassObj.pSingleton) {",
+                        "\tobj_Release((OBJ_ID)($P_ClassObj.pSingleton));",
+                        "}",
+                        "$P_ClassObj.pSingleton = pValue;",
+                        "",
+                        "fRc = psxLock_Unlock(pLock);",
+                        "obj_Release(pLock);",
+                        "pLock = OBJ_NIL;",
+                        ""
+                    ]
+                },
+                returns:{name:"fRc", type:"bool"}
+            },
+        }
+    }
+}

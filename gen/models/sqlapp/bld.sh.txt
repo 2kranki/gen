@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo "Formatting files:"
+go fmt ./...
+echo "Building Application:"
+go build -v
+

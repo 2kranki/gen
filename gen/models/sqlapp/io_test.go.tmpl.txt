@@ -1,0 +1,235 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+// Generated: [[Time]]
+
+package io[[.TD.Data.TitledName]]
+[[- $n := .TD.Data.TitledName]]
+
+import (
+    //"fmt"
+    "log"
+	"testing"
+)
+
+
+func SetupConnectParms() {
+	[[ if eq .TD.Data.SqlType "mariadb" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType  "mssql" ]]
+		SetPort("1401")
+		SetPW("Passw0rd!")
+		SetServer("localhost")
+		SetUser("SA")
+	[[ else if eq .TD.Data.SqlType "mysql" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType "postgres" ]]
+		SetPort("5432")
+		SetPW("Passw0rd!")
+		SetServer("localhost")
+		SetUser("postgres")
+	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+		SetServer("test.db")
+	[[ end ]]
+}
+
+func TestConnect(t *testing.T) {
+    var err         error
+
+	t.Logf("TestConnect()...\n")
+	SetupConnectParms()
+    err = Connect()
+    if err == nil {
+	    err = Disconnect()
+        if err != nil {
+            t.Fatalf("Error: %s\n\n", err)
+        }
+    } else {
+            t.Fatalf("Error: %s\n\n", err)
+    }
+	t.Logf("TestConnect() - End of Test\n\n\n")
+}
+
+func TestCreateTables(t *testing.T) {
+    var err         error
+
+	t.Logf("TestCreateTables()...\n")
+	SetupConnectParms()
+
+    err = Connect()
+    if err != nil {
+        t.Fatal("Error: Cannot connect: ", err)
+    }
+
+    err = TablesCreate()
+    if err != nil {
+        t.Fatal("Error: Cannot create tables: ", err)
+    }
+
+    err = Disconnect()
+    if err != nil {
+        t.Fatal("Error: Cannot disconnect: ", err)
+    }
+
+	t.Logf("TestCreateTables() - End of Test\n\n\n")
+}
+
+func TestDeleteTables(t *testing.T) {
+    var err         error
+
+	t.Logf("TestDeleteTables()...\n")
+	SetupConnectParms()
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+	t.Logf("TestDeleteTables() - End of Test\n\n\n")
+}
+
+func TestDisconnect(t *testing.T) {
+    var err         error
+
+	t.Logf("TestDisconnect()...\n")
+	SetupConnectParms()
+
+	// Disconnect before a connection has been made.
+    err = Disconnect()
+    if err == nil {
+        t.Fatal("Error: Never Connected!\n\n\n")
+    }
+
+    // Now connect then disconnect.
+    err = Connect()
+    if err != nil {
+        t.Fatal("Error: Cannot connect: ", err)
+    }
+    err = Disconnect()
+    if err != nil {
+        t.Fatal("Error: Cannot disconnect: ", err)
+    }
+
+	t.Logf("TestDisconnect() - End of Test\n\n\n")
+}
+
+[[- range $t := .TD.Data.Tables ]]
+    func Test[[$t.TitledName]]RowDelete(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]RowDelete()...\n")
+	    SetupConnectParms()
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+	    t.Logf("Test[[$t.TitledName]]RowDelete() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]RowInsert(t *testing.T) {
+        var err         error
+        var rcd         [[$t.TitledName]]
+
+    	t.Logf("Test[[$t.TitledName]]RowInsert()...\n")
+	    SetupConnectParms()
+
+        // Start clean with new empty tables.
+        err = Connect()
+        if err != nil {
+            t.Fatal("Error: Cannot connect: ", err)
+        }
+        err = TablesCreate()
+        if err != nil {
+            t.Fatal("Error: Cannot create tables: ", err)
+        }
+
+        // Now add some records.
+        for i := 0; i < 5; i++ {
+            t.Logf("\tInserting Record %d\n", i)
+            chr := 'A' + i
+            rcd.Name = string(chr)
+            rcd.Num = i
+            err = [[$t.TitledName]]RowInsert(&rcd)
+            if err != nil {
+                t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)
+            }
+        }
+
+        // Now read the first record.
+        t.Logf("\tReading First Record\n")
+        rcd, err = [[$t.TitledName]]RowFirst()
+        if err != nil {
+            t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 0 {
+            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
+        }
+        if rcd.Name != "A" {
+            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
+        }
+
+        // Now read the last record.
+        t.Logf("\tReading Last Record\n")
+        rcd, err = [[$t.TitledName]]RowLast()
+        if err != nil {
+            t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 4 {
+            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
+        }
+        if rcd.Name != "E" {
+            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
+        }
+
+        // Now read the middle record.
+        t.Logf("\tReading via Find the Middle Record\n")
+        rcd, err = [[$t.TitledName]]RowFind("2")
+        if err != nil {
+            t.Fatalf("Error: : Record Middle Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 2 {
+            t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
+        }
+        if rcd.Name != "C" {
+            t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
+        }
+
+        // Now read the first record via Find.
+        t.Logf("\tReading via Find the First Record\n")
+        rcd, err = [[$t.TitledName]]RowFind("0")
+        if err != nil {
+            t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 0 {
+            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
+        }
+        if rcd.Name != "A" {
+            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
+        }
+
+        // Now read the last record via Find.
+        t.Logf("\tReading via Find the Last Record\n")
+        rcd, err = [[$t.TitledName]]RowFind("4")
+        if err != nil {
+            t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 4 {
+            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
+        }
+        if rcd.Name != "E" {
+            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
+        }
+
+        //err = TablesDelete()
+        if err != nil {
+            t.Fatal("Error: Cannot delete tables: ", err)
+        }
+        err = Disconnect()
+        if err != nil {
+            t.Fatal("Error: Cannot disconnect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]RowInsert() - End of Test\n\n\n")
+    }
+[[ end ]]

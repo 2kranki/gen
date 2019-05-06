@@ -1,0 +1,21 @@
+# vi:nu:et:sts=4 ts=4 sw=4
+
+{
+    "Flags":[
+        {
+            "Name":"exec",
+            "Internal":"execPath",
+            "Desc":"exec json path (optional)",
+            "Type":"string",
+            "Init":""
+        }
+    ],
+    "Usage":{
+        "Line":"",
+        "Notes":[
+            "'exec json' is a file that defines the command line parameters \\n",
+            "so that you can set them and then execute gen with -x or -exec\\n",
+            "option.\\n\\n"
+        ]
+    }
+}

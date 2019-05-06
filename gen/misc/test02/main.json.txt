@@ -1,0 +1,57 @@
+# vi:nu:et:sts=4 ts=4 sw=4
+
+{
+    "Flags":[
+        {
+            "Name":"debug",
+            "Desc":"enable debugging",
+            "Type":"bool",
+            "Init":""
+        },
+        {
+            "Name":"exec",
+            "Internal":"execPath",
+            "Desc":"exec json path (optional)",
+            "Type":"string",
+            "Init":""
+        },
+        {
+            "Name":"force",
+            "Desc":"enable over-writes and deletions",
+            "Type":"bool",
+            "Init":""
+        },
+        {
+            "Name":"noop",
+            "Desc":"execute program, but do not make real changes",
+            "Type":"bool",
+            "Init":""
+        },
+        {
+            "Name":"port",
+            "Desc":"port to be listened to by this program",
+            "Type":"int",
+            "Init":""
+        },
+        {
+            "Name":"quiet",
+            "Desc":"enable quiet mode",
+            "Type":"bool",
+            "Init":""
+        },
+        {
+            "Name":"url",
+            "Desc":"url to be listened on by this program",
+            "Type":"string",
+            "Init":"localhost"
+        }
+    ],
+    "Usage":{
+        "Line":"",
+        "Notes":[
+            "'exec json' is a file that defines the command line parameters \\n",
+            "so that you can set them and then execute gen with -x or -exec\\n",
+            "option.\\n\\n"
+        ]
+    }
+}

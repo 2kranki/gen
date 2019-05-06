@@ -1,0 +1,237 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+// Generated: [[Time]]
+
+package hndlr[[.TD.Data.TitledName]]
+[[- $n := .TD.Data.TitledName]]
+
+import (
+    //"fmt"
+    "log"
+	"testing"
+    "../io[[$n]]"
+)
+
+// SetupParms sets up the environment for testing including
+// creating the test databases needed for testing the handlers.
+func SetupParms(t *testing.T) {
+    var err         error
+[[- range $t := .TD.Data.Tables ]]
+    var rcd[[$t.TitledName]]    io[[$n]].[[$t.TitledName]]
+[[- end]]
+
+    SetTmplsDir("../")
+    SetupTmpls()
+
+    io[[$n]].SetServer("test.db")
+
+    // Start clean with new empty tables.
+    err = io[[$n]].Connect()
+    if err != nil {
+        t.Fatal("Error: Cannot connect: ", err)
+    }
+    err = io[[$n]].TablesCreate()
+    if err != nil {
+        t.Fatal("Error: Cannot create tables: ", err)
+    }
+
+    // Now add some records.
+    for i := 0; i < 5; i++ {
+        t.Logf("\tInserting Record %d\n", i)
+        chr := 'A' + i
+[[- range $t := .TD.Data.Tables ]]
+        rcd[[$t.TitledName]].Name = string(chr)
+        rcd[[$t.TitledName]].Num = i
+        err = io[[$n]].[[$t.TitledName]]RowInsert(&rcd[[$t.TitledName]])
+        if err != nil {
+            t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)
+        }
+[[end]]
+    }
+
+}
+
+/****
+func TestConnect(t *testing.T) {
+    var err         error
+
+	t.Logf("TestConnect()...\n")
+	SetupParms(t)
+    err = Connect()
+    if err == nil {
+	    err = Disconnect()
+        if err != nil {
+            t.Fatalf("Error: %s\n\n", err)
+        }
+    } else {
+            t.Fatalf("Error: %s\n\n", err)
+    }
+	t.Logf("TestConnect() - End of Test\n\n\n")
+}
+
+func TestCreateTables(t *testing.T) {
+    var err         error
+
+	t.Logf("TestCreateTables()...\n")
+	SetupParms(t)
+
+    err = Connect()
+    if err != nil {
+        t.Fatal("Error: Cannot connect: ", err)
+    }
+
+    err = TablesCreate()
+    if err != nil {
+        t.Fatal("Error: Cannot create tables: ", err)
+    }
+
+    err = Disconnect()
+    if err != nil {
+        t.Fatal("Error: Cannot disconnect: ", err)
+    }
+
+	t.Logf("TestCreateTables() - End of Test\n\n\n")
+}
+
+func TestDeleteTables(t *testing.T) {
+    var err         error
+
+	t.Logf("TestDeleteTables()...\n")
+	SetupParms(t)
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+	t.Logf("TestDeleteTables() - End of Test\n\n\n")
+}
+
+func TestDisconnect(t *testing.T) {
+    var err         error
+
+	t.Logf("TestDisconnect()...\n")
+	SetupParms(t)
+
+	// Disconnect before a connection has been made.
+    err = Disconnect()
+    if err == nil {
+        t.Fatal("Error: Never Connected!\n\n\n")
+    }
+
+    // Now connect then disconnect.
+    err = Connect()
+    if err != nil {
+        t.Fatal("Error: Cannot connect: ", err)
+    }
+    err = Disconnect()
+    if err != nil {
+        t.Fatal("Error: Cannot disconnect: ", err)
+    }
+
+	t.Logf("TestDisconnect() - End of Test\n\n\n")
+}
+ ***/
+
+[[- range $t := .TD.Data.Tables ]]
+    func Test[[$t.TitledName]]HndlrDelete(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrDelete()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrDelete() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]HndlrIndex(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrIndex()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrIndex() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]HndlrInsert(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrInsert()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrInsert() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]HndlrNext(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrNext()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrNext() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]HndlrPrev(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrPrev()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrPrev() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]HndlrShow(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrShow()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrShow() - End of Test\n\n\n")
+    }
+
+    func Test[[$t.TitledName]]HndlrUpdate(t *testing.T) {
+        var err         error
+
+        t.Logf("Test[[$t.TitledName]]HndlrUpdate()...\n")
+	    SetupParms(t)
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+
+	    t.Logf("Test[[$t.TitledName]]HndlrUpdate() - End of Test\n\n\n")
+    }
+
+[[ end ]]

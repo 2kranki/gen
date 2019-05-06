@@ -1,0 +1,32 @@
+/*
+
+
+ */
+
+
+
+
+{
+    "program":{
+        "name":"genObject",
+        "libDeps":["Cmn"],
+        "headers_private":["genObject.h"],
+        "headers_public":[],
+        "headers_test":["test_defs.h"],
+        "main":"mainProgram.c"
+    },
+    "properties":{
+        // "name_in_normal_case": {
+        //      "type": types
+        // },
+        "str":{"type":"AStr", "desc":"Object String", "size":"sizeof(void *)", "shift":""},
+        "priority":{"type":"uint16_t","desc":"Object String", "size":"sizeof(void *)", "shift":""},
+        "genTree":{"srcDeps":["genObject.h"], "test":null},
+        "genScan":{"srcDeps":["genObject.h"], "test":null},
+        "main":{"srcDeps":["genObject.h"], "test":null},
+    },
+    "macosx": {
+    },
+    "win32": {
+    },
+}

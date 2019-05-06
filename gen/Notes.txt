@@ -1,0 +1,12 @@
+# vi:nu:et:sts=4 ts=4 sw=4
+# My objective with this program is to be able to generate applications and objects
+# in several languages.
+
+# In developing this program, I have accidentally over-written the base files of
+# the program several times and had to reconstruct the over-written files.  Since
+# I wasn't doing commits very often, the reconstruction was sometimes a little
+# painful.  Now, I am doing lots of commits. So, that any reconstruction is rather
+# painless. lol  Live and learn!
+
+
+

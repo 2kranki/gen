@@ -1,0 +1,106 @@
+# vi:nu:et:sts=4 ts=4 sw=4
+
+{
+    "Name":"Finances",
+    "SqlType":"postgres",                   # mariadb | mssql | mysql | postgres | sqlite (required)
+    "Tables":[
+        {
+            "Name":"Customer",
+            "PrimaryKey":"CustNo",
+            "Fields":[
+                {
+                    "Name":"CustNo",
+                    "Type":"int",
+                    "PrimaryKey":true,
+                    "List":true
+                },
+                {
+                    "Name":"CustName",
+                    "Type":"text",
+                    "Len":30,
+                    "List":true
+                },
+                {
+                    "Name":"CustAddr1",
+                    "Type":"text",
+                    "Len":30
+                },
+                {
+                    "Name":"CustAddr2",
+                    "Type":"text",
+                    "Len":30
+                },
+                {
+                    "Name":"CustCity",
+                    "Type":"text",
+                    "Len":20
+                },
+                {
+                    "Name":"CustState",
+                    "Type":"text",
+                    "Len":10
+                },
+                {
+                    "Name":"CustZip",
+                    "Type":"text",
+                    "Len": 15
+                },
+                {
+                    "Name":"CustCurBal",
+                    "Type":"money",
+                    "Len": 15,
+                    "Scale":2
+                }
+            ]
+        },
+        {
+            "Name":"Vendor",
+            "PrimaryKey":"VendNo",
+            "Fields":[
+                {
+                    "Name":"VendNo",
+                    "Type":"int",
+                    "PrimaryKey":true,
+                    "List":true
+                },
+                {
+                    "Name":"VendName",
+                    "Type":"text",
+                    "Len":30,
+                    "List":true
+                },
+                {
+                    "Name":"VendAddr1",
+                    "Type":"text",
+                    "Len":30
+                },
+                {
+                    "Name":"VendAddr2",
+                    "Type":"text",
+                    "Len":30
+                },
+                {
+                    "Name":"VendCity",
+                    "Type":"text",
+                    "Len":20
+                },
+                {
+                    "Name":"VendState",
+                    "Type":"text",
+                    "Len":10
+                },
+                {
+                    "Name":"VendZip",
+                    "Type":"text"
+                },
+                {
+                    "Name":"VendCurBal",
+                    "Type":"money",
+                    "Len": 15,
+                    "Scale":2
+                }
+            ]
+        }
+    ]
+}
+

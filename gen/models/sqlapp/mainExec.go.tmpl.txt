@@ -1,0 +1,120 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// SQL Application main program
+
+// Generated: [[Time]]
+[[- $n := .TD.Data.TitledName]]
+
+package main
+
+import (
+    "fmt"
+	"github.com/gorilla/mux"
+    "log"
+	"net/http"
+	"time"
+	"./hndlr[[$n]]"
+)
+
+func HndlrFavIcon(w http.ResponseWriter, r *http.Request) {
+    if r.Method != "GET" {
+	    http.NotFound(w, r)
+	}
+    http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+}
+
+func HndlrHome(w http.ResponseWriter, r *http.Request) {
+    if r.URL.Path != "/" {
+        http.NotFound(w, r)
+        return
+    }
+
+    w.Write([]byte("Set up main menu here..."))
+}
+
+func HndlrDebug(w http.ResponseWriter, r *http.Request) {
+    http.ServeFile(w, r, "./tmpl/form.html")
+}
+
+func HndlrDebugAdd(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "POST" {
+	    http.NotFound(w, req)
+	}
+    fmt.Fprintf(w, "Good Addition!")
+}
+
+func HndlrDebugDelete(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "POST" {
+	    http.NotFound(w, req)
+	}
+    fmt.Fprintf(w, "Good Deletion!")
+}
+
+func HndlrDebugNext(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "GET" {
+	    http.NotFound(w, req)
+	}
+    fmt.Fprintf(w, "Going to Next!")
+}
+
+func HndlrDebugPrev(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "GET" {
+	    http.NotFound(w, req)
+	}
+    fmt.Fprintf(w, "Going to Prev!")
+}
+
+func HndlrDebugReset(w http.ResponseWriter, req *http.Request) {
+    fmt.Fprintf(w, "Doing a Reset!")
+
+}
+
+func HndlrDebugUpdate(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "POST" {
+	    http.NotFound(w, req)
+	}
+    fmt.Fprintf(w, "Good Update!")
+}
+
+func exec() {
+
+	r := mux.NewRouter()
+	r.HandleFunc("/", mainIndex)
+	r.HandleFunc("/favicon.ico", HndlrFavIcon)
+	    r.HandleFunc("/debug", HndlrDebug)
+	    r.HandleFunc("/debugAdd", HndlrDebugAdd)
+	    r.HandleFunc("/debugDelete", HndlrDebugDelete)
+	    r.HandleFunc("/debugNext", HndlrDebugNext)
+	    r.HandleFunc("/debugPrev", HndlrDebugPrev)
+	    r.HandleFunc("/debugReset", HndlrDebugReset)
+	    r.HandleFunc("/debugUpdate", HndlrDebugUpdate)
+	[[range $t := .TD.Data.Tables -]]
+	    r.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.Name]]HndlrIndex)
+	    r.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.Name]]HndlrShow)
+	    r.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.Name]]HndlrInsert)
+	    r.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.Name]]HndlrDelete)
+	    r.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.Name]]HndlrNext)
+	    r.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.Name]]HndlrPrev)
+	    r.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.Name]]HndlrUpdate)
+	[[ end -]]
+
+	srvUrl := fmt.Sprintf("%s:%s", http_srvr, http_port)
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         srvUrl,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
+}
+
+
+func mainIndex(w http.ResponseWriter, req *http.Request) {
+	//http.Redirect(w, req, "/$v.Name", http.StatusSeeOther)
+}
+
+// Tell Client that we don't have the requested file
+func noFile(w http.ResponseWriter, req *http.Request) {
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+}

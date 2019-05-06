@@ -1,0 +1,15 @@
+    {{ if .JsonData.Sqlapp }}
+        {{ if .JsonData.Sqlapp.SqlType == "mssql"
+            {{- range $t := .JsonData.Sqlapp.Tables -}}
+                DROP TABLE IF EXISTS {{$t.Name}};
+                GO
+                CREATE TABLE {{$t.Name}} (
+                {{- range $f := $t.Fields -}}
+                    {{ $f.Name }} {{ $f.Type }} {{ if $f.Len }}({{printf "%d" $f.Len }}{{ if $f.Scale }},{{printf "%d" $f.Scale }}{{ end }}){{ end }}
+                    {{ if $f.PrimaryKey }}PRIMARY KEY{{ end }};
+                {{ end }}
+                );
+                -- GO
+            {{ end }}
+        {{ end }}
+	{{ end }}

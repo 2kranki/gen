@@ -1,0 +1,148 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+//
+
+// Generated: [[Time]]
+
+package io[[.TD.Data.TitledName]]
+
+import (
+    //"database/sql"
+	"errors"
+	[[ if eq .TD.Data.SqlType "mariadb" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType  "mssql" ]]
+	_ "github.com/2kranki/go-mssqldb"
+	[[ else if eq .TD.Data.SqlType "mysql" ]]
+		_ "github.com/go-sql-driver/mysql"
+	[[ else if eq .TD.Data.SqlType "postgres" ]]
+		_ "github.com/lib/pq"
+	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+	    _ "github.com/2kranki/go-sqlite3"
+	[[ end ]]
+	//"net/http"
+	//"strconv"
+)
+
+[[.Table.CreateStruct]]
+
+
+// [[.Table.TitledName]]Create creates the table in the
+// given database deleting the current table if
+// present.
+func [[.Table.TitledName]]Create() error {
+    var createSql = "[[.Table.CreateSql]]"
+    var err     error
+
+    err = [[.Table.TitledName]]Delete()
+    if err != nil {
+        return err
+    }
+    _, err = db.Exec(createSql)
+
+    return err
+}
+
+// [[.Table.TitledName]]Delete deletes the table in the
+// given database if present.
+func [[.Table.TitledName]]Delete() error {
+    var deleteSql = "[[.Table.DeleteSql]]"
+    var err     error
+
+    _, err = db.Exec(deleteSql)
+
+    return err
+}
+
+func [[.Table.TitledName]]RowDelete(key string) error {
+
+    // Do the SQL deletion.
+	_, err := db.Exec("DELETE FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1;", key)
+	if err != nil {
+		return errors.New("500. Internal Server Error")
+	}
+
+	return nil
+}
+
+func [[.Table.TitledName]]RowFind(key string) ([[.Table.TitledName]], error) {
+    data := [[.Table.TitledName]]{}
+
+    if key == "" {
+	    return data, errors.New("400. Bad Request.")
+    }
+
+	row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1", key)
+
+	err := row.Scan([[.Table.ScanFields "&data"]])
+	if err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
+func [[.Table.TitledName]]RowFirst() ([[.Table.TitledName]], error) {
+    data := [[.Table.TitledName]]{}
+
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] LIMIT 1")
+
+	err := row.Scan([[.Table.ScanFields "&data"]])
+	if err != nil {
+		return data, err
+	}
+
+    return data, nil
+}
+
+func [[.Table.TitledName]]RowInsert(d *[[.Table.TitledName]]) error {
+    var err     error
+
+    // Validate the input record.
+
+    // Add it to the table.
+    _, err = db.Exec("INSERT INTO [[.Table.Name]] ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]])",
+                        [[.Table.ScanFields "d"]])
+	if err != nil {
+		err = errors.New("500. Internal Server Error." + err.Error())
+	}
+	return err
+}
+
+func [[.Table.TitledName]]RowLast() ([[.Table.TitledName]], error) {
+    data := [[.Table.TitledName]]{}
+
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1")
+
+	err := row.Scan([[.Table.ScanFields "&data"]])
+
+    return data, err
+}
+
+func [[.Table.TitledName]]RowNext(key string) ([[.Table.TitledName]], error) {
+    data := [[.Table.TitledName]]{}
+
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] > $1 ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT 1", key)
+
+	err := row.Scan([[.Table.ScanFields "&data"]])
+
+    return data, err
+}
+
+func [[.Table.TitledName]]RowPrev(key string) ([[.Table.TitledName]], error) {
+    data := [[.Table.TitledName]]{}
+
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] < $1 ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1", key)
+
+	err := row.Scan([[.Table.ScanFields "&data"]])
+
+    return data, err
+}
+
+func [[.Table.Name]]RowUpdate(d *[[.Table.TitledName]]) error {
+    var err     error
+
+    return err
+}
+

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Form</title>
+    <style>
+        html, body, p {
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: left;
+            height: 100vh;
+        }
+        p {
+            margin-left: 4rem;
+            font-size: 2rem;
+            color: black;
+        }
+        .link {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <form id="testForm" method="post" action = "/default/page">
+        <output id="errors"></output>
+        <fieldset>
+            <legend>Name &amp; Address</legend>
+            <p>
+            <label class="vendor" for="name">Name:</label>
+            <input type="text" id="name" name="name" 
+                                        placeholder="Enter name here" 
+                                        size="50" required autofocus>
+            </p>
+            <div><label>Telephone: <input type=tel></label></div>
+            <div><label>Email address: <input type=email></label></div>            
+            <p>
+            <label class="vendor" for="addr1">Address:</label>
+            <input type="text" id="addr1" name="addr1" 
+                                        placeholder="Enter address here" 
+                                        size="50">
+            </p>
+            <p>
+            <input type="text" id="addr2" name="addr2" 
+                                        size="50">
+            </p>
+            <p>
+            <label class="vendor" for="addr1">City, State, Zip:</label>
+            <input type="text" id="city" name="city" 
+                                        size="50">
+            <input type="text" id="state" name="state" 
+                                        size="20">
+            <input type="text" id="zip" name="zip" 
+                                        size="9">
+            </p>
+        </fieldset>
+        <fieldset>
+            <legend>Financial Data</legend>
+            <p>
+            <label class="vendor" for="amt">Amt:</label>
+            <input type="text" id="amt" name="amt" 
+                                        size="15">
+            <label class="vendor" for="ytd">YTD:</label>
+            <input type="text" id="ytd" name="ytd" 
+                                        size="15">
+            </p>
+        </fieldset>
+        <p/>
+        <p/>
+        <p/>
+        <input type=submit onclick='onPrev()' value="Prev">
+        <input type=submit onclick='onAdd()' value="Add">
+        <input type=submit onclick='onDelete()' value="Delete">
+        <input type=submit onclick='onUpdate()' value="Update">
+        <input type=submit onclick='onNext()' value="Next">
+        <input type=reset onclick='onReset()' value="Reset">
+    </form>
+    <script>
+        function onAdd() {
+            document.getElementById("testForm").action = "/Create/Process";
+        }
+        function onDelete() {
+            document.getElementById("testForm").action = "/Delete/Process";
+        }
+        function onNext() {
+            document.getElementById("testForm").action = "/Next";
+            document.getElementById("testForm").method = "get";
+        }
+        function onPrev() {
+            document.getElementById("testForm").action = "/Prev";
+            document.getElementById("testForm").method = "get";
+        }
+        function onReset() {
+            //document.getElementById("testForm").action = "/Prev";
+            //document.getElementById("testForm").method = "get";
+        }
+        function onUpdate() {
+            document.getElementById("testForm").action = "/Update/Process";
+        }
+    </script>
+</body>
+</html>

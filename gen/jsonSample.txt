@@ -1,0 +1,36 @@
+# My objective with this program is reproduce the logic of dotnet01/console04. That
+# program is  a study in how access and build databases using Microsoft SQL Server 
+# running in Docker.
+
+# To do this, I had to add an SQL interface to Golang. So, I did:
+go get github.com/denisenkom/go-mssqldb
+# It installed the package and did not affect the current directory.
+
+# I found an tsql.go in their example directory and was able to pull some logice from
+# it.
+
+# When I started this, I had my git repository in the place that I normally put all my
+# other source repositories. lol  Not with Go!  It needs to be put in a specific
+# directory.  Since I run a macOS, you need to add your source under the ~/go/src directory.
+# Since I am saving this repository on github, it needs to be ~/go/src/github.com/2kranki.
+# It is ok with me since it is easy to reconstruct by re-cloning the repository there
+# if I re-install macOS.  Once you have all that set up, you cd to 
+# ~/go/src/github.com/<your id>/golang01/console01
+# Then to just run the code, you do (make sure that you start docker first):
+go run main.go
+# I actually like better this:
+go build
+./console01
+
+# Ok, this program is done for now.  I will work on it more as a different name a little
+# later.  To do this program, I read the entire "Golang" book and am 1/3 of the way through
+# the "Complete Go Bootcamp" on Udemy.com which I hope to complete in a few days.
+
+# I find the Golang system a little restrictive, but not unpalatable.  Actually, I am rather
+# enjoying it.  I did have a lot of experience with C, Rudy and Python before this.  Go is
+# is kind of a mixture of some of those languages and Pascal/Modula.  The biggest problem
+# in learning new languages if you already know a language seems to be learning the libraries.
+# Go has been around for 10 years as I write this.  So, there are lots of libraries. lol
+# Take a look at https://awesome-go.com for one resource that I just found, besides
+# https://golang.org/ for the standard libraries.  Back to my course! lol
+

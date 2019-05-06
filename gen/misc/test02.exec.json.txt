@@ -1,0 +1,10 @@
+{
+    "cmd":"cobj",
+    "data":"./misc/test02/db.json.txt",
+    "debug":true,
+    "force":false,
+    "main":"./misc/test02/main.json.txt",
+    "noop":true,
+    "outdir":"/tmp/gen",
+    "quiet":false
+}
