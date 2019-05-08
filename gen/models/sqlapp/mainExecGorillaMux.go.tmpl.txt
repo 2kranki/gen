@@ -10,8 +10,10 @@ package main
 
 import (
     "fmt"
+	"github.com/gorilla/mux"
     "log"
 	"net/http"
+	"time"
 	"./hndlr[[$n]]"
 )
 
@@ -27,7 +29,8 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
         http.NotFound(w, r)
         return
     }
-    http.ServeFile(w,r,"./html/[[$n]].menu.html")
+
+    w.Write([]byte("Set up main menu here..."))
 }
 
 func HndlrDebug(w http.ResponseWriter, r *http.Request) {
@@ -76,33 +79,42 @@ func HndlrDebugUpdate(w http.ResponseWriter, req *http.Request) {
 
 func exec() {
 
-    // Set up default URL handlers
-	http.HandleFunc("/", HndlrHome)
-	http.HandleFunc("/favicon.ico", HndlrFavIcon)
-
-	// Set up Debug URL handlers to practice on simple form
-    http.HandleFunc("/debug", HndlrDebug)
-    http.HandleFunc("/debugAdd", HndlrDebugAdd)
-    http.HandleFunc("/debugDelete", HndlrDebugDelete)
-    http.HandleFunc("/debugNext", HndlrDebugNext)
-    http.HandleFunc("/debugPrev", HndlrDebugPrev)
-    http.HandleFunc("/debugReset", HndlrDebugReset)
-    http.HandleFunc("/debugUpdate", HndlrDebugUpdate)
-
+	r := mux.NewRouter()
+	r.HandleFunc("/", mainIndex)
+	r.HandleFunc("/favicon.ico", HndlrFavIcon)
+	    r.HandleFunc("/debug", HndlrDebug)
+	    r.HandleFunc("/debugAdd", HndlrDebugAdd)
+	    r.HandleFunc("/debugDelete", HndlrDebugDelete)
+	    r.HandleFunc("/debugNext", HndlrDebugNext)
+	    r.HandleFunc("/debugPrev", HndlrDebugPrev)
+	    r.HandleFunc("/debugReset", HndlrDebugReset)
+	    r.HandleFunc("/debugUpdate", HndlrDebugUpdate)
 	[[range $t := .TD.Data.Tables -]]
-	    // [[$t.Name]] URL handlers for table maintenance
-	    http.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.Name]]HndlrIndex)
-	    http.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.Name]]HndlrShow)
-	    http.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.Name]]HndlrInsert)
-	    http.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.Name]]HndlrDelete)
-	    http.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.Name]]HndlrNext)
-	    http.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.Name]]HndlrPrev)
-	    http.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.Name]]HndlrUpdate)
+	    r.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.Name]]HndlrIndex)
+	    r.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.Name]]HndlrShow)
+	    r.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.Name]]HndlrInsert)
+	    r.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.Name]]HndlrDelete)
+	    r.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.Name]]HndlrNext)
+	    r.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.Name]]HndlrPrev)
+	    r.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.Name]]HndlrUpdate)
 	[[ end -]]
 
-	// Start the HTTP Server.
-	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
-	log.Fatal(http.ListenAndServe(srvrStr, nil))
-
+	srvUrl := fmt.Sprintf("%s:%s", http_srvr, http_port)
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         srvUrl,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
 }
 
+
+func mainIndex(w http.ResponseWriter, req *http.Request) {
+	//http.Redirect(w, req, "/$v.Name", http.StatusSeeOther)
+}
+
+// Tell Client that we don't have the requested file
+func noFile(w http.ResponseWriter, req *http.Request) {
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+}

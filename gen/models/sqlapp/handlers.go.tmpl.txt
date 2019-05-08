@@ -36,7 +36,7 @@ func Body(i interface{}) string {
 }
 
 func init() {
-    tmplsDir = "./"
+    tmplsDir = "./tmpl"
 }
 
 func SetTmplsDir(d string) {
@@ -47,7 +47,7 @@ func SetTmplsDir(d string) {
 // and loads them.
 func SetupTmpls() {
     funcs := map[string]interface{}{"Title":Title, "Body":Body,}
-    path := tmplsDir + "tmpl/*.tmpl"
+    path := tmplsDir + "/*.tmpl"
 	Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
 }
 

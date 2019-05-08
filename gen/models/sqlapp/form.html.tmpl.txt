@@ -41,6 +41,8 @@
         <input type=submit onclick='onNext()' value="Next">
         <input type=reset onclick='onReset()' value="Reset">
     </form>
+    <p/>
+    <p>{{msg}}</p>
     <script>
         function onAdd() {
             document.getElementById("dataForm").action = "/debugAdd";

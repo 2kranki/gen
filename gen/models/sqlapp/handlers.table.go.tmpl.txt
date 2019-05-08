@@ -4,6 +4,7 @@
 //  Handle HTTP Events
 
 // Generated: [[Time]]
+[[- $n := .TD.Data.TitledName]]
 
 
 package hndlr[[.TD.Data.TitledName]]
@@ -20,7 +21,7 @@ import (
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	_ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
-    //"html/template"
+	"fmt"
     "../io[[.TD.Data.TitledName]]"
 	"net/http"
 	"strconv"
@@ -43,6 +44,22 @@ import (
         return data, err
     }
 
+    // [[.Table.Name]]Show displays the given record.
+    func [[.Table.Name]]Show(w http.ResponseWriter, rcd  *io[[$n]].[[.Table.TitledName]], msg string) {
+	    var err     error
+
+	    data := struct {
+	                rcd         *io[[$n]].[[.Table.TitledName]]
+	                msg         string
+	            }{rcd, msg}
+        name := "[[$n]].[[.Table.Name]].form.gohtml"
+	    err = Tmpls.ExecuteTemplate(w, name, data)
+	    if err != nil {
+		    fmt.Fprintf(w, err.Error())
+	    }
+
+    }
+
     // [[.Table.Name]]HndlrIndex handles the display of the table index.
     func [[.Table.Name]]HndlrIndex(w http.ResponseWriter, r *http.Request) {
         if r.Method != "GET" {
@@ -62,6 +79,7 @@ import (
     func [[.Table.Name]]HndlrShow(w http.ResponseWriter, r *http.Request) {
         var err     error
         var key     string
+	    var rcd     io[[$n]].[[.Table.TitledName]]
 
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -76,14 +94,14 @@ import (
 	    }
 
         // Get the row to display.
-        data, err := io[[.TD.Data.TitledName]].[[.Table.Name]]RowFind(key)
+        rcd, err = io[[.TD.Data.TitledName]].[[.Table.Name]]RowFind(key)
 	    if err != nil {
             http.Error(w, http.StatusText(400), http.StatusBadRequest)
             return
 	    }
 
         // Display the row in the form.
-        Tmpls.ExecuteTemplate(w, "[[.TD.Data.TitledName]].[[.Table.Name]].form.gohtml", data)
+        [[.Table.Name]]Show(w, &rcd, "")
 
     }
 
@@ -92,6 +110,7 @@ import (
     func [[.Table.Name]]HndlrDelete(w http.ResponseWriter, r *http.Request) {
         var err     error
         var key     string
+	    var rcd     io[[$n]].[[.Table.TitledName]]
 
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -113,6 +132,8 @@ import (
 	    }
 
         // Display the next row in the form with status message.
+        rcd, err = io[[.TD.Data.TitledName]].[[.Table.Name]]RowNext(key)
+        [[.Table.Name]]Show(w, &rcd, "Row Added")
 
         w.Write([]byte("Process the form data from the row deletion form..."))
     }

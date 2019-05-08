@@ -126,6 +126,9 @@ func [[.Table.TitledName]]RowNext(key string) ([[.Table.TitledName]], error) {
     row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] > $1 ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT 1", key)
 
 	err := row.Scan([[.Table.ScanFields "&data"]])
+	if err != nil {
+	    data, err = [[.Table.TitledName]]RowFirst()
+	}
 
     return data, err
 }
@@ -136,6 +139,9 @@ func [[.Table.TitledName]]RowPrev(key string) ([[.Table.TitledName]], error) {
     row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] < $1 ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1", key)
 
 	err := row.Scan([[.Table.ScanFields "&data"]])
+	if err != nil {
+	    data, err = [[.Table.TitledName]]RowLast()
+	}
 
     return data, err
 }

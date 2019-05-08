@@ -12,6 +12,7 @@ package hndlr[[.TD.Data.TitledName]]
 import (
     //"fmt"
     "log"
+    "net/http/httptest"
 	"testing"
     "../io[[$n]]"
 )
@@ -24,7 +25,7 @@ func SetupParms(t *testing.T) {
     var rcd[[$t.TitledName]]    io[[$n]].[[$t.TitledName]]
 [[- end]]
 
-    SetTmplsDir("../")
+    SetTmplsDir("../tmpl")
     SetupTmpls()
 
     io[[$n]].SetServer("test.db")
@@ -50,7 +51,7 @@ func SetupParms(t *testing.T) {
         if err != nil {
             t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)
         }
-[[end]]
+[[- end]]
     }
 
 }

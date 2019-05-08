@@ -71,6 +71,14 @@ var FileDefns []FileDefn = []FileDefn{
 		"one",
 		2,
 	},
+	{"menu.html.tmpl.txt",
+		"/html",
+		"${DbName}.menu.html",
+		"text",
+		0644,
+		"one",
+		0,
+	},
 	{"main.go.tmpl.txt",
 		"",
 		"main.go",
@@ -340,6 +348,14 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         if err = os.RemoveAll(tmpName); err != nil {
             log.Fatalln("Error: Could not remove output directory:", tmpName, err)
         }
+		tmpName = path.Clean(sharedData.OutDir() + "/html")
+		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+			log.Fatalln("Error: Could not create output directory:", tmpName, err)
+		}
+		tmpName = path.Clean(sharedData.OutDir() + "/style")
+		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+			log.Fatalln("Error: Could not create output directory:", tmpName, err)
+		}
         tmpName = path.Clean(sharedData.OutDir() + "/tmpl")
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)

@@ -135,7 +135,7 @@ func (f *DbField) FormInput() string {
 	}
 
 	tdd := td.Html
-	str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" value={{%s}}></label>\n",
+	str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" value={{rcd.%s}}></label>\n",
 		strings.Title(f.Label), strings.Title(tdd), f.TitledName()))
 
 	return str.String()

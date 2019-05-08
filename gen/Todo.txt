@@ -3,37 +3,33 @@
     * write any extra needed documentation
 
 * GenSqlApp:
-    * Session variables ??
+    * Main Menu Generation
     * Form Generation:
-        * Common buttons
-        * Common form stuff
-        * Field order and display grouping
+        * Field order and display grouping (JSON indicated)
         * Field Alignment - if it can not be done easily, add comment for it
             to be done by hand
+        * Field Length in Form
     * List Report form
-        *
-    * Handlers
-        * Translate SQL type to internal type and look at the relationship to
-            that and form type
-        * Translation of special types unique to a particular sql such as bitset in
-            mssql and maybe others
-    * Generate setup.sh  which takes care of the application requirements such as:
-        * go get <package>
+        * limited by JSON
+    * Generate bld.sh  which takes care of the application requirements such as:
+        * go get <package> if needed
         * compile and install program
         * set up database and create tables
     * table display/maintenance
         * tableio.go - change to <database_name>DB so that we can have
         * several db's per JSON definition
         * tablehndlr.go
-        * toubleform.html per table
+        * form.html per table
             * Try to do all the single record stuff in one form
-            * Add ability to switch back to list form from this record
+            * Add ability to switch back to list form or main menu from this record
         * tablelist.html per table
             * Consider doing paging
             * Allow some selection criteria
             * generate switch to single record mode and back
 * possibly json to struct converter and vice versa
 * Check into for possible inclusion:
+    * https://github.com/gorilla/mux
+    * https://github.com/gin-gonic/gin
     * https://github.com/volatiletech/openapi-generator
     * https://github.com/volatiletech/sqlboiler
-    * https://github.com/gin-gonic/gin
+

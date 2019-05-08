@@ -4,7 +4,7 @@
 // SQL Application main program
 
 // Generated: [[Time]]
-
+[[- $n := .TD.Data.TitledName]]
 
 package main
 
@@ -65,13 +65,13 @@ func main() {
 [[ if .TD.Main.Flags -]]
     [[ GenFlagSetup ]]
 [[ end -]]
-	flag.StringVar(&db_pw, "dbpw", "Passw0rd!", "the database password")
-	flag.StringVar(&db_port, "dbport", "1401", "the database port")
-	flag.StringVar(&db_srvr, "dbserver", "localhost", "the database server")
-	flag.StringVar(&db_user, "dbuser", "sa", "the database user")
-	flag.StringVar(&db_name, "dbname", "", "the database name")
-	flag.StringVar(&http_port, "port", "8080", "server port")
-	flag.StringVar(&http_srvr, "server", "localhost", "server site")
+	flag.StringVar(&db_pw, "dbPW", "Passw0rd!", "the database password")
+	flag.StringVar(&db_port, "dbPort", "1433", "the database port")
+	flag.StringVar(&db_srvr, "dbServer", "localhost", "the database server")
+	flag.StringVar(&db_user, "dbUser", "sa", "the database user")
+	flag.StringVar(&db_name, "dbName", "", "the database name")
+	flag.StringVar(&http_port, "httpPort", "5000", "server port")
+	flag.StringVar(&http_srvr, "httpServer", "localhost", "server site")
 
     // Parse the flags and check them
 	flag.Parse()
