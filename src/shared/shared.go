@@ -16,23 +16,26 @@ import (
 var cmd			string
 var dataPath	string
 var defns		map[string]interface{}
-var	debug		bool
-var force		bool
 var funcs		map[string]interface{}
 var mainPath	string
 var	mdlDir		string
-var	noop		bool
 var	outDir		string
-var quiet		bool
-var timeNow		string
 
 func init() {
 	defns  = map[string]interface{}{}
 	funcs  = map[string]interface{}{}
 	mdlDir = "./models"
 	outDir = "./test"
-	timeNow = time.Now().Format("Mon Jan _2, 2006 15:04")
-	//sharedData.SetFunc("Time", Time)	<== Causes import cycle, added to main
+	defns["Debug"] = false
+	defns["Force"] = false
+	defns["GenDebugging"] = false
+	funcs["GenDebugging"] = GenDebugging
+	defns["GenLogging"] = false
+	funcs["GenLogging"] = GenLogging
+	defns["Noop"] = false
+	defns["Quiet"] = false
+	defns["Time"] = time.Now().Format("Mon Jan _2, 2006 15:04")
+	funcs["Time"] = Time
 }
 
 func Cmd() string {
@@ -53,11 +56,11 @@ func SetDataPath(f string) {
 }
 
 func Debug() bool {
-	return debug
+	return defns["Debug"].(bool)
 }
 
 func SetDebug(f bool) {
-	debug = f
+	defns["Debug"] = f
 }
 
 func Defn(nm string) interface{} {
@@ -66,25 +69,23 @@ func Defn(nm string) interface{} {
 		return cmd
 	case "dataPath":
 		return dataPath
-	case "debug":
-		return debug
-	case "force":
-		return force
 	case "mainPath":
 		return mainPath
 	case "mdlDir":
 		return mdlDir
-	case "noop":
-		return noop
 	case "outDir":
 		return outDir
-	case "quiet":
-		return quiet
-	case "timeNow":
-		return timeNow
 	}
 	 d, _ := defns[nm]
 	return d
+}
+
+func IsDefined(nm string) bool {
+	x := Defn(nm)
+	if x != nil {
+		return true
+	}
+	return false
 }
 
 func SetDefn(nm string, d interface{}) {
@@ -101,13 +102,13 @@ func SetDefn(nm string, d interface{}) {
 		if str, ok = d.(string); ok {
 			dataPath = str
 		}
-	case "debug":
+	case "Debug":
 		if sw, ok = d.(bool); ok {
-			debug = sw
+			defns["Debug"] = sw
 		}
-	case "force":
+	case "Force":
 		if sw, ok = d.(bool); ok {
-			force = sw
+			defns["Force"] = sw
 		}
 	case "mainPath":
 		if str, ok = d.(string); ok {
@@ -117,21 +118,21 @@ func SetDefn(nm string, d interface{}) {
 		if str, ok = d.(string); ok {
 			mdlDir = str
 		}
-	case "noop":
+	case "Noop":
 		if sw, ok = d.(bool); ok {
-			noop = sw
+			defns["Noop"] = sw
 		}
 	case "outDir":
 		if str, ok = d.(string); ok {
 			outDir = str
 		}
-	case "quiet":
+	case "Quiet":
 		if sw, ok = d.(bool); ok {
-			quiet = sw
+			defns["Quiet"] = sw
 		}
-	case "timeNow":
+	case "Time":
 		if str, ok = d.(string); ok {
-			timeNow = str
+			defns["Time"] = str
 		}
 	default:
 		defns[nm] = d
@@ -139,11 +140,11 @@ func SetDefn(nm string, d interface{}) {
 }
 
 func Force() bool {
-	return force
+	return defns["Force"].(bool)
 }
 
 func SetForce(f bool) {
-	force = f
+	defns["Force"] = f
 }
 
 func Funcs() map[string]interface{} {
@@ -164,6 +165,14 @@ func SetFunc(nm string, d interface{}) {
 	funcs[nm] = d
 }
 
+func GenDebugging() bool {
+	return defns["GenLogging"].(bool)
+}
+
+func GenLogging() bool {
+	return defns["GenLogging"].(bool)
+}
+
 // MainPath is the path to the main json file.
 func MainPath() string {
 	return mainPath
@@ -181,12 +190,45 @@ func SetMdlDir(f string) {
 	mdlDir = f
 }
 
+// MergeFrom merges the given map into the shared
+// data definitions optionally replacing any that
+// already exist.
+func MergeFrom(m map[string]interface{}, rep bool) {
+	var ok			bool
+
+	for k, v := range m {
+		if rep {
+			defns[k] = v
+		} else {
+			if _, ok = defns[k]; !ok {
+				defns[k] = v
+			}
+		}
+	}
+}
+
+// MergeTo merges the shared into the given map
+// optionally replacing any in the given map.\
+func MergeTo(m map[string]interface{}, rep bool) {
+	var ok			bool
+
+	for k, v := range defns {
+		if rep {
+			m[k] = v
+		} else {
+			if _, ok = m[k]; !ok {
+				m[k] = v
+			}
+		}
+	}
+}
+
 func Noop() bool {
-	return noop
+	return defns["Noop"].(bool)
 }
 
 func SetNoop(f bool) {
-	noop = f
+	defns["Noop"] = f
 }
 
 func OutDir() string {
@@ -198,11 +240,11 @@ func SetOutDir(f string) {
 }
 
 func Quiet() bool {
-	return quiet
+	return defns["Quiet"].(bool)
 }
 
 func SetQuiet(f bool) {
-	quiet = f
+	defns["Quiet"] = f
 }
 
 // String returns a stringified version of the shared data
@@ -210,24 +252,24 @@ func String() string {
 	s := "{"
 	s += fmt.Sprintf("cmd:%q,",cmd)
 	s += fmt.Sprintf("dataPath:%q,",dataPath)
-	s += fmt.Sprintf("debug:%v,",debug)
-	s += fmt.Sprintf("force:%v,",force)
+	s += fmt.Sprintf("Debug:%v,",defns["Debug"])
+	s += fmt.Sprintf("Force:%v,",defns["Force"])
 	s += fmt.Sprintf("mainPath:%q,",mainPath)
 	s += fmt.Sprintf("mdlDir:%q,",mdlDir)
-	s += fmt.Sprintf("noop:%v,",noop)
+	s += fmt.Sprintf("Noop:%v,",defns["Noop"])
 	s += fmt.Sprintf("outDir:%q,",outDir)
-	s += fmt.Sprintf("quiet:%v,",quiet)
-	s += fmt.Sprintf("time:%q,",timeNow)
+	s += fmt.Sprintf("Quiet:%v,",defns["Quiet"])
+	s += fmt.Sprintf("Time:%q,",defns["Time"])
 	s += "}"
 	return s
 }
 
 // MainPath is the path to the main json file.
 func Time() string {
-	return timeNow
+	return defns["Time"].(string)
 }
 
 func SetTime(f string) {
-	timeNow = f
+	defns["Time"] = f
 }
 

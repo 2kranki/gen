@@ -11,9 +11,8 @@
         * Field Length in Form
     * List Report form
         * limited by JSON
-    * Generate bld.sh  which takes care of the application requirements such as:
+    * Add to b.sh  which takes care of the application requirements such as:
         * go get <package> if needed
-        * compile and install program
         * set up database and create tables
     * table display/maintenance
         * tableio.go - change to <database_name>DB so that we can have

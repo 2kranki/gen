@@ -13,8 +13,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
-
 	// genGo packages
 	"./genCObj"
 	"./genSqlApp"
@@ -31,21 +29,23 @@ import (
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	Data		*interface{}
-	Main		*mainData.MainData
+	Data			*interface{}
+	Main			*mainData.MainData
 }
 
-var	tmplData	TmplData
+var	tmplData		TmplData
 var (
-	debug    	bool
-	execPath 	string
-	force    	bool
-	jsonPath 	string
-	mainPath 	string
-	mdldir   	string
-	noop     	bool
-	outdir   	string
-	quiet    	bool
+	debug    		bool
+	execPath 		string
+	force    		bool
+	genDebugging	bool
+	genLogging		bool
+	jsonPath 		string
+	mainPath 		string
+	mdldir   		string
+	noop     		bool
+	outdir   		string
+	quiet    		bool
 )
 
 
@@ -78,6 +78,8 @@ func SetupShared(execPath string, cmd string) error {
 	sharedData.SetCmd(cmd)
 	sharedData.SetDebug(debug)
 	sharedData.SetForce(force)
+	sharedData.SetDefn("GenDebugging", genDebugging)
+	sharedData.SetDefn("GenLogging", genLogging)
 	if len(mdldir) > 0 {
 		sharedData.SetMdlDir(mdldir)
 	} else {
@@ -121,10 +123,10 @@ func SetupShared(execPath string, cmd string) error {
 		if wrk, ok = m["data"]; ok {
 			sharedData.SetDataPath(wrk.(string))
 		}
-		if wrk, ok = m["debug"]; ok {
+		if wrk, ok = m["Debug"]; ok {
 			sharedData.SetDebug(wrk.(bool))
 		}
-		if wrk, ok = m["force"]; ok {
+		if wrk, ok = m["Force"]; ok {
 			sharedData.SetForce(wrk.(bool))
 		}
 		if wrk, ok = m["main"]; ok {
@@ -133,13 +135,13 @@ func SetupShared(execPath string, cmd string) error {
 		if wrk, ok = m["mdldir"]; ok {
 			sharedData.SetMdlDir(wrk.(string))
 		}
-		if wrk, ok = m["noop"]; ok {
+		if wrk, ok = m["Noop"]; ok {
 			sharedData.SetNoop(wrk.(bool))
 		}
 		if wrk, ok = m["outdir"]; ok {
 			sharedData.SetOutDir(wrk.(string))
 		}
-		if wrk, ok = m["quiet"]; ok {
+		if wrk, ok = m["Quiet"]; ok {
 			sharedData.SetQuiet(wrk.(bool))
 		}
 		if wrk, ok = m["define"]; ok {
@@ -156,9 +158,9 @@ func SetupShared(execPath string, cmd string) error {
 		}
 	}
 
-	wrkTime := time.Now().String()[:19]
-	sharedData.SetTime(string(wrkTime))
-	sharedData.SetFunc("Time", sharedData.Time)
+	//wrkTime := time.Now().String()[:19]
+	//sharedData.SetTime(string(wrkTime))
+	//sharedData.SetFunc("Time", sharedData.Time)
 
 
 	return nil
@@ -171,15 +173,17 @@ func main() {
 	flag.BoolVar(&debug, "debug", true, "enable debugging")
 	flag.StringVar(&execPath, "exec", "", "exec json path (optional)")
 	flag.StringVar(&execPath, "x", "", "exec json path (optional)")
-	flag.BoolVar(&force, "force", true, "enable over-writes and deletions")
-	flag.BoolVar(&force, "f", true, "enable over-writes and deletions")
+	flag.BoolVar(&force, "force", false, "enable over-writes and deletions")
+	flag.BoolVar(&force, "f", false, "enable over-writes and deletions")
+	flag.BoolVar(&genDebugging, "genDebugging", true, "generate debugging output")
+	flag.BoolVar(&genLogging, "genLogging", true, "generate logging")
 	flag.StringVar(&mainPath, "main", "", "set json main input path")
 	flag.StringVar(&jsonPath, "json", "", "set json main input path")
 	flag.StringVar(&mdldir, "mdldir", "./models", "set model input directory")
-	flag.BoolVar(&noop, "noop", true, "execute program, but do not make real changes")
+	flag.BoolVar(&noop, "noop", false, "execute program, but do not make real changes")
 	flag.StringVar(&outdir, "outdir", "./out", "set output directory")
-	flag.BoolVar(&quiet, "quiet", true, "enable quiet mode")
-	flag.BoolVar(&quiet, "q", true, "enable quiet mode")
+	flag.BoolVar(&quiet, "quiet", false, "enable quiet mode")
+	flag.BoolVar(&quiet, "q", false, "enable quiet mode")
 	flag.Var(&defnFlags, "define", "enter definitions (<name>=<string>)")
 	flag.Var(&defnFlags, "d", "enter definitions (<name>=<string>)")
 	flag.Parse()

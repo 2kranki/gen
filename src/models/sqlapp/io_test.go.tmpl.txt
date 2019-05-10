@@ -130,6 +130,7 @@ func TestDisconnect(t *testing.T) {
     func Test[[$t.TitledName]]RowInsert(t *testing.T) {
         var err         error
         var rcd         [[$t.TitledName]]
+        var rcdp        *[[$t.TitledName]]
 
     	t.Logf("Test[[$t.TitledName]]RowInsert()...\n")
 	    SetupConnectParms()
@@ -158,66 +159,66 @@ func TestDisconnect(t *testing.T) {
 
         // Now read the first record.
         t.Logf("\tReading First Record\n")
-        rcd, err = [[$t.TitledName]]RowFirst()
+        rcdp, err = [[$t.TitledName]]RowFirst()
         if err != nil {
             t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
         }
-        if rcd.Num != 0 {
+        if rcdp.Num != 0 {
             t.Fatalf("Error: : Record First Verification Failed\n\n\n")
         }
-        if rcd.Name != "A" {
+        if rcdp.Name != "A" {
             t.Fatalf("Error: : Record First Verification Failed\n\n\n")
         }
 
         // Now read the last record.
         t.Logf("\tReading Last Record\n")
-        rcd, err = [[$t.TitledName]]RowLast()
+        rcdp, err = [[$t.TitledName]]RowLast()
         if err != nil {
             t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
         }
-        if rcd.Num != 4 {
+        if rcdp.Num != 4 {
             t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
         }
-        if rcd.Name != "E" {
+        if rcdp.Name != "E" {
             t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
         }
 
         // Now read the middle record.
         t.Logf("\tReading via Find the Middle Record\n")
-        rcd, err = [[$t.TitledName]]RowFind("2")
+        rcdp, err = [[$t.TitledName]]RowFind("2")
         if err != nil {
             t.Fatalf("Error: : Record Middle Failed: %s\n\n\n", err)
         }
-        if rcd.Num != 2 {
+        if rcdp.Num != 2 {
             t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
         }
-        if rcd.Name != "C" {
+        if rcdp.Name != "C" {
             t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
         }
 
         // Now read the first record via Find.
         t.Logf("\tReading via Find the First Record\n")
-        rcd, err = [[$t.TitledName]]RowFind("0")
+        rcdp, err = [[$t.TitledName]]RowFind("0")
         if err != nil {
             t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
         }
-        if rcd.Num != 0 {
+        if rcdp.Num != 0 {
             t.Fatalf("Error: : Record First Verification Failed\n\n\n")
         }
-        if rcd.Name != "A" {
+        if rcdp.Name != "A" {
             t.Fatalf("Error: : Record First Verification Failed\n\n\n")
         }
 
         // Now read the last record via Find.
         t.Logf("\tReading via Find the Last Record\n")
-        rcd, err = [[$t.TitledName]]RowFind("4")
+        rcdp, err = [[$t.TitledName]]RowFind("4")
         if err != nil {
             t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
         }
-        if rcd.Num != 4 {
+        if rcdp.Num != 4 {
             t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
         }
-        if rcd.Name != "E" {
+        if rcdp.Name != "E" {
             t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
         }
 

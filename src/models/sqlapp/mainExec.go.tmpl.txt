@@ -1,0 +1,145 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// SQL Application main program
+
+// Generated: [[Time]]
+[[- $n := .TD.Data.TitledName]]
+
+package main
+
+import (
+    "fmt"
+    "log"
+	"net/http"
+	"./hndlr[[$n]]"
+	"./io[[$n]]"
+)
+
+func HndlrFavIcon(w http.ResponseWriter, r *http.Request) {
+
+    [[if GenDebugging]]
+        fmt.Printf("HndlrFavIcon(%s)\n", r.Method)
+    [[end]]
+
+    if r.Method != "GET" {
+	    http.NotFound(w, r)
+	}
+    http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+
+    [[if GenDebugging]]
+        fmt.Printf("...end HndlrFavIcon(Error:405)\n")
+    [[end]]
+}
+
+func HndlrHome(w http.ResponseWriter, r *http.Request) {
+
+    [[if GenDebugging]]
+        fmt.Printf("HndlrHome(%s)\n", r.Method)
+    [[end]]
+
+    if r.URL.Path != "/" {
+        http.NotFound(w, r)
+        return
+    }
+    http.ServeFile(w, r, "./html/[[$n]].menu.html")
+
+    [[if GenDebugging]]
+        fmt.Printf("...end HndlrHome()\n")
+    [[end]]
+}
+
+[[if GenDebugging]]
+    func HndlrDebug(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebug(%s)\n", r.Method)
+        http.ServeFile(w, r, "./html/form.html")
+        fmt.Printf("...end HndlrDebug()\n")
+    }
+
+    func HndlrDebugAdd(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebugAdd(%s)\n", r.Method)
+        if r.Method != "POST" {
+            http.NotFound(w, r)
+        }
+        fmt.Fprintf(w, "Good Addition!")
+    }
+
+    func HndlrDebugDelete(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebugDelete(%s)\n", r.Method)
+        if r.Method != "POST" {
+            http.NotFound(w, r)
+        }
+        fmt.Fprintf(w, "Good Deletion!")
+    }
+
+    func HndlrDebugNext(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebugNext(%s)\n", r.Method)
+        if r.Method != "GET" {
+            http.NotFound(w, r)
+        }
+        fmt.Fprintf(w, "Going to Next!")
+    }
+
+    func HndlrDebugPrev(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebugPrev(%s)\n", r.Method)
+        if r.Method != "GET" {
+            http.NotFound(w, r)
+        }
+        fmt.Fprintf(w, "Going to Prev!")
+    }
+
+    func HndlrDebugReset(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebugReset(%s)\n", r.Method)
+
+        fmt.Fprintf(w, "Doing a Reset!")
+    }
+
+    func HndlrDebugUpdate(w http.ResponseWriter, r *http.Request) {
+        fmt.Printf("HndlrDebugUpdate(%s)\n", r.Method)
+        if r.Method != "POST" {
+            http.NotFound(w, r)
+        }
+        fmt.Fprintf(w, "Good Update!")
+    }
+[[end]]
+
+func exec() {
+
+    // Connect the databases.
+    err := io[[$n]].Connect()
+    if err != nil {
+        log.Fatalf("ERROR - Failed to Connect Databases\n\n\n")
+    }
+
+    // Set up default URL handlers
+	http.HandleFunc("/", HndlrHome)
+	http.HandleFunc("/favicon.ico", HndlrFavIcon)
+
+	// Set up Debug URL handlers to practice on simple form
+    [[if GenDebugging]]
+        http.HandleFunc("/debug", HndlrDebug)
+        http.HandleFunc("/debugAdd", HndlrDebugAdd)
+        http.HandleFunc("/debugDelete", HndlrDebugDelete)
+        http.HandleFunc("/debugNext", HndlrDebugNext)
+        http.HandleFunc("/debugPrev", HndlrDebugPrev)
+        http.HandleFunc("/debugReset", HndlrDebugReset)
+        http.HandleFunc("/debugUpdate", HndlrDebugUpdate)
+    [[end]]
+
+	[[range $t := .TD.Data.Tables -]]
+	    // [[$t.Name]] URL handlers for table maintenance
+	    http.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.Name]]HndlrIndex)
+	    http.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.Name]]HndlrShow)
+	    http.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.Name]]HndlrInsert)
+	    http.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.Name]]HndlrDelete)
+	    http.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.Name]]HndlrNext)
+	    http.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.Name]]HndlrPrev)
+	    http.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.Name]]HndlrUpdate)
+	[[ end -]]
+
+	// Start the HTTP Server.
+	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
+	log.Fatal(http.ListenAndServe(srvrStr, nil))
+
+}
+

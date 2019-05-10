@@ -11,6 +11,7 @@ package hndlr[[.TD.Data.TitledName]]
 
 import (
     //"fmt"
+    "io/ioutil"
     "log"
     "net/http/httptest"
 	"testing"
@@ -25,6 +26,7 @@ func SetupParms(t *testing.T) {
     var rcd[[$t.TitledName]]    io[[$n]].[[$t.TitledName]]
 [[- end]]
 
+    t.Logf("SetupParms()...\n")
     SetTmplsDir("../tmpl")
     SetupTmpls()
 
@@ -54,89 +56,29 @@ func SetupParms(t *testing.T) {
 [[- end]]
     }
 
+    t.Logf("...End of SetupParms()\n")
 }
-
-/****
-func TestConnect(t *testing.T) {
-    var err         error
-
-	t.Logf("TestConnect()...\n")
-	SetupParms(t)
-    err = Connect()
-    if err == nil {
-	    err = Disconnect()
-        if err != nil {
-            t.Fatalf("Error: %s\n\n", err)
-        }
-    } else {
-            t.Fatalf("Error: %s\n\n", err)
-    }
-	t.Logf("TestConnect() - End of Test\n\n\n")
-}
-
-func TestCreateTables(t *testing.T) {
-    var err         error
-
-	t.Logf("TestCreateTables()...\n")
-	SetupParms(t)
-
-    err = Connect()
-    if err != nil {
-        t.Fatal("Error: Cannot connect: ", err)
-    }
-
-    err = TablesCreate()
-    if err != nil {
-        t.Fatal("Error: Cannot create tables: ", err)
-    }
-
-    err = Disconnect()
-    if err != nil {
-        t.Fatal("Error: Cannot disconnect: ", err)
-    }
-
-	t.Logf("TestCreateTables() - End of Test\n\n\n")
-}
-
-func TestDeleteTables(t *testing.T) {
-    var err         error
-
-	t.Logf("TestDeleteTables()...\n")
-	SetupParms(t)
-    //err = db.Ping()
-    if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
-    }
-	t.Logf("TestDeleteTables() - End of Test\n\n\n")
-}
-
-func TestDisconnect(t *testing.T) {
-    var err         error
-
-	t.Logf("TestDisconnect()...\n")
-	SetupParms(t)
-
-	// Disconnect before a connection has been made.
-    err = Disconnect()
-    if err == nil {
-        t.Fatal("Error: Never Connected!\n\n\n")
-    }
-
-    // Now connect then disconnect.
-    err = Connect()
-    if err != nil {
-        t.Fatal("Error: Cannot connect: ", err)
-    }
-    err = Disconnect()
-    if err != nil {
-        t.Fatal("Error: Cannot disconnect: ", err)
-    }
-
-	t.Logf("TestDisconnect() - End of Test\n\n\n")
-}
- ***/
 
 [[- range $t := .TD.Data.Tables ]]
+    func Test[[$t.TitledName]]Show(t *testing.T) {
+        var rcd         io[[$n]].[[$t.TitledName]]
+        var w           *httptest.ResponseRecorder
+
+        t.Logf("Test[[$t.TitledName]]Show()...\n")
+        SetupParms(t)
+        w = httptest.NewRecorder()
+
+        // First try a blank record.
+        [[$t.TitledName]]Show(w, &rcd, "")
+        resp := w.Result()
+        // fmt.Println(resp.StatusCode)
+        // fmt.Println(resp.Header.Get("Content-Type"))
+        body, _ := ioutil.ReadAll(resp.Body)
+        t.Logf("Output:\n%q\n\n\n", string(body))
+
+        t.Logf("Test[[$t.TitledName]]Show() - End of Test\n\n\n")
+    }
+
     func Test[[$t.TitledName]]HndlrDelete(t *testing.T) {
         var err         error
 
@@ -208,15 +150,19 @@ func TestDisconnect(t *testing.T) {
     }
 
     func Test[[$t.TitledName]]HndlrShow(t *testing.T) {
-        var err         error
+        var w           *httptest.ResponseRecorder
 
         t.Logf("Test[[$t.TitledName]]HndlrShow()...\n")
 	    SetupParms(t)
+        w = httptest.NewRecorder()
 
-        //err = db.Ping()
-        if err != nil {
-            log.Fatalln("Error: Cannot connect: ", err)
-        }
+        req := httptest.NewRequest("GET", "http://localhost:5000/[[$t.TitledName]]", nil)
+        [[$t.TitledName]]HndlrShow(w, req)
+        resp := w.Result()
+        // fmt.Println(resp.StatusCode)
+        // fmt.Println(resp.Header.Get("Content-Type"))
+        body, _ := ioutil.ReadAll(resp.Body)
+        t.Logf("Output:\n%q\n\n\n", string(body))
 
 	    t.Logf("Test[[$t.TitledName]]HndlrShow() - End of Test\n\n\n")
     }

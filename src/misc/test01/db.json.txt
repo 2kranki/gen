@@ -12,6 +12,8 @@
     "dbPort":"",                # sqlite   default port
     "dbPW":"Passw0rd",
     #"User":"",
+    "GenDebugging":true,
+    "GenLogging":true,
     "Tables":[
         {
             "Name":"Customer",

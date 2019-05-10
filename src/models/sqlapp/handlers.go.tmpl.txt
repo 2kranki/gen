@@ -20,6 +20,9 @@ import (
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	_ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
+    [[if GenDebugging]]
+        "log"
+    [[end]]
     "html/template"
     //"../io[[.TD.Data.TitledName]]"
 )
@@ -35,6 +38,16 @@ func Body(i interface{}) string {
     return "Body() - NOT Implemented"
 }
 
+[[if GenDebugging]]
+    func ErrorString(err error) string {
+        if err == nil {
+            return "ok"
+        } else {
+            return err.Error()
+        }
+    }
+[[end]]
+
 func init() {
     tmplsDir = "./tmpl"
 }
@@ -46,8 +59,17 @@ func SetTmplsDir(d string) {
 // SetupTmpls initializes the functions used in the templates
 // and loads them.
 func SetupTmpls() {
+
+    [[if GenDebugging]]
+        log.Printf("\tSetupTmpls(%s/*.gohtml)\n", tmplsDir)
+    [[end]]
+
     funcs := map[string]interface{}{"Title":Title, "Body":Body,}
-    path := tmplsDir + "/*.tmpl"
+    path := tmplsDir + "/*.gohtml"
 	Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
+
+    [[if GenDebugging]]
+        log.Printf("\tend of SetupTmpls()\n")
+    [[end]]
 }
 

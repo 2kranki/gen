@@ -35,6 +35,16 @@ var dbPort     	string
 var dbServer    string
 var dbUser     	string
 
+[[if GenDebugging]]
+    func ErrorString(err error) string {
+        if err == nil {
+            return "ok"
+        } else {
+            return err.Error()
+        }
+    }
+[[end]]
+
 func Connect() error {
     var err         error
 
@@ -85,7 +95,7 @@ func TablesCreate() error {
     var err         error
 
 	[[range $t := .TD.Data.Tables -]]
-        err = [[$t.TitledName]]Create()
+        err = [[$t.TitledName]]TableCreate()
         if err != nil {
             log.Fatalln("Error: Cannot create table: ", err)
         }
@@ -98,7 +108,7 @@ func TablesDelete() error {
     var err         error
 
 	[[range $t := .TD.Data.Tables -]]
-        err = [[$t.TitledName]]Delete()
+        err = [[$t.TitledName]]TableDelete()
         if err != nil {
             log.Fatalln("Error: Cannot delete table: ", err)
         }

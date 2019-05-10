@@ -27,7 +27,7 @@
     </style>
 </head>
 <body>
-    <form id="dataForm" method="post" action="/[[.Table.Name]]">
+    <form id="dataForm" method="get" action="/[[.Table.Name]]">
         [[range $f := .Table.Fields]]
             [[$f.FormInput -]]
         [[end]]
@@ -42,28 +42,31 @@
         <input type=reset onclick='onReset()' value="Reset">
     </form>
     <p/>
-    <p>{{msg}}</p>
+    <p>{{.Msg}}</p>
     <script>
         function onAdd() {
-            document.getElementById("dataForm").action = "/debugAdd";
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/insert";
+            document.getElementById("dataForm").method = "post";
         }
         function onDelete() {
-            document.getElementById("dataForm").action = "/debugDelete";
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/delete";
+            document.getElementById("dataForm").method = "delete";
         }
         function onNext() {
-            document.getElementById("dataForm").action = "/debugNext";
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/next";
             document.getElementById("dataForm").method = "get";
         }
         function onPrev() {
-            document.getElementById("dataForm").action = "/debugPrev";
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/prev";
             document.getElementById("dataForm").method = "get";
         }
         function onReset() {
-            document.getElementById("dataForm").action = "/debugReset";
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/reset";
             //document.getElementById("dataForm").method = "get";
         }
         function onUpdate() {
-            document.getElementById("dataForm").action = "/debugUpdate";
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/update";
+            document.getElementById("dataForm").method = "post";
         }
     </script>
 </body>
