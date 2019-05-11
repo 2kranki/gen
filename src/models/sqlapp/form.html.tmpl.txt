@@ -56,6 +56,7 @@
         <input type=submit onclick='onNext()' value="Next">
         <input type=submit onclick='onLast()' value="Last">
         <input type=reset onclick='onReset()' value="Reset">
+        <input type=submit onclick='onMenu()' value="Menu">
     </form>
     <p/>
     <p>{{.Msg}}</p>
@@ -65,8 +66,9 @@
             document.getElementById("dataForm").method = "post";
         }
         function onDelete() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/delete";
-            document.getElementById("dataForm").method = "delete";
+            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/delete?key="+key;
+            document.getElementById("dataForm").method = "get";
         }
         function onFirst() {
             document.getElementById("dataForm").action = "/[[.Table.Name]]/first";
@@ -74,6 +76,10 @@
         }
         function onLast() {
             document.getElementById("dataForm").action = "/[[.Table.Name]]/last";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onMenu() {
+            document.getElementById("dataForm").action = "/ ";
             document.getElementById("dataForm").method = "get";
         }
         function onNext() {

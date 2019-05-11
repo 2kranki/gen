@@ -272,16 +272,28 @@ func [[.Table.TitledName]]RowPrev(key string) (*[[.Table.TitledName]], error) {
     return &data, err
 }
 
-func [[.Table.Name]]RowUpdate(d *[[.Table.TitledName]]) error {
+func [[.Table.TitledName]]RowUpdate(d *[[.Table.TitledName]]) error {
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]RowPrev(%+v)\n", d)
+        log.Printf("[[.Table.TitledName]]RowUpdate(%+v)\n", d)
     [[end]]
+
+    // Validate the input record.
+
+    // Add it to the table.
+    _, err = db.Exec("INSERT INTO [[.Table.Name]] ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]])",
+                        [[.Table.ScanFields "d"]])
+	if err != nil {
+    [[if GenDebugging]]
+        log.Printf("...end [[.Table.TitledName]]RowUpdate(Error:500) - Internal Error\n")
+    [[end]]
+		err = errors.New("500. Internal Server Error." + err.Error())
+	}
 
     [[if GenDebugging]]
         log.Printf("...end [[.Table.TitledName]]RowUpdate(%s)\n", ErrorString(err))
     [[end]]
-    return err
+	return err
 }
 
