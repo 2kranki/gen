@@ -24,6 +24,20 @@
         .link {
             font-size: 1rem;
         }
+        label {
+            display:block;
+            position:relative;
+        }
+
+        label span {
+            font-weight:bold;
+            position:absolute;
+            left: 3px;
+        }
+
+        label input, label textarea, label select {
+            margin-left: 120px;
+        }
     </style>
 </head>
 <body>
@@ -34,11 +48,13 @@
         <p/>
         <p/>
         <p/>
+        <input type=submit onclick='onFirst()' value="First">
         <input type=submit onclick='onPrev()' value="Prev">
         <input type=submit onclick='onAdd()' value="Add">
         <input type=submit onclick='onDelete()' value="Delete">
         <input type=submit onclick='onUpdate()' value="Update">
         <input type=submit onclick='onNext()' value="Next">
+        <input type=submit onclick='onLast()' value="Last">
         <input type=reset onclick='onReset()' value="Reset">
     </form>
     <p/>
@@ -52,12 +68,22 @@
             document.getElementById("dataForm").action = "/[[.Table.Name]]/delete";
             document.getElementById("dataForm").method = "delete";
         }
+        function onFirst() {
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/first";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onLast() {
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/last";
+            document.getElementById("dataForm").method = "get";
+        }
         function onNext() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/next";
+            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/next?key="+key;
             document.getElementById("dataForm").method = "get";
         }
         function onPrev() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/prev";
+            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/prev?key="+key;
             document.getElementById("dataForm").method = "get";
         }
         function onReset() {

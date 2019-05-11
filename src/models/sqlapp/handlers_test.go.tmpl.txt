@@ -74,7 +74,7 @@ func SetupParms(t *testing.T) {
         // fmt.Println(resp.StatusCode)
         // fmt.Println(resp.Header.Get("Content-Type"))
         body, _ := ioutil.ReadAll(resp.Body)
-        t.Logf("Output:\n%q\n\n\n", string(body))
+        t.Logf("Output:\n%s\n\n\n", string(body))
 
         t.Logf("Test[[$t.TitledName]]Show() - End of Test\n\n\n")
     }
@@ -162,7 +162,7 @@ func SetupParms(t *testing.T) {
         // fmt.Println(resp.StatusCode)
         // fmt.Println(resp.Header.Get("Content-Type"))
         body, _ := ioutil.ReadAll(resp.Body)
-        t.Logf("Output:\n%q\n\n\n", string(body))
+        t.Logf("Output:\n%s\n\n\n", string(body))
 
 	    t.Logf("Test[[$t.TitledName]]HndlrShow() - End of Test\n\n\n")
     }

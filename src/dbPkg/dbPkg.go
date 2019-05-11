@@ -127,6 +127,8 @@ func (f *DbField) CreateStruct() string {
 
 func (f *DbField) FormInput() string {
 	var str			strings.Builder
+	var lbl			string
+	var m			string
 
 	td := tds.FindDefn(f.TypeDefn)
 	if td == nil {
@@ -135,8 +137,20 @@ func (f *DbField) FormInput() string {
 	}
 
 	tdd := td.Html
-	str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" value=\"{{.Rcd.%s}}\"></label>\n",
-		strings.Title(f.Label), strings.Title(tdd), f.TitledName()))
+	if len(f.Label) > 0 {
+		lbl = strings.Title(f.Label)
+	} else {
+		lbl = strings.Title(f.Name)
+	}
+	switch td.Name {
+	case "money":
+		m = "m=\"0\" step=\"0.01\" "
+	default:
+		m = ""
+	}
+
+	str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></label>\n",
+		lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
 
 	return str.String()
 }

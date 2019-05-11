@@ -111,35 +111,45 @@ func exec() {
         log.Fatalf("ERROR - Failed to Connect Databases\n\n\n")
     }
 
+    // Set up templates.
+    hndlr[[$n]].SetupTmpls()
+
     // Set up default URL handlers
-	http.HandleFunc("/", HndlrHome)
-	http.HandleFunc("/favicon.ico", HndlrFavIcon)
+    mux := http.NewServeMux()
+	mux.HandleFunc("/", HndlrHome)
+	mux.HandleFunc("/favicon.ico", HndlrFavIcon)
 
 	// Set up Debug URL handlers to practice on simple form
     [[if GenDebugging]]
-        http.HandleFunc("/debug", HndlrDebug)
-        http.HandleFunc("/debugAdd", HndlrDebugAdd)
-        http.HandleFunc("/debugDelete", HndlrDebugDelete)
-        http.HandleFunc("/debugNext", HndlrDebugNext)
-        http.HandleFunc("/debugPrev", HndlrDebugPrev)
-        http.HandleFunc("/debugReset", HndlrDebugReset)
-        http.HandleFunc("/debugUpdate", HndlrDebugUpdate)
+        mux.HandleFunc("/debug", HndlrDebug)
+        mux.HandleFunc("/debugAdd", HndlrDebugAdd)
+        mux.HandleFunc("/debugDelete", HndlrDebugDelete)
+        mux.HandleFunc("/debugNext", HndlrDebugNext)
+        mux.HandleFunc("/debugPrev", HndlrDebugPrev)
+        mux.HandleFunc("/debugReset", HndlrDebugReset)
+        mux.HandleFunc("/debugUpdate", HndlrDebugUpdate)
     [[end]]
 
 	[[range $t := .TD.Data.Tables -]]
 	    // [[$t.Name]] URL handlers for table maintenance
-	    http.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.Name]]HndlrIndex)
-	    http.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.Name]]HndlrShow)
-	    http.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.Name]]HndlrInsert)
-	    http.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.Name]]HndlrDelete)
-	    http.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.Name]]HndlrNext)
-	    http.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.Name]]HndlrPrev)
-	    http.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.Name]]HndlrUpdate)
+	    mux.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.TitledName]]HndlrIndex)
+	    mux.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.TitledName]]HndlrDelete)
+	    mux.HandleFunc("/[[$t.Name]]/empty",              hndlr[[$n]].[[$t.TitledName]]HndlrEmpty)
+	    mux.HandleFunc("/[[$t.Name]]/first",              hndlr[[$n]].[[$t.TitledName]]HndlrFirst)
+	    mux.HandleFunc("/[[$t.Name]]/form",               hndlr[[$n]].[[$t.TitledName]]HndlrForm)
+	    mux.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.TitledName]]HndlrInsert)
+	    mux.HandleFunc("/[[$t.Name]]/last",               hndlr[[$n]].[[$t.TitledName]]HndlrLast)
+	    mux.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.TitledName]]HndlrNext)
+	    mux.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.TitledName]]HndlrPrev)
+	    mux.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.TitledName]]HndlrShow)
+	    mux.HandleFunc("/[[$t.Name]]/table/create",       hndlr[[$n]].[[$t.TitledName]]HndlrTableCreate)
+	    mux.HandleFunc("/[[$t.Name]]/table/load",         hndlr[[$n]].[[$t.TitledName]]HndlrTableLoad)
+	    mux.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.TitledName]]HndlrUpdate)
 	[[ end -]]
 
 	// Start the HTTP Server.
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
-	log.Fatal(http.ListenAndServe(srvrStr, nil))
+	log.Fatal(http.ListenAndServe(srvrStr, mux))
 
 }
 
