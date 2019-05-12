@@ -79,7 +79,7 @@
             document.getElementById("dataForm").method = "get";
         }
         function onMenu() {
-            document.getElementById("dataForm").action = "/ ";
+            document.getElementById("dataForm").action = "/";
             document.getElementById("dataForm").method = "get";
         }
         function onNext() {

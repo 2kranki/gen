@@ -1,5 +1,29 @@
 #!/bin/sh
 
+echo "Adding needed packages:"
+if [ -d ~/go/src/github.com/denisenkom/go-mssqldb ]; then   # MS SQL Driver
+    :
+else
+    echo "...Fetching github.com/denisenkom/go-mssqldb"
+    go get github.com/denisenkom/go-mssqldb
+fi
+if [ -d ~/go/src/github.com/go-sql-driver/mysql ]; then     # MySQL Driver
+    :
+else
+    echo "...Fetching github.com/go-sql-driver/mysql"
+    go get github.com/go-sql-driver/mysql
+fi
+if [ -d ~/go/src/github.com/lib/pq ]; then                  # Postgres Driver
+    :
+else
+    go get github.com/lib/pq
+fi
+if [ -d ~/go/src/github.com/mattn/go-sqlite3 ]; then        # SQLite 3 Driver
+    :
+else
+    echo "...Fetching github.com/mattn/go-sqlite3"
+    go get github.com/mattn/go-sqlite3
+fi
 echo "Formatting files:"
 go fmt ./...
 echo "Building Application:"

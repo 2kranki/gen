@@ -72,6 +72,7 @@ type DbField struct {
 	Dec		    int		    `json:"Dec,omitempty"`			// Decimal Positions
 	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
 	Nullable	bool		`json:"Null,omitempty"`
+	SQLParms	string		`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 	List		bool	    `json:"List,omitempty"`			// Include in List Report
 }
 
@@ -105,7 +106,7 @@ func (f *DbField) CreateSql(cm string) string {
 	if f.PrimaryKey {
 		pk = " PRIMARY KEY"
 	}
-	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s\\n", f.Name, ft, nl, pk, cm))
+	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s %s\\n", f.Name, ft, nl, pk, cm, f.SQLParms))
 
 	return str.String()
 }
@@ -202,6 +203,7 @@ func (f *DbField) TitledName( ) string {
 type DbTable struct {
 	Name		string		`json:"Name,omitempty"`
 	Fields		[]DbField	`json:"Fields,omitempty"`
+	SQLParms	string		`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 }
 
 // CreateInsertStr() creates a string of all the field
@@ -233,12 +235,34 @@ func (t *DbTable) CreateSql() string {
 
 func (t *DbTable) CreateStruct( ) string {
 	var str			strings.Builder
+	var f 			*DbField = t.PrimaryKey()
+	var wstr		string
 
 	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName()))
 	for i,_ := range t.Fields {
 		str.WriteString(t.Fields[i].CreateStruct())
 	}
-	str.WriteString("}\n")
+	str.WriteString("}\n\n")
+
+	// Now generate struct functions needed.
+	str.WriteString(fmt.Sprintf("func (s *%s) KeyToString() string {\n", t.TitledName()))
+	switch f.TypeDefn {
+	case "dec":
+		fallthrough
+	case "decimal":
+		wstr = fmt.Sprintf("\tstr := strconv.Itoa(s.%s)\n", f.TitledName())
+	case "int":
+		fallthrough
+	case "integer":
+		wstr = fmt.Sprintf("\tstr := strconv.Itoa(s.%s)\n", f.TitledName())
+	case "money":
+		wstr = fmt.Sprintf("\tstr := strconv.FormatFloat(s.%s, \"f\", 2, 64)\n", f.TitledName())
+	default:
+		wstr = fmt.Sprintf("\tstr := s.%s\n", f.TitledName())
+	}
+	str.WriteString(wstr)
+	str.WriteString("\treturn str")
+	str.WriteString("}\n\n")
 
 	return str.String()
 }
@@ -349,12 +373,13 @@ func (t *DbTable) TitledName( ) string {
 }
 
 type Database struct {
-	Name	string			`json:"Name,omitempty"`
-	SqlType	string			`json:"SqlType,omitempty"`
-	Server	string			`json:"Server,omitempty"`
-	Port	string			`json:"Port,omitempty"`
-	PW		string			`json:"PW,omitempty"`
-	Tables  []DbTable		`json:"Tables,omitempty"`
+	Name		string			`json:"Name,omitempty"`
+	SqlType		string			`json:"SqlType,omitempty"`
+	SQLParms	string			`json:"SQLParms,omitempty"`		// Extra SQL Parameters
+	Server		string			`json:"Server,omitempty"`
+	Port		string			`json:"Port,omitempty"`
+	PW			string			`json:"PW,omitempty"`
+	Tables  	[]DbTable		`json:"Tables,omitempty"`
 }
 
 func (d *Database) ForTables(f func(t *DbTable) ) {
