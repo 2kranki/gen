@@ -203,7 +203,7 @@ func (f *DbField) TitledName( ) string {
 type DbTable struct {
 	Name		string		`json:"Name,omitempty"`
 	Fields		[]DbField	`json:"Fields,omitempty"`
-	SQLParms	string		`json:"SQLParms,omitempty"`		// Extra SQL Parameters
+	SQLParms	[]string	`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 }
 
 // CreateInsertStr() creates a string of all the field
@@ -216,14 +216,20 @@ func (t *DbTable) CreateSql() string {
 	var str			strings.Builder
 
 	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\\n", t.Name))
-	for i,f := range t.Fields {
+	for i, f := range t.Fields {
 		var cm  		string
 
 		cm = ""
 		if i != (len(t.Fields) - 1) {
 			cm = ","
 		}
-		str.WriteString(f.CreateSql(cm))
+		str.WriteString(fmt.Sprintf("%s\n", f.CreateSql(cm)))
+	}
+	if len(t.SQLParms) > 0 {
+		str.WriteString(",\n")
+		for _, l := range t.SQLParms {
+			str.WriteString(fmt.Sprintf("%s\n", l))
+		}
 	}
 	str.WriteString(fmt.Sprintf(");\\n"))
 	if dbStruct.SqlType == "mssql" {
