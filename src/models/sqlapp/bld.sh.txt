@@ -7,7 +7,7 @@ else
     echo "...Fetching github.com/denisenkom/go-mssqldb"
     go get github.com/denisenkom/go-mssqldb
 fi
-if [ -d ~/go/src/github.com/go-sql-driver/mysql ]; then     # MySQL Driver
+if [ -d ~/go/src/github.com/go-sql-driver/mysql ]; then     # MariaDB/MySQL Driver
     :
 else
     echo "...Fetching github.com/go-sql-driver/mysql"

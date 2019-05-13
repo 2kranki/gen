@@ -20,7 +20,7 @@ and I will build and refine them as I go. This project is still around
 version 0.07.  My current road map is to:
 
 1. Finish Add (Done)
-2. Finish Update
+2. Finish Update (Done)
 3. Finish List.
 4. Declare version 0.1
 5. Finish MS-SQL Support

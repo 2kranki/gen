@@ -30,7 +30,7 @@ import (
     "../io[[.TD.Data.TitledName]]"
 	"net/http"
 	"strconv"
-	"strings"
+	//"strings"
 )
 
     // [[.Table.TitledName]]Req2Struct converts the form values to a struct.
@@ -38,10 +38,10 @@ import (
         var err         error
         var wrk         string
 
-    [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]Req2Struct()\n")
-        log.Printf("\tFormValues: %q\n", r.FormValue)
-    [[end]]
+        [[if GenDebugging]]
+            log.Printf("[[.Table.TitledName]]Req2Struct()\n")
+            log.Printf("\tr.FormValue: %q\n", r.FormValue)
+        [[end]]
 
         data  := io[[$n]].[[.Table.TitledName]]{}
         [[range $f := .Table.Fields -]]
@@ -91,9 +91,7 @@ import (
     func [[.Table.TitledName]]HndlrDelete(w http.ResponseWriter, r *http.Request) {
         var err     error
         var key     string
-        var ok      bool
 	    var rcd     *io[[$n]].[[.Table.TitledName]]
-	    var x       []string
 
         [[if GenDebugging]]
             log.Printf("[[.Table.TitledName]]HndlrDelete(%s, %s)\n", r.Method, r.FormValue("[[.Table.PrimaryKey.Name]]"))
@@ -107,16 +105,18 @@ import (
         }
 
         // Get the key.
-        params := r.URL.Query()
-        x, ok = params["[[.Table.PrimaryKey.Name]]"]
-        if !ok {
+	    key = r.FormValue("[[.Table.PrimaryKey.Name]]")
+        // if key is not present, assume first record.
+        [[if GenDebugging]]
+            log.Printf("\tkey: %s\n", key)
+        [[end]]
+        if key == "" {
             [[if GenDebugging]]
                 log.Printf("...end [[.Table.TitledName]]HndlrNext(Error:400) - No Key\n")
             [[end]]
             http.Error(w, http.StatusText(400), http.StatusBadRequest)
             return
         }
-        key = strings.Join(x,"")
 
         // Delete the row with data given.
         err = io[[.TD.Data.TitledName]].[[.Table.Name]]RowDelete(key)
@@ -331,8 +331,6 @@ import (
     func [[.Table.TitledName]]HndlrNext(w http.ResponseWriter, r *http.Request) {
 	    var rcd     *io[[$n]].[[.Table.TitledName]]
         var err     error
-        var ok      bool
-        var x       []string
         var key     string
 
         [[if GenDebugging]]
@@ -346,16 +344,17 @@ import (
         }
 
         // Get the prior key.
-        params := r.URL.Query()
-        x, ok = params["[[.Table.PrimaryKey.Name]]"]
-        if !ok {
+	    key = r.FormValue("[[.Table.PrimaryKey.Name]]")
+        [[if GenDebugging]]
+            log.Printf("\tkey: %s\n", key)
+        [[end]]
+        if key == "" {
             [[if GenDebugging]]
                 log.Printf("...end [[.Table.TitledName]]HndlrNext(Error:400) - No Key\n")
             [[end]]
             http.Error(w, http.StatusText(400), http.StatusBadRequest)
             return
         }
-        key = strings.Join(x,"")
 
         // Get the next row to display.
         rcd, err = io[[$n]].[[.Table.TitledName]]RowNext(key)
@@ -381,8 +380,6 @@ import (
     func [[.Table.TitledName]]HndlrPrev(w http.ResponseWriter, r *http.Request) {
 	    var rcd     *io[[$n]].[[.Table.TitledName]]
         var err     error
-        var ok      bool
-        var x       []string
         var key     string
 
         [[if GenDebugging]]
@@ -395,16 +392,17 @@ import (
         }
 
         // Get the prior key.
-        params := r.URL.Query()
-        x, ok = params["[[.Table.PrimaryKey.Name]]"]
-        if !ok {
+	    key = r.FormValue("[[.Table.PrimaryKey.Name]]")
+        [[if GenDebugging]]
+            log.Printf("\tkey: %s\n", key)
+        [[end]]
+        if key == "" {
             [[if GenDebugging]]
-                log.Printf("...end [[.Table.TitledName]]HndlrNext(Error:400) - No Key\n")
+                log.Printf("...end [[.Table.TitledName]]HndlrPrev(Error:400) - No Key\n")
             [[end]]
             http.Error(w, http.StatusText(400), http.StatusBadRequest)
             return
         }
-        key = strings.Join(x,"")
 
         // Get the next row to display.
         rcd, err = io[[$n]].[[.Table.TitledName]]RowPrev(key)
@@ -547,8 +545,8 @@ import (
     // [[.Table.TitledName]]HndlrUpdate handles an update request which comes from
     // the row display form.
     func [[.Table.TitledName]]HndlrUpdate(w http.ResponseWriter, r *http.Request) {
-	    //var rcd     *io[[$n]].[[.Table.TitledName]]
         var err     error
+        var key     string
 
         [[if GenDebugging]]
             log.Printf("[[.Table.TitledName]]HndlrUpdate(%s, %s)\n", r.Method, r.FormValue("[[.Table.PrimaryKey.Name]]"))
@@ -559,18 +557,45 @@ import (
             return
         }
 
-        // Update the row with data given.
-        data, err := [[.Table.TitledName]]Req2Struct(r)
-        if err != nil {
+        // Verify any fields that need it.
+	    key = r.FormValue("[[.Table.PrimaryKey.Name]]")
+        // if key is not present, assume first record.
+        [[if GenDebugging]]
+            log.Printf("\tkey: %s\n", key)
+        [[end]]
+        if key == "" {
             [[if GenDebugging]]
-                log.Printf("...end [[.Table.TitledName]]HndlrShow(Error:400) - %s\n", err.Error())
+                log.Printf("...end [[.Table.TitledName]]HndlrUpdate(Error:400) - No Key\n")
             [[end]]
             http.Error(w, http.StatusText(400), http.StatusBadRequest)
             return
         }
 
+        // Delete the row.
+        err = io[[.TD.Data.TitledName]].[[.Table.Name]]RowDelete(key)
+	    if err != nil {
+            [[if GenDebugging]]
+                log.Printf("...end [[.Table.TitledName]]HndlrNext(Error:400) - %s\n", ErrorString(err))
+            [[end]]
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+	    }
+
+        // Create a record from the data given.
+        data, err := [[.Table.TitledName]]Req2Struct(r)
+        if err != nil {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+        }
+
+        // Add the row.
+        err = io[[$n]].[[.Table.TitledName]]RowInsert(&data)
+        if err != nil {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+        }
+
         // Display the next row in the form.
-        //[[.Table.TitledName]]Show(w, rcd, "Record updated")
         [[.Table.TitledName]]Show(w, &data, "Record updated")
 
         [[if GenDebugging]]

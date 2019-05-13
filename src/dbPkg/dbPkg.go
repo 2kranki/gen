@@ -81,6 +81,7 @@ func (f *DbField) CreateSql(cm string) string {
 	var ft			string
 	var nl			string
 	var pk			string
+	var sp			string
 
 	td := tds.FindDefn(f.TypeDefn)
 	if td == nil {
@@ -106,7 +107,12 @@ func (f *DbField) CreateSql(cm string) string {
 	if f.PrimaryKey {
 		pk = " PRIMARY KEY"
 	}
-	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s %s\\n", f.Name, ft, nl, pk, cm, f.SQLParms))
+	sp = ""
+	if len(f.SQLParms) > 0 {
+		sp = fmt.Sprintf(" %s", f.SQLParms)
+	}
+
+	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
 
 	return str.String()
 }
@@ -196,6 +202,35 @@ func (f *DbField) TitledName( ) string {
 	return strings.Title(f.Name)
 }
 
+// ToString generates code to convert the struct st.f field to string in variable, v.
+func (f *DbField) ToString(v string, st string) string {
+	var str			string
+
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	tdd := td.Name
+	switch tdd {
+	case "dec":
+		fallthrough
+	case "decimal":
+		fallthrough
+	case "int":
+		fallthrough
+	case "integer":
+		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%d\", %s.%s)\n", v, st, f.TitledName())
+	case "money":
+		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%d.dd\", %s.%s)\n", v, st, f.TitledName())
+	default:
+		str = fmt.Sprintf("\t%s = %s.%s\n", v, st, f.TitledName())
+	}
+
+	return str
+}
+
 // DbTable stands for Database Table and defines
 // the make up of the SQL Table.
 // Fields should be in the order in which they are to
@@ -223,12 +258,12 @@ func (t *DbTable) CreateSql() string {
 		if i != (len(t.Fields) - 1) {
 			cm = ","
 		}
-		str.WriteString(fmt.Sprintf("%s\n", f.CreateSql(cm)))
+		str.WriteString(fmt.Sprintf("%s\\n", f.CreateSql(cm)))
 	}
 	if len(t.SQLParms) > 0 {
-		str.WriteString(",\n")
+		str.WriteString(",\\n")
 		for _, l := range t.SQLParms {
-			str.WriteString(fmt.Sprintf("%s\n", l))
+			str.WriteString(fmt.Sprintf("%s\\n", l))
 		}
 	}
 	str.WriteString(fmt.Sprintf(");\\n"))
