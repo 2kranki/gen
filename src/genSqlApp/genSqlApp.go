@@ -55,6 +55,14 @@ var FileDefns []FileDefn = []FileDefn{
 		"one",
 		0,
 	},
+	{"static.txt",
+		"static",
+		"README.txt",
+		"copy",
+		0644,
+		"one",
+		0,
+	},
 	{"tst.sh.txt",
 		"",
 		"t.sh",
@@ -258,7 +266,7 @@ func copyFile(modelPath, outPath string) (int64, error) {
 	}
 
 	if outPath, err = util.IsPathRegularFile(outPath); err == nil {
-		if sharedData.Force() {
+		if sharedData.Replace() {
 			if err = os.Remove(outPath); err != nil {
 				return 0, errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
 			}
@@ -325,7 +333,7 @@ func createOutputPath(dir string, dn string, tn string, fn string) (string, erro
 	}
 	outPath, err = util.IsPathRegularFile(outPath)
 	if err == nil {
-		if !sharedData.Force() {
+		if !sharedData.Replace() {
 			return outPath, errors.New(fmt.Sprint("Over-write error of:", outPath))
 		}
 	}
@@ -377,10 +385,18 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	// Set up the output directory structure
     if !sharedData.Noop() {
         tmpName := path.Clean(sharedData.OutDir())
-        if err = os.RemoveAll(tmpName); err != nil {
-            log.Fatalln("Error: Could not remove output directory:", tmpName, err)
-        }
+        // We only delete main directory if forced to. Otherwise, we
+        // will simply replace our files within it.
+        if sharedData.Force() {
+			if err = os.RemoveAll(tmpName); err != nil {
+				log.Fatalln("Error: Could not remove output directory:", tmpName, err)
+			}
+		}
 		tmpName = path.Clean(sharedData.OutDir() + "/html")
+		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+			log.Fatalln("Error: Could not create output directory:", tmpName, err)
+		}
+		tmpName = path.Clean(sharedData.OutDir() + "/static")
 		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
 			log.Fatalln("Error: Could not create output directory:", tmpName, err)
 		}

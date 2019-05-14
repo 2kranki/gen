@@ -34,6 +34,7 @@ func init() {
 	funcs["GenLogging"] = GenLogging
 	defns["Noop"] = false
 	defns["Quiet"] = false
+	defns["Replace"] = true
 	defns["Time"] = time.Now().Format("Mon Jan _2, 2006 15:04")
 	funcs["Time"] = Time
 }
@@ -129,6 +130,10 @@ func SetDefn(nm string, d interface{}) {
 	case "Quiet":
 		if sw, ok = d.(bool); ok {
 			defns["Quiet"] = sw
+		}
+	case "Replace":
+		if sw, ok = d.(bool); ok {
+			defns["Replace"] = sw
 		}
 	case "Time":
 		if str, ok = d.(string); ok {
@@ -245,6 +250,14 @@ func Quiet() bool {
 
 func SetQuiet(f bool) {
 	defns["Quiet"] = f
+}
+
+func Replace() bool {
+	return defns["Replace"].(bool)
+}
+
+func SetReplace(f bool) {
+	defns["Replace"] = f
 }
 
 // String returns a stringified version of the shared data

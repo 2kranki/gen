@@ -248,6 +248,43 @@ func [[.Table.TitledName]]RowNext(key string) (*[[.Table.TitledName]], error) {
     return &data, err
 }
 
+// func [[.Table.TitledName]]RowPage returns a page of rows where a page size is the
+// 'limit' parameter and 'offset' is the offset into the result set ordered by the main
+// index. Both 'limit' and 'offset' are relative to 1. We return an address to the array
+// rows (structs) so that we don't have the overhead of copying them everwhere.
+func [[.Table.TitledName]]RowPage(offset int, limit int) (*[][[.Table.TitledName]], error) {
+    data := [][[.Table.TitledName]]{}
+
+    [[if GenDebugging]]
+        log.Printf("[[.Table.TitledName]]RowPage()\n")
+    [[end]]
+
+    rows, err := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT $1 OFFSET $2", )
+	if err != nil {
+	    var datap   *[][[.Table.TitledName]]
+	    datap, err = [[.Table.TitledName]]RowLast()
+	    if datap != nil {
+	        data = *datap
+	    }
+	    return &data,err
+	}
+
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			log.Fatal(err)
+		}
+		names = append(names, name)
+	}
+
+	rows.Close()
+
+    [[if GenDebugging]]
+        log.Printf("...end [[.Table.TitledName]]RowPage(%s)\n", ErrorString(err))
+    [[end]]
+    return &data, err
+}
+
 func [[.Table.TitledName]]RowPrev(key string) (*[[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 

@@ -46,6 +46,7 @@ var (
 	noop     		bool
 	outdir   		string
 	quiet    		bool
+	replace    		bool
 )
 
 
@@ -93,6 +94,7 @@ func SetupShared(execPath string, cmd string) error {
 		sharedData.SetOutDir(outdir)
 	}
 	sharedData.SetQuiet(quiet)
+	sharedData.SetReplace(replace)
 
 	// Now merge in CLI defines. Defines are the <name>=<value>
 	// pairs found on the command line.  Note it is fine to
@@ -144,6 +146,9 @@ func SetupShared(execPath string, cmd string) error {
 		if wrk, ok = m["Quiet"]; ok {
 			sharedData.SetQuiet(wrk.(bool))
 		}
+		if wrk, ok = m["Replace"]; ok {
+			sharedData.SetReplace(wrk.(bool))
+		}
 		if wrk, ok = m["define"]; ok {
 			s := strings.Split(wrk.(string), ",")
 			for _, v := range s {
@@ -183,6 +188,7 @@ func main() {
 	flag.BoolVar(&noop, "noop", false, "execute program, but do not make real changes")
 	flag.StringVar(&outdir, "outdir", "./out", "set output directory")
 	flag.BoolVar(&quiet, "quiet", false, "enable quiet mode")
+	flag.BoolVar(&replace, "replace", true, "overwrite existing files")
 	flag.BoolVar(&quiet, "q", false, "enable quiet mode")
 	flag.Var(&defnFlags, "define", "enter definitions (<name>=<string>)")
 	flag.Var(&defnFlags, "d", "enter definitions (<name>=<string>)")

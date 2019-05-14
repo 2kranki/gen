@@ -345,7 +345,7 @@ func (t *DbTable) ForFields(f func(f *DbField) ) {
 	}
 }
 
-func (t *DbTable) Form() string {
+func (t *DbTable) Formff() string {
 	var str			strings.Builder
 	str.WriteString(fmt.Sprintf("<form id=\"%s\" method=\"post\">\n", t.Name))
 	for _, v := range t.Fields {
