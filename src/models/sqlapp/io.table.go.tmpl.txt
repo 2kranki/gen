@@ -252,29 +252,25 @@ func [[.Table.TitledName]]RowNext(key string) (*[[.Table.TitledName]], error) {
 // 'limit' parameter and 'offset' is the offset into the result set ordered by the main
 // index. Both 'limit' and 'offset' are relative to 1. We return an address to the array
 // rows (structs) so that we don't have the overhead of copying them everwhere.
-func [[.Table.TitledName]]RowPage(offset int, limit int) (*[][[.Table.TitledName]], error) {
+func [[.Table.TitledName]]RowPage(offset int, limit int) ([][[.Table.TitledName]], error) {
     data := [][[.Table.TitledName]]{}
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]RowPage()\n")
+        log.Printf("[[.Table.TitledName]]RowPage(%d,%d)\n",offset,limit)
     [[end]]
 
-    rows, err := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT $1 OFFSET $2", )
+    rows, err := db.Query("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT $1 OFFSET $2 ;", limit, offset)
 	if err != nil {
-	    var datap   *[][[.Table.TitledName]]
-	    datap, err = [[.Table.TitledName]]RowLast()
-	    if datap != nil {
-	        data = *datap
-	    }
-	    return &data,err
+	    return data,err
 	}
 
 	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
+		var rcd     [[.Table.TitledName]]
+		if err := rows.Scan([[.Table.ScanFields "&rcd"]]); err != nil {
 			log.Fatal(err)
+		} else {
+		    data = append(data, rcd)
 		}
-		names = append(names, name)
 	}
 
 	rows.Close()
@@ -282,7 +278,7 @@ func [[.Table.TitledName]]RowPage(offset int, limit int) (*[][[.Table.TitledName
     [[if GenDebugging]]
         log.Printf("...end [[.Table.TitledName]]RowPage(%s)\n", ErrorString(err))
     [[end]]
-    return &data, err
+    return data, err
 }
 
 func [[.Table.TitledName]]RowPrev(key string) (*[[.Table.TitledName]], error) {
