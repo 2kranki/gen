@@ -3,12 +3,14 @@
     * write any extra needed documentation
 
 * GenSqlApp:
-    * Main Menu Generation
+    * Main Menu Generation - make it prettier lol
     * Form Generation:
         * Field order and display grouping (JSON indicated)
         * Field Alignment - if it can not be done easily, add comment for it
             to be done by hand
         * Field Length in Form
+        * CSS or Table
+        * Add button to get to list mode ???
     * List Report form
         * limited by JSON
     * Add to b.sh  which takes care of the application requirements such as:

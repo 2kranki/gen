@@ -5,6 +5,6 @@
     "force":false,
     "main":"./misc/test01/main.json.txt",
     "noop":false,
-    "outdir":"/tmp/gen",
+    "outdir":"/tmp/app01/app",
     "quiet":false
 }

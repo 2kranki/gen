@@ -71,7 +71,8 @@ type DbField struct {
 	Len		    int		    `json:"Len,omitempty"`			// Data Maximum Length
 	Dec		    int		    `json:"Dec,omitempty"`			// Decimal Positions
 	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
-	Nullable	bool		`json:"Null,omitempty"`
+	Hidden		bool	    `json:"Hidden,omitempty"`		// Do not display in the browser
+	Nullable	bool		`json:"Null,omitempty"`			// Allow NULL for this field
 	SQLParms	string		`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 	List		bool	    `json:"List,omitempty"`			// Include in List Report
 }
@@ -156,8 +157,13 @@ func (f *DbField) FormInput() string {
 		m = ""
 	}
 
-	str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></label>\n",
-		lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
+	if f.Hidden {
+		str.WriteString(fmt.Sprintf("\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
+			f.TitledName(), f.TitledName(), m, f.TitledName()))
+	} else {
+		str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></label>\n",
+			lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
+	}
 
 	return str.String()
 }

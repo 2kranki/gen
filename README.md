@@ -47,3 +47,7 @@ To use this as I do, try the following:
 I am running this on MacOSX for now.  I will adapt the above for Windows at some point.
 My editor is Goland from Intellij.  It has worked well for me.
 
+I have added repository, app01. It contains the latest output of 'gen' for the Test01
+example.  See the 'misc' directory in this repo for the controlling JSON files and 
+https://github.com/2kranki/app01 for the generated  code.
+

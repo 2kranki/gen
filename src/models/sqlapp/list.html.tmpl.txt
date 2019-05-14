@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>[[.TD.Data.TitledName]]/[[.Table.Name]] List</title>
+    <style>
+        html, body, p {
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: left;
+            height: 100vh;
+        }
+        p {
+            margin-left: 4rem;
+            font-size: 2rem;
+            color: black;
+        }
+        .link {
+            font-size: 1rem;
+        }
+        label {
+            display:block;
+            position:relative;
+        }
+
+        label span {
+            font-weight:bold;
+            position:absolute;
+            left: 3px;
+        }
+
+        label input, label textarea, label select {
+            margin-left: 120px;
+        }
+    </style>
+</head>
+<body>
+    {{.}}
+    <form id="listForm" method="get" action="/[[.Table.Name]]">
+        <p/>
+        <p/>
+        <p/>
+        <input type=submit onclick='onFirst()' value="First">
+        <input type=submit onclick='onPrev()' value="Prev">
+        <input type=submit onclick='onNext()' value="Next">
+        <input type=submit onclick='onLast()' value="Last">
+        <input type=submit onclick='onMenu()' value="Menu">
+    </form>
+    <p/>
+    <script>
+        function onFirst() {
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/first";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onLast() {
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/last";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onMenu() {
+            document.getElementById("dataForm").action = "/";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onNext() {
+            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/next?key="+key;
+            document.getElementById("dataForm").method = "get";
+        }
+        function onPrev() {
+            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/prev?key="+key;
+            document.getElementById("dataForm").method = "get";
+        }
+    </script>
+</body>
+</html>
