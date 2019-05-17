@@ -27,14 +27,14 @@ version 0.07.  My current road map is to:
 
 To use this as I do, try the following:
 1. Install GO
-2. "git clone github.com/2kranki/gen"
-3. "cd gen"
-4. "go build main.go"
-5. "./gen -x misc/test01/exec.json.txt" <- Creates "/tmp/gen"
-6. "cd /tmp/gen"
-7. "./b.sh"
-8. "./gen"   <- SQLite Application on localhost:8080
-9. localhost:8080 in your browser
+2. `git clone github.com/2kranki/gen.git`
+3. `cd gen`
+4. `go build main.go`
+5. `./gen -x misc/test01/exec.json.txt` <- Creates "/tmp/gen"
+6. `cd /tmp/gen`
+7. `./b.sh`
+8. `./gen`   <- SQLite Application on localhost:8080
+9. `localhost:8080` in your browser
 10. Select "Load test data" for Customer Table
 11. Back to main menu
 12. Select "Maintain Table" for Customer Table

@@ -1,6 +1,12 @@
 #!/bin/sh
 
 echo "Adding needed packages:"
+if [ -d ~/go/src/github.com/2kranki/jsonpreprocess ]; then  # JSON Comment Remover
+    :
+else
+    echo "...Fetching github.com/2kranki/jsonpreprocess"
+    go get github.com/2kranki/jsonpreprocess
+fi
 if [ -d ~/go/src/github.com/denisenkom/go-mssqldb ]; then   # MS SQL Driver
     :
 else
