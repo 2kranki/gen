@@ -320,10 +320,10 @@ func createOutputPath(dir string, dn string, tn string, fn string) (string, erro
 	}
 	outPath += fn
 	if len(dn) > 0 {
-		outPath = strings.ReplaceAll(outPath, "${DbName}", strings.Title(dn))
+		outPath = strings.Replace(outPath, "${DbName}", strings.Title(dn), -1)
 	}
 	if len(tn) > 0 {
-		outPath = strings.ReplaceAll(outPath, "${TblName}", strings.Title(tn))
+		outPath = strings.Replace(outPath, "${TblName}", strings.Title(tn), -1)
 	}
 	if sharedData.Debug() && strings.Contains(outPath, "${DbName}") {
 		log.Fatalf("Error: output path, %s, contains $DbName request!.  args: %q\n", outPath)
