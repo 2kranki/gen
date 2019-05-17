@@ -1,4 +1,4 @@
-                        Gen Projects
+                        Gen Projects - v0.1.0
 
 The idea for the Gen project came about when I became aware of how powerful the templating system in Go is.  So, as I was taking
 the udemy.com course, "Web Development with Google's Golang" by Todd McLeod, I
@@ -19,14 +19,11 @@ the progress of adding.  However, some of the fundamentals are done
 and I will build and refine them as I go. This project is still around
 version 0.07.  My current road map is to:
 
-1. Finish Add (Done)
-2. Finish Update (Done)
-3. Finish List.
-4. Declare version 0.1
-5. Finish MS-SQL Support
-6. Finish MySQL Support
-7. Finish Postgres Support
-8. Declare version 0.2
+*  Finish MS-SQL Support
+*  Finish MySQL Support
+*  Finish Postgres Support
+*  Clean up form templating
+*  Declare version 0.2
 
 To use this as I do, try the following:
 1. Install GO
