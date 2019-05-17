@@ -24,8 +24,8 @@ var	outDir		string
 func init() {
 	defns  = map[string]interface{}{}
 	funcs  = map[string]interface{}{}
-	mdlDir = "./models"
-	outDir = "./test"
+	mdlDir = "./src/models"
+	outDir = "./src/test"
 	defns["Debug"] = false
 	defns["Force"] = false
 	defns["GenDebugging"] = false

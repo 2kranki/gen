@@ -6,8 +6,12 @@
 
 
 fDebug=
+fForce=
 fQuiet=
 pgmname="gen"
+srcDir="src"
+dstDir="/tmp"
+pgmPath="${dstDir}/${pgmname}"
 
 
 
@@ -18,16 +22,22 @@ pgmname="gen"
 
 buildApp () {
 
-    test -z "$fQuiet" && echo "Building ${pgmname}..."
-
-    if go build -o ${pgmname} ; then
-        test -z "$fQuiet" && echo "...Build was successful!"
+    test -z "$fQuiet" && echo "Building ${pgmPath}..."
+    rebuild=""
+    if [ -n "$fForce" ] ; then
+        rebuild="-a"
     fi
 
-    if [ -x ./${pgmname} ] ; then
-        test -z "$fQuiet" && echo "...Installing executable"
+    cd ${srcDir}
+    if go build -o ${pgmPath} -v -race ${rebuild} ; then
+        test -z "$fQuiet" && echo "...Build was successful!"
+    fi
+    cd -
+
+    if [ -x ./${pgmPath} ] ; then
+        test -z "$fQuiet" && echo "...Installing executable in "
         if [ -d "${HOME}/Support" ] ; then
-            cp ${pgmname} ${HOME}/Support/bin/
+            cp ${pgmPath} ${HOME}/Support/bin/
             test -z "$fQuiet" && echo "...Installed executable"
         fi
     fi
@@ -60,6 +70,7 @@ displayUsage( ) {
 #        echo
         echo "Flags:"
         echo "  -d, --debug     Debug Mode"
+        echo "  -f, --force     Force complete rebuild"
         echo "  -h, --help      This message"
         echo "  -q, --quiet     Quiet Mode"
         echo "  -r, --run       Run the compiled program"
@@ -124,6 +135,7 @@ getReplyYN( ) {
 
 main( ) {
     dbgFlg=
+    fBuild=y
 
     # Parse off the command arguments.
     if [ $# -eq 0 ]; then             # Handle no arguments given.
@@ -169,7 +181,7 @@ main( ) {
             opt="$1"
             case "$opt" in
                 b | build)
-                    buildApp
+                    fBuild=y
                     ;;
                 install)
                     #downloadAndInstallHomebrew
@@ -186,7 +198,7 @@ main( ) {
                     fi
                     ;;
                 update)
-                    hbUpdate
+                    #hbUpdate
                     ;;
                 *)
                     if test -z "$fQuiet"; then
@@ -197,6 +209,10 @@ main( ) {
             esac
             shift
         done
+    fi
+
+    if [ -n "$fBuild" ] ; then
+        buildApp
     fi
 
     return $?

@@ -29,11 +29,11 @@ To use this as I do, try the following:
 1. Install GO
 2. `git clone github.com/2kranki/gen.git`
 3. `cd gen`
-4. `go build main.go`
-5. `./gen -x misc/test01/exec.json.txt` <- Creates "/tmp/gen"
-6. `cd /tmp/gen`
-7. `./b.sh`
-8. `./gen`   <- SQLite Application on localhost:8080
+4. `./b.sh`     <- builds /tmp/gen
+5. `/tmp/gen -x misc/test01.exec.json.txt` <- Creates "/tmp/gen"
+6. `cd /tmp/app01/app`
+7. `./b.sh`     <- builds app
+8. `./app`      <- SQLite Application on localhost:8080
 9. `localhost:8080` in your browser
 10. Select "Load test data" for Customer Table
 11. Back to main menu

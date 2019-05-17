@@ -84,7 +84,7 @@ func SetupShared(execPath string, cmd string) error {
 	if len(mdldir) > 0 {
 		sharedData.SetMdlDir(mdldir)
 	} else {
-		dir := os.ExpandEnv("${GENGOMDL}")
+		dir := os.ExpandEnv("${GENMODELDIR}")
 		if len(dir) > 0 {
 			sharedData.SetMdlDir(dir)
 		}
@@ -184,9 +184,9 @@ func main() {
 	flag.BoolVar(&genLogging, "genLogging", true, "generate logging")
 	flag.StringVar(&mainPath, "main", "", "set json main input path")
 	flag.StringVar(&jsonPath, "json", "", "set json main input path")
-	flag.StringVar(&mdldir, "mdldir", "./models", "set model input directory")
+	flag.StringVar(&mdldir, "mdldir", "./src/models", "set model input directory")
 	flag.BoolVar(&noop, "noop", false, "execute program, but do not make real changes")
-	flag.StringVar(&outdir, "outdir", "./out", "set output directory")
+	flag.StringVar(&outdir, "outdir", "/tmp", "set output directory")
 	flag.BoolVar(&quiet, "quiet", false, "enable quiet mode")
 	flag.BoolVar(&replace, "replace", true, "overwrite existing files")
 	flag.BoolVar(&quiet, "q", false, "enable quiet mode")

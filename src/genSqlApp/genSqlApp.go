@@ -363,8 +363,9 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	//var ok 		bool
 
 	if sharedData.Debug() {
-		log.Println("\tsql_app: In Debug Mode")
+		log.Println("\t sql_app: In Debug Mode")
 		log.Printf("\t  args: %q\n", flag.Args())
+		log.Printf("\tmdldir: %s\n", sharedData.MdlDir())
 	}
 
     // Read the JSON files.
