@@ -17,7 +17,7 @@ and libraries.)
 It is still a work in progress and needs more work which I am in
 the progress of adding.  However, some of the fundamentals are done
 and I will build and refine them as I go. This project is still around
-version 0.07.  My current road map is to:
+version 0.07.  Currently, I only support SQLite. My current road map is to:
 
 *  Finish MS-SQL Support
 *  Finish MySQL Support
@@ -41,7 +41,7 @@ To use this as I do, try the following:
 13. Play and have fun.
 14. Please send me any comments or problems.
 
-I am running this on MacOSX for now.  I will adapt the above for Windows at some point.
+I am running this on MacOSX for now with golang v1.12.1.  I will adapt the above for Windows at some point.
 My editor is Goland from Intellij.  It has worked well for me.
 
 I have added repository, app01. It contains the latest output of 'gen' for the Test01
