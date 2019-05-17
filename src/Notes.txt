@@ -8,5 +8,12 @@
 # painful.  Now, I am doing lots of commits. So, that any reconstruction is rather
 # painless. lol  Live and learn!
 
+# When I first started coding this, I moved a lot of code out of the templates and
+# into the generation functions.  As time went by, I learned that this was a mistake
+# especially when you are generating fmt.Sprintf code.  It is much harder to wrap
+# head around generating code that will generate code than just put it in the
+# template file and supplement it with small functions.  At a later date, I will
+# rewrite some of the code and templates to reflect this.
+
 
 

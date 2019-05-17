@@ -42,6 +42,7 @@
 </head>
 <body>
     <form id="dataForm" method="get" action="/[[.Table.Name]]">
+        <input type=hidden id=key name=key value="{{.Rcd.[[.Table.PrimaryKey.TitledName]]}}">
         [[range $f := .Table.Fields]]
             [[$f.FormInput -]]
         [[end]]

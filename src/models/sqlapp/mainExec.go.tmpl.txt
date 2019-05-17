@@ -39,9 +39,16 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
     [[end]]
 
     if r.URL.Path != "/" {
+        [[if GenDebugging]]
+            fmt.Printf("HndlrHome(Error 404) Not '/' URL\n")
+        [[end]]
         http.NotFound(w, r)
         return
     }
+
+    [[if GenDebugging]]
+        fmt.Printf("HndlrHome(%s) Serving File: ./html/[[$n]].menu.htm\n")
+    [[end]]
     http.ServeFile(w, r, "./html/[[$n]].menu.html")
 
     [[if GenDebugging]]
@@ -132,9 +139,15 @@ func exec() {
 
 	[[range $t := .TD.Data.Tables -]]
 	    // [[$t.Name]] URL handlers for table maintenance
-	    mux.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.TitledName]]HndlrIndex)
+	    mux.HandleFunc("/[[$t.Name]]/list/first",         hndlr[[$n]].[[$t.TitledName]]HndlrListFirst)
+	    mux.HandleFunc("/[[$t.Name]]/list/last",          hndlr[[$n]].[[$t.TitledName]]HndlrListLast)
+	    mux.HandleFunc("/[[$t.Name]]/list/next",          hndlr[[$n]].[[$t.TitledName]]HndlrListNext)
+	    mux.HandleFunc("/[[$t.Name]]/list/prev",          hndlr[[$n]].[[$t.TitledName]]HndlrListPrev)
+	    mux.HandleFunc("/[[$t.Name]]/table/create",       hndlr[[$n]].[[$t.TitledName]]HndlrTableCreate)
+	    mux.HandleFunc("/[[$t.Name]]/table/load",         hndlr[[$n]].[[$t.TitledName]]HndlrTableLoad)
 	    mux.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.TitledName]]HndlrDelete)
 	    mux.HandleFunc("/[[$t.Name]]/empty",              hndlr[[$n]].[[$t.TitledName]]HndlrEmpty)
+	    mux.HandleFunc("/[[$t.Name]]/find",               hndlr[[$n]].[[$t.TitledName]]HndlrFind)
 	    mux.HandleFunc("/[[$t.Name]]/first",              hndlr[[$n]].[[$t.TitledName]]HndlrFirst)
 	    mux.HandleFunc("/[[$t.Name]]/form",               hndlr[[$n]].[[$t.TitledName]]HndlrForm)
 	    mux.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.TitledName]]HndlrInsert)
@@ -142,13 +155,8 @@ func exec() {
 	    mux.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.TitledName]]HndlrNext)
 	    mux.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.TitledName]]HndlrPrev)
 	    mux.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.TitledName]]HndlrShow)
-	    mux.HandleFunc("/[[$t.Name]]/list/first",         hndlr[[$n]].[[$t.TitledName]]HndlrListFirst)
-	    mux.HandleFunc("/[[$t.Name]]/list/last",          hndlr[[$n]].[[$t.TitledName]]HndlrListLast)
-	    mux.HandleFunc("/[[$t.Name]]/list/next",          hndlr[[$n]].[[$t.TitledName]]HndlrListNext)
-	    mux.HandleFunc("/[[$t.Name]]/list/prev",          hndlr[[$n]].[[$t.TitledName]]HndlrListPrev)
-	    mux.HandleFunc("/[[$t.Name]]/table/create",       hndlr[[$n]].[[$t.TitledName]]HndlrTableCreate)
-	    mux.HandleFunc("/[[$t.Name]]/table/load",         hndlr[[$n]].[[$t.TitledName]]HndlrTableLoad)
 	    mux.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.TitledName]]HndlrUpdate)
+	    mux.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.TitledName]]HndlrIndex)
 	[[ end -]]
 
 	// Start the HTTP Server.

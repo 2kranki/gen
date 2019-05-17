@@ -32,7 +32,7 @@
             <li>[[$t.Name]] Table</li>
             <ul>
                 <li><a href="/[[$t.Name]]/table/create">Create Table</a></li>
-                <li><a href="/[[$t.Name]]">List Rows</a></li>
+                <li><a href="/[[$t.Name]]/list/first">List Rows</a></li>
                 <li><a href="/[[$t.Name]]/table/load">Load test rows</a></li>
                 <li><a href="/[[$t.Name]]/show">Maintain Rows</a></li>
             </ul>

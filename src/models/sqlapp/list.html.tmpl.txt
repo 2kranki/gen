@@ -41,40 +41,49 @@
     </style>
 </head>
 <body>
-    {{.}}
     <form id="listForm" method="get" action="/[[.Table.Name]]">
+    <table>
+        <tbody>
+            {{range $r := .Rcds}}
+                <tr>
+                {{$r.ListOutput -}}
+                </tr>
+            {{end}}
+        </tbody>
+    </table>
+        <input type=hidden name=offset id=offset value={{.Offset}}>
         <p/>
         <p/>
         <p/>
-        <input type=submit onclick='onFirst()' value="First">
-        <input type=submit onclick='onPrev()' value="Prev">
-        <input type=submit onclick='onNext()' value="Next">
-        <input type=submit onclick='onLast()' value="Last">
-        <input type=submit onclick='onMenu()' value="Menu">
+        <input type=submit onclick='onListFirst()' value="First">
+        <input type=submit onclick='onListPrev()'  value="Prev">
+        <input type=submit onclick='onListNext()'  value="Next">
+        <input type=submit onclick='onListLast()'  value="Last">
+        <input type=submit onclick='onListMenu()'  value="Menu">
     </form>
     <p/>
     <script>
-        function onFirst() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/first";
-            document.getElementById("dataForm").method = "get";
+        function onListFirst() {
+            document.getElementById("listForm").action = "/[[.Table.Name]]/list/first";
+            document.getElementById("listForm").method = "get";
         }
-        function onLast() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/last";
-            document.getElementById("dataForm").method = "get";
+        function onListLast() {
+            document.getElementById("listForm").action = "/[[.Table.Name]]/list/last";
+            document.getElementById("listForm").method = "get";
         }
-        function onMenu() {
-            document.getElementById("dataForm").action = "/";
-            document.getElementById("dataForm").method = "get";
+        function onListMenu() {
+            document.getElementById("listForm").action = "/";
+            document.getElementById("listForm").method = "get";
         }
-        function onNext() {
-            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/next?key="+key;
-            document.getElementById("dataForm").method = "get";
+        function onListNext() {
+            key = document.getElementById("offset").value
+            document.getElementById("listForm").action = "/[[.Table.Name]]/list/next?key="+key;
+            document.getElementById("listForm").method = "get";
         }
-        function onPrev() {
-            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/list/prev?key="+key;
-            document.getElementById("dataForm").method = "get";
+        function onListPrev() {
+            key = document.getElementById("offset").value
+            document.getElementById("listForm").action = "/[[.Table.Name]]/list/prev?key="+key;
+            document.getElementById("listForm").method = "get";
         }
     </script>
 </body>

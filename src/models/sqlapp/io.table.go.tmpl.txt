@@ -17,11 +17,17 @@ package io[[.TD.Data.TitledName]]
 import (
     "database/sql"
 	"errors"
+    [[if or .Table.IsFloat .Table.IsInteger]]
+        "fmt"
+    [[end]]
     [[if GenDebugging]]
         "log"
     [[end]]
 	//"net/http"
 	"strconv"
+    [[if .Table.IsFloat]]
+        "strings"
+    [[end]]
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType  "mssql" ]]
@@ -37,12 +43,68 @@ import (
 
 [[.Table.CreateStruct]]
 
+// KeyToString converts the primary key field value
+// to a string.
+func (s [[.Table.TitledName]]) KeyToString() string {
+    var str     string
+
+    [[.Table.PrimaryKey.GenToString "str" "s"]]
+
+    return str
+}
+
+func (s [[.Table.TitledName]]) ListOutput() string {
+	var str strings.Builder
+    var wrk string
+
+    [[$t := .Table]]
+    [[range $f := .Table.Fields]]
+        [[if $f.List]]
+            // Field: [[$f.TitledName]]
+            str.WriteString("<td>\n")
+            [[$f.GenToString "wrk" "s"]]
+            [[if $f.PrimaryKey]]
+                {
+                    fstr := fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
+                    str.WriteString(fstr)
+                }
+            [[end]]
+            wrk += "\n"
+            str.WriteString(wrk)
+            [[if $f.PrimaryKey]]
+                str.WriteString("</a>\n" )
+            [[end]]
+            str.WriteString("</td>\n")
+        [[end]]
+	[[end]]
+
+	return str.String()
+}
+
+
 // [[.Table.TitledName]]New creates a new empty
 // struct.
 func [[.Table.TitledName]]New() *[[.Table.TitledName]] {
     return &[[.Table.TitledName]]{}
 }
 
+
+func [[.Table.TitledName]]TableCount( ) (int, error) {
+    var count       int
+
+    [[if GenDebugging]]
+        log.Printf("[[.Table.TitledName]]TableCount()\n")
+    [[end]]
+
+    row := db.QueryRow("SELECT COUNT(*) FROM [[.Table.Name]]")
+
+	err := row.Scan(&count)
+
+    [[if GenDebugging]]
+        log.Printf("...end [[.Table.TitledName]]TableCount(%s) %d\n", ErrorString(err), count)
+    [[end]]
+    return count, err
+}
 
 // [[.Table.TitledName]]TableCreate creates the table in the
 // given database deleting the current table if
@@ -86,23 +148,6 @@ func [[.Table.TitledName]]TableDelete() error {
         log.Printf("...end [[.Table.TitledName]]TableDelete(%s)\n", ErrorString(err))
     [[end]]
     return err
-}
-
-func [[.Table.TitledName]]RowCount(key string) (int, error) {
-    var count       int
-
-    [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]TableCount()\n")
-    [[end]]
-
-    row := db.QueryRow("SELECT COUNT(*) FROM [[.Table.Name]]")
-
-	err := row.Scan(&count)
-
-    [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]]RowCount(%s) %d\n", ErrorString(err), count)
-    [[end]]
-    return count, err
 }
 
 func [[.Table.TitledName]]RowDelete(key string) error {

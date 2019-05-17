@@ -11,6 +11,8 @@
         * Field Length in Form
         * CSS or Table
         * Add button to get to list mode ???
+        * All HTML forms need to be converted to using html/template and they should
+            only have data added no html codes ???
     * List Report form
         * limited by JSON
     * Add to b.sh  which takes care of the application requirements such as:
@@ -27,6 +29,8 @@
             * Consider doing paging
             * Allow some selection criteria
             * generate switch to single record mode and back
+    * If we included the field/table tables in doPkg in the io package, we might be
+        able to generate a more table-driven application that required less code generation.
 * possibly json to struct converter and vice versa
 * Check into for possible inclusion:
     * https://github.com/gorilla/mux

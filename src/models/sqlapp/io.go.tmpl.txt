@@ -13,6 +13,10 @@ import (
 	"errors"
     "fmt"
     "log"
+    [[if .TD.Data.IsFloat]]
+        "strconv"
+        "strings"
+    [[end]]
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType  "mssql" ]]
@@ -44,6 +48,22 @@ var dbUser     	string
         }
     }
 [[end]]
+
+[[if .TD.Data.IsFloat]]
+
+    func FloatToString(num float64) string {
+        s := fmt.Sprintf("%.4f", num)
+        return strings.TrimRight(strings.TrimRight(s, "0"), ".")
+    }
+
+    func StringToFloat(str string) float64 {
+        var num float64
+        num, _ = strconv.ParseFloat(str, 64)
+        return num
+    }
+
+[[end]]
+
 
 func Connect() error {
     var err         error

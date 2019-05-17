@@ -26,6 +26,30 @@ const (
 	DBTYPE_SQLITE
 )
 
+// StringsBuilder is a composition of strings.Builder so that
+// we can add supplemental functions.
+type StringBuilder struct {
+	str		strings.Builder
+}
+
+func NewStringBuilder() *StringBuilder {
+	sb := StringBuilder{}
+	return &sb
+}
+
+// WriteString allows us to write a string to the buffer.
+func (s StringBuilder) WriteString(format string) error {
+	_, err := s.str.WriteString(format)
+	return err
+}
+
+// WriteStringf allows us to write a formatted string.
+func (s StringBuilder) WriteStringf(format string, a ...interface{}) error {
+	str := fmt.Sprintf(format, a...)
+	err := s.WriteString(str)
+	return err
+}
+
 type TypeDefn struct {
 	Name		string		`json:"Name,omitempty"`		// Type Name
 	Html		string		`json:"Html,omitempty"`		// HTML Type
@@ -121,13 +145,7 @@ func (f *DbField) CreateSql(cm string) string {
 func (f *DbField) CreateStruct() string {
 	var str			strings.Builder
 
-	td := tds.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	tdd := td.Go
+	tdd := f.GoType()
 	str.WriteString(fmt.Sprintf("\t%s\t%s\n", strings.Title(f.Name),tdd))
 
 	return str.String()
@@ -168,6 +186,113 @@ func (f *DbField) FormInput() string {
 	return str.String()
 }
 
+// GenFromString generates the code to go from a string (sn) to
+// a field (dn).  sn and dn are variable names.
+func (f *DbField) GenFromString(dn,sn string) string {
+	var str			string
+
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	switch td.Name {
+	case "int":
+		fallthrough
+	case "integer":
+		{
+			wrk := "\t%s.%s, err = strconv.Atoi(%s)\n"
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
+		}
+	case "dec":
+		fallthrough
+	case "decimal":
+		fallthrough
+	case "money":
+		{
+			wrk := 	"\t{\n\t\twrk := r.FormValue(\"%s\")\n" +
+				"\t\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n\t}\n"
+			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
+		}
+	default:
+		str = fmt.Sprintf("\t%s.%s = %s\n", dn, f.TitledName(), sn)
+	}
+
+	return str
+}
+
+// GenToString generates code to convert the struct st.f field to string in variable, v.
+func (f *DbField) GenToString(v string, st string) string {
+	var str			string
+
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	tdd := td.Name
+	switch tdd {
+	case "int":
+		fallthrough
+	case "integer":
+		str = fmt.Sprintf("\t%s = strconv.Itoa(%s.%s)\n", v, st, f.TitledName())
+	case "dec":
+		fallthrough
+	case "decimal":
+		fallthrough
+	case "money":
+		str = fmt.Sprintf("\t{\n")
+		str += fmt.Sprintf("\t\ts := fmt.Sprintf(\"%s.4f\", %s.%s)\n", "%", st, f.TitledName())
+		str += fmt.Sprintf("\t\t%s = strings.TrimRight(strings.TrimRight(s, \"0\"), \".\")\n", v)
+		str += fmt.Sprintf("\t}\n")
+	default:
+		str = fmt.Sprintf("\t%s = %s.%s\n", v, st, f.TitledName())
+	}
+
+	return str
+}
+
+func (f *DbField) GoType() string {
+
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	tdd := td.Go
+
+	return tdd
+}
+
+func (f *DbField) IsFloat() bool {
+
+	tdd := f.GoType()
+	if tdd == "float64" {
+		return true
+	}
+
+	return false
+}
+
+func (f *DbField) IsInteger() bool {
+
+	tdd := f.GoType()
+	if tdd == "int32" {
+		return true
+	}
+	if tdd == "int64" {
+		return true
+	}
+	if tdd == "int" {
+		return true
+	}
+
+	return false
+}
+
 func (f *DbField) RValueToStruct(dn string) string {
 	var str			string
 
@@ -179,10 +304,6 @@ func (f *DbField) RValueToStruct(dn string) string {
 
 	tdd := td.Name
 	switch tdd {
-	case "dec":
-		fallthrough
-	case "decimal":
-		str = fmt.Sprintf("\t%s.%s = strconv.Atoi(r.FormValue(\"%s\"))\n", dn, f.TitledName(), f.TitledName())
 	case "int":
 		fallthrough
 	case "integer":
@@ -191,6 +312,10 @@ func (f *DbField) RValueToStruct(dn string) string {
 				"\t%s.%s, err = strconv.Atoi(wrk)\n"
 			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
 		}
+	case "dec":
+		fallthrough
+	case "decimal":
+		fallthrough
 	case "money":
 		{
 			wrk := 	"\twrk = r.FormValue(\"%s\")\n" +
@@ -206,35 +331,6 @@ func (f *DbField) RValueToStruct(dn string) string {
 
 func (f *DbField) TitledName( ) string {
 	return strings.Title(f.Name)
-}
-
-// ToString generates code to convert the struct st.f field to string in variable, v.
-func (f *DbField) ToString(v string, st string) string {
-	var str			string
-
-	td := tds.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	tdd := td.Name
-	switch tdd {
-	case "dec":
-		fallthrough
-	case "decimal":
-		fallthrough
-	case "int":
-		fallthrough
-	case "integer":
-		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%d\", %s.%s)\n", v, st, f.TitledName())
-	case "money":
-		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%d.dd\", %s.%s)\n", v, st, f.TitledName())
-	default:
-		str = fmt.Sprintf("\t%s = %s.%s\n", v, st, f.TitledName())
-	}
-
-	return str
 }
 
 // DbTable stands for Database Table and defines
@@ -282,8 +378,6 @@ func (t *DbTable) CreateSql() string {
 
 func (t *DbTable) CreateStruct( ) string {
 	var str			strings.Builder
-	var f 			*DbField = t.PrimaryKey()
-	var wstr		string
 
 	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName()))
 	for i,_ := range t.Fields {
@@ -291,25 +385,9 @@ func (t *DbTable) CreateStruct( ) string {
 	}
 	str.WriteString("}\n\n")
 
-	// Now generate struct functions needed.
-	str.WriteString(fmt.Sprintf("func (s *%s) KeyToString() string {\n", t.TitledName()))
-	switch f.TypeDefn {
-	case "dec":
-		fallthrough
-	case "decimal":
-		wstr = fmt.Sprintf("\tstr := strconv.Itoa(s.%s)\n", f.TitledName())
-	case "int":
-		fallthrough
-	case "integer":
-		wstr = fmt.Sprintf("\tstr := strconv.Itoa(s.%s)\n", f.TitledName())
-	case "money":
-		wstr = fmt.Sprintf("\tstr := strconv.FormatFloat(s.%s, \"f\", 2, 64)\n", f.TitledName())
-	default:
-		wstr = fmt.Sprintf("\tstr := s.%s\n", f.TitledName())
-	}
-	str.WriteString(wstr)
-	str.WriteString("\treturn str")
-	str.WriteString("}\n\n")
+	// I was generating some of the struct functions here.  It turned out to be a
+	// mistake.  Using the template system and supplement it with small functions
+	// is far easier making it a much better strategy.
 
 	return str.String()
 }
@@ -345,42 +423,28 @@ func (t *DbTable) ForFields(f func(f *DbField) ) {
 	}
 }
 
-func (t *DbTable) Formff() string {
-	var str			strings.Builder
-	str.WriteString(fmt.Sprintf("<form id=\"%s\" method=\"post\">\n", t.Name))
-	for _, v := range t.Fields {
-		str.WriteString(fmt.Sprintf("<p>%s</p>\n",v.Name))
+// IsFloat returns true if any of the fields are a
+// float which will need float to string conversion
+func (t *DbTable) IsFloat() bool {
+
+	for i,_ := range t.Fields {
+		if t.Fields[i].IsFloat() {
+			return true
+		}
 	}
-	str.WriteString("<p/>\n<p/>\n<p/>\n")
-	str.WriteString("\t<input type=submit onclick='onPrev()' value=\"Prev\">\n")
-	str.WriteString("\t<input type=submit onclick='onAdd()' value=\"Add\">\n")
-	str.WriteString("\t<input type=submit onclick='onDelete()' value=\"Delete\">\n")
-	str.WriteString("\t<input type=submit onclick='onUpdate()' value=\"Update\">\n")
-	str.WriteString("\t<input type=submit onclick='onNext()' value=\"Next\">\n")
-	str.WriteString("\t<input type=reset onclick='onReset()' value=\"Reset\">\n")
-	str.WriteString("</form>\n\n")
-	str.WriteString("<script>\n")
-	str.WriteString("\tfunction onAdd() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Create/Process\";\n", t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onDelete() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Delete/Process\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onNext() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Next\";\n",t.Name))
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onPrev() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Prev\";\n",t.Name))
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onReset() {\n")
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onUpdate() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Update/Process\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("</script>\n")
-	return str.String()
+	return false
+}
+
+// IsInteger returns true if any of the fields are a
+// integers which will need float to string conversion
+func (t *DbTable) IsInteger() bool {
+
+	for i,_ := range t.Fields {
+		if t.Fields[i].IsInteger() {
+			return true
+		}
+	}
+	return false
 }
 
 // PrimaryKey returns the first field that it finds
@@ -433,6 +497,15 @@ func (d *Database) ForTables(f func(t *DbTable) ) {
 	for i,_ := range d.Tables {
 		f(&d.Tables[i])
 	}
+}
+
+func (d *Database) IsFloat( ) bool {
+	for i,_ := range d.Tables {
+		if d.Tables[i].IsFloat() {
+			return true
+		}
+	}
+	return false
 }
 
 func (d *Database) TitledName( ) string {

@@ -23,12 +23,14 @@ import (
     [[if GenDebugging]]
         "log"
     [[end]]
-    "html/template"
+    "text/template"
     //"../io[[.TD.Data.TitledName]]"
 )
 
 var tmplsDir        string
 var Tmpls           *template.Template
+var RowsPerPage     int = 20
+
 
 func Title(i interface{}) string {
     return "Title() - NOT Implemented"
