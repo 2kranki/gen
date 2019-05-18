@@ -1,0 +1,33 @@
+{
+    "name":"anObj",
+    "properties":[
+        # Properties are generated in 3 modules and multiple places in some of
+        # those files.  Internal Header contains property definition and private/none
+        # property access funtions. Header contains public access function 
+        # definitions.  
+        {
+            "name":"abc",
+            "internal":"def",           # optional, if not given, use $name
+            "desc":"important data",    # optional
+            "typeDefn":"uint32_t",
+            "obj":false,                # true == object which needs release
+            "init":"2000",              # optional, initialization
+            "vis":"public",             # Visibility: public, private, read-only, none
+            "base":"",                  # Base Struct/Pointer
+            "offset":0,                 # Offset from Base for Field in bytes
+            "size":0,                   # size of field in bits
+            "shift":0                   # amount to shift right to put in lowest bit   
+        },
+        {
+            "internal":"ghi",
+            "desc":"important object",  
+            "type":"Node",
+            "obj":true,
+            "vis":"ro",
+            "base":null,
+            "offset":0,
+            "size":0,
+            "shift":0 
+        }
+    ]
+}

@@ -15,7 +15,6 @@
 package genSqlApp
 
 import (
-	"../dbPkg"
 	"../mainData"
 	"../shared"
 	"../util"
@@ -37,7 +36,7 @@ type FileDefn struct {
 	ModelName		string 		`json:"ModelName,omitempty"`
 	FileDir			string		`json:"FileDir,omitempty"`		// Output File Directory
 	FileName  		string 		`json:"FileName,omitempty"`		// Output File Name
-	FileType  		string 		`json:"Type,omitempty"`  		// text, sql, html
+	FileType  		string 		`json:"Type,omitempty"`  		// copy, text, sql, html
 	FilePerms		os.FileMode	`json:"FilePerms,omitempty"`	// Output File Permissions
 	Class     		string 		`json:"Class,omitempty"` 		// single, table
 	PerGrp  		int			`json:"PerGrp,omitempty"` 		// 0 == generate one file
@@ -192,9 +191,9 @@ var FileDefns []FileDefn = []FileDefn{
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	Data     	*dbPkg.Database
+	Data     	*Database
 	Main     	*mainData.MainData
-	Table		*dbPkg.DbTable
+	Table		*DbTable
 }
 
 var tmplData TmplData
@@ -202,7 +201,7 @@ var tmplData TmplData
 type TaskData struct {
 	FD			*FileDefn
 	TD			*TmplData
-	Table		*dbPkg.DbTable
+	Table		*DbTable
 	PathIn	  	string						// Input File Path
 	PathOut	  	string						// Output File Path
 
@@ -350,7 +349,7 @@ func readJsonFiles() error {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
 	}
 
-	if err = dbPkg.ReadJsonFile(sharedData.DataPath()); err != nil {
+	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
 	}
 
@@ -381,7 +380,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	//if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
 	//	log.Fatalln("Error - Could not type assert appData.AppJson()")
 	//}
-	tmplData.Data = dbPkg.DbStruct()
+	tmplData.Data = DbStruct()
 
 	// Set up the output directory structure
     if !sharedData.Noop() {
@@ -462,8 +461,8 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 			inputQueue <- data
 		case 2:
 			// Output File is Titled Table Name in Titled Database Name directory
-			dbPkg.ForTables(
-				func(v *dbPkg.DbTable) {
+			ForTables(
+				func(v *DbTable) {
 					data := TaskData{FD:&FileDefns[i], TD:&tmplData, Table:v, PathIn:pathIn}
 					if data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, v.Name, def.FileName); err != nil {
 						log.Fatalln(err)

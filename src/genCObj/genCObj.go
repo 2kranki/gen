@@ -15,7 +15,6 @@
 package genCObj
 
 import (
-	"../dbPkg"
 	"../mainData"
 	"../shared"
 	"../util"
@@ -44,35 +43,35 @@ type FileDefn struct {
 	ModelName string `json:"ModelName,omitempty"`
 	FileName  string `json:"FileName,omitempty"`
 	FileType  string `json:"Type,omitempty"`  // text, sql, html
-	Class     string `json:"Class,omitempty"` // single, table
+	FilePerms	os.FileMode	`json:"FilePerms,omitempty"`	// Output File Permissions
 }
 
 // FileDefns controls what files are generated.
 var FileDefns []FileDefn = []FileDefn{
-	{"base.html.tmpl.txt",
-		"/tmpl/base.html.tmpl",
-		"copy",
-		"one",
-	},
-	{"main.go.tmpl.txt",
-		"main.go",
+	{"obj_int_h.txt",
+		"${srcDir}/${objName}_internal.h",
 		"text",
-		"one",
+		0644,
 	},
-	{"mainExec.go.tmpl.txt",
-		"mainExec.go",
+	{"obj_obj_c.txt",
+		"${srcDir}/${objName}_object.c",
 		"text",
-		"single",
+		0644,
 	},
-	{"handlers.go.tmpl.txt",
-		"/handlers/handlers.go",
+	{"obj_c.txt",
+		"${srcDir}/${objName}.c",
 		"text",
-		"single",
+		0644,
 	},
-	{"tableio.go.tmpl.txt",
-		"/tableio/tableio.go",
+	{"obj_h.txt",
+		"${srcDir}/${objName}.h",
 		"text",
-		"single",
+		0644,
+	},
+	{"obj_test_c.txt",
+		"${testDir}/test_${objName}.c",
+		"text",
+		0644,
 	},
 }
 
@@ -83,7 +82,7 @@ var FileDefns []FileDefn = []FileDefn{
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	Data     *dbPkg.Database
+	Data     *DbObject
 	Main     *mainData.MainData
 }
 
@@ -171,9 +170,11 @@ func readJsonFiles() error {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
 	}
 
-	if err = dbPkg.ReadJsonFile(sharedData.DataPath()); err != nil {
+	/***
+	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
 	}
+	***/
 
     return nil
 }
@@ -186,6 +187,9 @@ func GenCObj(inDefns map[string]interface{}) error {
 		log.Printf("\t  args: %q\n", flag.Args())
 	}
 
+	// Verify the parameters needed.
+
+
     // Read the JSON files.
     if err = readJsonFiles(); err != nil {
 		log.Fatalln(err)
@@ -193,7 +197,7 @@ func GenCObj(inDefns map[string]interface{}) error {
 
 	// Set up template data
 	tmplData.Main = mainData.MainStruct()
-	tmplData.Data = dbPkg.DbStruct()
+	tmplData.Data = DbStruct()
 
 	// Set up the output directory structure
     if !sharedData.Noop() {
