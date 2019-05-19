@@ -261,7 +261,7 @@ func (f *DbProp) GenProp( ) string {
 		str.WriteString(fmt.Sprintf("\"%s\",", dbStruct.DataName()))
 	}
 	if f.Offset < 0 {
-		str.WriteString(fmt.Sprintf("OFFSETOF(%s,%s),", dbStruct.DataName(), name))
+		str.WriteString(fmt.Sprintf("offsetof(%s,%s),", dbStruct.DataName(), name))
 	} else {
 		str.WriteString(fmt.Sprintf("\"%s_DATA\",", dbStruct.UpperName()))
 	}

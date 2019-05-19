@@ -25,7 +25,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 )
 
@@ -301,8 +300,7 @@ func createModelPath(fn string) (string, error) {
 	modelPath += "/sqlapp"
 	modelPath += "/"
 	modelPath += fn
-	//modelPath = filepath.Clean(modelPath)				// Clean() is part of Abs()
-	modelPath, err = filepath.Abs(modelPath)
+	modelPath, err = util.IsPathRegularFile(modelPath)
 
 	return modelPath, err
 }

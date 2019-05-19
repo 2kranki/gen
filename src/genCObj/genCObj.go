@@ -23,7 +23,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -139,11 +138,9 @@ func createModelPath(fn string) (string, error) {
 
 	// Calculate the model path.
 	modelPath = sharedData.MdlDir()
-	modelPath += "/cobj"
-	modelPath += "/"
+	modelPath += "/cobj/"
 	modelPath += fn
-	//modelPath = filepath.Clean(modelPath)				// Clean() is part of Abs()
-	modelPath, err = filepath.Abs(modelPath)
+	modelPath, err = util.IsPathRegularFile(modelPath)
 
 	return modelPath, err
 }

@@ -237,4 +237,5 @@ func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), "'{{' and '}}' are not used in the basic templates.  Instead, '[['\n")
 	fmt.Fprintf(flag.CommandLine.Output(), "and ']]' are used. This way, we can pass the generated text back\n")
 	fmt.Fprintf(flag.CommandLine.Output(), "through the templating system at execution time.\n")
+	fmt.Fprintf(flag.CommandLine.Output(), "Version: 0.1\n\n")
 }
