@@ -23,6 +23,7 @@ func IsPathRegularFile(fp string) (string, error) {
 	var err error
 	var path string
 
+	fp = os.ExpandEnv(fp)
 	fp = filepath.Clean(fp)
 	path, err = filepath.Abs(fp)
 	if err != nil {

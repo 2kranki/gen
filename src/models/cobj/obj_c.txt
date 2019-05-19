@@ -1,9 +1,10 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 /*
- * File:   [[.Defns.Name]].c
+ * File:   [[.Data.Name]].c
  *	Generated [[Time]]
  *
  */
+[[$o := .Data]]
 
  
 /*
@@ -41,7 +42,7 @@
 //*****************************************************************
 
 /* Header File Inclusion */
-#include        <[[.Defns.Name]]_internal.h>
+#include        <[[.Data.Name]]_internal.h>
 #include        <trace.h>
 
 
@@ -64,11 +65,11 @@ extern "C" {
 
 #ifdef XYZZY
     static
-    void            [[.Defns.Name]]_task_body (
+    void            [[.Data.Name]]_task_body (
         void            *pData
     )
     {
-        //[[.Defns.NameUC]]_DATA  *this = pData;
+        //[[.Data.UpperName]]_DATA  *this = pData;
         
     }
 #endif
@@ -84,12 +85,12 @@ extern "C" {
     //                      *** Class Methods ***
     //===============================================================
 
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Alloc (
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_Alloc (
         void
     )
     {
-        [[.Defns.NameUC]]_DATA       *this;
-        uint32_t        cbSize = sizeof([[.Defns.NameUC]]_DATA);
+        [[.Data.UpperName]]_DATA       *this;
+        uint32_t        cbSize = sizeof([[.Data.UpperName]]_DATA);
         
         // Do initialization.
         
@@ -101,15 +102,15 @@ extern "C" {
 
 
 
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_New (
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_New (
         void
     )
     {
-        [[.Defns.NameUC]]_DATA       *this;
+        [[.Data.UpperName]]_DATA       *this;
         
-        this = [[.Defns.Name]]_Alloc( );
+        this = [[.Data.Name]]_Alloc( );
         if (this) {
-            this = [[.Defns.Name]]_Init(this);
+            this = [[.Data.Name]]_Init(this);
         } 
         return this;
     }
@@ -122,19 +123,22 @@ extern "C" {
     //                      P r o p e r t i e s
     //===============================================================
 
+    [[range $p := .Data.Props]]
+        [[- $p.GenBody]]
+    [[- end]]
     //---------------------------------------------------------------
     //                          P r i o r i t y
     //---------------------------------------------------------------
     
-    uint16_t        [[.Defns.Name]]_getPriority (
-        [[.Defns.NameUC]]_DATA     *this
+    uint16_t        [[.Data.Name]]_getPriority (
+        [[.Data.UpperName]]_DATA     *this
     )
     {
 
         // Validate the input parameters.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return 0;
         }
@@ -145,14 +149,14 @@ extern "C" {
     }
 
 
-    bool            [[.Defns.Name]]_setPriority (
-        [[.Defns.NameUC]]_DATA     *this,
+    bool            [[.Data.Name]]_setPriority (
+        [[.Data.UpperName]]_DATA     *this,
         uint16_t        value
     )
     {
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return false;
         }
@@ -169,13 +173,13 @@ extern "C" {
     //                              S i z e
     //---------------------------------------------------------------
     
-    uint32_t        [[.Defns.Name]]_getSize (
-        [[.Defns.NameUC]]_DATA       *this
+    uint32_t        [[.Data.Name]]_getSize (
+        [[.Data.UpperName]]_DATA       *this
     )
     {
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return 0;
         }
@@ -190,15 +194,15 @@ extern "C" {
     //                              S t r
     //---------------------------------------------------------------
     
-    ASTR_DATA * [[.Defns.Name]]_getStr (
-        [[.Defns.NameUC]]_DATA     *this
+    ASTR_DATA * [[.Data.Name]]_getStr (
+        [[.Data.UpperName]]_DATA     *this
     )
     {
         
         // Validate the input parameters.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
@@ -208,14 +212,14 @@ extern "C" {
     }
     
     
-    bool        [[.Defns.Name]]_setStr (
-        [[.Defns.NameUC]]_DATA     *this,
+    bool        [[.Data.Name]]_setStr (
+        [[.Data.UpperName]]_DATA     *this,
         ASTR_DATA   *pValue
     )
     {
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return false;
         }
@@ -238,15 +242,15 @@ extern "C" {
     //                          S u p e r
     //---------------------------------------------------------------
     
-    OBJ_IUNKNOWN *  [[.Defns.Name]]_getSuperVtbl (
-        [[.Defns.NameUC]]_DATA     *this
+    OBJ_IUNKNOWN *  [[.Data.Name]]_getSuperVtbl (
+        [[.Data.UpperName]]_DATA     *this
     )
     {
 
         // Validate the input parameters.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return 0;
         }
@@ -275,16 +279,16 @@ extern "C" {
      a copy of the object is performed.
      Example:
      @code 
-        ERESULT eRc = [[.Defns.Name]]_Assign(this,pOther);
+        ERESULT eRc = [[.Data.Name]]_Assign(this,pOther);
      @endcode 
      @param     this    object pointer
-     @param     pOther  a pointer to another [[.Defns.NameUC]] object
+     @param     pOther  a pointer to another [[.Data.UpperName]] object
      @return    If successful, ERESULT_SUCCESS otherwise an 
                 ERESULT_* error 
      */
-    ERESULT         [[.Defns.Name]]_Assign (
-        [[.Defns.NameUC]]_DATA		*this,
-        [[.Defns.NameUC]]_DATA     *pOther
+    ERESULT         [[.Data.Name]]_Assign (
+        [[.Data.UpperName]]_DATA		*this,
+        [[.Data.UpperName]]_DATA     *pOther
     )
     {
         ERESULT     eRc;
@@ -292,11 +296,11 @@ extern "C" {
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
-        if (![[.Defns.Name]]_Validate(pOther)) {
+        if (![[.Data.Name]]_Validate(pOther)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -348,9 +352,9 @@ extern "C" {
                 ERESULT_SUCCESS_LESS_THAN if this < other
                 ERESULT_SUCCESS_GREATER_THAN if this > other
      */
-    ERESULT         [[.Defns.Name]]_Compare (
-        [[.Defns.NameUC]]_DATA     *this,
-        [[.Defns.NameUC]]_DATA     *pOther
+    ERESULT         [[.Data.Name]]_Compare (
+        [[.Data.UpperName]]_DATA     *this,
+        [[.Data.UpperName]]_DATA     *pOther
     )
     {
         int             i = 0;
@@ -364,11 +368,11 @@ extern "C" {
         
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
-        if (![[.Defns.Name]]_Validate(pOther)) {
+        if (![[.Data.Name]]_Validate(pOther)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_PARAMETER;
         }
@@ -406,32 +410,32 @@ extern "C" {
      Copy the current object creating a new object.
      Example:
      @code 
-        [[.Defns.Name]]      *pCopy = [[.Defns.Name]]_Copy(this);
+        [[.Data.Name]]      *pCopy = [[.Data.Name]]_Copy(this);
      @endcode 
      @param     this    object pointer
-     @return    If successful, a [[.Defns.NameUC]] object which must be 
+     @return    If successful, a [[.Data.UpperName]] object which must be 
                 released, otherwise OBJ_NIL.
      @warning   Remember to release the returned object.
      */
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Copy (
-        [[.Defns.NameUC]]_DATA       *this
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_Copy (
+        [[.Data.UpperName]]_DATA       *this
     )
     {
-        [[.Defns.NameUC]]_DATA       *pOther = OBJ_NIL;
+        [[.Data.UpperName]]_DATA       *pOther = OBJ_NIL;
         ERESULT         eRc;
         
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
 #endif
         
-        pOther = [[.Defns.Name]]_New( );
+        pOther = [[.Data.Name]]_New( );
         if (pOther) {
-            eRc = [[.Defns.Name]]_Assign(this, pOther);
+            eRc = [[.Data.Name]]_Assign(this, pOther);
             if (ERESULT_HAS_FAILED(eRc)) {
                 obj_Release(pOther);
                 pOther = OBJ_NIL;
@@ -449,11 +453,11 @@ extern "C" {
     //                        D e a l l o c
     //---------------------------------------------------------------
 
-    void            [[.Defns.Name]]_Dealloc (
+    void            [[.Data.Name]]_Dealloc (
         OBJ_ID          objId
     )
     {
-        [[.Defns.NameUC]]_DATA   *this = objId;
+        [[.Data.UpperName]]_DATA   *this = objId;
 
         // Do initialization.
         if (NULL == this) {
@@ -461,7 +465,7 @@ extern "C" {
         }        
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return;
         }
@@ -469,11 +473,11 @@ extern "C" {
 
 #ifdef XYZZY
         if (obj_IsEnabled(this)) {
-            (([[.Defns.NameUC]]_VTBL *)obj_getVtbl(this))->devVtbl.pStop((OBJ_DATA *)this,NULL);
+            (([[.Data.UpperName]]_VTBL *)obj_getVtbl(this))->devVtbl.pStop((OBJ_DATA *)this,NULL);
         }
 #endif
 
-        [[.Defns.Name]]_setStr(this, OBJ_NIL);
+        [[.Data.Name]]_setStr(this, OBJ_NIL);
 
         obj_setVtbl(this, this->pSuperVtbl);
         // pSuperVtbl is saved immediately after the super
@@ -496,8 +500,8 @@ extern "C" {
      @return    if successful, ERESULT_SUCCESS.  Otherwise, an ERESULT_*
                 error code.
      */
-    ERESULT         [[.Defns.Name]]_Disable (
-        [[.Defns.NameUC]]_DATA		*this
+    ERESULT         [[.Data.Name]]_Disable (
+        [[.Data.UpperName]]_DATA		*this
     )
     {
         //ERESULT         eRc;
@@ -505,7 +509,7 @@ extern "C" {
         // Do initialization.
     #ifdef NDEBUG
     #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -531,8 +535,8 @@ extern "C" {
      @return    if successful, ERESULT_SUCCESS.  Otherwise, an ERESULT_*
                 error code.
      */
-    ERESULT         [[.Defns.Name]]_Enable (
-        [[.Defns.NameUC]]_DATA		*this
+    ERESULT         [[.Data.Name]]_Enable (
+        [[.Data.UpperName]]_DATA		*this
     )
     {
         //ERESULT         eRc;
@@ -540,7 +544,7 @@ extern "C" {
         // Do initialization.
     #ifdef NDEBUG
     #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -560,11 +564,11 @@ extern "C" {
     //                          I n i t
     //---------------------------------------------------------------
 
-    [[.Defns.NameUC]]_DATA *   [[.Defns.Name]]_Init (
-        [[.Defns.NameUC]]_DATA       *this
+    [[.Data.UpperName]]_DATA *   [[.Data.Name]]_Init (
+        [[.Data.UpperName]]_DATA       *this
     )
     {
-        uint32_t        cbSize = sizeof([[.Defns.NameUC]]_DATA);
+        uint32_t        cbSize = sizeof([[.Data.UpperName]]_DATA);
         //ERESULT         eRc;
         
         if (OBJ_NIL == this) {
@@ -582,7 +586,7 @@ extern "C" {
         }
 
         //this = (OBJ_ID)other_Init((OTHER_DATA *)this);    // Needed for Inheritance
-        this = (OBJ_ID)obj_Init(this, cbSize, OBJ_IDENT_[[.Defns.NameUC]]);
+        this = (OBJ_ID)obj_Init(this, cbSize, OBJ_IDENT_[[.Data.UpperName]]);
         if (OBJ_NIL == this) {
             DEBUG_BREAK();
             obj_Release(this);
@@ -590,22 +594,25 @@ extern "C" {
         }
         //obj_setSize(this, cbSize);                        // Needed for Inheritance
         this->pSuperVtbl = obj_getVtbl(this);
-        obj_setVtbl(this, (OBJ_IUNKNOWN *)&[[.Defns.Name]]_Vtbl);
+        obj_setVtbl(this, (OBJ_IUNKNOWN *)&[[.Data.Name]]_Vtbl);
         
         //this->stackSize = obj_getMisc1(this);
         //this->pArray = objArray_New( );
+    [[range $p := .Data.Props -]]
+        [[- $p.GenInit]]
+    [[- end]]
 
     #ifdef NDEBUG
     #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             obj_Release(this);
             return OBJ_NIL;
         }
 #ifdef __APPLE__
-        fprintf(stderr, "[[.Defns.Name]]::sizeof([[.Defns.NameUC]]_DATA) = %lu\n", sizeof([[.Defns.NameUC]]_DATA));
+        fprintf(stderr, "[[.Data.Name]]::sizeof([[.Data.UpperName]]_DATA) = %lu\n", sizeof([[.Data.UpperName]]_DATA));
 #endif
-        BREAK_NOT_BOUNDARY4(sizeof([[.Defns.NameUC]]_DATA));
+        BREAK_NOT_BOUNDARY4(sizeof([[.Data.UpperName]]_DATA));
     #endif
 
         return this;
@@ -617,8 +624,8 @@ extern "C" {
     //                       I s E n a b l e d
     //---------------------------------------------------------------
     
-    ERESULT         [[.Defns.Name]]_IsEnabled (
-        [[.Defns.NameUC]]_DATA		*this
+    ERESULT         [[.Data.Name]]_IsEnabled (
+        [[.Data.UpperName]]_DATA		*this
     )
     {
         //ERESULT         eRc;
@@ -626,7 +633,7 @@ extern "C" {
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -653,14 +660,14 @@ extern "C" {
      Example:
      @code
         // Return a method pointer for a string or NULL if not found. 
-        void        *pMethod = [[.Defns.Name]]_QueryInfo(this, OBJ_QUERYINFO_TYPE_METHOD, "xyz");
+        void        *pMethod = [[.Data.Name]]_QueryInfo(this, OBJ_QUERYINFO_TYPE_METHOD, "xyz");
      @endcode 
      @param     objId   object pointer
      @param     type    one of OBJ_QUERYINFO_TYPE members (see obj.h)
      @param     pData   for OBJ_QUERYINFO_TYPE_INFO, this field is not used,
                         for OBJ_QUERYINFO_TYPE_METHOD, this field points to a 
                         character string which represents the method name without
-                        the object name, "[[.Defns.Name]]", prefix,
+                        the object name, "[[.Data.Name]]", prefix,
                         for OBJ_QUERYINFO_TYPE_PTR, this field contains the
                         address of the method to be found.
      @return    If unsuccessful, NULL. Otherwise, for:
@@ -668,13 +675,13 @@ extern "C" {
                 OBJ_QUERYINFO_TYPE_METHOD: method pointer,
                 OBJ_QUERYINFO_TYPE_PTR: constant UTF-8 method name pointer
      */
-    void *          [[.Defns.Name]]_QueryInfo (
+    void *          [[.Data.Name]]_QueryInfo (
         OBJ_ID          objId,
         uint32_t        type,
         void            *pData
     )
     {
-        [[.Defns.NameUC]]_DATA     *this = objId;
+        [[.Data.UpperName]]_DATA     *this = objId;
         const
         char            *pStr = pData;
         
@@ -683,7 +690,7 @@ extern "C" {
         }
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return NULL;
         }
@@ -692,11 +699,11 @@ extern "C" {
         switch (type) {
                 
         case OBJ_QUERYINFO_TYPE_OBJECT_SIZE:
-            return (void *)sizeof([[.Defns.NameUC]]_DATA);
+            return (void *)sizeof([[.Data.UpperName]]_DATA);
             break;
             
             case OBJ_QUERYINFO_TYPE_CLASS_OBJECT:
-                return (void *)[[.Defns.Name]]_Class();
+                return (void *)[[.Data.Name]]_Class();
                 break;
                 
 #ifdef XYZZY  
@@ -726,22 +733,22 @@ extern "C" {
                         
                     case 'D':
                         if (str_Compare("Disable", (char *)pStr) == 0) {
-                            return [[.Defns.Name]]_Disable;
+                            return [[.Data.Name]]_Disable;
                         }
                         break;
 
                     case 'E':
                         if (str_Compare("Enable", (char *)pStr) == 0) {
-                            return [[.Defns.Name]]_Enable;
+                            return [[.Data.Name]]_Enable;
                         }
                         break;
 
                     case 'T':
                         if (str_Compare("ToDebugString", (char *)pStr) == 0) {
-                            return [[.Defns.Name]]_ToDebugString;
+                            return [[.Data.Name]]_ToDebugString;
                         }
                         if (str_Compare("ToJSON", (char *)pStr) == 0) {
-                            return [[.Defns.Name]]_ToJSON;
+                            return [[.Data.Name]]_ToJSON;
                         }
                         break;
                         
@@ -751,9 +758,9 @@ extern "C" {
                 break;
                 
             case OBJ_QUERYINFO_TYPE_PTR:
-                if (pData == [[.Defns.Name]]_ToDebugString)
+                if (pData == [[.Data.Name]]_ToDebugString)
                     return "ToDebugString";
-                if (pData == [[.Defns.Name]]_ToJSON)
+                if (pData == [[.Data.Name]]_ToJSON)
                     return "ToJSON";
                 break;
                 
@@ -770,8 +777,8 @@ extern "C" {
     //                       T o  J S O N
     //---------------------------------------------------------------
     
-     ASTR_DATA *     [[.Defns.Name]]_ToJSON (
-        [[.Defns.NameUC]]_DATA      *this
+     ASTR_DATA *     [[.Data.Name]]_ToJSON (
+        [[.Data.UpperName]]_DATA      *this
     )
     {
         ERESULT         eRc;
@@ -782,7 +789,7 @@ extern "C" {
         
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
@@ -813,16 +820,16 @@ extern "C" {
      Create a string that describes this object and the objects within it.
      Example:
      @code 
-        ASTR_DATA      *pDesc = [[.Defns.Name]]_ToDebugString(this,4);
+        ASTR_DATA      *pDesc = [[.Data.Name]]_ToDebugString(this,4);
      @endcode 
-     @param     this    [[.Defns.NameUC]] object pointer
+     @param     this    [[.Data.UpperName]] object pointer
      @param     indent  number of characters to indent every line of output, can be 0
      @return    If successful, an AStr object which must be released containing the
                 description, otherwise OBJ_NIL.
      @warning  Remember to release the returned AStr object.
      */
-    ASTR_DATA *     [[.Defns.Name]]_ToDebugString (
-        [[.Defns.NameUC]]_DATA      *this,
+    ASTR_DATA *     [[.Data.Name]]_ToDebugString (
+        [[.Data.UpperName]]_DATA      *this,
         int             indent
     )
     {
@@ -838,7 +845,7 @@ extern "C" {
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (![[.Defns.Name]]_Validate(this)) {
+        if (![[.Data.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
@@ -859,7 +866,7 @@ extern "C" {
                     "{%p(%s) size=%d\n",
                     this,
                     pInfo->pClassName,
-                    [[.Defns.Name]]_getSize(this)
+                    [[.Data.Name]]_getSize(this)
             );
 
 #ifdef  XYZZY        
@@ -896,15 +903,15 @@ extern "C" {
 
     #ifdef NDEBUG
     #else
-    bool            [[.Defns.Name]]_Validate (
-        [[.Defns.NameUC]]_DATA      *this
+    bool            [[.Data.Name]]_Validate (
+        [[.Data.UpperName]]_DATA      *this
     )
     {
  
         // WARNING: We have established that we have a valid pointer
         //          in 'this' yet.
        if (this) {
-            if (obj_IsKindOf(this, OBJ_IDENT_[[.Defns.NameUC]]))
+            if (obj_IsKindOf(this, OBJ_IDENT_[[.Data.UpperName]]))
                 ;
             else {
                 // 'this' is not our kind of data. We really don't
@@ -920,7 +927,7 @@ extern "C" {
         // 'this'.
 
 
-        if (!(obj_getSize(this) >= sizeof([[.Defns.NameUC]]_DATA))) {
+        if (!(obj_getSize(this) >= sizeof([[.Data.UpperName]]_DATA))) {
             return false;
         }
 

@@ -1,92 +1,119 @@
 /*
  *	Generated [[Time]]
  */
+[[$o := .Data]]
 
 
-#import <XCTest/XCTest.h>
 
 
 
 // All code under test must be linked into the Unit Test bundle
 // Test Macros:
-//      XCTAssert(expression, failure_description, ...)
-//      XCTFail(failure_description, ...)
-//      XCTAssertEqualObjects(object_1, object_2, failure_description, ...) uses isEqualTo:
-//      XCTAssertEquals(value_1, value_2, failure_description, ...)
-//      XCTAssertEqualsWithAccuracy(value_1, value_2, accuracy, failure_description, ...)
-//      XCTAssertNil(expression, failure_description, ...)
-//      XCTAssertNotNil(expression, failure_description, ...)
-//      XCTAssertTrue(expression, failure_description, ...)
-//      XCTAssertFalse(expression, failure_description, ...)
-//      XCTAssertThrows(expression, failure_description, ...)
-//      XCTAssertThrowsSpecific(expression, exception_class, failure_description, ...)
-//      XCTAssertThrowsSpecificNamed(expression, exception_class, exception_name, failure_description, ...)
-//      XCTAssertNoThrow(expression, failure_description, ...)
-//      XCTAssertNoThrowSpecific(expression, exception_class, failure_description, ...)
-//      XCTAssertNoThrowSpecificNamed(expression, exception_class, exception_name, failure_description, ...)
+//      TINYTEST_ASSERT(condition)
+//      TINYTEST_ASSERT_MSG(condition,msg)
+//      TINYTEST_EQUAL(expected, actual)
+//      TINYTEST_EQUAL_MSG(expected, actual, msg)
+//      TINYTEST_FALSE_MSG(condition,msg)
+//      TINYTEST_FALSE(condition)
+//      TINYTEST_TRUE_MSG(pointer,msg)
+//      TINYTEST_TRUE(condition)
 
 
-#include    <[[.Defns.Name]]_internal.h>
+
+
+
+#include    <tinytest.h>
+#include    <cmn_defs.h>
 #include    <trace.h>
+#include    <[[.Data.Name]]_internal.h>
 
 
 
-
-@interface [[.Defns.Name]]Tests : XCTestCase
-
-@end
-
-@implementation [[.Defns.Name]]Tests
-
-
-- (void)setUp
+int             setUp(
+    const
+    char            *pTestName
+)
 {
-    [super setUp];
-    
     mem_Init( );
-    
+    trace_Shared( ); 
     // Put setup code here. This method is called before the invocation of each
     // test method in the class.
+    
+    return 1; 
 }
 
 
-- (void)tearDown
+int             tearDown(
+    const
+    char            *pTestName
+)
 {
     // Put teardown code here. This method is called after the invocation of each
     // test method in the class.
 
-    trace_SharedReset();
-    mem_Dump( );
+    
+    trace_SharedReset( ); 
+    if (mem_Dump( ) ) {
+        fprintf(
+                stderr,
+                "\x1b[1m"
+                "\x1b[31m"
+                "ERROR: "
+                "\x1b[0m"
+                "Leaked memory areas were found!\n"
+        );
+        exitCode = 4;
+        return 0;
+    }
     mem_Release( );
-
-    [super tearDown];
+    
+    return 1; 
 }
 
 
 
 
-- (void)testOpenClose
+
+
+int             test_[[.Data.Name]]_OpenClose(
+    const
+    char            *pTestName
+)
 {
     ERESULT         eRc = ERESULT_SUCCESS;
-    [[.Defns.NameUC]]_DATA	*pObj = OBJ_NIL;
+    [[.Data.UpperName]]_DATA	    *pObj = OBJ_NIL;
    
-    pObj = [[.Defns.Name]]_Alloc( );
-    XCTAssertFalse( (OBJ_NIL == pObj) );
-    pObj = [[.Defns.Name]]_Init( pObj );
-    XCTAssertFalse( (OBJ_NIL == pObj) );
+    fprintf(stderr, "Performing: %s\n", pTestName);
+
+    pObj = [[.Data.Name]]_Alloc( );
+    TINYTEST_FALSE( (OBJ_NIL == pObj) );
+    pObj = [[.Data.Name]]_Init( pObj );
+    TINYTEST_FALSE( (OBJ_NIL == pObj) );
     if (pObj) {
+
+        //obj_TraceSet(pObj, true);       
         
-        XCTAssertTrue( (!ERESULT_FAILED(eRc)) );
+        // Test something.
+        TINYTEST_FALSE( (ERESULT_FAILED(eRc)) );
 
         obj_Release(pObj);
         pObj = OBJ_NIL;
     }
 
+    fprintf(stderr, "...%s completed.\n\n", pTestName);
+    return 1;
 }
 
 
 
-@end
+
+TINYTEST_START_SUITE(test_[[.Data.Name]]);
+    TINYTEST_ADD_TEST(test_[[.Data.Name]]_OpenClose,setUp,tearDown);
+TINYTEST_END_SUITE();
+
+TINYTEST_MAIN_SINGLE_SUITE(test_[[.Data.Name]]);
+
+
 
 
 

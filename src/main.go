@@ -125,10 +125,10 @@ func SetupShared(execPath string, cmd string) error {
 		if wrk, ok = m["data"]; ok {
 			sharedData.SetDataPath(wrk.(string))
 		}
-		if wrk, ok = m["Debug"]; ok {
+		if wrk, ok = m["debug"]; ok {
 			sharedData.SetDebug(wrk.(bool))
 		}
-		if wrk, ok = m["Force"]; ok {
+		if wrk, ok = m["force"]; ok {
 			sharedData.SetForce(wrk.(bool))
 		}
 		if wrk, ok = m["main"]; ok {
@@ -137,16 +137,16 @@ func SetupShared(execPath string, cmd string) error {
 		if wrk, ok = m["mdldir"]; ok {
 			sharedData.SetMdlDir(wrk.(string))
 		}
-		if wrk, ok = m["Noop"]; ok {
+		if wrk, ok = m["noop"]; ok {
 			sharedData.SetNoop(wrk.(bool))
 		}
 		if wrk, ok = m["outdir"]; ok {
 			sharedData.SetOutDir(wrk.(string))
 		}
-		if wrk, ok = m["Quiet"]; ok {
+		if wrk, ok = m["quiet"]; ok {
 			sharedData.SetQuiet(wrk.(bool))
 		}
-		if wrk, ok = m["Replace"]; ok {
+		if wrk, ok = m["replace"]; ok {
 			sharedData.SetReplace(wrk.(bool))
 		}
 		if wrk, ok = m["define"]; ok {
@@ -200,11 +200,6 @@ func main() {
 	err = SetupShared(execPath, flag.Arg(0))
 	if err != nil {
 		log.Fatalln("Error: failed to set up main definitions:", err)
-	}
-
-	// Read JSON definition files
-	if err = mainData.ReadJsonFileMain(sharedData.MainPath()); err != nil {
-		log.Fatalln("Error: Reading Main Json Input:", mainPath, err)
 	}
 
 	// Execute the command

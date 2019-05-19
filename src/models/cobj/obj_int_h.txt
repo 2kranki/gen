@@ -1,13 +1,13 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 /* 
- * File:   [[.Defns.Name]]_internal.h
+ * File:   [[.Data.Name]]_internal.h
  *	Generated [[Time]]
  *
  * Notes:
  *  --	N/A
  *
  */
-
+[[$o := .Data]]
 
 /*
  This is free and unencumbered software released into the public domain.
@@ -39,12 +39,12 @@
 
 
 
-#include        <[[.Defns.Name]].h>
+#include        <[[.Data.Name]].h>
 #include        <jsonIn.h>
 
 
-#ifndef [[.Defns.NameUC]]_INTERNAL_H
-#define	[[.Defns.NameUC]]_INTERNAL_H
+#ifndef [[.Data.UpperName]]_INTERNAL_H
+#define	[[.Data.UpperName]]_INTERNAL_H
 
 
 
@@ -64,7 +64,7 @@ extern "C" {
     //---------------------------------------------------------------
 
 #pragma pack(push, 1)
-struct [[.Defns.Name]]_data_s	{
+struct [[.Data.Name]]_data_s	{
     /* Warning - OBJ_DATA must be first in this object!
      */
     OBJ_DATA        super;
@@ -74,16 +74,19 @@ struct [[.Defns.Name]]_data_s	{
     uint16_t        size;		    // maximum number of elements
     uint16_t        rsvd16;
     ASTR_DATA       *pStr;
+    [[range $p := .Data.Props]]
+        [[- $p.GenStruct]]
+    [[- end]]
 
 };
 #pragma pack(pop)
 
     extern
-    struct [[.Defns.Name]]_class_data_s  [[.Defns.Name]]_ClassObj;
+    struct [[.Data.Name]]_class_data_s  [[.Data.Name]]_ClassObj;
 
     extern
     const
-    [[.Defns.NameUC]]_VTBL         [[.Defns.Name]]_Vtbl;
+    [[.Data.UpperName]]_VTBL         [[.Data.Name]]_Vtbl;
 
 
 
@@ -91,13 +94,13 @@ struct [[.Defns.Name]]_data_s	{
     //              Class Object Method Forward Definitions
     //---------------------------------------------------------------
 
-#ifdef  [[.Defns.NameUC]]_SINGLETON
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_getSingleton (
+#ifdef  [[.Data.UpperName]]_SINGLETON
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_getSingleton (
         void
     );
 
-    bool            [[.Defns.Name]]_setSingleton (
-     [[.Defns.NameUC]]_DATA       *pValue
+    bool            [[.Data.Name]]_setSingleton (
+     [[.Data.UpperName]]_DATA       *pValue
 );
 #endif
 
@@ -107,30 +110,33 @@ struct [[.Defns.Name]]_data_s	{
     //              Internal Method Forward Definitions
     //---------------------------------------------------------------
 
-    OBJ_IUNKNOWN *  [[.Defns.Name]]_getSuperVtbl (
-        [[.Defns.NameUC]]_DATA     *this
+    OBJ_IUNKNOWN *  [[.Data.Name]]_getSuperVtbl (
+        [[.Data.UpperName]]_DATA     *this
     );
 
+    [[range $p := .Data.Props]]
+        [[$p.GenDefnPrivate]]
+    [[- end]]
 
-    void            [[.Defns.Name]]_Dealloc (
+    void            [[.Data.Name]]_Dealloc (
         OBJ_ID          objId
     );
 
 
-    [[.Defns.NameUC]]_DATA *       [[.Defns.Name]]_ParseObject (
+    [[.Data.UpperName]]_DATA *       [[.Data.Name]]_ParseObject (
         JSONIN_DATA     *pParser
     );
 
 
-    void *          [[.Defns.Name]]_QueryInfo (
+    void *          [[.Data.Name]]_QueryInfo (
         OBJ_ID          objId,
         uint32_t        type,
         void            *pData
     );
 
 
-    ASTR_DATA *     [[.Defns.Name]]_ToJSON (
-        [[.Defns.NameUC]]_DATA      *this
+    ASTR_DATA *     [[.Data.Name]]_ToJSON (
+        [[.Data.UpperName]]_DATA      *this
     );
 
 
@@ -138,8 +144,8 @@ struct [[.Defns.Name]]_data_s	{
 
 #ifdef NDEBUG
 #else
-    bool			[[.Defns.Name]]_Validate (
-        [[.Defns.NameUC]]_DATA       *this
+    bool			[[.Data.Name]]_Validate (
+        [[.Data.UpperName]]_DATA       *this
     );
 #endif
 
@@ -149,5 +155,5 @@ struct [[.Defns.Name]]_data_s	{
 }
 #endif
 
-#endif	/* [[.Defns.NameUC]]_INTERNAL_H */
+#endif	/* [[.Data.UpperName]]_INTERNAL_H */
 

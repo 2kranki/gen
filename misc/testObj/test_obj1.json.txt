@@ -9,8 +9,8 @@
             "name":"abc",
             "internal":"def",           # optional, if not given, use $name
             "desc":"important data",    # optional
-            "typeDefn":"uint32_t",
-            "obj":false,                # true == object which needs release
+            "type":"uint32_t",
+            "object":false,             # true == object which needs release
             "init":"2000",              # optional, initialization
             "vis":"public",             # Visibility: public, private, read-only, none
             "base":"",                  # Base Struct/Pointer
@@ -19,10 +19,12 @@
             "shift":0                   # amount to shift right to put in lowest bit   
         },
         {
-            "internal":"ghi",
-            "desc":"important object",  
-            "type":"Node",
-            "obj":true,
+            "name":"ghi",
+            "internal":"pGhi",
+            "desc":"another important object",
+            "type":"NODE_DATA",
+            "object":true,
+            "init":"OBJ_NIL",
             "vis":"ro",
             "base":null,
             "offset":0,

@@ -15,7 +15,6 @@
 package genCObj
 
 import (
-	"../mainData"
 	"../shared"
 	"../util"
 	"errors"
@@ -24,8 +23,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -40,36 +39,42 @@ const (
 // FileDefn gives the parameters needed to generate a file.  The fields of
 // the struct have been simplified to allow for easy json encoding/decoding.
 type FileDefn struct {
-	ModelName string `json:"ModelName,omitempty"`
-	FileName  string `json:"FileName,omitempty"`
-	FileType  string `json:"Type,omitempty"`  // text, sql, html
+	ModelName 	string 		`json:"ModelName,omitempty"`
+	FileDir		string		`json:"FileDir,omitempty"`		// Output File Directory
+	FileName  	string 		`json:"FileName,omitempty"`
+	FileType  	string 		`json:"Type,omitempty"`  // text, sql, html
 	FilePerms	os.FileMode	`json:"FilePerms,omitempty"`	// Output File Permissions
 }
 
 // FileDefns controls what files are generated.
 var FileDefns []FileDefn = []FileDefn{
 	{"obj_int_h.txt",
-		"${srcDir}/${objName}_internal.h",
+		"src",
+		"${Name}_internal.h",
 		"text",
 		0644,
 	},
 	{"obj_obj_c.txt",
-		"${srcDir}/${objName}_object.c",
+		"src",
+		"${Name}_object.c",
 		"text",
 		0644,
 	},
 	{"obj_c.txt",
-		"${srcDir}/${objName}.c",
+		"src",
+		"${Name}.c",
 		"text",
 		0644,
 	},
 	{"obj_h.txt",
-		"${srcDir}/${objName}.h",
+		"src",
+		"${Name}.h",
 		"text",
 		0644,
 	},
 	{"obj_test_c.txt",
-		"${testDir}/test_${objName}.c",
+		"tests",
+		"test_${Name}.c",
 		"text",
 		0644,
 	},
@@ -83,7 +88,6 @@ var FileDefns []FileDefn = []FileDefn{
 // access by the generation functions.
 type TmplData struct {
 	Data     *DbObject
-	Main     *mainData.MainData
 }
 
 var tmplData TmplData
@@ -135,7 +139,7 @@ func createModelPath(fn string) (string, error) {
 
 	// Calculate the model path.
 	modelPath = sharedData.MdlDir()
-	modelPath += "/sqlapp"
+	modelPath += "/cobj"
 	modelPath += "/"
 	modelPath += fn
 	//modelPath = filepath.Clean(modelPath)				// Clean() is part of Abs()
@@ -144,11 +148,17 @@ func createModelPath(fn string) (string, error) {
 	return modelPath, err
 }
 
-func createOutputPath(fn string) (string, error) {
-	var outPath string
-	var err error
+func createOutputPath(dn,fn string) (string, error) {
+	var outPath 	string
+	var err 		error
+
+	if len(fn) > 0 {
+		fn = strings.Replace(fn, "${Name}", tmplData.Data.Name, -1)
+	}
 
 	outPath = sharedData.OutDir()
+	outPath += "/"
+	outPath += dn
 	outPath += "/"
 	outPath += fn
 	outPath, err = util.IsPathRegularFile(outPath)
@@ -161,63 +171,28 @@ func createOutputPath(fn string) (string, error) {
 	return outPath, nil
 }
 
-// readJsonFiles reads in the two JSON files that define the
-// application to be generated.
-func readJsonFiles() error {
-	var err error
-
-	if err = mainData.ReadJsonFileMain(sharedData.MainPath()); err != nil {
-		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
-	}
-
-	/***
-	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
-		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
-	}
-	***/
-
-    return nil
-}
-
 func GenCObj(inDefns map[string]interface{}) error {
-	var err error
+	var err 	error
 
 	if sharedData.Debug() {
-		log.Println("\tsql_app: In Debug Mode")
+		log.Println("GenCObj: In Debug Mode...")
 		log.Printf("\t  args: %q\n", flag.Args())
 	}
 
-	// Verify the parameters needed.
-
-
-    // Read the JSON files.
-    if err = readJsonFiles(); err != nil {
-		log.Fatalln(err)
-    }
-
 	// Set up template data
-	tmplData.Main = mainData.MainStruct()
 	tmplData.Data = DbStruct()
 
-	// Set up the output directory structure
-    if !sharedData.Noop() {
-        tmpName := path.Clean(sharedData.OutDir())
-        if err = os.RemoveAll(tmpName); err != nil {
-            log.Fatalln("Error: Could not remove output directory:", tmpName, err)
-        }
-        tmpName = path.Clean(sharedData.OutDir() + "/tmpl")
-        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-            log.Fatalln("Error: Could not create output directory:", tmpName, err)
-        }
-        tmpName = path.Clean(sharedData.OutDir() + "/handlers")
-        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-            log.Fatalln("Error: Could not create output directory:", tmpName, err)
-        }
-        tmpName = path.Clean(sharedData.OutDir() + "/tableio")
-        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-            log.Fatalln("Error: Could not create output directory:", tmpName, err)
-        }
-    }
+	// Read the JSON file.
+	if sharedData.Debug() {
+		log.Println("\tDataPath:", sharedData.DataPath())
+	}
+	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
+		log.Fatalln(errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err)))
+	}
+
+	if sharedData.OutDir() == "" {
+		log.Fatalf("Error - 'libPath' cli argument is required!\n\n\n")
+	}
 
 	// Now handle each FileDefn creating a file for it.
 	for _, def := range (FileDefns) {
@@ -228,10 +203,6 @@ func GenCObj(inDefns map[string]interface{}) error {
 			log.Println("Process file:", def.ModelName, "generating:", def.FileName, "...")
 		}
 
-		//if def.PreprocSql {
-		//PreprocessSql(json.(DatabaseData))
-		//}
-
 		// Create the input model file path.
 		if modelPath, err = createModelPath(def.ModelName); err != nil {
 			return errors.New(fmt.Sprintln("Error:", modelPath, err))
@@ -241,7 +212,7 @@ func GenCObj(inDefns map[string]interface{}) error {
 		}
 
 		// Create the output path
-		if outPath, err = createOutputPath(def.FileName); err != nil {
+		if outPath, err = createOutputPath(def.FileDir, def.FileName); err != nil {
 			log.Fatalln(err)
 		}
 		if sharedData.Debug() {

@@ -1,7 +1,8 @@
 // vi: nu:noai:ts=4:sw=4
 
-//	Class Object Metods and Tables for '[[.Defns.Name]]'
+//	Class Object Metods and Tables for '[[.Data.Name]]'
 //	Generated [[Time]]
+[[$o := .Data]]
 
 
 /*
@@ -34,9 +35,9 @@
 
 
 
-#define			[[.Defns.NameUC]]_OBJECT_C	    1
-#include        <[[.Defns.Name]]_internal.h>
-#ifdef  [[.Defns.NameUC]]_SINGLETON
+#define			[[.Data.UpperName]]_OBJECT_C	    1
+#include        <[[.Data.Name]]_internal.h>
+#ifdef  [[.Data.UpperName]]_SINGLETON
 #include        <psxLock.h>
 #endif
 
@@ -46,14 +47,14 @@
 //                  Class Object Definition
 //===========================================================
 
-struct [[.Defns.Name]]_class_data_s	{
+struct [[.Data.Name]]_class_data_s	{
     // Warning - OBJ_DATA must be first in this object!
     OBJ_DATA        super;
     
     // Common Data
-#ifdef  [[.Defns.NameUC]]_SINGLETON
+#ifdef  [[.Data.UpperName]]_SINGLETON
     volatile
-    [[.Defns.NameUC]]_DATA       *pSingleton;
+    [[.Data.UpperName]]_DATA       *pSingleton;
 #endif
     //uint32_t        misc;
     //OBJ_ID          pObjCatalog;
@@ -69,7 +70,7 @@ struct [[.Defns.Name]]_class_data_s	{
 
 
 static
-void *          [[.Defns.Name]]Class_QueryInfo (
+void *          [[.Data.Name]]Class_QueryInfo (
     OBJ_ID          objId,
     uint32_t        type,
     void            *pData
@@ -78,17 +79,17 @@ void *          [[.Defns.Name]]Class_QueryInfo (
 
 static
 const
-OBJ_INFO        [[.Defns.Name]]_Info;            // Forward Reference
+OBJ_INFO        [[.Data.Name]]_Info;            // Forward Reference
 
 
 
 
 static
-bool            [[.Defns.Name]]Class_IsKindOf (
+bool            [[.Data.Name]]Class_IsKindOf (
     uint16_t		classID
 )
 {
-    if (OBJ_IDENT_[[.Defns.NameUC]]_CLASS == classID) {
+    if (OBJ_IDENT_[[.Data.UpperName]]_CLASS == classID) {
        return true;
     }
     if (OBJ_IDENT_OBJ_CLASS == classID) {
@@ -99,11 +100,11 @@ bool            [[.Defns.Name]]Class_IsKindOf (
 
 
 static
-uint16_t		[[.Defns.Name]]Class_WhoAmI (
+uint16_t		[[.Data.Name]]Class_WhoAmI (
     void
 )
 {
-    return OBJ_IDENT_[[.Defns.NameUC]]_CLASS;
+    return OBJ_IDENT_[[.Data.UpperName]]_CLASS;
 }
 
 
@@ -115,17 +116,17 @@ uint16_t		[[.Defns.Name]]Class_WhoAmI (
 
 static
 const
-[[.Defns.NameUC]]_CLASS_VTBL    class_Vtbl = {
+[[.Data.UpperName]]_CLASS_VTBL    class_Vtbl = {
     {
-        &[[.Defns.Name]]_Info,
-        [[.Defns.Name]]Class_IsKindOf,
+        &[[.Data.Name]]_Info,
+        [[.Data.Name]]Class_IsKindOf,
         obj_RetainNull,
         obj_ReleaseNull,
         NULL,
-        [[.Defns.Name]]_Class,
-        [[.Defns.Name]]Class_WhoAmI,
-        (P_OBJ_QUERYINFO)[[.Defns.Name]]Class_QueryInfo,
-        NULL                        // [[.Defns.Name]]Class_ToDebugString
+        [[.Data.Name]]_Class,
+        [[.Data.Name]]Class_WhoAmI,
+        (P_OBJ_QUERYINFO)[[.Data.Name]]Class_QueryInfo,
+        NULL                        // [[.Data.Name]]Class_ToDebugString
     },
 };
 
@@ -135,10 +136,10 @@ const
 //						Class Object
 //-----------------------------------------------------------
 
-[[.Defns.NameUC]]_CLASS_DATA  [[.Defns.Name]]_ClassObj = {
+[[.Data.UpperName]]_CLASS_DATA  [[.Data.Name]]_ClassObj = {
     {
         (const OBJ_IUNKNOWN *)&class_Vtbl,      // pVtbl
-        sizeof([[.Defns.NameUC]]_CLASS_DATA),                  // cbSize
+        sizeof([[.Data.UpperName]]_CLASS_DATA),                  // cbSize
         0,                                      // cbFlags
         1,                                      // cbRetainCount
         {0}                                     // cbMisc
@@ -152,17 +153,17 @@ const
 //          S i n g l e t o n  M e t h o d s
 //---------------------------------------------------------------
 
-#ifdef  [[.Defns.NameUC]]_SINGLETON
-[[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_getSingleton (
+#ifdef  [[.Data.UpperName]]_SINGLETON
+[[.Data.UpperName]]_DATA *     [[.Data.Name]]_getSingleton (
     void
 )
 {
-    return (OBJ_ID)([[.Defns.Name]]_ClassObj.pSingleton);
+    return (OBJ_ID)([[.Data.Name]]_ClassObj.pSingleton);
 }
 
 
-bool            [[.Defns.Name]]_setSingleton (
-    [[.Defns.NameUC]]_DATA       *pValue
+bool            [[.Data.Name]]_setSingleton (
+    [[.Data.UpperName]]_DATA       *pValue
 )
 {
     PSXLOCK_DATA    *pLock = OBJ_NIL;
@@ -182,10 +183,10 @@ bool            [[.Defns.Name]]_setSingleton (
     }
     
     obj_Retain(pValue);
-    if ([[.Defns.Name]]_ClassObj.pSingleton) {
-        obj_Release((OBJ_ID)([[.Defns.Name]]_ClassObj.pSingleton));
+    if ([[.Data.Name]]_ClassObj.pSingleton) {
+        obj_Release((OBJ_ID)([[.Data.Name]]_ClassObj.pSingleton));
     }
-    [[.Defns.Name]]_ClassObj.pSingleton = pValue;
+    [[.Data.Name]]_ClassObj.pSingleton = pValue;
     
     fRc = psxLock_Unlock(pLock);
     obj_Release(pLock);
@@ -195,17 +196,17 @@ bool            [[.Defns.Name]]_setSingleton (
 
 
 
-[[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Shared (
+[[.Data.UpperName]]_DATA *     [[.Data.Name]]_Shared (
     void
 )
 {
-    [[.Defns.NameUC]]_DATA       *this = (OBJ_ID)([[.Defns.Name]]_ClassObj.pSingleton);
+    [[.Data.UpperName]]_DATA       *this = (OBJ_ID)([[.Data.Name]]_ClassObj.pSingleton);
     
     if (NULL == this) {
-        this = [[.Defns.Name]]_New( );
-        [[.Defns.Name]]_setSingleton(this);
+        this = [[.Data.Name]]_New( );
+        [[.Data.Name]]_setSingleton(this);
         obj_Release(this);          // Shared controls object retention now.
-        // [[.Defns.Name]]_ClassObj.pSingleton = OBJ_NIL;
+        // [[.Data.Name]]_ClassObj.pSingleton = OBJ_NIL;
     }
     
     return this;
@@ -213,15 +214,15 @@ bool            [[.Defns.Name]]_setSingleton (
 
 
 
-void            [[.Defns.Name]]_SharedReset (
+void            [[.Data.Name]]_SharedReset (
     void
 )
 {
-    [[.Defns.NameUC]]_DATA       *this = (OBJ_ID)([[.Defns.Name]]_ClassObj.pSingleton);
+    [[.Data.UpperName]]_DATA       *this = (OBJ_ID)([[.Data.Name]]_ClassObj.pSingleton);
     
     if (this) {
         obj_Release(this);
-        [[.Defns.Name]]_ClassObj.pSingleton = OBJ_NIL;
+        [[.Data.Name]]_ClassObj.pSingleton = OBJ_NIL;
     }
     
 }
@@ -237,13 +238,13 @@ void            [[.Defns.Name]]_SharedReset (
 //---------------------------------------------------------------
 
 static
-void *          [[.Defns.Name]]Class_QueryInfo (
+void *          [[.Data.Name]]Class_QueryInfo (
     OBJ_ID          objId,
     uint32_t        type,
     void            *pData
 )
 {
-    [[.Defns.NameUC]]_CLASS_DATA *this = objId;
+    [[.Data.UpperName]]_CLASS_DATA *this = objId;
     const
     char            *pStr = pData;
     
@@ -254,7 +255,7 @@ void *          [[.Defns.Name]]Class_QueryInfo (
     switch (type) {
       
         case OBJ_QUERYINFO_TYPE_OBJECT_SIZE:
-            return (void *)sizeof([[.Defns.NameUC]]_DATA);
+            return (void *)sizeof([[.Data.UpperName]]_DATA);
             break;
             
         case OBJ_QUERYINFO_TYPE_CLASS_OBJECT:
@@ -269,7 +270,7 @@ void *          [[.Defns.Name]]Class_QueryInfo (
  
                 case 'C':
                     if (str_Compare("ClassInfo", (char *)pStr) == 0) {
-                        return (void *)&[[.Defns.Name]]_Info;
+                        return (void *)&[[.Data.Name]]_Info;
                     }
                     break;
                     
@@ -287,13 +288,13 @@ void *          [[.Defns.Name]]Class_QueryInfo (
                     
                 case 'N':
                     if (str_Compare("New", (char *)pStr) == 0) {
-                        return [[.Defns.Name]]_New;
+                        return [[.Data.Name]]_New;
                     }
                     break;
                     
                  case 'W':
                     if (str_Compare("WhoAmI", (char *)pStr) == 0) {
-                        return [[.Defns.Name]]Class_WhoAmI;
+                        return [[.Data.Name]]Class_WhoAmI;
                     }
                     break;
                     
@@ -313,11 +314,11 @@ void *          [[.Defns.Name]]Class_QueryInfo (
 
 
 static
-bool            [[.Defns.Name]]_IsKindOf (
+bool            [[.Data.Name]]_IsKindOf (
     uint16_t		classID
 )
 {
-    if (OBJ_IDENT_[[.Defns.NameUC]] == classID) {
+    if (OBJ_IDENT_[[.Data.UpperName]] == classID) {
        return true;
     }
     if (OBJ_IDENT_OBJ == classID) {
@@ -329,25 +330,25 @@ bool            [[.Defns.Name]]_IsKindOf (
 
 // Dealloc() should be put into the Internal Header as well
 // for classes that get inherited from.
-void            [[.Defns.Name]]_Dealloc (
+void            [[.Data.Name]]_Dealloc (
     OBJ_ID          objId
 );
 
 
-OBJ_ID          [[.Defns.Name]]_Class (
+OBJ_ID          [[.Data.Name]]_Class (
     void
 )
 {
-    return (OBJ_ID)&[[.Defns.Name]]_ClassObj;
+    return (OBJ_ID)&[[.Data.Name]]_ClassObj;
 }
 
 
 static
-uint16_t		[[.Defns.Name]]_WhoAmI (
+uint16_t		[[.Data.Name]]_WhoAmI (
     void
 )
 {
-    return OBJ_IDENT_[[.Defns.NameUC]];
+    return OBJ_IDENT_[[.Data.UpperName]];
 }
 
 
@@ -359,34 +360,34 @@ uint16_t		[[.Defns.Name]]_WhoAmI (
 //===========================================================
 
 const
-[[.Defns.NameUC]]_VTBL     [[.Defns.Name]]_Vtbl = {
+[[.Data.UpperName]]_VTBL     [[.Data.Name]]_Vtbl = {
     {
-        &[[.Defns.Name]]_Info,
-        [[.Defns.Name]]_IsKindOf,
-#ifdef  [[.Defns.NameUC]]_IS_SINGLETON
+        &[[.Data.Name]]_Info,
+        [[.Data.Name]]_IsKindOf,
+#ifdef  [[.Data.UpperName]]_IS_SINGLETON
         obj_RetainNull,
         obj_ReleaseNull,
 #else
         obj_RetainStandard,
         obj_ReleaseStandard,
 #endif
-        [[.Defns.Name]]_Dealloc,
-        [[.Defns.Name]]_Class,
-        [[.Defns.Name]]_WhoAmI,
-        (P_OBJ_QUERYINFO)[[.Defns.Name]]_QueryInfo,
-        (P_OBJ_TOSTRING)[[.Defns.Name]]_ToDebugString,
-        NULL,			// [[.Defns.Name]]_Enable,
-        NULL,			// [[.Defns.Name]]_Disable,
-        NULL,			// (P_OBJ_ASSIGN)[[.Defns.Name]]_Assign,
-        NULL,			// (P_OBJ_COMPARE)[[.Defns.Name]]_Compare,
-        NULL, 			// (P_OBJ_PTR)[[.Defns.Name]]_Copy,
-        NULL, 			// (P_OBJ_PTR)[[.Defns.Name]]_DeepCopy,
-        NULL 			// (P_OBJ_HASH)[[.Defns.Name]]_Hash,
+        [[.Data.Name]]_Dealloc,
+        [[.Data.Name]]_Class,
+        [[.Data.Name]]_WhoAmI,
+        (P_OBJ_QUERYINFO)[[.Data.Name]]_QueryInfo,
+        (P_OBJ_TOSTRING)[[.Data.Name]]_ToDebugString,
+        NULL,			// [[.Data.Name]]_Enable,
+        NULL,			// [[.Data.Name]]_Disable,
+        NULL,			// (P_OBJ_ASSIGN)[[.Data.Name]]_Assign,
+        NULL,			// (P_OBJ_COMPARE)[[.Data.Name]]_Compare,
+        NULL, 			// (P_OBJ_PTR)[[.Data.Name]]_Copy,
+        NULL, 			// (P_OBJ_PTR)[[.Data.Name]]_DeepCopy,
+        NULL 			// (P_OBJ_HASH)[[.Data.Name]]_Hash,
     },
     // Put other object method names below this.
     // Properties:
     // Methods:
-    //[[.Defns.Name]]_IsEnabled,
+    //[[.Data.Name]]_IsEnabled,
  
 };
 
@@ -394,13 +395,13 @@ const
 
 static
 const
-OBJ_INFO        [[.Defns.Name]]_Info = {
-    "[[.Defns.Name]]",
-    "[[.Defns.Name]]",	// <-- Fill in description
-    (OBJ_DATA *)&[[.Defns.Name]]_ClassObj,
+OBJ_INFO        [[.Data.Name]]_Info = {
+    "[[.Data.Name]]",
+    "[[.Data.Name]]",	// <-- Fill in description
+    (OBJ_DATA *)&[[.Data.Name]]_ClassObj,
     (OBJ_DATA *)&obj_ClassObj,
-    (OBJ_IUNKNOWN *)&[[.Defns.Name]]_Vtbl,
-    sizeof([[.Defns.NameUC]]_DATA)
+    (OBJ_IUNKNOWN *)&[[.Data.Name]]_Vtbl,
+    sizeof([[.Data.UpperName]]_DATA)
 };
 #warning -- adjust super class object in Info above 
 //			if object inherits from another class

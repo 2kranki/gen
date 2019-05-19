@@ -1,16 +1,16 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 
 //****************************************************************
-//          [[.Defns.NameUC]]  ([[.Defns.Name]]) Header
+//          [[.Data.UpperName]]  ([[.Data.Name]]) Header
 //****************************************************************
 /*
  * Program
- *			Separate [[.Defns.Name]] ([[.Defns.Name]])
+ *			Separate [[.Data.Name]] ([[.Data.Name]])
  * Purpose
  *			This object provides a standardized way of handling
- *          a separate [[.Defns.Name]] to run things without complications
- *          of interfering with the main [[.Defns.Name]]. A [[.Defns.Name]] may be
- *          called a [[.Defns.Name]] on other O/S's.
+ *          a separate [[.Data.Name]] to run things without complications
+ *          of interfering with the main [[.Data.Name]]. A [[.Data.Name]] may be
+ *          called a [[.Data.Name]] on other O/S's.
  *
  * Remarks
  *	1.      None
@@ -18,6 +18,7 @@
  * History
  *  Generated [[Time]]
  */
+[[$o := .Data]]
 
 
 /*
@@ -55,11 +56,11 @@
 #include        <AStr.h>
 
 
-#ifndef         [[.Defns.NameUC]]_H
-#define         [[.Defns.NameUC]]_H
+#ifndef         [[.Data.UpperName]]_H
+#define         [[.Data.UpperName]]_H
 
 
-//#define   [[.Defns.NameUC]]_SINGLETON    1
+//#define   [[.Data.UpperName]]_SINGLETON    1
 
 
 
@@ -75,25 +76,25 @@ extern "C" {
     //****************************************************************
 
 
-    typedef struct [[.Defns.Name]]_data_s	[[.Defns.NameUC]]_DATA;            // Inherits from OBJ
-    typedef struct [[.Defns.Name]]_class_data_s [[.Defns.NameUC]]_CLASS_DATA;   // Inherits from OBJ
+    typedef struct [[.Data.Name]]_data_s	[[.Data.UpperName]]_DATA;            // Inherits from OBJ
+    typedef struct [[.Data.Name]]_class_data_s [[.Data.UpperName]]_CLASS_DATA;   // Inherits from OBJ
 
-    typedef struct [[.Defns.Name]]_vtbl_s	{
+    typedef struct [[.Data.Name]]_vtbl_s	{
         OBJ_IUNKNOWN    iVtbl;              // Inherited Vtbl.
         // Put other methods below this as pointers and add their
         // method names to the vtbl definition in $P_object.c.
         // Properties:
         // Methods:
-        //bool        (*pIsEnabled)([[.Defns.NameUC]]_DATA *);
+        //bool        (*pIsEnabled)([[.Data.UpperName]]_DATA *);
     } $Q_VTBL;
 
-    typedef struct [[.Defns.Name]]_class_vtbl_s	{
+    typedef struct [[.Data.Name]]_class_vtbl_s	{
         OBJ_IUNKNOWN    iVtbl;              // Inherited Vtbl.
         // Put other methods below this as pointers and add their
         // method names to the vtbl definition in $P_object.c.
         // Properties:
         // Methods:
-        //bool        (*pIsEnabled)([[.Defns.NameUC]]_DATA *);
+        //bool        (*pIsEnabled)([[.Data.UpperName]]_DATA *);
     } $Q_CLASS_VTBL;
 
 
@@ -108,12 +109,12 @@ extern "C" {
     //                      *** Class Methods ***
     //---------------------------------------------------------------
 
-#ifdef  [[.Defns.NameUC]]_SINGLETON
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Shared (
+#ifdef  [[.Data.UpperName]]_SINGLETON
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_Shared (
         void
     );
 
-    bool            [[.Defns.Name]]_SharedReset (
+    bool            [[.Data.Name]]_SharedReset (
         void
     );
 #endif
@@ -125,17 +126,17 @@ extern "C" {
      released.
      @return    pointer to $P object if successful, otherwise OBJ_NIL.
      */
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Alloc (
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_Alloc (
         void
     );
     
     
-    OBJ_ID          [[.Defns.Name]]_Class (
+    OBJ_ID          [[.Data.Name]]_Class (
         void
     );
     
     
-    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_New (
+    [[.Data.UpperName]]_DATA *     [[.Data.Name]]_New (
         void
     );
     
@@ -145,6 +146,10 @@ extern "C" {
     //                      *** Properties ***
     //---------------------------------------------------------------
 
+    [[range $p := .Data.Props]]
+        [[$p.GenDefn]]
+    [[- end]]
+
 
 
     
@@ -152,23 +157,23 @@ extern "C" {
     //                      *** Methods ***
     //---------------------------------------------------------------
 
-    ERESULT     [[.Defns.Name]]_Disable (
-        [[.Defns.NameUC]]_DATA		*this
+    ERESULT     [[.Data.Name]]_Disable (
+        [[.Data.UpperName]]_DATA		*this
     );
 
 
-    ERESULT     [[.Defns.Name]]_Enable (
-        [[.Defns.NameUC]]_DATA		*this
+    ERESULT     [[.Data.Name]]_Enable (
+        [[.Data.UpperName]]_DATA		*this
     );
 
    
-    [[.Defns.NameUC]]_DATA *   [[.Defns.Name]]_Init (
-        [[.Defns.NameUC]]_DATA     *this
+    [[.Data.UpperName]]_DATA *   [[.Data.Name]]_Init (
+        [[.Data.UpperName]]_DATA     *this
     );
 
 
-    ERESULT     [[.Defns.Name]]_IsEnabled (
-        [[.Defns.NameUC]]_DATA		*this
+    ERESULT     [[.Data.Name]]_IsEnabled (
+        [[.Data.UpperName]]_DATA		*this
     );
     
  
@@ -176,7 +181,7 @@ extern "C" {
      Create a string that describes this object and the objects within it.
      Example:
      @code 
-        ASTR_DATA      *pDesc = [[.Defns.Name]]_ToDebugString(this,4);
+        ASTR_DATA      *pDesc = [[.Data.Name]]_ToDebugString(this,4);
      @endcode 
      @param     this    object pointer
      @param     indent  number of characters to indent every line of output, can be 0
@@ -184,8 +189,8 @@ extern "C" {
                 description, otherwise OBJ_NIL.
      @warning   Remember to release the returned AStr object.
      */
-    ASTR_DATA *    [[.Defns.Name]]_ToDebugString (
-        [[.Defns.NameUC]]_DATA     *this,
+    ASTR_DATA *    [[.Data.Name]]_ToDebugString (
+        [[.Data.UpperName]]_DATA     *this,
         int             indent
     );
     
@@ -196,5 +201,5 @@ extern "C" {
 }
 #endif
 
-#endif	/* [[.Defns.NameUC]]_H */
+#endif	/* [[.Data.UpperName]]_H */
 

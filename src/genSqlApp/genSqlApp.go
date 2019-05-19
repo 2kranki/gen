@@ -373,13 +373,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
     }
 
 	// Set up template data
-	//if tmplData.MainJson, ok = mainData.MainJson().(map[string]interface{}); !ok {
-		//log.Fatalln("Error - Could not type assert mainData.MainJson()")
-	//}
 	tmplData.Main = mainData.MainStruct()
-	//if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
-	//	log.Fatalln("Error - Could not type assert appData.AppJson()")
-	//}
 	tmplData.Data = DbStruct()
 
 	// Set up the output directory structure
