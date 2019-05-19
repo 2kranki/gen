@@ -8,13 +8,14 @@
         {
             "name":"abc",
             "internal":"def",           # optional, if not given, use $name
+            "external":"abc",           # optional, if not given, use $name
             "desc":"important data",    # optional
             "type":"uint32_t",
             "object":false,             # true == object which needs release
             "init":"2000",              # optional, initialization
             "vis":"public",             # Visibility: public, private, read-only, none
             "base":"",                  # Base Struct/Pointer
-            "offset":0,                 # Offset from Base for Field in bytes
+            "offset":-1,                # Offset from Base for Field in bytes
             "size":0,                   # size of field in bits
             "shift":0                   # amount to shift right to put in lowest bit   
         },
@@ -27,9 +28,22 @@
             "init":"OBJ_NIL",
             "vis":"ro",
             "base":null,
-            "offset":0,
+            "offset":-1,
             "size":0,
             "shift":0 
+        },
+        {
+            "name":"jkl",
+            "internal":"pJkl",
+            "desc":"another object",
+            "type":"OBJ_ID",
+            "object":true,
+            "init":"OBJ_NIL",
+            "vis":"public",
+            "base":null,
+            "offset":-1,
+            "size":0,
+            "shift":0
         }
     ]
 }

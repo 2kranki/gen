@@ -62,6 +62,7 @@ func (s StringBuilder) WriteStringf(format string, a ...interface{}) error {
 type DbProp struct {
 	Name		string		`json:"name,omitempty"`			// External Name
 	Internal	string		`json:"internal,omitempty"`		// Optional Internal Name
+	External	string		`json:"external,omitempty"`		// Optional External Name
 	Desc		string		`json:"desc,omitempty"`			// Optional Description
 	TypeDefn	string		`json:"type,omitempty"`			// Type Definition
 	Init		string		`json: init,omitempty`			// Initialization
@@ -87,10 +88,11 @@ func (f *DbProp) GenBody( ) string {
 	}
 
 	str.WriteString("\n\t//---------------------------------------------------------------\n")
+	str.WriteString(fmt.Sprintf("\t//\t\t\t %s\n", f.Name))
 	str.WriteString("\t//---------------------------------------------------------------\n\n")
 
 	// Generate Get()
-	if f.Object {
+	if f.Object && f.TypeDefn != "OBJ_ID" {
 		str.WriteString(fmt.Sprintf("\t%s *\t\t\t\t%s_get%s(\n", f.TypeDefn, dbStruct.Name, f.TitledName()))
 	} else {
 		str.WriteString(fmt.Sprintf("\t%s\t\t\t\t%s_get%s(\n", f.TypeDefn, dbStruct.Name, f.TitledName()))
@@ -115,10 +117,14 @@ func (f *DbProp) GenBody( ) string {
 	// Generate Set()
 	str.WriteString(fmt.Sprintf("\tbool\t\t\t\t%s_set%s(\n", dbStruct.Name, f.TitledName()))
 	str.WriteString(fmt.Sprintf("\t\t%s_DATA\t*this,\n", dbStruct.UpperName()))
-	if f.Object {
+	if f.Object && f.TypeDefn != "OBJ_ID" {
 		str.WriteString(fmt.Sprintf("\t\t%s\t\t*pValue,\n", f.TypeDefn))
 	} else {
-		str.WriteString(fmt.Sprintf("\t\t%s\t\tvalue,\n", f.TypeDefn))
+		value := "value"
+		if f.TypeDefn == "OBJ_ID" {
+			value = "pValue"
+		}
+		str.WriteString(fmt.Sprintf("\t\t%s\t\t%s,\n", f.TypeDefn, value))
 	}
 	str.WriteString("\t)\n")
 	str.WriteString("\t{\n")
@@ -151,7 +157,7 @@ func (f *DbProp) GenDefn() string {
 		if len(f.Desc) > 0 {
 			str.WriteString(fmt.Sprintf("//%s - %s\n", f.Name, f.Desc))
 		}
-		if f.Object {
+		if f.Object && f.TypeDefn != "OBJ_ID" {
 			str.WriteString(fmt.Sprintf("\t%s *\t\t\t\t%s_get%s(\n", f.TypeDefn, dbStruct.Name, f.TitledName()))
 		} else {
 			str.WriteString(fmt.Sprintf("\t%s\t\t\t\t%s_get%s(\n", f.TypeDefn, dbStruct.Name, f.TitledName()))
@@ -161,10 +167,14 @@ func (f *DbProp) GenDefn() string {
 		if f.Vis == "public" {
 			str.WriteString(fmt.Sprintf("\tbool\t\t\t\t%s_set%s(\n", dbStruct.Name, f.TitledName()))
 			str.WriteString(fmt.Sprintf("\t\t%s_DATA\t*this,\n", dbStruct.UpperName()))
-			if f.Object {
+			if f.Object && f.TypeDefn != "OBJ_ID" {
 				str.WriteString(fmt.Sprintf("\t\t%s\t\t*pValue\n", f.TypeDefn))
 			} else {
-				str.WriteString(fmt.Sprintf("\t\t%s\t\tvalue\n", f.TypeDefn))
+				value := "value"
+				if f.TypeDefn == "OBJ_ID" {
+					value = "pValue"
+				}
+				str.WriteString(fmt.Sprintf("\t\t%s\t\t%s,\n", f.TypeDefn, value))
 			}
 			str.WriteString("\t);\n\n\n")
 		} else {
@@ -184,7 +194,7 @@ func (f *DbProp) GenDefnPrivate() string {
 		}
 	}
 	if f.Vis == "private" {
-		if f.Object {
+		if f.Object && f.TypeDefn != "OBJ_ID" {
 			str.WriteString(fmt.Sprintf("\t%s *\t\t\t\t%s_get%s(\n", f.TypeDefn, dbStruct.Name, f.TitledName()))
 		} else {
 			str.WriteString(fmt.Sprintf("\t%s\t\t\t\t%s_get%s(\n", f.TypeDefn, dbStruct.Name, f.TitledName()))
@@ -195,10 +205,14 @@ func (f *DbProp) GenDefnPrivate() string {
 	if f.Vis == "private" || f.Vis == "read-only" || f.Vis == "ro" {
 		str.WriteString(fmt.Sprintf("\tbool\t\t\t\t%s_set%s(\n", dbStruct.Name, f.TitledName()))
 		str.WriteString(fmt.Sprintf("\t\t%s_DATA\t*this,\n", dbStruct.UpperName()))
-		if f.Object {
+		if f.Object && f.TypeDefn == "OBJ_ID" {
 			str.WriteString(fmt.Sprintf("\t\t%s\t\t*pValue\n", f.TypeDefn))
 		} else {
-			str.WriteString(fmt.Sprintf("\t\t%s\t\tvalue\n", f.TypeDefn))
+			value := "value"
+			if f.TypeDefn == "OBJ_ID" {
+				value = "pValue"
+			}
+			str.WriteString(fmt.Sprintf("\t\t%s\t\t%s,\n", f.TypeDefn, value))
 		}
 		str.WriteString("\t);\n\n\n")
 	}
@@ -223,6 +237,49 @@ func (f *DbProp) GenInit( ) string {
 	return str.String()
 }
 
+func (f *DbProp) GenProp( ) string {
+	var str			strings.Builder
+	var name		string
+
+	if len(f.Internal) > 0 {
+		name = f.Internal
+	} else {
+		name = f.Name
+	}
+
+	str.WriteString("\t{ ")
+	str.WriteString(fmt.Sprintf("\"%s\",", f.Name))
+	str.WriteString(fmt.Sprintf("\"%s\",", f.Internal))
+	str.WriteString(fmt.Sprintf("\"%s\",", f.External))
+	str.WriteString(fmt.Sprintf("\"%s\",", f.Desc))
+	str.WriteString(fmt.Sprintf("\"%s\",", f.TypeDefn))
+	str.WriteString(fmt.Sprintf("\"%s\",", f.Init))
+	str.WriteString(fmt.Sprintf("\"%s\",", f.Vis))
+	if len(f.Base) > 0 {
+		str.WriteString(fmt.Sprintf("\"%s\",", f.Base))
+	} else {
+		str.WriteString(fmt.Sprintf("\"%s\",", dbStruct.DataName()))
+	}
+	if f.Offset < 0 {
+		str.WriteString(fmt.Sprintf("OFFSETOF(%s,%s),", dbStruct.DataName(), name))
+	} else {
+		str.WriteString(fmt.Sprintf("\"%s_DATA\",", dbStruct.UpperName()))
+	}
+	if f.Size == 0 {
+		if f.Object && f.TypeDefn != "OBJ_ID" {
+			str.WriteString(fmt.Sprintf("(sizeof(%s *) << 3),", f.TypeDefn))
+		} else {
+			str.WriteString(fmt.Sprintf("(sizeof(%s) << 3),", f.TypeDefn))
+		}
+	} else {
+		str.WriteString(fmt.Sprintf("%d,", f.Size))
+	}
+	str.WriteString(fmt.Sprintf("%d", f.Shift))
+	str.WriteString("\t},\n")
+
+	return str.String()
+}
+
 func (f *DbProp) GenStruct() string {
 	var str			strings.Builder
 	var name		string
@@ -233,7 +290,7 @@ func (f *DbProp) GenStruct() string {
 		name = f.Name
 	}
 
-	if f.Object {
+	if f.Object && f.TypeDefn != "OBJ_ID" {
 		str.WriteString(fmt.Sprintf("\t%s\t\t*%s;\n", f.TypeDefn, name))
 	} else {
 		str.WriteString(fmt.Sprintf("\t%s\t\t%s;\n", f.TypeDefn, name))
@@ -255,10 +312,20 @@ type DbObject struct {
 	Props		[]DbProp	`json:"properties,omitempty"`
 }
 
+func (t *DbObject) DataName( ) string {
+	name := strings.ToUpper(t.Name)
+	return fmt.Sprintf("%s_DATA", name)
+}
+
 func (t *DbObject) ForFields(f func(f *DbProp) ) {
 	for i, _ := range t.Props {
 		f(&t.Props[i])
 	}
+}
+
+func (t *DbObject) PropCount( ) string {
+	str := fmt.Sprintf("%d", len(t.Props))
+	return str
 }
 
 func (t *DbObject) TitledName( ) string {

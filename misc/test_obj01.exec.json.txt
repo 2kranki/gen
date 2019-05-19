@@ -1,6 +1,6 @@
 {
     "cmd":"cobj",
-    "data":"./misc/testObj/test_obj1.json.txt",
+    "data":"./misc/testObj/test_obj01.json.txt",
     "debug":true,
     "force":true,
     "noop":false,

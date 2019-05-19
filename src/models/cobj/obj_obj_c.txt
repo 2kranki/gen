@@ -393,6 +393,19 @@ const
 
 
 
+
+const
+uint32_t        [[.Data.Name]]_cProps = [[.Data.PropCount]];
+const
+OBJ_PROP        [[.Data.Name]]_pProps[] {
+    [[range $p := .Data.Props]]
+        [[- $p.GenProp]]
+    [[- end]]
+    {NULL}
+};
+
+
+
 static
 const
 OBJ_INFO        [[.Data.Name]]_Info = {

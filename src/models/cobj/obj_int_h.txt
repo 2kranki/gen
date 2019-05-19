@@ -88,6 +88,12 @@ struct [[.Data.Name]]_data_s	{
     const
     [[.Data.UpperName]]_VTBL         [[.Data.Name]]_Vtbl;
 
+    extern
+    const
+    uint32_t        [[.Data.Name]]_cProps;
+    extern
+    const
+    OBJ_PROP        [[.Data.Name]]_pProps[];
 
 
     //---------------------------------------------------------------
