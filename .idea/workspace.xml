@@ -3,13 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="d2ab8454-5cac-44c2-8c87-7804cbe075e4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/b.sh" beforeDir="false" afterPath="$PROJECT_DIR$/b.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/testObj/test_obj01.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/testObj/test_obj01.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCObj/dbData.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCObj/dbData.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_c.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/cobj/obj_c.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_h.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/cobj/obj_h.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_int_h.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/cobj/obj_int_h.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,91 +15,22 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/genCObj/genCObj.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2394">
-              <caret line="143" selection-start-line="142" selection-end-line="143" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5238">
+            <state relative-caret-position="673">
               <caret line="303" selection-start-line="303" selection-end-line="303" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_int_h.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1278">
-              <caret line="71" selection-start-line="70" selection-end-line="71" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/genCObj/dbData.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5724">
-              <caret line="326" column="5" selection-start-line="326" selection-start-column="5" selection-end-line="326" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/misc/testObj/test_obj01.json.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
-              <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/b.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="526">
-              <caret line="36" column="12" selection-start-line="36" selection-start-column="12" selection-end-line="36" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7596">
-              <caret line="422" column="13" selection-start-line="422" selection-start-column="13" selection-end-line="422" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_c.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10944">
-              <caret line="608" column="7" selection-start-line="608" selection-start-column="7" selection-end-line="608" selection-end-column="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_h.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1062">
-              <caret line="59" selection-start-line="56" selection-end-line="59" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_test_c.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="4" selection-start-line="4" selection-end-line="4" />
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="619">
+                <caret line="59" column="53" selection-start-line="59" selection-start-column="53" selection-end-line="59" selection-end-column="53" />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -147,7 +73,6 @@
         <option value="$PROJECT_DIR$/bld.sh" />
         <option value="$PROJECT_DIR$/src/shared/shared.go" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/genSqlApp/genSqlApp_test.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbData.go" />
         <option value="$PROJECT_DIR$/src/util/util.go" />
@@ -164,6 +89,7 @@
         <option value="$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt" />
         <option value="$PROJECT_DIR$/src/models/cobj/obj_c.txt" />
         <option value="$PROJECT_DIR$/b.sh" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -188,78 +114,34 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
               <item name="misc" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
               <item name="misc" type="462c0819:PsiDirectoryNode" />
               <item name="testObj" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="genCObj" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="genSqlApp" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
-              <item name="cobj" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
-              <item name="sqlapp" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="shared" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gen" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gen" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="util" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -289,7 +171,7 @@
       <module name="gen" />
       <working_directory value="$PROJECT_DIR$/" />
       <go_parameters value="-i -race" />
-      <parameters value="-x misc/test_obj01.exec.json.txt" />
+      <parameters value="-x misc/test01.exec.json.txt" />
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$/src/main.go" />
       <directory value="$PROJECT_DIR$/" />
@@ -301,7 +183,7 @@
     <frame x="124" y="151" width="1442" height="888" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.32857144" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.33714285" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -472,16 +354,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="22">
-            <caret line="18" column="27" selection-start-line="18" selection-start-column="27" selection-end-line="18" selection-end-column="27" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
@@ -559,34 +431,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5238">
-          <caret line="303" selection-start-line="303" selection-end-line="303" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_int_h.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1278">
-          <caret line="71" selection-start-line="70" selection-end-line="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/genCObj/dbData.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5724">
-          <caret line="326" column="5" selection-start-line="326" selection-start-column="5" selection-end-line="326" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7596">
-          <caret line="422" column="13" selection-start-line="422" selection-start-column="13" selection-end-line="422" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_c.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="10944">
@@ -617,8 +461,46 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/b.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="526">
-          <caret line="36" column="12" selection-start-line="36" selection-start-column="12" selection-end-line="36" selection-end-column="12" />
+        <state relative-caret-position="26">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="709">
+          <caret line="422" column="13" selection-start-line="422" selection-start-column="13" selection-end-line="422" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genCObj/dbData.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="673">
+          <caret line="326" column="5" selection-start-line="326" selection-start-column="5" selection-end-line="326" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/cobj/obj_int_h.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="709">
+          <caret line="71" selection-start-line="70" selection-end-line="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="673">
+          <caret line="303" selection-start-line="303" selection-end-line="303" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="619">
+            <caret line="59" column="53" selection-start-line="59" selection-start-column="53" selection-end-line="59" selection-end-column="53" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>

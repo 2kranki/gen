@@ -26,7 +26,8 @@ definition and having them control the generation process.
 - [ ] Finish MySQL/MariaDB Support
 - [ ] Finish Postgres Support
 - [ ] Clean up form templating
-- [ ] Add more testing in both genapp and the generated code
+- [ ] Add more testing to xx_test.go files in both genapp and the generated code
+- [ ] Add **csv** save/restore per table
 - [ ] Declare version 0.2
 
 
@@ -56,5 +57,5 @@ My editor is Goland from Intellij.  It has worked well for me.
 
 I have added repository, app01. It contains the latest output of *genapp* for the Test01
 example.  See the *misc* directory in this repo for the controlling JSON files and 
-[app01](https://github.com/2kranki/app01) for the generated  code.
+[app01](https://github.com/2kranki/app01) repostiory for the generated  code.
 
