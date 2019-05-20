@@ -54,6 +54,9 @@
 
 #include        <cmn_defs.h>
 #include        <AStr.h>
+[[with .Data.Super]]
+#include        <[[.]].h>
+[[end]]
 
 
 #ifndef         [[.Data.UpperName]]_H
@@ -76,8 +79,13 @@ extern "C" {
     //****************************************************************
 
 
-    typedef struct [[.Data.Name]]_data_s	[[.Data.UpperName]]_DATA;            // Inherits from OBJ
-    typedef struct [[.Data.Name]]_class_data_s [[.Data.UpperName]]_CLASS_DATA;   // Inherits from OBJ
+[[with .Data.Super]]
+    // [[$o.Name]] inherits from [[.]]
+[[else]]
+    // [[$o.Name]] inherits from OBJ
+[[end]]
+    typedef struct [[.Data.Name]]_data_s	[[.Data.UpperName]]_DATA;
+    typedef struct [[.Data.Name]]_class_data_s [[.Data.UpperName]]_CLASS_DATA;
 
     typedef struct [[.Data.Name]]_vtbl_s	{
         OBJ_IUNKNOWN    iVtbl;              // Inherited Vtbl.

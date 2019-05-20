@@ -41,6 +41,9 @@
 
 #include        <[[.Data.Name]].h>
 #include        <jsonIn.h>
+[[with .Data.Super]]
+#include        <[[.]]_internal.h>
+[[end]]
 
 
 #ifndef [[.Data.UpperName]]_INTERNAL_H
@@ -65,9 +68,15 @@ extern "C" {
 
 #pragma pack(push, 1)
 struct [[.Data.Name]]_data_s	{
+[[with .Data.Super]]
+    /* Warning - [[$o.DataSuper]] must be first in this object!
+     */
+    [[$o.DataSuper]]        super;
+[[else]]
     /* Warning - OBJ_DATA must be first in this object!
      */
     OBJ_DATA        super;
+[[end]]
     OBJ_IUNKNOWN    *pSuperVtbl;    // Needed for Inheritance
 
     // Common Data

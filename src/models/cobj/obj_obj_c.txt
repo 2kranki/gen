@@ -409,15 +409,18 @@ OBJ_PROP        [[.Data.Name]]_pProps[] = {
 static
 const
 OBJ_INFO        [[.Data.Name]]_Info = {
-    "[[.Data.Name]]",
-    "[[.Data.Name]]",	// <-- Fill in description
-    (OBJ_DATA *)&[[.Data.Name]]_ClassObj,
-    (OBJ_DATA *)&obj_ClassObj,
+    "[[.Data.Name]]",                               // Class Name
+    "[[.Data.Name]]",	                            // Class Description
+    (OBJ_DATA *)&[[.Data.Name]]_ClassObj,           // Our ClassObj
+[[with .Data.Super]]
+    (OBJ_DATA *)&[[.]]_ClassObj,                    // Super's ClassObj
+[[else]]
+    (OBJ_DATA *)&obj_ClassObj,                      // Super's ClassObj
+[[end]]
     (OBJ_IUNKNOWN *)&[[.Data.Name]]_Vtbl,
     sizeof([[.Data.UpperName]]_DATA)
 };
-#warning -- adjust super class object in Info above 
-//			if object inherits from another class
+#warning -- Fill in class description above
 
 
 

@@ -1,5 +1,6 @@
 {
     "name":"anObj",
+    "super":"xyz",
     "properties":[
         # Properties are generated in 3 modules and multiple places in some of
         # those files.  Internal Header contains property definition and private/none

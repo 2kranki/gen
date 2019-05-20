@@ -34,7 +34,7 @@ buildApp () {
     fi
     cd -
 
-    if [ -x ./${pgmPath} ] ; then
+    if [ -x ${pgmPath} ] ; then
         test -z "$fQuiet" && echo "...Installing executable in "
         if [ -d "${HOME}/Support" ] ; then
             cp ${pgmPath} ${HOME}/Support/bin/

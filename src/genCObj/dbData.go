@@ -309,11 +309,22 @@ func (f *DbProp) TitledName( ) string {
 // be displayed in the list form and the main form.
 type DbObject struct {
 	Name		string		`json:"name,omitempty"`
+	Super		string		`json:"super,omitempty"`
 	Props		[]DbProp	`json:"properties,omitempty"`
 }
 
 func (t *DbObject) DataName( ) string {
 	name := strings.ToUpper(t.Name)
+	return fmt.Sprintf("%s_DATA", name)
+}
+
+func (t *DbObject) DataSuper( ) string {
+	var name	string
+	if len(t.Super) > 0 {
+		name = strings.ToUpper(t.Super)
+	} else {
+		name = "OBJ"
+	}
 	return fmt.Sprintf("%s_DATA", name)
 }
 
@@ -330,6 +341,10 @@ func (t *DbObject) PropCount( ) string {
 
 func (t *DbObject) TitledName( ) string {
 	return strings.Title(t.Name)
+}
+
+func (t *DbObject) TitledSuper( ) string {
+	return strings.Title(t.Super)
 }
 
 func (t *DbObject) UpperName( ) string {

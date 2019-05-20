@@ -584,7 +584,18 @@ extern "C" {
             obj_Release(this);
             return OBJ_NIL;
         }
-
+[[with .Data.Super]]
+        this = (OBJ_ID)other_Init(([[$o.DataSuper]] *)this);    // Needed for Inheritance
+        //this = (OBJ_ID)obj_Init(this, cbSize, OBJ_IDENT_[[$o.UpperName]]);
+        if (OBJ_NIL == this) {
+            DEBUG_BREAK();
+            obj_Release(this);
+            return OBJ_NIL;
+        }
+        obj_setSize(this, cbSize);                        // Needed for Inheritance
+        this->pSuperVtbl = obj_getVtbl(this);
+        obj_setVtbl(this, (OBJ_IUNKNOWN *)&[[$o.Name]]_Vtbl);
+[[else]]
         //this = (OBJ_ID)other_Init((OTHER_DATA *)this);    // Needed for Inheritance
         this = (OBJ_ID)obj_Init(this, cbSize, OBJ_IDENT_[[.Data.UpperName]]);
         if (OBJ_NIL == this) {
@@ -595,7 +606,7 @@ extern "C" {
         //obj_setSize(this, cbSize);                        // Needed for Inheritance
         this->pSuperVtbl = obj_getVtbl(this);
         obj_setVtbl(this, (OBJ_IUNKNOWN *)&[[.Data.Name]]_Vtbl);
-        
+[[end]]
         //this->stackSize = obj_getMisc1(this);
         //this->pArray = objArray_New( );
     [[range $p := .Data.Props -]]
