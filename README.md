@@ -38,11 +38,11 @@ To use this as I do, try the following:
 1. Install GO
 2. `git clone github.com/2kranki/genapp.git`
 3. `cd genapp`
-4. `./b.sh`     <- builds /tmp/genapp
+4. `./b.sh`     <- builds /tmp/bin/genapp
 5. `/tmp/genapp -x misc/test01.exec.json.txt` <- Creates "/tmp/app01"
 6. `cd /tmp/app01/app`
 7. `./b.sh`     <- builds app01 as app
-8. `./app`      <- SQLite Application on localhost:8080
+8. `/tmp/bin/app`      <- SQLite Application on localhost:8080
 9. `localhost:8080` in your browser
 10. Select "Load test data" for Customer Table
 11. Back to main menu

@@ -33,5 +33,6 @@ fi
 echo "Formatting files:"
 go fmt ./...
 echo "Building Application:"
-go build -o app -v
+mkdir -P /tmp/bin
+go build -o /tmp/bin/app -v
 

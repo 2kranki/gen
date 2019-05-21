@@ -10,7 +10,7 @@ fForce=
 fQuiet=
 pgmname="gen"
 srcDir="src"
-dstDir="/tmp"
+dstDir="/tmp/bin"
 pgmPath="${dstDir}/${pgmname}"
 
 
@@ -29,7 +29,8 @@ buildApp () {
     fi
 
     cd ${srcDir}
-    if go build -o ${pgmPath} -v -race ${rebuild} ; then
+    mkdir -P ${dstDir}
+   if go build -o ${pgmPath} -v -race ${rebuild} ; then
         test -z "$fQuiet" && echo "...Build was successful!"
     fi
     cd -
