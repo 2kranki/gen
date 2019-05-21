@@ -7,6 +7,7 @@ package util
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -20,9 +21,72 @@ type jsonData struct {
 	Outdir  string `json:"outdir,omitempty"`
 }
 
+func TestFileCompare(t *testing.T) {
+
+	t.Log("TestFileCompare()")
+
+	src := "./util.go"
+	dst := "./util.go"
+	if !FileCompare(src,dst) {
+		t.Errorf("FileCompare(%s,%s) failed comparison\n", src, dst)
+	}
+
+	src = "./test/test.exec.json.txt"
+	dst = "./util.go"
+	if FileCompare(src,dst) {
+		t.Errorf("FileCompare(%s,%s) failed comparison\n", src, dst)
+	}
+
+	t.Log("\tend: TestFileCompare")
+}
+
+func TestCopyFile(t *testing.T) {
+	var err error
+
+	t.Log("TestCopyFile()")
+
+	src := "./test/test.exec.json.txt"
+	dst := "./testout.txt"
+	err = CopyFile(src, dst)
+	if err != nil {
+		t.Errorf("CopyFile(%s,%s) failed: %s\n", src, dst, err)
+	}
+
+	if !FileCompare(src,dst) {
+		t.Errorf("CopyFile(%s,%s) failed comparison\n", src, dst)
+	}
+
+	err = os.Remove(dst)
+
+	t.Log("\tend: TestCopyFile")
+}
+
+func TestIsPathDir(t *testing.T) {
+	var path string
+	var err error
+
+	t.Log("TestIsPathDir()")
+
+	path, err = IsPathDir("./util.go")
+	if err == nil {
+		t.Errorf("IsPathDir(./files.go) failed: %s\n", err)
+	}
+	fmt.Println("./files.go path:", path)
+
+	path, err = IsPathDir("./test")
+	if err != nil {
+		t.Errorf("IsPathRegularFile(./xyzzy.go) should have failed!\n")
+	}
+	fmt.Println("./test path:", path)
+
+	t.Log("\tend: TestIsPathDir")
+}
+
 func TestIsPathRegularFile(t *testing.T) {
 	var path string
 	var err error
+
+	t.Log("\tend: TestIsPathRegularFile")
 
 	path, err = IsPathRegularFile("./util.go")
 	if err != nil {
@@ -36,13 +100,15 @@ func TestIsPathRegularFile(t *testing.T) {
 	}
 	fmt.Println("./xyzzy.go path:", path)
 
-	t.Log("\tSuccessfully completed: TestIsPathRegularFile")
+	t.Log("\tend: TestIsPathRegularFile")
 }
 
 func TestReadJson(t *testing.T) {
 	var jsonOut interface{}
 	var wrk interface{}
 	var err error
+
+	t.Log("TestReadJson()")
 
 	if jsonOut, err = ReadJsonFile("./test/test.exec.json.txt"); err != nil {
 		t.Errorf("ReadJson(test.exec.json.txt) failed: %s\n", err)
@@ -59,12 +125,14 @@ func TestReadJson(t *testing.T) {
 		t.Errorf("ReadJson(test.exec.json.txt) missing 'cmd'\n")
 	}
 
-	t.Log("\tSuccessfully completed: TestReadJson")
+	t.Log("\tend: TestReadJson")
 }
 
 func TestReadJsonFileToData(t *testing.T) {
 	var jsonOut = jsonData{}
 	var err error
+
+	t.Log("TestReadJsonFileToData()")
 
 	jsonOut = jsonData{}
 	t.Log("&jsonOut:", &jsonOut)
@@ -79,5 +147,5 @@ func TestReadJsonFileToData(t *testing.T) {
 	if jsonOut.Outdir != "./test" {
 		t.Errorf("ReadJson(test.exec.json.txt) missing or invalid 'outdir'\n")
 	}
-	t.Log("\tSuccessfully completed: TestReadJsonToData")
+	t.Log("\tend: TestReadJsonToData")
 }

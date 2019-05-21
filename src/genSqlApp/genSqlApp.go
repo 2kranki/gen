@@ -54,7 +54,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"static.txt",
-		"static",
+		"/static",
 		"README.txt",
 		"copy",
 		0644,
@@ -62,7 +62,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"tst.sh.txt",
-		"",
+		"/src",
 		"t.sh",
 		"copy",
 		0755,
@@ -70,7 +70,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"tst.sh.txt",
-		"/hndlr${DbName}",
+		"/src/hndlr${DbName}",
 		"t.sh",
 		"copy",
 		0755,
@@ -78,7 +78,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"tst.sh.txt",
-		"/io${DbName}",
+		"/src/io${DbName}",
 		"t.sh",
 		"copy",
 		0755,
@@ -118,7 +118,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"main.go.tmpl.txt",
-		"",
+		"/src",
 		"main.go",
 		"text",
 		0644,
@@ -126,7 +126,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"mainExec.go.tmpl.txt",
-		"",
+		"/src",
 		"mainExec.go",
 		"text",
 		0644,
@@ -134,7 +134,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"handlers.go.tmpl.txt",
-		"/hndlr${DbName}",
+		"/src/hndlr${DbName}",
 		"hndlr${DbName}.go",
 		"text",
 		0644,
@@ -142,7 +142,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"handlers_test.go.tmpl.txt",
-		"/hndlr${DbName}",
+		"/src/hndlr${DbName}",
 		"hndlr${DbName}_test.go",
 		"text",
 		0644,
@@ -150,7 +150,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"handlers.table.go.tmpl.txt",
-		"/hndlr${DbName}",
+		"/src/hndlr${DbName}",
 		"${TblName}.go",
 		"text",
 		0644,
@@ -158,7 +158,7 @@ var FileDefns []FileDefn = []FileDefn{
 		2,
 	},
 	{"io.go.tmpl.txt",
-		"/io${DbName}",
+		"/src/io${DbName}",
 		"io${DbName}.go",
 		"text",
 		0644,
@@ -166,7 +166,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"io_test.go.tmpl.txt",
-		"/io${DbName}",
+		"/src/io${DbName}",
 		"io${DbName}_test.go",
 		"text",
 		0644,
@@ -174,7 +174,7 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"io.table.go.tmpl.txt",
-		"/io${DbName}",
+		"/src/io${DbName}",
 		"${TblName}.go",
 		"text",
 		0644,
@@ -403,14 +403,18 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
-        tmpName = path.Clean(sharedData.OutDir() + "/hndlr" + tmplData.Data.TitledName())
+        tmpName = path.Clean(sharedData.OutDir() + "src/hndlr" + tmplData.Data.TitledName())
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
-        tmpName = path.Clean(sharedData.OutDir() + "/io" + tmplData.Data.TitledName())
+        tmpName = path.Clean(sharedData.OutDir() + "src/io" + tmplData.Data.TitledName())
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
+		tmpName = path.Clean(sharedData.OutDir() + "src/util" + tmplData.Data.TitledName())
+		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+			log.Fatalln("Error: Could not create output directory:", tmpName, err)
+		}
     }
 
 	// Setup the worker queue.
