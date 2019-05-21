@@ -65,11 +65,15 @@ func main() {
 [[ if .TD.Main.Flags -]]
     [[ GenFlagSetup ]]
 [[ end -]]
-	flag.StringVar(&db_pw, "dbPW", "Passw0rd!", "the database password")
-	flag.StringVar(&db_port, "dbPort", "1433", "the database port")
-	flag.StringVar(&db_srvr, "dbServer", "localhost", "the database server")
-	flag.StringVar(&db_user, "dbUser", "sa", "the database user")
-	flag.StringVar(&db_name, "dbName", "", "the database name")
+[[ if eq .TD.Data.SqlType "sqlite" ]]
+    flag.StringVar(&db_srvr, "dbServer", "test.db", "database file path")
+[[ else ]]
+    flag.StringVar(&db_pw,   "dbPW",    "Passw0rd!",    "the database password")
+    flag.StringVar(&db_port, "dbPort",  "1433",         "the database port")
+    flag.StringVar(&db_srvr, "dbServer", "localhost",   "the database server")
+    flag.StringVar(&db_user, "dbUser",   "sa",          "the database user")
+    flag.StringVar(&db_name, "dbName",   "",            "the database name")
+[[ end ]]
 	flag.StringVar(&http_port, "httpPort", "8080", "server port")
 	flag.StringVar(&http_srvr, "httpServer", "localhost", "server site")
 
