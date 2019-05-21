@@ -3,8 +3,6 @@
     * write any extra needed documentation
 
 * GenSqlApp:
-    * Set up generated app in 'src' directory with b.sh in top directory and
-        generate name of app same as given rather than just app
     * main.go
         * Customize parameters for sqlite indicating the database file path is
           to be supplied by the dbServer parameter.

@@ -181,6 +181,14 @@ var FileDefns []FileDefn = []FileDefn{
 		"single",
 		2,
 	},
+	{"util.go.txt",
+		"/src/util",
+		"util.go",
+		"text",
+		0644,
+		"single",
+		0,
+	},
 }
 
 // TmplData is used to centralize all the inputs
@@ -403,15 +411,15 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
-        tmpName = path.Clean(sharedData.OutDir() + "src/hndlr" + tmplData.Data.TitledName())
+        tmpName = path.Clean(sharedData.OutDir() + "/src/hndlr" + tmplData.Data.TitledName())
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
-        tmpName = path.Clean(sharedData.OutDir() + "src/io" + tmplData.Data.TitledName())
+        tmpName = path.Clean(sharedData.OutDir() + "/src/io" + tmplData.Data.TitledName())
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
-		tmpName = path.Clean(sharedData.OutDir() + "src/util" + tmplData.Data.TitledName())
+		tmpName = path.Clean(sharedData.OutDir() + "/src/util")
 		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
 			log.Fatalln("Error: Could not create output directory:", tmpName, err)
 		}
