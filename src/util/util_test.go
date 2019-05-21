@@ -8,6 +8,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"testing"
 )
 
@@ -59,6 +60,29 @@ func TestCopyFile(t *testing.T) {
 	err = os.Remove(dst)
 
 	t.Log("\tend: TestCopyFile")
+}
+
+func TestCopyDir(t *testing.T) {
+	var err error
+
+	t.Log("TestCopyDir()")
+
+	src := "./test"
+	dst := "./test2"
+	err = CopyDir(src, dst)
+	if err != nil {
+		t.Errorf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
+	}
+
+	cmd := exec.Command("diff", src, dst)
+	err = cmd.Run()
+	if err != nil {
+		t.Errorf("CopyDir(%s,%s) comparison failed: %s\n", src, dst, err)
+	}
+
+	err = os.RemoveAll(dst)
+
+	t.Log("\tend: TestCopyDir")
 }
 
 func TestIsPathDir(t *testing.T) {
