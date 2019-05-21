@@ -933,7 +933,7 @@ import (
         }
 
         [[if GenDebugging]]
-            log.Printf("\tLoading data...\n", path)
+            log.Printf("\tLoading data...\n")
         [[end]]
         for {
             record, err := rdr.Read()

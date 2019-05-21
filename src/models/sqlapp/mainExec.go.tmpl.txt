@@ -12,6 +12,8 @@ import (
     "fmt"
     "log"
 	"net/http"
+	"os"
+    "os/signal"
 	"./hndlr[[$n]]"
 	"./io[[$n]]"
 )
@@ -125,6 +127,15 @@ func exec() {
     if err != nil {
         log.Fatalf("ERROR - Failed to Connect Databases\n\n\n")
     }
+    chnl := make(chan os.Signal, 1)
+    signal.Notify(chnl, os.Interrupt, os.Kill)
+    go func(){
+        <-chnl
+        if io[[$n]].IsConnected() {
+            io[[$n]].Disconnect()
+        }
+        os.Exit(1)
+    }()
 
     // Set up templates.
     [[if GenDebugging]]

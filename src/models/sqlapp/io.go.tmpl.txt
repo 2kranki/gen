@@ -98,6 +98,7 @@ func Connect() error {
     }
     err = db.Ping()
     if err != nil {
+        Disconnect( )
         log.Fatalln("Error: Cannot Ping: ", err)
     }
 
@@ -113,7 +114,7 @@ func Disconnect() error {
     [[if GenDebugging]]
         log.Printf("\tDisconnecting from Database\n")
     [[end]]
-    if db != nil {
+    if IsConnected() {
         err = db.Close()
         db = nil
     } else {
@@ -121,6 +122,13 @@ func Disconnect() error {
     }
 
     return err
+}
+
+func IsConnected() bool {
+    if db != nil {
+        return true
+    }
+    return false
 }
 
 func TablesCreate() error {
