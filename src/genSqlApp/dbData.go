@@ -306,6 +306,15 @@ func (f *DbField) IsInteger() bool {
 	return false
 }
 
+func (f *DbField) IsText() bool {
+
+	if f.TypeDefn == "text" {
+		return true
+	}
+
+	return false
+}
+
 func (f *DbField) RValueToStruct(dn string) string {
 	var str			string
 

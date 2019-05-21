@@ -47,9 +47,18 @@ func SetupParms(t *testing.T) {
         t.Logf("\tInserting Record %d\n", i)
         chr := 'A' + i
 [[- range $t := .TD.Data.Tables ]]
-        [[/*TODO: Fix this for various key types*/]]
-        rcd[[$t.TitledName]].[[$t.PrimaryKey.Name]] = string(chr)
-        //rcd[[$t.TitledName]].Num = i
+        [[if $t.PrimaryKey.IsInteger]]
+            rcd.[[$t.PrimaryKey.TitledName]] = i
+        [[else if $t.PrimaryKey.IsFloat]]
+            rcd.[[$t.PrimaryKey.TitledName]] = float64(i)
+        [[else]]
+            rcd.[[$t.PrimaryKey.TitledName]] = string(chr)
+        [[end]]
+        [[range $f := $t.Fields]]
+            [[if $f.IsText]]
+                rcd.[[$f.TitledName]] = string(chr)
+            [[end]]
+        [[end]]
         err = io[[$n]].[[$t.TitledName]]RowInsert(&rcd[[$t.TitledName]])
         if err != nil {
             t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)

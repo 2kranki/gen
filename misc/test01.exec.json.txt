@@ -2,7 +2,7 @@
     "cmd":"sqlapp",
     "data":"./misc/test01/db.json.txt",
     "debug":true,
-    "force":true,
+    "force":false,
     "main":"./misc/test01/main.json.txt",
     "noop":false,
     "outdir":"/tmp/app01/app",

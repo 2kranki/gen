@@ -853,9 +853,18 @@ import (
         // Now add some records.
         for i := 0; i < 26; i++ {
             chr := 'A' + i
-            [[/*TODO: Fix this for various key types*/]]
-            rcd.[[.Table.PrimaryKey.Name]] = string(chr)
-            //rcd.Num = i
+            [[if .Table.PrimaryKey.IsInteger]]
+                rcd.[[.Table.PrimaryKey.Name]] = i
+            [[else if .Table.PrimaryKey.IsFloat]]
+                rcd.[[.Table.PrimaryKey.Name]] = float64(i)
+            [[else]]
+                rcd.[[.Table.PrimaryKey.Name]] = string(chr)
+            [[end]]
+            [[range $f := .Table.Fields]]
+                [[if $f.IsText]]
+                    rcd.[[$f.TitledName]] = string(chr)
+                [[end]]
+            [[end]]
             err = io[[$n]].[[.Table.TitledName]]RowInsert(&rcd)
             if err == nil {
                 str := fmt.Sprintf("Added row: %c\n", chr)

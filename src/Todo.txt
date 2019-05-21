@@ -3,7 +3,13 @@
     * write any extra needed documentation
 
 * GenSqlApp:
-    * Main Menu Generation - make it prettier lol
+    * main.go
+        * Customize parameters for sqlite indicating the database file path is
+          to be supplied by the dbServer parameter.
+    * Main Menu Generation
+        * Allow file path to be selected for Load and Save CSV
+        * make it prettier lol
+        * possibly convert to form ???
     * Form Generation:
         * Field order and display grouping (JSON indicated)
         * Field Alignment - if it can not be done easily, add comment for it
@@ -13,22 +19,19 @@
         * Add button to get to list mode ???
         * All HTML forms need to be converted to using html/template and they should
             only have data added no html codes ???
-    * List Report form
-        * limited by JSON
-    * Add to b.sh  which takes care of the application requirements such as:
-        * go get <package> if needed
-        * set up database and create tables
-    * table display/maintenance
-        * tableio.go - change to <database_name>DB so that we can have
-        * several db's per JSON definition
+    * table handler
+        * Do csv save handler
         * tablehndlr.go
         * form.html per table
             * Try to do all the single record stuff in one form
             * Add ability to switch back to list form or main menu from this record
         * tablelist.html per table
-            * Consider doing paging
             * Allow some selection criteria
             * generate switch to single record mode and back
+            * when switching to list start at the record that you were at in Maintenance
+    * table I/O
+        * tableio.go - change to <database_name>DB so that we can have
+        * several db's per JSON definition
     * If we included the field/table tables in doPkg in the io package, we might be
         able to generate a more table-driven application that required less code generation.
 * possibly json to struct converter and vice versa
