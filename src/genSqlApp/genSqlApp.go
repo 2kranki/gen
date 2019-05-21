@@ -350,6 +350,9 @@ func readJsonFiles() error {
 	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
 	}
+	if err = ValidateData(); err != nil {
+		log.Fatalf("Error: Validating Json Data: %s\n\n\n", err)
+	}
 
     return nil
 }

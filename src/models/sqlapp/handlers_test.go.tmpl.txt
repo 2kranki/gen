@@ -47,8 +47,9 @@ func SetupParms(t *testing.T) {
         t.Logf("\tInserting Record %d\n", i)
         chr := 'A' + i
 [[- range $t := .TD.Data.Tables ]]
-        rcd[[$t.TitledName]].Name = string(chr)
-        rcd[[$t.TitledName]].Num = i
+        [[/*TODO: Fix this for various key types*/]]
+        rcd[[$t.TitledName]].[[$t.PrimaryKey.Name]] = string(chr)
+        //rcd[[$t.TitledName]].Num = i
         err = io[[$n]].[[$t.TitledName]]RowInsert(&rcd[[$t.TitledName]])
         if err != nil {
             t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)

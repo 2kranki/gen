@@ -113,15 +113,29 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
 func exec() {
 
     // Connect the databases.
+    [[if GenDebugging]]
+        log.Printf("\tConnecting to the Database...\n")
+    [[end]]
+    io[[$n]].SetPort(db_port)
+    io[[$n]].SetPW(db_pw)
+    io[[$n]].SetPort(db_port)
+    io[[$n]].SetServer(db_srvr)
+    io[[$n]].SetUser(db_user)
     err := io[[$n]].Connect()
     if err != nil {
         log.Fatalf("ERROR - Failed to Connect Databases\n\n\n")
     }
 
     // Set up templates.
+    [[if GenDebugging]]
+        log.Printf("\tSetting up the Templates...\n")
+    [[end]]
     hndlr[[$n]].SetupTmpls()
 
     // Set up default URL handlers
+    [[if GenDebugging]]
+        log.Printf("\tSetting up the Mux Handlers...\n")
+    [[end]]
     mux := http.NewServeMux()
 	mux.HandleFunc("/", HndlrHome)
 	mux.HandleFunc("/favicon.ico", HndlrFavIcon)
@@ -144,6 +158,7 @@ func exec() {
 	    mux.HandleFunc("/[[$t.Name]]/list/next",          hndlr[[$n]].[[$t.TitledName]]HndlrListNext)
 	    mux.HandleFunc("/[[$t.Name]]/list/prev",          hndlr[[$n]].[[$t.TitledName]]HndlrListPrev)
 	    mux.HandleFunc("/[[$t.Name]]/table/create",       hndlr[[$n]].[[$t.TitledName]]HndlrTableCreate)
+	    mux.HandleFunc("/[[$t.Name]]/table/loadcsv",      hndlr[[$n]].[[$t.TitledName]]HndlrTableLoadCSV)
 	    mux.HandleFunc("/[[$t.Name]]/table/load",         hndlr[[$n]].[[$t.TitledName]]HndlrTableLoad)
 	    mux.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.TitledName]]HndlrDelete)
 	    mux.HandleFunc("/[[$t.Name]]/empty",              hndlr[[$n]].[[$t.TitledName]]HndlrEmpty)

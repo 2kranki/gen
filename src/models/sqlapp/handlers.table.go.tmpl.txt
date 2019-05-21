@@ -6,6 +6,7 @@
 // Generated: [[Time]]
 [[- $dot := .]]
 [[- $n := .TD.Data.TitledName]]
+[[- $t := .Table]]
 
 
 package hndlr[[.TD.Data.TitledName]]
@@ -22,13 +23,16 @@ import (
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	_ "github.com/mattn/go-sqlite3"
 	[[ end ]]
+	"encoding/csv"
     "fmt"
+    "io"
     [[if GenDebugging]]
         "log"
     [[end]]
     //"io"
     "../io[[.TD.Data.TitledName]]"
 	"net/http"
+	"os"
 	"strconv"
 	//"strings"
 )
@@ -849,8 +853,9 @@ import (
         // Now add some records.
         for i := 0; i < 26; i++ {
             chr := 'A' + i
-            rcd.Name = string(chr)
-            rcd.Num = i
+            [[/*TODO: Fix this for various key types*/]]
+            rcd.[[.Table.PrimaryKey.Name]] = string(chr)
+            //rcd.Num = i
             err = io[[$n]].[[.Table.TitledName]]RowInsert(&rcd)
             if err == nil {
                 str := fmt.Sprintf("Added row: %c\n", chr)
@@ -863,6 +868,98 @@ import (
 
         [[if GenDebugging]]
             log.Printf("...end [[.Table.TitledName]]HndlrLoad(%s)\n", ErrorString(err))
+        [[end]]
+    }
+
+    // [[.Table.TitledName]]HndlrTableLoadCSV creates the table deleting any
+    // current ones and loads in data from a CSV file.
+    func [[.Table.TitledName]]HndlrTableLoadCSV(w http.ResponseWriter, r *http.Request) {
+        var err         error
+        var rcd         io[[$n]].[[.Table.TitledName]]
+	    var fileIn      *os.File
+	    var path        string
+	    var cnt         int
+
+        [[if GenDebugging]]
+            log.Printf("[[.Table.TitledName]]HndlrLoadCSV(%s)\n", r.Method)
+        [[end]]
+
+        // Verify HTTP parameters
+        if r.Method != "GET" {
+            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+            return
+        }
+
+        path = r.FormValue("path")
+        if path == "" {
+            [[if GenDebugging]]
+                log.Printf("...end [[.Table.TitledName]]HndlrTableLoadCSV(Error:400) - Missing Path\n")
+            [[end]]
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+        }
+        [[if GenDebugging]]
+            log.Printf("\tpath = %s\n", path)
+        [[end]]
+
+        // Create the csv reader.
+        fileIn, err = os.Open(path)
+        if err != nil {
+            [[if GenDebugging]]
+                log.Printf("...end [[.Table.TitledName]]HndlrTableLoadCSV(Error:400) - %s\n", err)
+            [[end]]
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+        }
+        defer fileIn.Close()
+        [[if GenDebugging]]
+            log.Printf("\tFile, %s, is open...\n", path)
+        [[end]]
+        rdr := csv.NewReader(fileIn)
+
+        // Create the table.
+        err = io[[$n]].[[.Table.TitledName]]TableCreate()
+        if err != nil {
+            w.Write([]byte("Table creation had an error of:" + err.Error()))
+        }
+
+        [[if GenDebugging]]
+            log.Printf("\tLoading data...\n", path)
+        [[end]]
+        for {
+            record, err := rdr.Read()
+            if err == io.EOF {
+                break
+            }
+            if err != nil {
+                str := fmt.Sprintf("ERROR: Reading row %d from csv - %s\n", cnt, err.Error())
+                w.Write([]byte(str))
+                return
+            }
+
+            [[ range $f := .Table.Fields ]]
+                [[ $i := $t.FieldIndex $f.Name -]]
+                [[ $f.GenFromStringArray "rcd" "record" $i ]]
+            [[end]]
+
+            err = io[[$n]].[[.Table.TitledName]]RowInsert(&rcd)
+            if err != nil {
+                str := fmt.Sprintf("ERROR: Table creation had an error of: %s\n", err.Error())
+                w.Write([]byte(str))
+                return
+            }
+            cnt++
+            [[if GenDebugging]]
+                log.Printf("\t...Added row %d\n", cnt)
+            [[end]]
+        }
+        for i := 1; i > 0; i-- {
+            str := fmt.Sprintf("Added %d rows\n", cnt)
+            w.Write([]byte(str))
+        }
+
+        [[if GenDebugging]]
+            log.Printf("...end [[.Table.TitledName]]HndlrLoadCSV(ok) - %d\n", cnt)
         [[end]]
     }
 

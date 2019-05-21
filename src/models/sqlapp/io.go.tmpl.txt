@@ -13,7 +13,7 @@ import (
 	"errors"
     "fmt"
     "log"
-    [[if .TD.Data.IsFloat]]
+    [[if .TD.Data.HasFloat]]
         "strconv"
         "strings"
     [[end]]
@@ -49,7 +49,7 @@ var dbUser     	string
     }
 [[end]]
 
-[[if .TD.Data.IsFloat]]
+[[if .TD.Data.HasFloat]]
 
     func FloatToString(num float64) string {
         s := fmt.Sprintf("%.4f", num)
@@ -73,15 +73,24 @@ func Connect() error {
 	[[ else if eq .TD.Data.SqlType "mssql" ]]
 	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
 	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to %s\n", connStr)
+        [[end]]
 	    db, err := sql.Open("mssql", connStr)
 	[[ else if eq .TD.Data.SqlType "mysql" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType "postgres" ]]
 	    connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
 	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to %s\n", connStr)
+        [[end]]
         db, err = sql.Open("postgres", connStr)
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	    connStr := fmt.Sprintf("%s", dbServer)
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to %s\n", connStr)
+        [[end]]
 	    db, err = sql.Open("sqlite3", connStr)
 	[[ end ]]
     if err != nil {
@@ -101,6 +110,9 @@ func Connect() error {
 func Disconnect() error {
     var err         error
 
+    [[if GenDebugging]]
+        log.Printf("\tDisconnecting from Database\n")
+    [[end]]
     if db != nil {
         err = db.Close()
         db = nil

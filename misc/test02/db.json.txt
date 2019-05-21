@@ -1,103 +1,60 @@
 # vi:nu:et:sts=4 ts=4 sw=4
 
 {
-    "Name":"Finances",
-    "SqlType":"postgres",                   # mariadb | mssql | mysql | postgres | sqlite (required)
+    "Name":"MovieDB",
+    "SqlType":"sqlite",            # mariadb | mssql | mysql | postgres | sqlite (required)
+    "dbServer":"movies.db",
+    "GenDebugging":true,
+    "GenLogging":true,
     "Tables":[
         {
-            "Name":"Customer",
-            "PrimaryKey":"CustNo",
+            "Name":"Movies",
+            "PrimaryKey":"Title",
             "Fields":[
                 {
-                    "Name":"CustNo",
-                    "Type":"int",
+                    "Name":"Title",
+                    "TypeDef":"text",
                     "PrimaryKey":true,
                     "List":true
                 },
                 {
-                    "Name":"CustName",
-                    "Type":"text",
-                    "Len":30,
+                    "Name":"ImdbURL",
+                    "TypeDef":"text",
                     "List":true
                 },
                 {
-                    "Name":"CustAddr1",
-                    "Type":"text",
-                    "Len":30
-                },
-                {
-                    "Name":"CustAddr2",
-                    "Type":"text",
-                    "Len":30
-                },
-                {
-                    "Name":"CustCity",
-                    "Type":"text",
-                    "Len":20
-                },
-                {
-                    "Name":"CustState",
-                    "Type":"text",
-                    "Len":10
-                },
-                {
-                    "Name":"CustZip",
-                    "Type":"text",
-                    "Len": 15
-                },
-                {
-                    "Name":"CustCurBal",
-                    "Type":"money",
-                    "Len": 15,
-                    "Scale":2
-                }
-            ]
-        },
-        {
-            "Name":"Vendor",
-            "PrimaryKey":"VendNo",
-            "Fields":[
-                {
-                    "Name":"VendNo",
-                    "Type":"int",
-                    "PrimaryKey":true,
+                    "Name":"LastWatched",
+                    "TypeDef":"date",
                     "List":true
                 },
                 {
-                    "Name":"VendName",
-                    "Type":"text",
-                    "Len":30,
+                    "Name":"Stars",                 # 0 - 10
+                    "TypeDef":"int",
                     "List":true
                 },
                 {
-                    "Name":"VendAddr1",
-                    "Type":"text",
-                    "Len":30
+                    "Name":"EndingEmotion",         # h-happy, n-neutral, s-sad
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendAddr2",
-                    "Type":"text",
-                    "Len":30
+                    "Name":"EndingType",            # f-final, n-neutral, o-open
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendCity",
-                    "Type":"text",
-                    "Len":20
+                    "Name":"Source",                # dvd, file, spectrum
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendState",
-                    "Type":"text",
-                    "Len":10
+                    "Name":"NextInSeries",
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendZip",
-                    "Type":"text"
+                    "Name":"Keywords",
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendCurBal",
-                    "Type":"money",
-                    "Len": 15,
-                    "Scale":2
+                    "Name":"SelectType",
+                    "TypeDef":"text"
                 }
             ]
         }

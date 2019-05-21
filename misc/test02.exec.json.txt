@@ -1,10 +1,11 @@
 {
-    "cmd":"cobj",
+    "cmd":"sqlapp",
     "data":"./misc/test02/db.json.txt",
     "debug":true,
     "force":false,
     "main":"./misc/test02/main.json.txt",
-    "noop":true,
+    "noop":false,
     "outdir":"/tmp/app02/app",
-    "quiet":false
+    "quiet":false,
+    "replace":true
 }

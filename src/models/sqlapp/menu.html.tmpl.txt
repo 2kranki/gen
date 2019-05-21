@@ -33,6 +33,7 @@
             <ul>
                 <li><a href="/[[$t.Name]]/table/create">Create Table</a></li>
                 <li><a href="/[[$t.Name]]/list/first">List Rows</a></li>
+                <li><a href="/[[$t.Name]]/table/loadcsv?path=">Load CSV File:</a></li>
                 <li><a href="/[[$t.Name]]/table/load">Load test rows</a></li>
                 <li><a href="/[[$t.Name]]/show">Maintain Rows</a></li>
             </ul>

@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -184,6 +185,18 @@ func (f *DbField) FormInput() string {
 	}
 
 	return str.String()
+}
+
+// GenFromStringArray generates the code to go from a string array
+// (sn) element (n) to a field (dn).  sn and dn are variable names.
+func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
+	var str			string
+	var src			string
+
+	src = sn + "[" + strconv.Itoa(n) + "]"
+	str = f.GenFromString(dn, src)
+
+	return str
 }
 
 // GenFromString generates the code to go from a string (sn) to
@@ -423,9 +436,18 @@ func (t *DbTable) ForFields(f func(f *DbField) ) {
 	}
 }
 
-// IsFloat returns true if any of the fields are a
+func (t *DbTable) FieldIndex(n string) int {
+	for i, f := range t.Fields {
+		if f.Name == n {
+			return i
+		}
+	}
+	return -1
+}
+
+// HasFloat returns true if any of the fields are a
 // float which will need float to string conversion
-func (t *DbTable) IsFloat() bool {
+func (t *DbTable) HasFloat() bool {
 
 	for i,_ := range t.Fields {
 		if t.Fields[i].IsFloat() {
@@ -435,9 +457,9 @@ func (t *DbTable) IsFloat() bool {
 	return false
 }
 
-// IsInteger returns true if any of the fields are a
+// HasInteger returns true if any of the fields are a
 // integers which will need float to string conversion
-func (t *DbTable) IsInteger() bool {
+func (t *DbTable) HasInteger() bool {
 
 	for i,_ := range t.Fields {
 		if t.Fields[i].IsInteger() {
@@ -451,8 +473,8 @@ func (t *DbTable) IsInteger() bool {
 // that is marked as a primary key.
 func (t *DbTable) PrimaryKey() *DbField {
 
-	for i,_ := range t.Fields {
-		if t.Fields[i].PrimaryKey {
+	for i, f := range t.Fields {
+		if f.PrimaryKey {
 			return &t.Fields[i]
 		}
 	}
@@ -499,9 +521,18 @@ func (d *Database) ForTables(f func(t *DbTable) ) {
 	}
 }
 
-func (d *Database) IsFloat( ) bool {
+func (d *Database) HasFloat( ) bool {
 	for i,_ := range d.Tables {
-		if d.Tables[i].IsFloat() {
+		if d.Tables[i].HasFloat() {
+			return true
+		}
+	}
+	return false
+}
+
+func (d *Database) HasMoney( ) bool {
+	for i,_ := range d.Tables {
+		if d.Tables[i].HasFloat() {
 			return true
 		}
 	}
@@ -638,7 +669,7 @@ func ReadJsonFile(fn string) error {
 	}
 
 	if sharedData.Debug() {
-		log.Println("\tJson Struct:", dbStruct)
+		log.Printf("\tdbStruct: %+v\n", dbStruct)
 	}
 
 	return nil
@@ -677,6 +708,9 @@ func ValidateData() error {
 		}
 		if len(t.Fields) == 0 {
 			return errors.New(fmt.Sprintf("There are no fields defined for %s!", t.Name))
+		}
+		if t.PrimaryKey() == nil {
+			return errors.New(fmt.Sprintf("There is no key defined for %s!", t.Name))
 		}
 		for j,f := range t.Fields {
 			if f.Name == "" {

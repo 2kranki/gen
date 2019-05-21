@@ -17,7 +17,7 @@ package io[[.TD.Data.TitledName]]
 import (
     "database/sql"
 	"errors"
-    [[if or .Table.IsFloat .Table.IsInteger]]
+    [[if or .Table.HasFloat .Table.HasInteger]]
         "fmt"
     [[end]]
     [[if GenDebugging]]
@@ -25,9 +25,7 @@ import (
     [[end]]
 	//"net/http"
 	"strconv"
-    [[if .Table.IsFloat]]
-        "strings"
-    [[end]]
+    "strings"
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType  "mssql" ]]
