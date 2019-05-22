@@ -118,6 +118,7 @@ func exec() {
     [[if GenDebugging]]
         log.Printf("\tConnecting to the Database...\n")
     [[end]]
+    io[[$n]].SetName(db_name)
     io[[$n]].SetPort(db_port)
     io[[$n]].SetPW(db_pw)
     io[[$n]].SetPort(db_port)
