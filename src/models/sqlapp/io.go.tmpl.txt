@@ -66,16 +66,20 @@ func Connect() error {
 	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
 	                            dbUser,dbPW,dbServer,dbPort,dbName)
         [[if GenDebugging]]
-            log.Printf("\tConnecting to %s\n", connStr)
+            log.Printf("\tConnecting to mssql using: %s\n", connStr)
         [[end]]
 	    db, err := sql.Open("mssql", connStr)
 	[[ else if eq .TD.Data.SqlType "mysql" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType "postgres" ]]
-	    connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
-	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
+	    connStr := fmt.Sprintf("user=%s password='%s' host=%s port=%s ",
+	                            dbUser,dbPW,dbServer,dbPort)
+	    if len(dbName) > 0 {
+	        connStr += fmt.Sprintf("dbname='%s' ", dbName)
+	    }
+	    connStr += "sslmode=disable"
         [[if GenDebugging]]
-            log.Printf("\tConnecting to %s\n", connStr)
+            log.Printf("\tConnecting to postgres using: %s\n", connStr)
         [[end]]
         db, err = sql.Open("postgres", connStr)
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]

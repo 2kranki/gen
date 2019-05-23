@@ -1,0 +1,175 @@
+-- A Company Toy Database to play with
+-- Created 02/22/2019
+
+
+
+DROP DATABASE IF EXISTS GeneralLedgerDB; 
+GO
+
+CREATE DATABASE GeneralLedgerDB;
+GO
+USE GeneralLedgerDB;
+
+
+
+CREATE TABLE Types 
+(
+    typeId       CHAR(2) NOT NULL , 
+    typeDesc     NVARCHAR(50) NULL ,
+    CONSTRAINT  PK_Types PRIMARY KEY(typeId)
+);
+GO
+
+--SET IDENTITY_INSERT Types ON;
+INSERT INTO Types 
+    (typeId, typeDesc)
+    VALUES('db', 'Debit');
+INSERT INTO Types 
+    (typeId, typeDesc)
+    VALUES('cr', 'Credit');
+INSERT INTO Types 
+    (typeId, typeDesc)
+    VALUES('re', 'Retained Earnings');
+INSERT INTO Types 
+    (typeId, typeDesc)
+    VALUES('eq', 'Equity');
+INSERT INTO Types 
+    (typeId, typeDesc)
+    VALUES('in', 'Income');
+INSERT INTO Types 
+    (typeId, typeDesc)
+    VALUES('ex', 'Expense');
+--SET IDENTITY_INSERT Types OFF;
+GO
+
+
+
+
+CREATE TABLE  Accounts
+(
+    acctId      INT NOT NULL ,
+    typeId      CHAR(2) NOT NULL ,
+    acctDesc    NVARCHAR(50) NULL ,
+    acctCurBal  DECIMAL(10,2) NULL ,
+    CONSTRAINT  PK_Accounts PRIMARY KEY(acctId) ,
+    CONSTRAINT  FK_Accounts_Types FOREIGN KEY (typeId) REFERENCES Types (typeId)
+);
+GO
+
+--SET IDENTITY_INSERT Accounts ON;
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(1040, 'db', 'Cash in Bank', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(1060, 'db', 'Cash in Savings', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(1070, 'db', 'Petty Cash', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(3040, 'cr', 'Accounts Payable', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(3140, 'cr', 'Notes Payable', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(4010, 'eq', 'Owners Equity', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(4100, 're', 'Retained Earnings', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(5010, 'in', 'Consulting Fees', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(5100, 'in', 'Other Income', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(5200, 'in', 'Interest Income', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(6010, 'ex', 'Office Expenses', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(6100, 'ex', 'Computer Expenses', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(6200, 'ex', 'Interest Expenses', 0.00);
+INSERT INTO Accounts 
+    (acctId, typeId, acctDesc, acctCurBal)
+    VALUES(6300, 'ex', 'Other Expenses', 0.00);
+--SET IDENTITY_INSERT Accounts OFF;
+GO
+
+
+
+-- Account Summary Table
+-- One row per period per account
+-- (ie if periods are monthly, one row per account per month)
+-- So, end of period processing means that we add a row for
+-- each account in this table with the current date and balance.
+CREATE TABLE  AcctSums
+(
+    rcdId       INT NOT NULL PRIMARY KEY IDENTITY(1,1) ,
+    acctId      INT NOT NULL , 
+    acctDate    DATE ,
+    acctBal     DECIMAL(10,2) NULL ,
+    CONSTRAINT  FK_AcctSums_Accounts FOREIGN KEY (acctId) REFERENCES Accounts (acctId)
+);
+GO
+
+
+
+
+CREATE TABLE Sources 
+(
+    srcId       CHAR(2) NOT NULL , 
+    srcDesc     NVARCHAR(50) NULL ,
+    CONSTRAINT  PK_Sources PRIMARY KEY(srcId)
+);
+GO
+
+--SET IDENTITY_INSERT Sources ON;
+INSERT INTO Sources 
+    (srcId, srcDesc)
+    VALUES('ap', 'Accounts Payable');
+INSERT INTO Sources 
+    (srcId, srcDesc)
+    VALUES('ar', 'Accounts Receivalbe');
+INSERT INTO Sources 
+    (srcId, srcDesc)
+    VALUES('gl', 'General Ledger');
+INSERT INTO Sources 
+    (srcId, srcDesc)
+    VALUES('pa', 'Payroll');
+--SET IDENTITY_INSERT Sources OFF;
+GO
+
+
+
+
+CREATE TABLE Transactions 
+(
+    transId     INT NOT NULL , 
+    acctId      INT NOT NULL , 
+    trasnDate   DATE NULL ,
+    transSrc    INT NULL ,
+    transRef    INT NULL ,
+    transDesc   NVARCHAR(50) NULL ,
+    transAmt    DECIMAL(9,2) NULL , 
+    CONSTRAINT  PK_Transactions PRIMARY KEY(transId) ,
+    CONSTRAINT  FK_Transactions_Accounts FOREIGN KEY (acctId) REFERENCES Accounts (acctId)
+);
+GO
+
+--SET IDENTITY_INSERT Transactions ON;
+--INSERT INTO Transactions 
+--    (transId, acctId, trasnDate, transSrc, transRef, transDesc, transAmt) 
+--    VALUES(1, '', '');
+--SET IDENTITY_INSERT Transactions OFF;
+GO
+
+
+
+

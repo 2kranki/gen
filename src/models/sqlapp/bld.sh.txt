@@ -36,5 +36,8 @@ go fmt ./...
 echo "Building Application:"
 mkdir -p /tmp/bin
 go build -o /tmp/bin/app -v
+if [ $? -eq 0 ] ; then
+    echo "Built: /tmp/bin/app"
+fi
 cd -
 

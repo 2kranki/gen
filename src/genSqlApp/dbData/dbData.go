@@ -126,22 +126,6 @@ func (t TypeDefns) SqlType(name string) string {
 	return ""
 }
 
-var tds	= TypeDefns {
-	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
-	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
-	{Name:"email", 		Html:"email", 		Sql:"NVARCHAR", 	Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
-	{Name:"tel", 		Html:"tel",			Sql:"NVARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
-	{Name:"text", 		Html:"text",		Sql:"NVARCHAR",		Go:"string",	DftLen:0,},
-	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
-	{Name:"url", 		Html:"url",			Sql:"NVARCHAR",		Go:"string",	DftLen:50,},
-}
-
 // DbField defines a Table's field mostly in terms of
 // SQL.
 type DbField struct {
@@ -165,7 +149,7 @@ func (f *DbField) CreateSql(cm string) string {
 	var pk			string
 	var sp			string
 
-	td := tds.FindDefn(f.TypeDefn)
+	td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -213,7 +197,7 @@ func (f *DbField) FormInput() string {
 	var lbl			string
 	var m			string
 
-	td := tds.FindDefn(f.TypeDefn)
+	td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -260,7 +244,7 @@ func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
 func (f *DbField) GenFromString(dn,sn string) string {
 	var str			string
 
-	td := tds.FindDefn(f.TypeDefn)
+	td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -295,7 +279,7 @@ func (f *DbField) GenFromString(dn,sn string) string {
 func (f *DbField) GenToString(v string, st string) string {
 	var str			string
 
-	td := tds.FindDefn(f.TypeDefn)
+	td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -325,7 +309,7 @@ func (f *DbField) GenToString(v string, st string) string {
 
 func (f *DbField) GoType() string {
 
-	td := tds.FindDefn(f.TypeDefn)
+	td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -374,7 +358,7 @@ func (f *DbField) IsText() bool {
 func (f *DbField) RValueToStruct(dn string) string {
 	var str			string
 
-	td := tds.FindDefn(f.TypeDefn)
+	td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -806,7 +790,7 @@ func ValidateData() error {
 			if f.Name == "" {
 				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
 			}
-			td := tds.FindDefn(f.TypeDefn)
+			td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
 			if td == nil {
 				log.Fatalln("Error - Could not find Type definition for field,",
 					f.Name,"type:",f.TypeDefn)

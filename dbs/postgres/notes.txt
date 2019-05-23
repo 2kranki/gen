@@ -1,0 +1,12 @@
+This directory contains the scripts that I use to run PostgreSQL.
+
+To implement PostgreSQL, I used PostgreSQL native on MacOS since I had it installed
+from before.  Also, I used pgAdmin to add the "Finances" database under "postgres"
+which is the default user. From there, I was able to get the connection string
+done and running.
+
+Now that I had it running native, I turned to running it through docker. To set up
+a Docker image of PostgreSQL, I did the following:
+
+
+
