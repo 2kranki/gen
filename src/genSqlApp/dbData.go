@@ -594,6 +594,7 @@ type Database struct {
 	Port		string			`json:"Port,omitempty"`
 	PW			string			`json:"PW,omitempty"`
 	Tables  	[]DbTable		`json:"Tables,omitempty"`
+	ImportStr	string
 }
 
 func (d *Database) ForTables(f func(t *DbTable) ) {
@@ -749,12 +750,27 @@ func ReadJsonFile(fn string) error {
 		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
 	}
 
+	if err = ValidateData(); err != nil {
+		return err
+	}
+
 	// Fix up the tables with back pointers that we do not store externally.
 	for i, v := range dbStruct.Tables {
 		for ii, _ := range v.Fields {
 			v.Fields[ii].Tbl = &v
 		}
 		dbStruct.Tables[i].DB = &dbStruct
+	}
+	if sharedData.Debug() {
+		log.Printf("\tplugins: %d\n", len(plugins))
+		for n, v := range plugins {
+			log.Printf("\t\tplugin: %s %q\n", n, v)
+		}
+	}
+	if plg := Plugin(dbStruct.SqlType); plg != nil {
+		dbStruct.ImportStr = plg.ImportString()
+	} else {
+		return errors.New(fmt.Sprintf("Error: Can't find import string for %s!\n\n\n", dbStruct.SqlType))
 	}
 
 	if sharedData.Debug() {

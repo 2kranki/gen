@@ -1,7 +1,7 @@
 // See License.txt in main repository directory
 
-// dbMysql is the plugin for MySQL and  contains the
-// data and functions specific for SQLite to generate
+// dbMssql is the plugin for Microsoft SQL and  contains the
+// data and functions specific for Microsoft SQL to generate
 // table and field data for html forms, handlers and
 // table sql i/o for a specific database.
 
@@ -28,11 +28,11 @@ var tds	= genSqlApp.TypeDefns {
 }
 
 func ImportString() string {
-	return "\"github.com/go-sql-driver/mysql\""
+	return "\"github.com/denisenkom/go-mssqldb\""
 }
 
 func init() {
-	pd :=  genSqlApp.Plugin_Data{"mysql", &tds, ImportString}
+	pd :=  genSqlApp.Plugin_Data{"mssql", &tds, ImportString}
 	genSqlApp.Register(&pd)
 }
 

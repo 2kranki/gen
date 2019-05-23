@@ -31,7 +31,7 @@ func ImportString() string {
 	return "\"github.com/lib/pq\""
 }
 
-func Init() {
+func init() {
 	pd :=  genSqlApp.Plugin_Data{"postgres", &tds, ImportString}
 	genSqlApp.Register(&pd)
 }

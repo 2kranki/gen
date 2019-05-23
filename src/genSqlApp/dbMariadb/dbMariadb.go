@@ -1,7 +1,7 @@
 // See License.txt in main repository directory
 
-// dbMariadb is the plugin for MySQL and  contains the
-// data and functions specific for SQLite to generate
+// dbMariadb is the plugin for MariaDB and  contains the
+// data and functions specific for MariaDB to generate
 // table and field data for html forms, handlers and
 // table sql i/o for a specific database.
 
@@ -28,10 +28,10 @@ var tds	= genSqlApp.TypeDefns {
 }
 
 func ImportString() string {
-	return "\"ERROR - NOT IMPLEMENTED\""
+	return "\"github.com/go-sql-driver/mysql\""
 }
 
-func Init() {
+func init() {
 	pd :=  genSqlApp.Plugin_Data{"mariadb", &tds, ImportString}
 	genSqlApp.Register(&pd)
 }

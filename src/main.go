@@ -16,6 +16,11 @@ import (
 	// genGo packages
 	"./genCObj"
 	"./genSqlApp"
+	_ "./genSqlApp/dbMariadb"
+	_ "./genSqlApp/dbMssql"
+	_ "./genSqlApp/dbMysql"
+	_ "./genSqlApp/dbPostgres"
+	_ "./genSqlApp/dbSqlite"
 	"./mainData"
 	"./shared"
 	"./util"

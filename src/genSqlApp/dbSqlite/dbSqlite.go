@@ -9,6 +9,7 @@ package dbSqlite
 
 import (
 	"../../genSqlApp"
+	"log"
 )
 
 var tds	= genSqlApp.TypeDefns {
@@ -31,7 +32,8 @@ func ImportString() string {
 	return "\"github.com/mattn/go-sqlite3\""
 }
 
-func Init() {
+func init() {
+	log.Printf("\tRegistering SQLite\n")
 	pd :=  genSqlApp.Plugin_Data{"sqlite", &tds, ImportString}
 	genSqlApp.Register(&pd)
 }
