@@ -54,9 +54,7 @@ func CopyDir(src, dst string) (error) {
 	}
 
 	for _, fi := range fis {
-
 		srcpath := src + "/" + fi.Name()
-
 		dstpath := dst + "/" + fi.Name()
 
 		if fi.IsDir() {
@@ -148,19 +146,19 @@ func FileCompare(file1, file2 string) bool {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f1.Close()
 
 	f2, err := os.Open(file2)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f2.Close()
 
+	b1 := make([]byte, 8192)
+	b2 := make([]byte, 8192)
 	for {
-		b1 := make([]byte, 8192)
 		c1, err1 := f1.Read(b1)
-
-		b2 := make([]byte, 8192)
 		c2, err2 := f2.Read(b2)
-
 		if c1 != c2 {
 			return false
 		}
@@ -180,7 +178,7 @@ func FileCompare(file1, file2 string) bool {
 		}
 	}
 
-	return true
+	return false
 }
 
 // IsPathDir cleans up the supplied file path

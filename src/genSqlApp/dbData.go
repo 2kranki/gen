@@ -27,28 +27,66 @@ const (
 	DBTYPE_SQLITE
 )
 
-// StringsBuilder is a composition of strings.Builder so that
-// we can add supplemental functions.
-type StringBuilder struct {
-	str		strings.Builder
+// Plugin_Interface defines the supported interface that
+// all plugins must support. The functions, here, need to
+// be defined in all plugins.
+type Plugin_Interface interface {
+	goType(typename string) string
+	htmlType(typename string) string
+	importString() string			// Returns import string
+	sqlType(typename string) string
 }
 
-func NewStringBuilder() *StringBuilder {
-	sb := StringBuilder{}
-	return &sb
+/***
+type ImportString interface {
+	importString() string			// Returns import string
+}
+***/
+
+type Plugin_Data	struct {
+	Name		string
+	T			*TypeDefns
+	ImportString func() string
 }
 
-// WriteString allows us to write a string to the buffer.
-func (s StringBuilder) WriteString(format string) error {
-	_, err := s.str.WriteString(format)
-	return err
+/**
+func (pd Plugin_Data) ImportString() string {
+	return ""
+}
+**/
+
+var plugins		map[string]*Plugin_Data
+// The index into Plugins is the database name as used in
+// the JSON input (ie mariadb, mssql, mysql, postgresql, sqlite)
+
+// Register() registers the given plugin into the map.
+func Register(pd *Plugin_Data) error {
+	if plugins == nil {
+		plugins = map[string]*Plugin_Data{}
+	}
+	plugins[pd.Name] = pd
+	return nil
 }
 
-// WriteStringf allows us to write a formatted string.
-func (s StringBuilder) WriteStringf(format string, a ...interface{}) error {
-	str := fmt.Sprintf(format, a...)
-	err := s.WriteString(str)
-	return err
+// Unregister() unregisters a given plugin in the map.
+func Unregister(name string) {
+	if plugins == nil {
+		return
+	}
+	if _, ok := plugins[name]; ok {
+		delete(plugins, name)
+	}
+}
+
+// Plugin returns the Plugin interface for a name if possible.
+func Plugin(name string) *Plugin_Data {
+	if plugins == nil {
+		return nil
+	}
+	if _, ok := plugins[name]; ok {
+		return plugins[name]
+	}
+	return nil
 }
 
 type TypeDefn struct {
@@ -62,13 +100,45 @@ type TypeDefn struct {
 
 type TypeDefns []TypeDefn
 
-func (t TypeDefns) FindDefn(Name string) *TypeDefn {
+func (t TypeDefns) DftLen(name string) int {
+	tdd := t.FindDefn(name)
+	if tdd != nil {
+		return tdd.DftLen
+	}
+	return -1
+}
+
+func (t TypeDefns) FindDefn(name string) *TypeDefn {
 	for i,v := range t {
-		if Name == v.Name {
+		if name == v.Name {
 			return &t[i]
 		}
 	}
 	return nil
+}
+
+func (t TypeDefns) GoType(name string) string {
+	tdd := t.FindDefn(name)
+	if tdd != nil {
+		return tdd.Go
+	}
+	return ""
+}
+
+func (t TypeDefns) HtmlType(name string) string {
+	tdd := t.FindDefn(name)
+	if tdd != nil {
+		return tdd.Html
+	}
+	return ""
+}
+
+func (t TypeDefns) SqlType(name string) string {
+	tdd := t.FindDefn(name)
+	if tdd != nil {
+		return tdd.Sql
+	}
+	return ""
 }
 
 var tds	= TypeDefns {
@@ -100,6 +170,7 @@ type DbField struct {
 	Nullable	bool		`json:"Null,omitempty"`			// Allow NULL for this field
 	SQLParms	string		`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 	List		bool	    `json:"List,omitempty"`			// Include in List Report
+	Tbl			*DbTable									// Filled in after JSON is parsed
 }
 
 func (f *DbField) CreateSql(cm string) string {
@@ -363,6 +434,7 @@ type DbTable struct {
 	Name		string		`json:"Name,omitempty"`
 	Fields		[]DbField	`json:"Fields,omitempty"`
 	SQLParms	[]string	`json:"SQLParms,omitempty"`		// Extra SQL Parameters
+	DB			*Database
 }
 
 // CreateInsertStr() creates a string of all the field
@@ -660,7 +732,7 @@ func init() {
 	sharedData.SetFunc("GenAccessFuncs", GenAccessFuncs)
 }
 
-// ReadJsonFileDb reads the input JSON file for app
+// ReadJsonFile reads the input JSON file for app
 // and stores the generic JSON Table as well as the
 // decoded structs.
 func ReadJsonFile(fn string) error {
@@ -675,6 +747,14 @@ func ReadJsonFile(fn string) error {
 	// Read in the json file structurally
 	if err = util.ReadJsonFileToData(jsonPath, &dbStruct); err != nil {
 		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
+	}
+
+	// Fix up the tables with back pointers that we do not store externally.
+	for i, v := range dbStruct.Tables {
+		for ii, _ := range v.Fields {
+			v.Fields[ii].Tbl = &v
+		}
+		dbStruct.Tables[i].DB = &dbStruct
 	}
 
 	if sharedData.Debug() {

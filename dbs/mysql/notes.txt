@@ -1,0 +1,32 @@
+                            MySQL Docker Container
+
+You can find the documentation on the MySQL Docker container here:
+    https://hub.docker.com/_/mysql
+
+There are several commands that you will want to learn to use the container. First
+is:
+    docker container pull mysql:latest
+
+This adds the MySQL container image to your local Docker images. Once, you have it
+added to the images, you will want to run it. The following will do that with the 
+defaults that the generated application will automatically use:
+    docker run --name mysql1 -e MYSQL_ROOT_PASSWORD=Passw0rd -d mysql:latest
+
+After you have it running, you can stop it with:
+    docker container stop mysql1
+
+And restart the stopped container with:
+    docker container start mysql1
+
+To delete the container that you created with the "run" command, you do
+    docker container rm mysql1
+
+This delete does not get rid of the Docker container image. So, you can create
+a fresh container by simply running the "run" command as above.
+
+So, for testing, you issue the "run", then do your testing. If the database is
+no longer useable or you want to start from scratch, you simply do a "stop"
+followed by a "rm".  The next time that you need an image, you just issue the
+"run" command again and you start over from scratch.  This is why testing using
+Docker is so great!
+

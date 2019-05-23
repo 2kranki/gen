@@ -29,7 +29,7 @@ buildApp () {
     fi
 
     cd ${srcDir}
-    mkdir -p ${dstDir}
+    mkdir -P ${dstDir}
    if go build -o ${pgmPath} -v -race ${rebuild} ; then
         test -z "$fQuiet" && echo "...Build was successful!"
     fi

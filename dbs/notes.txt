@@ -1,0 +1,27 @@
+This directory contains the scripts that I use to run the various databases using
+Dockker.  If you are not familiar with Docker, I highly recommend that you learn
+how to use it.  It basically is the way to build a self-contained system for a
+single purpose that is easy to manage and use.  Most cloud computing sites now
+support Docker images. So, I will probably set up the generated output so that it
+can run in a Docker image as well.  Anyway, there are several books and websites
+that offer Docker training.  I used udemy.com and took the "Docker Mastery"
+course by Bret Fischer. I supplemented it with the book, "Docker Deep Dive", by
+Nigel Poulton.  Between the two, I felt that I go a decent education on how to 
+use Docker.
+
+If you want to know about Docker internals and do things inside Docker containers,
+you should get a fundamental education on Linux and Bash that is what they are
+based on.  I run MacOS which is a Linux like operating system under the hood. So,
+I already understood Bash and the fundamentals.  I like MacOS a lot. I don't al-
+ways like Apple. lol  However, if you have an iphone, running an Apple computer
+works well.
+
+My experience so far is that Apple computers are more expensive, but they come
+with a lot of the software that you would have to buy for a Windows machine. So,
+it seems to be a wash.  Anyway, I have had good experiences with Apple so far.
+
+Back to Docker...
+
+Please look in the individual subdirectories to learn how I run the Docker
+containers for the various databases.
+

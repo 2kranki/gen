@@ -3,6 +3,8 @@
     * write any extra needed documentation
 
 * GenSqlApp:
+    * Setup a Dockerfile and associated bash shells to run it so that we can
+        containerize the generated application.
     * main.go
         * Customize parameters for sqlite indicating the database file path is
           to be supplied by the dbServer parameter.

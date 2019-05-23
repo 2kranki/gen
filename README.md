@@ -59,3 +59,6 @@ I have added repository, app01. It contains the latest output of *genapp* for th
 example.  See the *misc* directory in this repo for the controlling JSON files and 
 [app01](https://github.com/2kranki/app01) repostiory for the generated  code.
 
+If you are new to Golang, I strongly recommend that you buy "The GO Programming Language" by
+Alan Donovan and Brian Kernighan.  It is an excellent book and reference.  I also bought "GO in Action" by William Kennedy but I can not recommend it.  "The GO Programming Language" book is far superior from my point of view and is a great reference on the language and its libraries.
+

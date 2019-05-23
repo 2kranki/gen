@@ -4,11 +4,11 @@
 
 
 
-
+dbName="finances"
 fDebug=
 fForce=
 fQuiet=
-pgmname="gen"
+pgmname="genapp"
 srcDir="src"
 dstDir="/tmp/bin"
 pgmPath="${dstDir}/${pgmname}"
@@ -29,7 +29,7 @@ buildApp () {
     fi
 
     cd ${srcDir}
-    mkdir -p ${dstDir}
+    mkdir -P ${dstDir}
    if go build -o ${pgmPath} -v -race ${rebuild} ; then
         test -z "$fQuiet" && echo "...Build was successful!"
     fi
@@ -71,6 +71,7 @@ displayUsage( ) {
 #        echo
         echo "Flags:"
         echo "  -d, --debug     Debug Mode"
+        echo "  --dbName <name> Assign new database name (default ${dbName})"
         echo "  -f, --force     Force complete rebuild"
         echo "  -h, --help      This message"
         echo "  -q, --quiet     Quiet Mode"
@@ -136,7 +137,8 @@ getReplyYN( ) {
 
 main( ) {
     dbgFlg=
-    fBuild=y
+    fBuild=
+    fPull=
 
     # Parse off the command arguments.
     if [ $# -eq 0 ]; then             # Handle no arguments given.
@@ -151,7 +153,11 @@ main( ) {
                     if test -z "$fQuiet"; then
                         echo "In Debug Mode"
                     fi
-                    dbgFg="--debug"
+                    dbgFlg="--debug"
+                    ;;
+                 --dbName)
+                    shift
+                    dbName="$1"
                     ;;
                  -f | --force)
                     fForce=y
@@ -182,21 +188,36 @@ main( ) {
             opt="$1"
             case "$opt" in
                 b | build)
-                    fBuild=y
+                    #fBuild=y
                     ;;
-                install)
-                    #downloadAndInstallHomebrew
+                exec)
+                    docker container exec -it mysql1 bash
                     ;;
-                macvim)
-                    #installMacVim
+                kill)
+                    docker container kill mysql1
                     ;;
-                php56)
-                    #installPHP56
+                list)
+                    docker container ls -a
+                    ;;
+                pull)
+                    if docker container pull mysql:latest ; then
+                        echo "\tPull executed successfully"
+                    else
+                        echo "\tPull failed with code $?"
+                        return $?
+                    fi
                     ;;
                 r | run)
-                    if [ -x ./${pgmname} ] ; then
-                        ./${pgmname}  $dbgFlg -exec ./test/test01.exec.json.txt
+                    if docker run --name mysql1 --rm -e MYSQL_ROOT_PASSWORD=Passw0rd -e MYSQL_DATABASE=${dbName} -e MYSQL_USER=sa -e MYSQL_PASSWORD=Passw0rd -d mysql:latest ; then
+                        echo "\tRun executed successfully"
+                        echo "\tUse localhost:4133 for this container"
+                    else
+                        echo "\tRun failed with code $?"
+                        return $?
                     fi
+                    ;;
+                rm)
+                    docker container rm mysql1
                     ;;
                 update)
                     #hbUpdate
@@ -210,10 +231,6 @@ main( ) {
             esac
             shift
         done
-    fi
-
-    if [ -n "$fBuild" ] ; then
-        buildApp
     fi
 
     return $?
