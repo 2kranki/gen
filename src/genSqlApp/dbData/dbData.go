@@ -6,11 +6,11 @@
 // databases should be handled with multiple ??? of
 // this package.
 
-package genSqlApp
+package dbData
 
 import (
-	"../shared"
-	"../util"
+	"../../shared"
+	"../../util"
 	"errors"
 	"fmt"
 	"log"
@@ -27,26 +27,11 @@ const (
 	DBTYPE_SQLITE
 )
 
-// Plugin_Interface defines the supported interface that
-// all plugins must support. The functions, here, need to
-// be defined in all plugins.
-type Plugin_Interface interface {
-	goType(typename string) string
-	htmlType(typename string) string
-	importString() string			// Returns import string
-	sqlType(typename string) string
-}
-
-/***
-type ImportString interface {
-	importString() string			// Returns import string
-}
-***/
-
 type Plugin_Data	struct {
 	Name		string
 	T			*TypeDefns
 	ImportString func() string
+	AddGo		bool			// Add "GO" after major sql statements
 }
 
 /**

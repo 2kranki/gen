@@ -26,17 +26,7 @@ import (
 	//"net/http"
 	"strconv"
     "strings"
-	[[ if eq .TD.Data.SqlType "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType  "mssql" ]]
-	_ "github.com/denisenkom/go-mssqldb"
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		_ "github.com/go-sql-driver/mysql"
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
-		_ "github.com/lib/pq"
-	[[ else if eq .TD.Data.SqlType "sqlite" ]]
-	    _ "github.com/mattn/go-sqlite3"
-	[[ end ]]
+	_ [[.TD.Data.ImportStr]]
 )
 
 [[.Table.CreateStruct]]

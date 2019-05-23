@@ -18,6 +18,12 @@ import (
 	"../mainData"
 	"../shared"
 	"../util"
+	"./dbData"
+	_ "./dbMariadb"
+	_ "./dbMssql"
+	_ "./dbMysql"
+	_ "./dbPostgres"
+	_ "./dbSqlite"
 	"errors"
 	"flag"
 	"fmt"
@@ -198,9 +204,9 @@ var FileDefns []FileDefn = []FileDefn{
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	Data     	*Database
+	Data     	*dbData.Database
 	Main     	*mainData.MainData
-	Table		*DbTable
+	Table		*dbData.DbTable
 }
 
 var tmplData TmplData
@@ -208,7 +214,7 @@ var tmplData TmplData
 type TaskData struct {
 	FD			*FileDefn
 	TD			*TmplData
-	Table		*DbTable
+	Table		*dbData.DbTable
 	PathIn	  	string						// Input File Path
 	PathOut	  	string						// Output File Path
 
@@ -355,11 +361,8 @@ func readJsonFiles() error {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
 	}
 
-	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
+	if err = dbData.ReadJsonFile(sharedData.DataPath()); err != nil {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
-	}
-	if err = ValidateData(); err != nil {
-		log.Fatalf("Error: Validating Json Data: %s\n\n\n", err)
 	}
 
     return nil
@@ -383,7 +386,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 
 	// Set up template data
 	tmplData.Main = mainData.MainStruct()
-	tmplData.Data = DbStruct()
+	tmplData.Data = dbData.DbStruct()
 
 	// Set up the output directory structure
     if !sharedData.Noop() {
@@ -468,8 +471,8 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 			inputQueue <- data
 		case 2:
 			// Output File is Titled Table Name in Titled Database Name directory
-			ForTables(
-				func(v *DbTable) {
+			dbData.ForTables(
+				func(v *dbData.DbTable) {
 					data := TaskData{FD:&FileDefns[i], TD:&tmplData, Table:v, PathIn:pathIn}
 					if data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, v.Name, def.FileName); err != nil {
 						log.Fatalln(err)

@@ -8,10 +8,10 @@
 package dbMysql
 
 import (
-	"../../genSqlApp"
+	"../dbData"
 )
 
-var tds	= genSqlApp.TypeDefns {
+var tds	= dbData.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"NVARCHAR", 	Go:"string",	DftLen:50,},
@@ -32,7 +32,7 @@ func ImportString() string {
 }
 
 func init() {
-	pd :=  genSqlApp.Plugin_Data{"mariadb", &tds, ImportString}
-	genSqlApp.Register(&pd)
+	pd :=  dbData.Plugin_Data{"mariadb", &tds, ImportString, false}
+	dbData.Register(&pd)
 }
 
