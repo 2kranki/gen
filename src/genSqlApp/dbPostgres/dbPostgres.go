@@ -32,7 +32,7 @@ func ImportString() string {
 }
 
 func init() {
-	pd :=  dbData.Plugin_Data{"postgres", &tds, ImportString, false}
+	pd :=  dbData.Plugin_Data{"postgres", &tds, ImportString, false, false}
 	dbData.Register(&pd)
 }
 

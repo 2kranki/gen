@@ -32,6 +32,7 @@ type Plugin_Data	struct {
 	T			*TypeDefns
 	ImportString func() string
 	AddGo		bool			// Add "GO" after major sql statements
+	CreateDB	bool
 }
 
 /**
@@ -564,6 +565,32 @@ type Database struct {
 	PW			string			`json:"PW,omitempty"`
 	Tables  	[]DbTable		`json:"Tables,omitempty"`
 	ImportStr	string
+	Plugin		*Plugin_Data
+}
+
+func (d *Database) CreateSql() string {
+	var str			strings.Builder
+
+	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;\\n", d.TitledName))
+	if dbStruct.SqlType == "mssql" {
+		str.WriteString("GO\\n")
+	}
+	str.WriteString(fmt.Sprintf("USE %s;\\n", d.TitledName))
+	if dbStruct.SqlType == "mssql" {
+		str.WriteString("GO\\n")
+	}
+
+	return str.String()
+}
+
+func (d *Database) DeleteSql() string {
+	var str			strings.Builder
+
+	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", d.TitledName))
+	if dbStruct.SqlType == "mssql" {
+		str.WriteString("GO\\n")
+	}
+	return str.String()
 }
 
 func (d *Database) ForTables(f func(t *DbTable) ) {
@@ -738,6 +765,7 @@ func ReadJsonFile(fn string) error {
 	}
 	if plg := Plugin(dbStruct.SqlType); plg != nil {
 		dbStruct.ImportStr = plg.ImportString()
+		dbStruct.Plugin = plg
 	} else {
 		return errors.New(fmt.Sprintf("Error: Can't find import string for %s!\n\n\n", dbStruct.SqlType))
 	}
@@ -790,7 +818,7 @@ func ValidateData() error {
 			if f.Name == "" {
 				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
 			}
-			td := Plugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+			td := dbStruct.Plugin.T.FindDefn(f.TypeDefn)
 			if td == nil {
 				log.Fatalln("Error - Could not find Type definition for field,",
 					f.Name,"type:",f.TypeDefn)

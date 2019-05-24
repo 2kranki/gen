@@ -50,7 +50,10 @@ To use this as I do, try the following:
 13. Play and have fun.
 14. Please send me any comments or problems.
 
-
+Look in the "dbs" directory for specific notes on what I did to get each database driver running.  Each was
+a little different on my system and it might be that way for you.  Remember that you can over-ride the 
+connection parameters from the command line.  To see the arguments, just run "/tmp/bin/app --help" and it
+will display them.
 
 I am running this on MacOSX for now with golang v1.12.1.  I will adapt the above for Windows at some point.
 My editor is Goland from Intellij.  It has worked well for me.

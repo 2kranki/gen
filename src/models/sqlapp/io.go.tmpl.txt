@@ -5,6 +5,7 @@
 // and data to interact with the SQL Database.
 
 // Generated: [[Time]]
+[[$td := .TD]]
 
 package io[[.TD.Data.TitledName]]
 
@@ -31,6 +32,10 @@ var dbServer    string
 var dbUser     	string
 
 
+//============================================================================
+//                              Miscellaneous
+//============================================================================
+
 [[if GenDebugging]]
     func ErrorString(err error) string {
         if err == nil {
@@ -55,103 +60,6 @@ var dbUser     	string
     }
 
 [[end]]
-
-
-func Connect() error {
-    var err         error
-
-	[[ if eq .TD.Data.SqlType "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "mssql" ]]
-	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
-	                            dbUser,dbPW,dbServer,dbPort,dbName)
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to mssql using: %s\n", connStr)
-        [[end]]
-	    db, err := sql.Open("mssql", connStr)
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
-	    connStr := fmt.Sprintf("user=%s password='%s' host=%s port=%s ",
-	                            dbUser,dbPW,dbServer,dbPort)
-	    if len(dbName) > 0 {
-	        connStr += fmt.Sprintf("dbname='%s' ", dbName)
-	    }
-	    connStr += "sslmode=disable"
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to postgres using: %s\n", connStr)
-        [[end]]
-        db, err = sql.Open("postgres", connStr)
-	[[ else if eq .TD.Data.SqlType "sqlite" ]]
-	    connStr := fmt.Sprintf("%s", dbServer)
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to %s\n", connStr)
-        [[end]]
-	    db, err = sql.Open("sqlite3", connStr)
-	[[ end ]]
-    if err != nil {
-        log.Fatalln("Error: Cannot Connect: ", err)
-    }
-    err = db.Ping()
-    if err != nil {
-        Disconnect( )
-        log.Fatalln("Error: Cannot Ping: ", err)
-    }
-
-    return nil
-}
-
-// Disconnect() cleans up anything that needs to be
-// accomplished before the database is closed
-// and then closes the database connection.
-func Disconnect() error {
-    var err         error
-
-    [[if GenDebugging]]
-        log.Printf("\tDisconnecting from Database\n")
-    [[end]]
-    if IsConnected() {
-        err = db.Close()
-        db = nil
-    } else {
-        err = errors.New("Error: Database was not connected!")
-    }
-
-    return err
-}
-
-func IsConnected() bool {
-    if db != nil {
-        return true
-    }
-    return false
-}
-
-func TablesCreate() error {
-    var err         error
-
-	[[range $t := .TD.Data.Tables -]]
-        err = [[$t.TitledName]]TableCreate()
-        if err != nil {
-            log.Fatalln("Error: Cannot create table: ", err)
-        }
-	[[ end ]]
-
-	return err
-}
-
-func TablesDelete() error {
-    var err         error
-
-	[[range $t := .TD.Data.Tables -]]
-        err = [[$t.TitledName]]TableDelete()
-        if err != nil {
-            log.Fatalln("Error: Cannot delete table: ", err)
-        }
-	[[ end ]]
-
-	return err
-}
 
 func Name() string {
     return dbName
@@ -191,4 +99,161 @@ func User() string {
 
 func SetUser(value string) {
    dbUser = value
+}
+
+// Connect connects the database/sql/driver to the appropriate
+//database using the given parameters.
+func Connect() error {
+    var err         error
+
+	[[ if eq .TD.Data.SqlType "mariadb" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType "mssql" ]]
+	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
+	                            dbUser,dbPW,dbServer,dbPort,dbName)
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to mssql using: %s\n", connStr)
+        [[end]]
+	    db, err := sql.Open("mssql", connStr)
+	[[ else if eq .TD.Data.SqlType "mysql" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType "postgres" ]]
+	    connStr := fmt.Sprintf("user=%s password='%s' host=%s port=%s ",
+	                            dbUser,dbPW,dbServer,dbPort)
+	    if len(dbName) > 0 {
+	        connStr += fmt.Sprintf("dbname='%s' ", dbName)
+	    }
+	    connStr += "sslmode=disable"
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to postgres using: %s\n", connStr)
+        [[end]]
+        db, err = sql.Open("postgres", connStr)
+	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+	    connStr := fmt.Sprintf("%s", dbName)
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to %s\n", connStr)
+        [[end]]
+	    db, err = sql.Open("sqlite3", connStr)
+	[[ end ]]
+    if err != nil {
+        log.Fatalln("Error: Cannot Connect: ", err)
+    }
+    err = db.Ping()
+    if err != nil {
+        Disconnect( )
+        log.Fatalln("Error: Cannot Ping: ", err)
+    }
+
+    [[if .TD.Data.Plugin.CreateDB]]
+        err := DatabaseCreate()
+        if err != nil {
+            Disconnect( )
+            log.Fatalln("Error: Cannot Ping: ", err)
+        }
+    [[end]]
+    return nil
+}
+
+// Disconnect() cleans up anything that needs to be
+// accomplished before the database is closed
+// and then closes the database connection.
+func Disconnect() error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("\tDisconnecting from Database\n")
+    [[end]]
+    if IsConnected() {
+        err = db.Close()
+        db = nil
+    } else {
+        err = errors.New("Error: Database was not connected!")
+    }
+
+    return err
+}
+
+func IsConnected() bool {
+    if db != nil {
+        return true
+    }
+    return false
+}
+
+//============================================================================
+//                        Database Maintenance
+//============================================================================
+
+// DatabaseCreate creates the table in the
+// given database deleting the current table if
+// present.
+func DatabaseCreate() error {
+    var createSql = "[[.TD.Data.CreateSql]]"
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("DatabaseCreate()\n")
+    [[end]]
+
+    err = DatabaseDelete()
+    if err != nil {
+        [[if GenDebugging]]
+            log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
+        [[end]]
+        return err
+    }
+    _, err = db.Exec(createSql)
+
+    [[if GenDebugging]]
+        log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+// DatabaseDelete deletes the table in the
+// given database if present.
+func DatabaseDelete() error {
+    var deleteSql = "[[.TD.Data.DeleteSql]]"
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("DatabaseDelete()\n")
+    [[end]]
+
+    _, err = db.Exec(deleteSql)
+
+    [[if GenDebugging]]
+        log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//============================================================================
+//                          Table Maintenance/Select
+//============================================================================
+
+func TablesCreate() error {
+    var err         error
+
+	[[range $t := .TD.Data.Tables -]]
+        err = [[$t.TitledName]]TableCreate()
+        if err != nil {
+            log.Fatalln("Error: Cannot create table: ", err)
+        }
+	[[ end ]]
+
+	return err
+}
+
+func TablesDelete() error {
+    var err         error
+
+	[[range $t := .TD.Data.Tables -]]
+        err = [[$t.TitledName]]TableDelete()
+        if err != nil {
+            log.Fatalln("Error: Cannot delete table: ", err)
+        }
+	[[ end ]]
+
+	return err
 }

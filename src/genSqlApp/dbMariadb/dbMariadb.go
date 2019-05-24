@@ -32,7 +32,7 @@ func ImportString() string {
 }
 
 func init() {
-	pd :=  dbData.Plugin_Data{"mariadb", &tds, ImportString, false}
+	pd :=  dbData.Plugin_Data{"mariadb", &tds, ImportString, false, true}
 	dbData.Register(&pd)
 }
 

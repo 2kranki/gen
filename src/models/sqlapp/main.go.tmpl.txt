@@ -82,7 +82,7 @@ func main() {
     flag.StringVar(&db_user, "dbUser",   "postgres",    "the database user")
     flag.StringVar(&db_name, "dbName",   "[[.TD.Data.Name]]", "the database name")
 [[ else if eq .TD.Data.SqlType     "sqlite" ]]
-    flag.StringVar(&db_srvr, "dbServer", "test.db", "database file path")
+    flag.StringVar(&db_name, "dbName",   "test.db",     "the database path")
 [[ else ]]
     flag.StringVar(&db_pw,   "dbPW",    "Passw0rd!",    "the database password")
     flag.StringVar(&db_port, "dbPort",  "1433",         "the database port")

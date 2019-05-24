@@ -32,7 +32,7 @@ func ImportString() string {
 }
 
 func init() {
-	pd :=  dbData.Plugin_Data{"mysql", &tds, ImportString, false}
+	pd :=  dbData.Plugin_Data{"mysql", &tds, ImportString, false, true}
 	dbData.Register(&pd)
 }
 

@@ -34,7 +34,7 @@ func ImportString() string {
 
 func init() {
 	log.Printf("\tRegistering SQLite\n")
-	pd :=  dbData.Plugin_Data{"sqlite", &tds, ImportString, false}
+	pd :=  dbData.Plugin_Data{"sqlite", &tds, ImportString, false, false}
 	dbData.Register(&pd)
 }
 

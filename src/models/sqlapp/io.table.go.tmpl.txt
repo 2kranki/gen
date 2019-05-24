@@ -11,6 +11,7 @@
 //      return a "row" need not be closed.
 
 // Generated: [[Time]]
+[[$td := .TD]]
 
 package io[[.TD.Data.TitledName]]
 
@@ -30,6 +31,10 @@ import (
 )
 
 [[.Table.CreateStruct]]
+
+//============================================================================
+//                              Miscellaneous
+//============================================================================
 
 // KeyToString converts the primary key field value
 // to a string.
@@ -77,66 +82,9 @@ func [[.Table.TitledName]]New() *[[.Table.TitledName]] {
 }
 
 
-func [[.Table.TitledName]]TableCount( ) (int, error) {
-    var count       int
-
-    [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]TableCount()\n")
-    [[end]]
-
-    row := db.QueryRow("SELECT COUNT(*) FROM [[.Table.Name]]")
-
-	err := row.Scan(&count)
-
-    [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]]TableCount(%s) %d\n", ErrorString(err), count)
-    [[end]]
-    return count, err
-}
-
-// [[.Table.TitledName]]TableCreate creates the table in the
-// given database deleting the current table if
-// present.
-func [[.Table.TitledName]]TableCreate() error {
-    var createSql = "[[.Table.CreateSql]]"
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]TableCreate()\n")
-    [[end]]
-
-    err = [[.Table.TitledName]]TableDelete()
-    if err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end [[.Table.TitledName]]TableCreate(Error:%s)\n", err.Error())
-        [[end]]
-        return err
-    }
-    _, err = db.Exec(createSql)
-
-    [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]]TableCreate(%s)\n", ErrorString(err))
-    [[end]]
-    return err
-}
-
-// [[.Table.TitledName]]TableDelete deletes the table in the
-// given database if present.
-func [[.Table.TitledName]]TableDelete() error {
-    var deleteSql = "[[.Table.DeleteSql]]"
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]]TableDelete()\n")
-    [[end]]
-
-    _, err = db.Exec(deleteSql)
-
-    [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]]TableDelete(%s)\n", ErrorString(err))
-    [[end]]
-    return err
-}
+//============================================================================
+//                        Row Maintenance/Select
+//============================================================================
 
 func [[.Table.TitledName]]RowDelete(key string) error {
 
@@ -361,5 +309,70 @@ func [[.Table.TitledName]]RowUpdate(d *[[.Table.TitledName]]) error {
         log.Printf("...end [[.Table.TitledName]]RowUpdate(%s)\n", ErrorString(err))
     [[end]]
 	return err
+}
+
+//============================================================================
+//                        Table Maintenance/Select
+//============================================================================
+
+func [[.Table.TitledName]]TableCount( ) (int, error) {
+    var count       int
+
+    [[if GenDebugging]]
+        log.Printf("[[.Table.TitledName]]TableCount()\n")
+    [[end]]
+
+    row := db.QueryRow("SELECT COUNT(*) FROM [[.Table.Name]]")
+
+	err := row.Scan(&count)
+
+    [[if GenDebugging]]
+        log.Printf("...end [[.Table.TitledName]]TableCount(%s) %d\n", ErrorString(err), count)
+    [[end]]
+    return count, err
+}
+
+// [[.Table.TitledName]]TableCreate creates the table in the
+// given database deleting the current table if
+// present.
+func [[.Table.TitledName]]TableCreate() error {
+    var createSql = "[[.Table.CreateSql]]"
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[.Table.TitledName]]TableCreate()\n")
+    [[end]]
+
+    err = [[.Table.TitledName]]TableDelete()
+    if err != nil {
+        [[if GenDebugging]]
+            log.Printf("...end [[.Table.TitledName]]TableCreate(Error:%s)\n", err.Error())
+        [[end]]
+        return err
+    }
+    _, err = db.Exec(createSql)
+
+    [[if GenDebugging]]
+        log.Printf("...end [[.Table.TitledName]]TableCreate(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+// [[.Table.TitledName]]TableDelete deletes the table in the
+// given database if present.
+func [[.Table.TitledName]]TableDelete() error {
+    var deleteSql = "[[.Table.DeleteSql]]"
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[.Table.TitledName]]TableDelete()\n")
+    [[end]]
+
+    _, err = db.Exec(deleteSql)
+
+    [[if GenDebugging]]
+        log.Printf("...end [[.Table.TitledName]]TableDelete(%s)\n", ErrorString(err))
+    [[end]]
+    return err
 }
 

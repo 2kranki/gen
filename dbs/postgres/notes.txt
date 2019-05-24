@@ -8,5 +8,20 @@ done and running.
 Now that I had it running native, I turned to running it through docker. To set up
 a Docker image of PostgreSQL, I did the following:
 
+    * I changed the port from 5432 to 5430 since it seemed to conflict with the
+        installed PostgreSQL.
+    * "./run.sh" loads postgres1 from the Docker Postgres Image with everything
+        established properly except for the database being defined.
+    * I had to use pgAdmin to create the "Finances" database under 'postgres' user.
+        It needed to be predefined before we could use and the generated program
+        did not seem like the right place for that. You select the "Databases" in
+        the right hand column and then "Create Database".
+    * Now you can run the app with "/tmp/bin/app -dbPort=5430" from the command
+        line.
+    * The shell scripts in this section should work:
+        ./run.sh        <- Create and Run the postgres1 container
+        ./exec.sh       <- Allows you to peer inside the container and make adjustments
+                            if needed.
+        ./kill.sh       <- Kills and deletes the postgres1 container
 
 
