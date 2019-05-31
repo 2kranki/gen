@@ -170,8 +170,8 @@ func exec() {
 	    mux.HandleFunc("/[[$t.Name]]/list/next",          hndlr[[$n]].[[$t.TitledName]]HndlrListNext)
 	    mux.HandleFunc("/[[$t.Name]]/list/prev",          hndlr[[$n]].[[$t.TitledName]]HndlrListPrev)
 	    mux.HandleFunc("/[[$t.Name]]/table/create",       hndlr[[$n]].[[$t.TitledName]]HndlrTableCreate)
-	    mux.HandleFunc("/[[$t.Name]]/table/loadcsv",      hndlr[[$n]].[[$t.TitledName]]HndlrTableLoadCSV)
-	    mux.HandleFunc("/[[$t.Name]]/table/load",         hndlr[[$n]].[[$t.TitledName]]HndlrTableLoad)
+	    mux.HandleFunc("/[[$t.Name]]/table/load/csv",     hndlr[[$n]].[[$t.TitledName]]HndlrTableLoadCSV)
+	    mux.HandleFunc("/[[$t.Name]]/table/load/test",    hndlr[[$n]].[[$t.TitledName]]HndlrTableLoadTestData)
 	    mux.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.TitledName]]HndlrDelete)
 	    mux.HandleFunc("/[[$t.Name]]/empty",              hndlr[[$n]].[[$t.TitledName]]HndlrEmpty)
 	    mux.HandleFunc("/[[$t.Name]]/find",               hndlr[[$n]].[[$t.TitledName]]HndlrFind)
@@ -187,6 +187,9 @@ func exec() {
 	[[ end -]]
 
 	// Start the HTTP Server.
+    [[if GenDebugging]]
+        log.Printf("\tStasrting Server at %:%s...\n", http_srvr, http_port)
+    [[end]]
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
 	log.Fatal(http.ListenAndServe(srvrStr, mux))
 

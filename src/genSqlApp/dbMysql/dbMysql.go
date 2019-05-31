@@ -8,10 +8,15 @@
 package dbMysql
 
 import (
-	"../dbData"
+	"../dbPlugin"
+	"fmt"
+	"strings"
 )
 
-var tds	= dbData.TypeDefns {
+// Notes:
+//	* We are now using a Decimal Package for support of decimal operations including
+//		monetary calculations via https://github.com/ericlagergren/decimal
+var tds	= dbPlugin.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"NVARCHAR", 	Go:"string",	DftLen:50,},
@@ -27,12 +32,28 @@ var tds	= dbData.TypeDefns {
 	{Name:"url", 		Html:"url",			Sql:"NVARCHAR",		Go:"string",	DftLen:50,},
 }
 
+func FlagsString(name string) string {
+	var str			strings.Builder
+	var wk			string
+
+	str.WriteString("\tflag.StringVar(&db_pw,\"dbPW\",\"Passw0rd!\",\"the database password\")\n")
+	str.WriteString("\tflag.StringVar(&db_port,\"dbPort\",\"3306\",\"the database port\")\n")
+	str.WriteString("\tflag.StringVar(&db_srvr,\"dbServer\",\"localhost\",\"the database server\")\n")
+	str.WriteString("\tflag.StringVar(&db_user,\"dbUser\",\"root\",\"the database user\")\n")
+	wk = fmt.Sprintf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
+	str.WriteString(wk)
+	return str.String()
+}
+
 func ImportString() string {
 	return "\"github.com/go-sql-driver/mysql\""
 }
 
 func init() {
-	pd :=  dbData.Plugin_Data{"mysql", &tds, ImportString, false, true}
-	dbData.Register(&pd)
+	pd :=  dbPlugin.PluginData{
+		Name:"mysql", Types:&tds, FlagsString:FlagsString, ImportString:ImportString,
+		AddGo:false, CreateDB:false, NeedsUse:true,
+	}
+	dbPlugin.Register(&pd)
 }
 

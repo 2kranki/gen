@@ -18,14 +18,20 @@ import (
 
 func SetupConnectParms() {
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
+		SetPort("4306")
+		SetPW("Passw0rd!")
+		SetServer("127.0.0.1")
+		SetUser("root")
 	[[ else if eq .TD.Data.SqlType  "mssql" ]]
 		SetPort("1401")
 		SetPW("Passw0rd!")
 		SetServer("localhost")
 		SetUser("SA")
 	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		ERROR - NOT IMPLEMENTED
+		SetPort("3306")
+		SetPW("Passw0rd!")
+		SetServer("127.0.0.1")
+		SetUser("root")
 	[[ else if eq .TD.Data.SqlType "postgres" ]]
 		SetPort("5432")
 		SetPW("Passw0rd!")

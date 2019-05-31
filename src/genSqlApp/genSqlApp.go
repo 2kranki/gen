@@ -12,6 +12,34 @@
 //		structures well especially arrays of structures within
 //		structures.
 
+/* 				*** Package Structure ***
+genSqlApp
+	- Responsible for generating the application
+	- Is controlled by internal table of files to generate
+		and support routines to generate each file given its
+		definition
+	- Sub-packages
+		- dbPlugin
+			- Provides Managerial functions for all plugins:
+				- Plugin registration
+				- Plugin unregistration
+				- Finding Registered plugins
+			- Defines the base struct that all plugins must support
+				and inherit from
+		- dbJson
+			- Responsible for importing, set up and validation of the
+				user defined JSON definition file.
+			- Constains JSON tables that define the databases, tables
+				and fields providing access to same.
+		- dbSql
+			- Responsible for generating the SQL statements that will
+				work in the appropriate database plugin
+		- dbForm
+			- Responsible for generating the HTML form data needed to
+				access/manage the database
+ */
+
+
 package genSqlApp
 
 import (
@@ -19,11 +47,9 @@ import (
 	"../shared"
 	"../util"
 	"./dbData"
-	_ "./dbMariadb"
-	_ "./dbMssql"
-	_ "./dbMysql"
-	_ "./dbPostgres"
-	_ "./dbSqlite"
+	_ "./dbForm"
+	"./dbJson"
+	_ "./dbSql"
 	"errors"
 	"flag"
 	"fmt"
@@ -32,6 +58,13 @@ import (
 	"os"
 	"path"
 	"strings"
+	// Include the various Database Plugins so that they will register
+	// with dbPlugin.
+	_ "./dbMariadb"
+	_ "./dbMssql"
+	_ "./dbMysql"
+	_ "./dbPostgres"
+	_ "./dbSqlite"
 )
 
 
@@ -54,7 +87,7 @@ var FileDefns []FileDefn = []FileDefn{
 	{"bld.sh.txt",
 		"",
 		"b.sh",
-		"copy",
+		"text",
 		0755,
 		"one",
 		0,
@@ -115,7 +148,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"one",
 		2,
 	},
-	{"menu.html.tmpl.txt",
+	{"main.menu.html.tmpl.txt",
 		"/html",
 		"${DbName}.menu.html",
 		"text",
@@ -268,6 +301,10 @@ func (t *TaskData) genFile() {
 
 }
 
+//----------------------------------------------------------------------------
+//								copyFile
+//----------------------------------------------------------------------------
+
 func copyFile(modelPath, outPath string) (int64, error) {
 	var dst *os.File
 	var err error
@@ -301,6 +338,10 @@ func copyFile(modelPath, outPath string) (int64, error) {
 	return amt, err
 }
 
+//----------------------------------------------------------------------------
+//								createModelPath
+//----------------------------------------------------------------------------
+
 func createModelPath(fn string) (string, error) {
 	var modelPath   string
 	var err         error
@@ -318,6 +359,10 @@ func createModelPath(fn string) (string, error) {
 
 	return modelPath, err
 }
+
+//----------------------------------------------------------------------------
+//								createOutputPath
+//----------------------------------------------------------------------------
 
 func createOutputPath(dir string, dn string, tn string, fn string) (string, error) {
 	var outPath string
@@ -352,6 +397,10 @@ func createOutputPath(dir string, dn string, tn string, fn string) (string, erro
 	return outPath, nil
 }
 
+//----------------------------------------------------------------------------
+//								readJsonFiles
+//----------------------------------------------------------------------------
+
 // readJsonFiles reads in the two JSON files that define the
 // application to be generated.
 func readJsonFiles() error {
@@ -361,8 +410,8 @@ func readJsonFiles() error {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
 	}
 
-	if err = dbData.ReadJsonFile(sharedData.DataPath()); err != nil {
-		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
+	if err = dbJson.ReadJsonFile(sharedData.DataPath()); err != nil {
+		return errors.New(fmt.Sprintln("Error: Reading Data Json Input:", sharedData.DataPath(), err))
 	}
 
     return nil

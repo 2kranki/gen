@@ -1,84 +1,25 @@
 // See License.txt in main repository directory
 
-// dbPkg contains the data and functions to generate
-// table and field data for html forms, handlers and
-// table sql i/o for a specific database.  Multiple
-// databases should be handled with multiple ??? of
-// this package.
+// dbJson contains the database definitions as defined
+// by the user.
 
-package dbData
+package dbJson
 
 import (
+	"../../shared"
+	"../../util"
+	"../dbPlugin"
 	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"../../shared"
-	"../../util"
-	"../dbPlugin"
 )
 
-const (
-	DBTYPE_MARIABDB	= 1 << iota
-	DBTYPE_MSSQL
-	DBTYPE_MYSQL
-	DBTYPE_POSTGRES
-	DBTYPE_SQLITE
-)
-
-type TypeDefn struct {
-	Name		string		`json:"Name,omitempty"`		// Type Name
-	Html		string		`json:"Html,omitempty"`		// HTML Type
-	Sql			string		`json:"Sql,omitempty"`		// SQL Type
-	Go			string		`json:"Go,omitempty"`		// GO Type
-	DftLen		int			`json:"DftLen,omitempty"`	// Default Length (used if length is not
-	//													//	given)(0 == Max Length)
-}
-
-type TypeDefns []TypeDefn
-
-func (t TypeDefns) DftLen(name string) int {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.DftLen
-	}
-	return -1
-}
-
-func (t TypeDefns) FindDefn(name string) *TypeDefn {
-	for i,v := range t {
-		if name == v.Name {
-			return &t[i]
-		}
-	}
-	return nil
-}
-
-func (t TypeDefns) GoType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Go
-	}
-	return ""
-}
-
-func (t TypeDefns) HtmlType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Html
-	}
-	return ""
-}
-
-func (t TypeDefns) SqlType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Sql
-	}
-	return ""
-}
+//============================================================================
+//                        JSON Database Field Support
+//============================================================================
 
 // DbField defines a Table's field mostly in terms of
 // SQL.
@@ -96,6 +37,10 @@ type DbField struct {
 	Tbl			*DbTable									// Filled in after JSON is parsed
 }
 
+//----------------------------------------------------------------------------
+//						Global/Internal Object Functions
+//----------------------------------------------------------------------------
+
 func (f *DbField) CreateSql(cm string) string {
 	var str			strings.Builder
 	var ft			string
@@ -103,7 +48,7 @@ func (f *DbField) CreateSql(cm string) string {
 	var pk			string
 	var sp			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -151,7 +96,7 @@ func (f *DbField) FormInput() string {
 	var lbl			string
 	var m			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -198,7 +143,7 @@ func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
 func (f *DbField) GenFromString(dn,sn string) string {
 	var str			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -231,7 +176,7 @@ func (f *DbField) GenFromString(dn,sn string) string {
 func (f *DbField) GenToString(v string, st string) string {
 	var str			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -261,7 +206,7 @@ func (f *DbField) GenToString(v string, st string) string {
 
 func (f *DbField) GoType() string {
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -325,7 +270,7 @@ func (f *DbField) IsText() bool {
 func (f *DbField) RValueToStruct(dn string) string {
 	var str			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -350,7 +295,7 @@ func (f *DbField) RValueToStruct(dn string) string {
 	case "float64":
 		{
 			wrk := 	"\twrk = r.FormValue(\"%s\")\n" +
-					"\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n"
+				"\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n"
 			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
 		}
 	default:
@@ -364,6 +309,10 @@ func (f *DbField) TitledName( ) string {
 	return strings.Title(f.Name)
 }
 
+//============================================================================
+//                        JSON Database Table Support
+//============================================================================
+
 // DbTable stands for Database Table and defines
 // the make up of the SQL Table.
 // Fields should be in the order in which they are to
@@ -374,6 +323,10 @@ type DbTable struct {
 	SQLParms	[]string	`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 	DB			*Database
 }
+
+//----------------------------------------------------------------------------
+//						Global/Internal Object Functions
+//----------------------------------------------------------------------------
 
 // CreateInsertStr() creates a string of all the field
 // names which can be used in SQL INSERT statements.
@@ -537,6 +490,10 @@ func (t *DbTable) TitledName( ) string {
 	return strings.Title(t.Name)
 }
 
+//============================================================================
+//                        	JSON Database Support
+//============================================================================
+
 type Database struct {
 	Name		string			`json:"Name,omitempty"`
 	SqlType		string			`json:"SqlType,omitempty"`
@@ -545,18 +502,16 @@ type Database struct {
 	Port		string			`json:"Port,omitempty"`
 	PW			string			`json:"PW,omitempty"`
 	Tables  	[]DbTable		`json:"Tables,omitempty"`
-	ImportStr	string
-	Plugin		*dbPlugin.PluginData
 }
 
 func (d *Database) CreateSql() string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;\\n", d.TitledName))
+	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;\\n", d.TitledName()))
 	if dbStruct.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
-	str.WriteString(fmt.Sprintf("USE %s;\\n", d.TitledName))
+	str.WriteString(fmt.Sprintf("USE %s;\\n", d.TitledName()))
 	if dbStruct.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -567,7 +522,7 @@ func (d *Database) CreateSql() string {
 func (d *Database) DeleteSql() string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", d.TitledName))
+	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", d.TitledName()))
 	if dbStruct.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -602,6 +557,16 @@ func (d *Database) TitledName( ) string {
 	return strings.Title(d.Name)
 }
 
+//----------------------------------------------------------------------------
+//						Global Support Functions
+//----------------------------------------------------------------------------
+
+// New provides a factory method to create an Sql Object.
+func New() (*Database) {
+	db := &Database{}
+	return db
+}
+
 var	dbStruct	Database
 
 func DbStruct() *Database {
@@ -612,104 +577,6 @@ func DefaultJsonFileName() string {
 	return "db.json.txt"
 }
 
-func InsertSql(t interface{}) string {
-	//var Fields 	[]map[string] interface{}
-	//var ok		bool
-	var x		string
-
-	//insertStr := ""
-	return x
-}
-
-func ForTables(f func(*DbTable)) {
-	for i,_ := range dbStruct.Tables {
-		f(&dbStruct.Tables[i])
-	}
-}
-
-func GenAccessFunc(t DbTable) string {
-	var str			strings.Builder
-	str.WriteString(fmt.Sprintf("\tfunc %sDeleteRow( ) {\n", t.Name))
-	str.WriteString("\t}\n\n")
-	str.WriteString(fmt.Sprintf("\tfunc %sInsertRow( ) {\n", t.Name))
-	str.WriteString("\t}\n\n")
-	str.WriteString(fmt.Sprintf("\tfunc %sSelect(sel string) ([]string, error) {\n", t.Name))
-	/***
-	  func {{title $t.Name }}Select(sel string) []string,error {
-	      {{ if eq .Data.SqlType "mariadb" }}
-	          ERROR - NOT IMPLEMENTED
-	      {{ else if eq .Data.SqlType "mssql" }}
-	      _ "github.com/2kranki/go-mssqldb"
-	      {{ else if eq .Data.SqlType "mysql" }}
-	          _ "github.com/go-sql-driver/mysql"
-	      {{ else if eq .Data.SqlType "postgres" }}
-	          _ "github.com/lib/pq"
-	      {{ else if eq .Data.SqlType "sqlite" }}
-	      _ "github.com/2kranki/go-sqlite3"
-	      {{ end }}
-
-	  }
-
-	 */
-	str.WriteString("\t}\n\n")
-	str.WriteString(fmt.Sprintf("\tfunc %sSetupRow(r *http.Request) {\n", t.Name))
-	/***
-	    func {{ title $t.Name }}SetupRow(r *http.Request) {
-	        data := interface{}
-	        key := r.FormValue("{{$t.PrimaryKey}}")
-		    if key == "" {
-			    return data, errors.New("400. Bad Request.")
-		    }
-	        row := config.DB.QueryRow("SELECT * FROM {{$t.Name}} WHERE {{$t.PrimaryKey}} = $1", key)
-	        err := row.Scan(
-	                    &data.Isbn,
-	                    &data.Title,
-	                    &data.Author,
-	                    &data.Price)
-	        if err != nil {
-	        	return data, err
-	        }
-	        	return data, nil
-	    }
-	*/
-	str.WriteString("\t}\n\n")
-	str.WriteString(fmt.Sprintf("\tfunc %sUpdateRow( ) {\n", t.Name))
-	str.WriteString("\t}\n\n")
-	return str.String()
-}
-
-func GenAccessFuncs() string {
-	var str			strings.Builder
-	for _, v := range dbStruct.Tables {
-		str.WriteString(GenAccessFunc(v))
-	}
-	return str.String()
-}
-
-func GenListField(f DbField) string {
-	var str			strings.Builder
-
-	if f.PrimaryKey {
-		str.WriteString("<a href=\"\">")
-	}
-
-	return str.String()
-}
-
-func GenListBody(t *DbTable) string {
-	var str			strings.Builder
-	for _, v := range t.Fields {
-		str.WriteString(GenListField(v))
-	}
-	return str.String()
-}
-
-// init() adds the functions needed for templating to
-// shared data.
-func init() {
-	sharedData.SetFunc("GenAccessFuncs", GenAccessFuncs)
-}
-
 // ReadJsonFile reads the input JSON file for app
 // and stores the generic JSON Table as well as the
 // decoded structs.
@@ -717,14 +584,14 @@ func ReadJsonFile(fn string) error {
 	var err		    error
 	var jsonPath	string
 
-	jsonPath,_ = filepath.Abs(fn)
+	jsonPath, _ = filepath.Abs(fn)
 	if sharedData.Debug() {
 		log.Println("json path:", jsonPath)
 	}
 
 	// Read in the json file structurally
 	if err = util.ReadJsonFileToData(jsonPath, &dbStruct); err != nil {
-		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
+		return errors.New(fmt.Sprintln("Error: unmarshalling:", jsonPath, ":", err))
 	}
 
 	// Fix up the tables with back pointers that we do not store externally.
@@ -733,12 +600,6 @@ func ReadJsonFile(fn string) error {
 			v.Fields[ii].Tbl = &v
 		}
 		dbStruct.Tables[i].DB = &dbStruct
-	}
-	if plg := dbPlugin.FindPlugin(dbStruct.SqlType); plg != nil {
-		dbStruct.ImportStr = plg.ImportString()
-		dbStruct.Plugin = plg
-	} else {
-		return errors.New(fmt.Sprintf("Error: Can't find import string for %s!\n\n\n", dbStruct.SqlType))
 	}
 
 	if err = ValidateData(); err != nil {
@@ -763,16 +624,13 @@ func TableNames() []string {
 }
 
 func ValidateData() error {
+	var plg		*dbPlugin.PluginData
 
-	switch dbStruct.SqlType {
-	case "mariadb":
-	case "mssql":
-	case "mysql":
-	case "postgres":
-	case "sqlite":
-	default:
-		return errors.New(fmt.Sprintf("SqlType of %s is not supported!",dbStruct.SqlType))
+	// Set up Plugin Support for this database type.
+	if plg = dbPlugin.FindPlugin(dbStruct.SqlType); plg == nil {
+		return errors.New(fmt.Sprintf("Error: Can't find plugin for %s!\n\n\n", dbStruct.SqlType))
 	}
+
 	if dbStruct.Name == "" {
 		return errors.New(fmt.Sprintf("Database Name is missing!"))
 	}
@@ -793,7 +651,7 @@ func ValidateData() error {
 			if f.Name == "" {
 				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
 			}
-			td := dbStruct.Plugin.T.FindDefn(f.TypeDefn)
+			td := plg.Types.FindDefn(f.TypeDefn)
 			if td == nil {
 				log.Fatalln("Error - Could not find Type definition for field,",
 					f.Name,"type:",f.TypeDefn)
@@ -803,3 +661,4 @@ func ValidateData() error {
 
 	return nil
 }
+

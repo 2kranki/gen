@@ -9,11 +9,16 @@
 package hndlr[[.TD.Data.TitledName]]
 
 import (
-	_ [[.TD.Data.ImportStr]]
+	_ "fmt"
+	_ "net/http"
+	_ "io"
+	_ "io/ioutil"
     [[if GenDebugging]]
         "log"
     [[end]]
+    _ "os"
     "text/template"
+	_ [[.TD.Data.ImportStr]]
     //"../io[[.TD.Data.TitledName]]"
 )
 
@@ -47,6 +52,10 @@ func init() {
 func SetTmplsDir(d string) {
     tmplsDir = d
 }
+
+//----------------------------------------------------------------------------
+//                           Setup Templates
+//----------------------------------------------------------------------------
 
 // SetupTmpls initializes the functions used in the templates
 // and loads them.

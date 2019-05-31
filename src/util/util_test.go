@@ -22,6 +22,10 @@ type jsonData struct {
 	Outdir  string `json:"outdir,omitempty"`
 }
 
+func (j jsonData) TestFunc() string {
+	return "xyzzy"
+}
+
 func TestFileCompare(t *testing.T) {
 
 	t.Log("TestFileCompare()")

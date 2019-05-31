@@ -21,11 +21,16 @@ import (
     [[end]]
     //"io"
     "../io[[.TD.Data.TitledName]]"
+    "mime/multipart"
 	"net/http"
-	"os"
+	_ "os"
 	"strconv"
 	//"strings"
 )
+
+    //----------------------------------------------------------------------------
+    //                             Request to Struct
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]Req2Struct converts the form values to a struct. FormValue(S) are available
     // for both, GET and POST.  It is just that all your parameters are present in the URL if you use
@@ -54,9 +59,15 @@ import (
         return data, err
     }
 
+
+
     //============================================================================
     //                                  Row Form Handlers
     //============================================================================
+
+    //----------------------------------------------------------------------------
+    //                                  Show
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]Show displays the given record.
     func [[.Table.TitledName]]Show(w http.ResponseWriter, rcd  *io[[$n]].[[.Table.TitledName]], msg string) {
@@ -85,6 +96,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]Show(%s)\n", ErrorString(err))
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             Row Delete
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]HndlrDelete handles an delete request which comes from
     // the row display form.
@@ -139,6 +154,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             Row Empty
+    //----------------------------------------------------------------------------
+
     // [[.Table.TitledName]]HndlrEmpty displays the table row form with an empty row.
     func [[.Table.TitledName]]HndlrEmpty(w http.ResponseWriter, r *http.Request) {
 	    var rcd     *io[[$n]].[[.Table.TitledName]]
@@ -166,6 +185,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrEmpty()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             Row Find
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]HndlrFind handles displaying of the table row form display.
     func [[.Table.TitledName]]HndlrFind(w http.ResponseWriter, r *http.Request) {
@@ -213,6 +236,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             Row First
+    //----------------------------------------------------------------------------
+
     // [[.Table.Name]]HndlrFirst displays the first row.
     func [[.Table.TitledName]]HndlrFirst(w http.ResponseWriter, r *http.Request) {
 	    var rcd     *io[[$n]].[[.Table.TitledName]]
@@ -248,6 +275,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrFirst()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             Row Form
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]HndlrForm displays the raw table row form without data.
     func [[.Table.TitledName]]HndlrForm(w http.ResponseWriter, r *http.Request) {
@@ -301,6 +332,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             Row Insert
+    //----------------------------------------------------------------------------
+
     // [[.Table.TitledName]]HndlrInsert handles an add row request which comes from
     // the row display form.
     func [[.Table.TitledName]]HndlrInsert(w http.ResponseWriter, r *http.Request) {
@@ -342,6 +377,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             Row Last
+    //----------------------------------------------------------------------------
+
     // [[.Table.Name]]HndlrLast displays the first row.
     func [[.Table.TitledName]]HndlrLast(w http.ResponseWriter, r *http.Request) {
 	    var rcd     *io[[$n]].[[.Table.TitledName]]
@@ -376,6 +415,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrLast()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             Row Next
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]HndlrNext handles an next request which comes from
     // the row display form and should display the next row from the
@@ -426,6 +469,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             Row Prev
+    //----------------------------------------------------------------------------
+
     // [[.Table.Name]]HndlrPrev handles an previous request which comes from
     // the row display form and should display the previous row from the
     // current one.
@@ -475,6 +522,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             Row Show
+    //----------------------------------------------------------------------------
+
     // [[.Table.TitledName]]HndlrShow handles displaying of the table row form display.
     func [[.Table.TitledName]]HndlrShow(w http.ResponseWriter, r *http.Request) {
         var err     error
@@ -520,6 +571,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrShow()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             Row Update
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]HndlrUpdate handles an update request which comes from
     // the row display form.
@@ -590,6 +645,10 @@ import (
     //                              List Form Handlers
     //============================================================================
 
+    //----------------------------------------------------------------------------
+    //                             Show List
+    //----------------------------------------------------------------------------
+
     // [[.Table.TitledName]]ShowList displays a list page given a starting offset.
     func [[.Table.TitledName]]ShowList(w http.ResponseWriter, offset int) {
 	    var err     error
@@ -630,6 +689,10 @@ import (
         [[end]]
     }
 
+    //----------------------------------------------------------------------------
+    //                             List First
+    //----------------------------------------------------------------------------
+
     // [[.Table.Name]]HndlrListFirst displays the first page of rows.
     func [[.Table.TitledName]]HndlrListFirst(w http.ResponseWriter, r *http.Request) {
 
@@ -653,6 +716,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrListFirst()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             List Last
+    //----------------------------------------------------------------------------
 
     // [[.Table.Name]]HndlrListLast displays the last page of rows.
     func [[.Table.TitledName]]HndlrListLast(w http.ResponseWriter, r *http.Request) {
@@ -692,6 +759,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrListLast()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             List Next
+    //----------------------------------------------------------------------------
 
     // [[.Table.Name]]HndlrListNext displays the next page of rows.
     func [[.Table.TitledName]]HndlrListNext(w http.ResponseWriter, r *http.Request) {
@@ -733,6 +804,10 @@ import (
             log.Printf("...end [[.Table.TitledName]]HndlrListNext()\n")
         [[end]]
     }
+
+    //----------------------------------------------------------------------------
+    //                             List Prev
+    //----------------------------------------------------------------------------
 
     // [[.Table.Name]]HndlrListPrev displays the next page of rows.
     func [[.Table.TitledName]]HndlrListPrev(w http.ResponseWriter, r *http.Request) {
@@ -787,6 +862,10 @@ import (
     //                             Table Form Handlers
     //============================================================================
 
+    //----------------------------------------------------------------------------
+    //                             Table Create
+    //----------------------------------------------------------------------------
+
     // [[.Table.TitledName]]HndlrTableCreate creates the table deleting any
     // current ones.
     func [[.Table.TitledName]]HndlrTableCreate(w http.ResponseWriter, r *http.Request) {
@@ -815,104 +894,56 @@ import (
         [[end]]
     }
 
-    // [[.Table.TitledName]]HndlrTableLoad creates the table deleting any
-    // current ones and loads in some test rows.
-    func [[.Table.TitledName]]HndlrTableLoad(w http.ResponseWriter, r *http.Request) {
-        var err         error
-        var rcd         io[[$n]].[[.Table.TitledName]]
-
-        [[if GenDebugging]]
-            log.Printf("[[.Table.TitledName]]HndlrLoad(%s)\n", r.Method)
-        [[end]]
-
-        // Verify HTTP parameters
-        if r.Method != "GET" {
-            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-            return
-        }
-
-        // Create the table.
-        err = io[[$n]].[[.Table.TitledName]]TableCreate()
-        if err == nil {
-            w.Write([]byte("Table was created\n"))
-        } else {
-            w.Write([]byte("Table creation had an error of:" + err.Error()))
-        }
-
-        // Load the test rows.
-        // Now add some records.
-        for i := 0; i < 26; i++ {
-            chr := 'A' + i
-            [[if .Table.PrimaryKey.IsInteger]]
-                rcd.[[.Table.PrimaryKey.Name]] = i
-            [[else if .Table.PrimaryKey.IsFloat]]
-                rcd.[[.Table.PrimaryKey.Name]] = float64(i)
-            [[else]]
-                rcd.[[.Table.PrimaryKey.Name]] = string(chr)
-            [[end]]
-            [[range $f := .Table.Fields]]
-                [[if $f.IsText]]
-                    rcd.[[$f.TitledName]] = string(chr)
-                [[end]]
-            [[end]]
-            err = io[[$n]].[[.Table.TitledName]]RowInsert(&rcd)
-            if err == nil {
-                str := fmt.Sprintf("Added row: %c\n", chr)
-                w.Write([]byte(str))
-            } else {
-                str := fmt.Sprintf("Table creation had an error of: %c\n", chr)
-                w.Write([]byte(str))
-            }
-        }
-
-        [[if GenDebugging]]
-            log.Printf("...end [[.Table.TitledName]]HndlrLoad(%s)\n", ErrorString(err))
-        [[end]]
-    }
+    //----------------------------------------------------------------------------
+    //                            Table Load CSV
+    //----------------------------------------------------------------------------
 
     // [[.Table.TitledName]]HndlrTableLoadCSV creates the table deleting any
     // current ones and loads in data from a CSV file.
     func [[.Table.TitledName]]HndlrTableLoadCSV(w http.ResponseWriter, r *http.Request) {
         var err         error
         var rcd         io[[$n]].[[.Table.TitledName]]
-	    var fileIn      *os.File
-	    var path        string
+	    var fileIn      multipart.File
 	    var cnt         int
+	    var maxMem      int64
 
         [[if GenDebugging]]
             log.Printf("[[.Table.TitledName]]HndlrLoadCSV(%s)\n", r.Method)
         [[end]]
 
         // Verify HTTP parameters
-        if r.Method != "GET" {
+        if r.Method != "POST" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
         }
 
-        path = r.FormValue("path")
-        if path == "" {
-            [[if GenDebugging]]
-                log.Printf("...end [[.Table.TitledName]]HndlrTableLoadCSV(Error:400) - Missing Path\n")
-            [[end]]
-            http.Error(w, http.StatusText(400), http.StatusBadRequest)
-            return
-        }
-        [[if GenDebugging]]
-            log.Printf("\tpath = %s\n", path)
-        [[end]]
+        // ParseMultipartForm parses a request body as multipart/form-data.
+        // The whole request body is parsed and up to a total of maxMemory
+        // bytes of its file parts are stored in memory, with the remainder
+        // stored on disk in temporary files. ParseMultipartForm calls ParseForm
+        // if necessary. After one call to ParseMultipartForm, subsequent
+        // calls have no effect.
+        name := "csvFile"           // Must match Name parameter of Form's "<input type=file name=???>"
+        maxMem = 64 << 20           // 64mb
+        r.ParseMultipartForm(maxMem)
 
-        // Create the csv reader.
-        fileIn, err = os.Open(path)
+        // FormFile returns the first file for the given key which was
+        // specified on the Form Input Type=file Name parameter.
+        // it also returns the FileHeader so we can get the Filename,
+        // the Header and the size of the file
+        fileIn, handler, err := r.FormFile(name)
         if err != nil {
-            [[if GenDebugging]]
-                log.Printf("...end [[.Table.TitledName]]HndlrTableLoadCSV(Error:400) - %s\n", err)
-            [[end]]
-            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+        [[if GenDebugging]]
+            log.Printf("...end [[.Table.TitledName]]HndlrTableLoadCSV(Error:500) - %s\n", err)
+        [[end]]
+            http.Error(w, http.StatusText(500), http.StatusInternalServerError)
             return
         }
-        defer fileIn.Close()
+        defer fileIn.Close() //close the file when we finish
         [[if GenDebugging]]
-            log.Printf("\tFile, %s, is open...\n", path)
+            log.Printf("\tUploaded File: %+v\n", handler.Filename)
+            log.Printf("\tFile Size: %+v\n", handler.Size)
+            log.Printf("\tMIME Header: %+v\n", handler.Header)
         [[end]]
         rdr := csv.NewReader(fileIn)
 
@@ -959,6 +990,77 @@ import (
 
         [[if GenDebugging]]
             log.Printf("...end [[.Table.TitledName]]HndlrLoadCSV(ok) - %d\n", cnt)
+        [[end]]
+    }
+
+    //----------------------------------------------------------------------------
+    //                             Table Load Test Data
+    //----------------------------------------------------------------------------
+
+    // [[.Table.TitledName]]HndlrTableLoadTestData creates the table deleting any
+    // current ones and loads in some test rows.
+    func [[.Table.TitledName]]HndlrTableLoadTestData(w http.ResponseWriter, r *http.Request) {
+        var err         error
+        var rcd         io[[$n]].[[.Table.TitledName]]
+
+        [[if GenDebugging]]
+            log.Printf("[[.Table.TitledName]]HndlrTableLoadTestData(%s)\n", r.Method)
+        [[end]]
+
+        // Verify HTTP parameters
+        if r.Method != "GET" {
+            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+            return
+        }
+
+        // Create the table.
+        err = io[[$n]].[[.Table.TitledName]]TableCreate()
+        if err == nil {
+            w.Write([]byte("Table was created\n"))
+        } else {
+            w.Write([]byte("Table creation had an error of:" + err.Error()))
+        }
+
+[[- if $dot.TD.Data.Plugin.NeedUse]]
+        // Set USE;
+        err = io[[$n]].DatabaseUse()
+        if err == nil {
+            w.Write([]byte("USE was issued\n"))
+        } else {
+            w.Write([]byte("USE had an error of:" + err.Error()))
+        }
+[[end -]]
+
+        // Load the test rows.
+        // Now add some records.
+        for i := 0; i < 26; i++ {
+            chr := 'A' + i
+            [[if .Table.PrimaryKey.IsInteger]]
+                rcd.[[.Table.PrimaryKey.TitledName]] = int64(i)
+            [[else if .Table.PrimaryKey.IsFloat]]
+                rcd.[[.Table.PrimaryKey.TitledName]] = float64(i)
+            [[else]]
+                rcd.[[.Table.PrimaryKey.TitledName]] = string(chr)
+            [[end]]
+            [[range $f := .Table.Fields]]
+                [[if $f.IsText]]
+                    rcd.[[$f.TitledName]] = string(chr)
+                [[else if $f.IsDec]]
+                    rcd.[[$f.TitledName]] = fmt.Sprintf("%d.00", i)
+                [[end]]
+            [[end]]
+            err = io[[$n]].[[.Table.TitledName]]RowInsert(&rcd)
+            if err == nil {
+                str := fmt.Sprintf("Added row: %c\n", chr)
+                w.Write([]byte(str))
+            } else {
+                str := fmt.Sprintf("Table creation had an error of: %c\n", chr)
+                w.Write([]byte(str))
+            }
+        }
+
+        [[if GenDebugging]]
+            log.Printf("...end [[.Table.TitledName]]HndlrTableLoadTestData(%s)\n", ErrorString(err))
         [[end]]
     }
 

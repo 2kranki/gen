@@ -1,32 +1,41 @@
-                            MySQL Docker Container
+                            MariaDB Docker Container
 
-You can find the documentation on the MySQL Docker container here:
-    https://hub.docker.com/_/mysql
+You can find the documentation on the MariaDB Docker container here:
+    https://hub.docker.com/_/mariadb
+
+MariaDB is a fork of the MySQL project. So, we handle them both the same for now.
 
 There are several commands that you will want to learn to use the container. First
 is:
-    docker container pull mysql:latest
+    docker image pull mariadb:latest
 
-This adds the MySQL container image to your local Docker images. Once, you have it
-added to the images, you will want to run it. The following will do that with the 
+This adds the MariaDB container image to your local Docker images. Once, you have it
+added to the images, you will want to run it. The following will do that with the
 defaults that the generated application will automatically use:
-    docker run --name mysql1 -e MYSQL_ROOT_PASSWORD=Passw0rd -d mysql:latest
+    docker run --name mariadb1 -e MYSQL_ROOT_PASSWORD="Passw0rd!" -d mariadb:latest
+                            or
+    ./run.sh
+You may get a "missing mariadb1" message and that is ok. Ignore it.  You can issue
+one run.sh after another, because it kills the one running and gives you a clean system
+to start over with.
+
 
 After you have it running, you can stop it with:
-    docker container stop mysql1
+    docker container stop mariadb1
 
 And restart the stopped container with:
-    docker container start mysql1
+    docker container start mariadb1
 
 To delete the container that you created with the "run" command, you do
-    docker container rm mysql1
+    docker container rm -f mariadb1
+                or
+    ./kill.sh
 
-This delete does not get rid of the Docker container image. So, you can create
-a fresh container by simply running the "run" command as above.
+This delete does get rid of the Docker container image. So, you will have to
+run.sh to create a fresh container.
 
 So, for testing, you issue the "run", then do your testing. If the database is
-no longer useable or you want to start from scratch, you simply do a "stop"
-followed by a "rm".  The next time that you need an image, you just issue the
-"run" command again and you start over from scratch.  This is why testing using
-Docker is so great!
+no longer useable or you want to start from scratch, you simply do another "run".
+If you want to quit and get rid of the container, just do a "kill.sh"
+This is why testing using Docker is so great!
 

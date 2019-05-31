@@ -65,32 +65,8 @@ func main() {
 [[ if .TD.Main.Flags -]]
     [[ GenFlagSetup ]]
 [[ end -]]
-	[[ if eq .TD.Data.SqlType      "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "mssql" ]]
-    flag.StringVar(&db_pw,   "dbPW",    "Passw0rd!",    "the database password")
-    flag.StringVar(&db_port, "dbPort",  "1433",         "the database port")
-    flag.StringVar(&db_srvr, "dbServer", "localhost",   "the database server")
-    flag.StringVar(&db_user, "dbUser",   "sa",          "the database user")
-    flag.StringVar(&db_name, "dbName",   "[[.TD.Data.Name]]", "the database name")
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
-    flag.StringVar(&db_pw,   "dbPW",    "Passw0rd!",    "the database password")
-    flag.StringVar(&db_port, "dbPort",  "5432",         "the database port")
-    flag.StringVar(&db_srvr, "dbServer", "localhost",   "the database server")
-    flag.StringVar(&db_user, "dbUser",   "postgres",    "the database user")
-    flag.StringVar(&db_name, "dbName",   "[[.TD.Data.Name]]", "the database name")
-[[ else if eq .TD.Data.SqlType     "sqlite" ]]
-    flag.StringVar(&db_name, "dbName",   "test.db",     "the database path")
-[[ else ]]
-    flag.StringVar(&db_pw,   "dbPW",    "Passw0rd!",    "the database password")
-    flag.StringVar(&db_port, "dbPort",  "1433",         "the database port")
-    flag.StringVar(&db_srvr, "dbServer", "localhost",   "the database server")
-    flag.StringVar(&db_user, "dbUser",   "sa",          "the database user")
-    flag.StringVar(&db_name, "dbName",   "",            "the database name")
-[[ end ]]
-	flag.StringVar(&http_port, "httpPort", "8080", "server port")
+[[.TD.Data.Plugin.FlagsStr .TD.Data.Name]]
+	flag.StringVar(&http_port, "httpPort", "8081", "server port")
 	flag.StringVar(&http_srvr, "httpServer", "localhost", "server site")
 
     // Parse the flags and check them

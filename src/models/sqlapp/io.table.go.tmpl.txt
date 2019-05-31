@@ -18,14 +18,15 @@ package io[[.TD.Data.TitledName]]
 import (
     "database/sql"
 	"errors"
-    [[if or .Table.HasFloat .Table.HasInteger]]
-        "fmt"
+	"fmt"
+    [[if .Table.HasDec]]
+        _ "github.com/ericlagergren/decimal"
     [[end]]
     [[if GenDebugging]]
         "log"
     [[end]]
 	//"net/http"
-	"strconv"
+	_ "strconv"
     "strings"
 	_ [[.TD.Data.ImportStr]]
 )
@@ -36,6 +37,10 @@ import (
 //                              Miscellaneous
 //============================================================================
 
+//----------------------------------------------------------------------------
+//                             Key to String
+//----------------------------------------------------------------------------
+
 // KeyToString converts the primary key field value
 // to a string.
 func (s [[.Table.TitledName]]) KeyToString() string {
@@ -45,6 +50,10 @@ func (s [[.Table.TitledName]]) KeyToString() string {
 
     return str
 }
+
+//----------------------------------------------------------------------------
+//                             List Output
+//----------------------------------------------------------------------------
 
 func (s [[.Table.TitledName]]) ListOutput() string {
 	var str strings.Builder
@@ -75,6 +84,10 @@ func (s [[.Table.TitledName]]) ListOutput() string {
 }
 
 
+//----------------------------------------------------------------------------
+//                             New Struct
+//----------------------------------------------------------------------------
+
 // [[.Table.TitledName]]New creates a new empty
 // struct.
 func [[.Table.TitledName]]New() *[[.Table.TitledName]] {
@@ -85,6 +98,10 @@ func [[.Table.TitledName]]New() *[[.Table.TitledName]] {
 //============================================================================
 //                        Row Maintenance/Select
 //============================================================================
+
+//----------------------------------------------------------------------------
+//                             Row Delete
+//----------------------------------------------------------------------------
 
 func [[.Table.TitledName]]RowDelete(key string) error {
 
@@ -106,6 +123,10 @@ func [[.Table.TitledName]]RowDelete(key string) error {
     [[end]]
 	return nil
 }
+
+//----------------------------------------------------------------------------
+//                             Row Find
+//----------------------------------------------------------------------------
 
 func [[.Table.TitledName]]RowFind(key string) (*[[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
@@ -130,6 +151,10 @@ func [[.Table.TitledName]]RowFind(key string) (*[[.Table.TitledName]], error) {
     [[end]]
 	return &data, err
 }
+
+//----------------------------------------------------------------------------
+//                             Row First
+//----------------------------------------------------------------------------
 
 // [[.Table.TitledName]]RowFirst returns the first row in the table,
 // [[.Table.TitledName]].  If there are no rows in the table, then
@@ -157,6 +182,10 @@ func [[.Table.TitledName]]RowFirst() (*[[.Table.TitledName]], error) {
     return &data, err
 }
 
+//----------------------------------------------------------------------------
+//                             Row Insert
+//----------------------------------------------------------------------------
+
 func [[.Table.TitledName]]RowInsert(d *[[.Table.TitledName]]) error {
     var err     error
 
@@ -182,6 +211,10 @@ func [[.Table.TitledName]]RowInsert(d *[[.Table.TitledName]]) error {
 	return err
 }
 
+//----------------------------------------------------------------------------
+//                             Row Last
+//----------------------------------------------------------------------------
+
 func [[.Table.TitledName]]RowLast() (*[[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
@@ -204,6 +237,10 @@ func [[.Table.TitledName]]RowLast() (*[[.Table.TitledName]], error) {
     [[end]]
     return &data, err
 }
+
+//----------------------------------------------------------------------------
+//                             Row Next
+//----------------------------------------------------------------------------
 
 func [[.Table.TitledName]]RowNext(key string) (*[[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
@@ -228,6 +265,10 @@ func [[.Table.TitledName]]RowNext(key string) (*[[.Table.TitledName]], error) {
     [[end]]
     return &data, err
 }
+
+//----------------------------------------------------------------------------
+//                             Row Page
+//----------------------------------------------------------------------------
 
 // func [[.Table.TitledName]]RowPage returns a page of rows where a page size is the
 // 'limit' parameter and 'offset' is the offset into the result set ordered by the main
@@ -262,6 +303,10 @@ func [[.Table.TitledName]]RowPage(offset int, limit int) ([][[.Table.TitledName]
     return data, err
 }
 
+//----------------------------------------------------------------------------
+//                             Row Prev
+//----------------------------------------------------------------------------
+
 func [[.Table.TitledName]]RowPrev(key string) (*[[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
@@ -285,6 +330,10 @@ func [[.Table.TitledName]]RowPrev(key string) (*[[.Table.TitledName]], error) {
     [[end]]
     return &data, err
 }
+
+//----------------------------------------------------------------------------
+//                             Row Update
+//----------------------------------------------------------------------------
 
 func [[.Table.TitledName]]RowUpdate(d *[[.Table.TitledName]]) error {
     var err     error
@@ -315,6 +364,10 @@ func [[.Table.TitledName]]RowUpdate(d *[[.Table.TitledName]]) error {
 //                        Table Maintenance/Select
 //============================================================================
 
+//----------------------------------------------------------------------------
+//                             Table Count
+//----------------------------------------------------------------------------
+
 func [[.Table.TitledName]]TableCount( ) (int, error) {
     var count       int
 
@@ -332,6 +385,10 @@ func [[.Table.TitledName]]TableCount( ) (int, error) {
     return count, err
 }
 
+//----------------------------------------------------------------------------
+//                             Table Create
+//----------------------------------------------------------------------------
+
 // [[.Table.TitledName]]TableCreate creates the table in the
 // given database deleting the current table if
 // present.
@@ -341,6 +398,7 @@ func [[.Table.TitledName]]TableCreate() error {
 
     [[if GenDebugging]]
         log.Printf("[[.Table.TitledName]]TableCreate()\n")
+        log.Printf("\tCreate SQL:\n%s\n", createSql)
     [[end]]
 
     err = [[.Table.TitledName]]TableDelete()
@@ -357,6 +415,10 @@ func [[.Table.TitledName]]TableCreate() error {
     [[end]]
     return err
 }
+
+//----------------------------------------------------------------------------
+//                             Table Delete
+//----------------------------------------------------------------------------
 
 // [[.Table.TitledName]]TableDelete deletes the table in the
 // given database if present.

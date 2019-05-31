@@ -107,7 +107,14 @@ func Connect() error {
     var err         error
 
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
+	    connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)", dbUser, dbPW, dbServer, dbPort)
+	    if len(dbName) > 0 {
+	        connStr += fmt.Sprintf("/%s", dbName)
+	    }
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to mariadb using: %s\n", connStr)
+        [[end]]
+        db, err = sql.Open("mysql", connStr)
 	[[ else if eq .TD.Data.SqlType "mssql" ]]
 	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
 	                            dbUser,dbPW,dbServer,dbPort,dbName)
@@ -116,7 +123,14 @@ func Connect() error {
         [[end]]
 	    db, err := sql.Open("mssql", connStr)
 	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		ERROR - NOT IMPLEMENTED
+	    connStr := fmt.Sprintf("%s:'%s'@%s:%s", dbUser, dbPW, dbServer, dbPort)
+	    if len(dbName) > 0 {
+	        connStr += fmt.Sprintf("/%s", dbName)
+	    }
+        [[if GenDebugging]]
+            log.Printf("\tConnecting to mysql using: %s\n", connStr)
+        [[end]]
+        db, err = sql.Open("mysql", connStr)
 	[[ else if eq .TD.Data.SqlType "postgres" ]]
 	    connStr := fmt.Sprintf("user=%s password='%s' host=%s port=%s ",
 	                            dbUser,dbPW,dbServer,dbPort)
@@ -145,7 +159,15 @@ func Connect() error {
     }
 
     [[if .TD.Data.Plugin.CreateDB]]
-        err := DatabaseCreate()
+        err = DatabaseCreate()
+        if err != nil {
+            Disconnect( )
+            log.Fatalln("Error: Cannot Ping: ", err)
+        }
+    [[end]]
+
+    [[if .TD.Data.Plugin.NeedUse]]
+        err = DatabaseUse()
         if err != nil {
             Disconnect( )
             log.Fatalln("Error: Cannot Ping: ", err)
@@ -224,6 +246,23 @@ func DatabaseDelete() error {
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+// DatabaseUse issues the database USE command.
+func DatabaseUse() error {
+    var sql = "USE [[.TD.Data.TitledName]];"
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("DatabaseUse()\n")
+    [[end]]
+
+    _, err = db.Exec(sql)
+
+    [[if GenDebugging]]
+        log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
     [[end]]
     return err
 }

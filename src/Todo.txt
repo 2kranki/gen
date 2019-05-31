@@ -3,6 +3,7 @@
     * write any extra needed documentation
 
 * GenSqlApp:
+    * Clean up that all accesses to the generated struct must be with TitledName()
     * Setup a Dockerfile and associated bash shells to run it so that we can
         containerize the generated application.
     * main.go
