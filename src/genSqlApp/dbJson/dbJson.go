@@ -9,11 +9,11 @@ import (
 	"../../shared"
 	"../../util"
 	"../dbPlugin"
+	"../dbType"
 	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -24,285 +24,19 @@ import (
 // DbField defines a Table's field mostly in terms of
 // SQL.
 type DbField struct {
-	Name		string		`json:"Name,omitempty"`			// Field Name
-	Label		string		`json:"Label,omitempty"`		// Form Label
-	TypeDefn	string		`json:"TypeDef,omitempty"`		// Type Definition
-	Len		    int		    `json:"Len,omitempty"`			// Data Maximum Length
-	Dec		    int		    `json:"Dec,omitempty"`			// Decimal Positions
-	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
-	Hidden		bool	    `json:"Hidden,omitempty"`		// Do not display in the browser
-	Nullable	bool		`json:"Null,omitempty"`			// Allow NULL for this field
-	SQLParms	string		`json:"SQLParms,omitempty"`		// Extra SQL Parameters
-	List		bool	    `json:"List,omitempty"`			// Include in List Report
-	Tbl			*DbTable									// Filled in after JSON is parsed
-}
-
-//----------------------------------------------------------------------------
-//						Global/Internal Object Functions
-//----------------------------------------------------------------------------
-
-func (f *DbField) CreateSql(cm string) string {
-	var str			strings.Builder
-	var ft			string
-	var nl			string
-	var pk			string
-	var sp			string
-
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-	tdd := td.Sql
-
-	if f.Len > 0 {
-		if f.Dec > 0 {
-			ft = fmt.Sprintf("%s(%d,%d)", tdd, f.Len, f.Dec)
-		} else {
-			ft = fmt.Sprintf("%s(%d)", tdd, f.Len)
-		}
-	} else {
-		ft = tdd
-	}
-	nl = " NOT NULL"
-	if f.Nullable {
-		nl = ""
-	}
-	pk = ""
-	if f.PrimaryKey {
-		pk = " PRIMARY KEY"
-	}
-	sp = ""
-	if len(f.SQLParms) > 0 {
-		sp = fmt.Sprintf(" %s", f.SQLParms)
-	}
-
-	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
-
-	return str.String()
-}
-
-func (f *DbField) CreateStruct() string {
-	var str			strings.Builder
-
-	tdd := f.GoType()
-	str.WriteString(fmt.Sprintf("\t%s\t%s\n", strings.Title(f.Name),tdd))
-
-	return str.String()
-}
-
-func (f *DbField) FormInput() string {
-	var str			strings.Builder
-	var lbl			string
-	var m			string
-
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	tdd := td.Html
-	if len(f.Label) > 0 {
-		lbl = strings.Title(f.Label)
-	} else {
-		lbl = strings.Title(f.Name)
-	}
-	switch td.Go {
-	case "float64":
-		m = "m=\"0\" step=\"0.01\" "
-	default:
-		m = ""
-	}
-
-	if f.Hidden {
-		str.WriteString(fmt.Sprintf("\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
-			f.TitledName(), f.TitledName(), m, f.TitledName()))
-	} else {
-		str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></label>\n",
-			lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
-	}
-
-	return str.String()
-}
-
-// GenFromStringArray generates the code to go from a string array
-// (sn) element (n) to a field (dn).  sn and dn are variable names.
-func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
-	var str			string
-	var src			string
-
-	src = sn + "[" + strconv.Itoa(n) + "]"
-	str = f.GenFromString(dn, src)
-
-	return str
-}
-
-// GenFromString generates the code to go from a string (sn) to
-// a field (dn).  sn and dn are variable names.
-func (f *DbField) GenFromString(dn,sn string) string {
-	var str			string
-
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	switch td.Go {
-	case "int":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		{
-			wrk := "\t%s.%s, err = strconv.ParseInt(%s,0,64)\n"
-			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
-		}
-	case "float64":
-		{
-			wrk := 	"\t{\n\t\twrk := r.FormValue(\"%s\")\n" +
-				"\t\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n\t}\n"
-			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
-		}
-	default:
-		str = fmt.Sprintf("\t%s.%s = %s\n", dn, f.TitledName(), sn)
-	}
-
-	return str
-}
-
-// GenToString generates code to convert the struct st.f field to string in variable, v.
-func (f *DbField) GenToString(v string, st string) string {
-	var str			string
-
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	tdd := td.Go
-	switch tdd {
-	case "int":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%%d\", %s.%s)\n", v, st, f.TitledName())
-	case "float32":
-		fallthrough
-	case "float64":
-		str = fmt.Sprintf("\t{\n")
-		str += fmt.Sprintf("\t\ts := fmt.Sprintf(\"%s.4f\", %s.%s)\n", "%", st, f.TitledName())
-		str += fmt.Sprintf("\t\t%s = strings.TrimRight(strings.TrimRight(s, \"0\"), \".\")\n", v)
-		str += fmt.Sprintf("\t}\n")
-	default:
-		str = fmt.Sprintf("\t%s = %s.%s\n", v, st, f.TitledName())
-	}
-
-	return str
-}
-
-func (f *DbField) GoType() string {
-
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	tdd := td.Go
-
-	return tdd
-}
-
-func (f *DbField) IsDec() bool {
-
-	if f.TypeDefn == "dec" {
-		return true
-	}
-	if f.TypeDefn == "decimal" {
-		return true
-	}
-	if f.TypeDefn == "money" {
-		return true
-	}
-
-	return false
-}
-
-func (f *DbField) IsFloat() bool {
-
-	tdd := f.GoType()
-	if tdd == "float64" {
-		return true
-	}
-
-	return false
-}
-
-func (f *DbField) IsInteger() bool {
-
-	tdd := f.GoType()
-	if tdd == "int32" {
-		return true
-	}
-	if tdd == "int64" {
-		return true
-	}
-	if tdd == "int" {
-		return true
-	}
-
-	return false
-}
-
-func (f *DbField) IsText() bool {
-
-	if f.TypeDefn == "text" {
-		return true
-	}
-
-	return false
-}
-
-func (f *DbField) RValueToStruct(dn string) string {
-	var str			string
-
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types.FindDefn(f.TypeDefn)
-	if td == nil {
-		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
-	}
-
-	tdd := td.Go
-	switch tdd {
-	case "int":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		{
-			wrk := "\twrk = r.FormValue(\"%s\")\n" +
-				"\t%s.%s, err = strconv.ParseInt(wrk,0,64)\n"
-			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
-		}
-	case "float":
-		fallthrough
-	case "float32":
-		fallthrough
-	case "float64":
-		{
-			wrk := 	"\twrk = r.FormValue(\"%s\")\n" +
-				"\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n"
-			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
-		}
-	default:
-		str = fmt.Sprintf("\t%s.%s = r.FormValue(\"%s\")\n", dn, f.TitledName(), f.TitledName())
-	}
-
-	return str
+	Name		string				`json:"Name,omitempty"`			// Field Name
+	Label		string				`json:"Label,omitempty"`		// Form Label
+	TypeDefn	string				`json:"TypeDef,omitempty"`		// Type Definition
+	Len		    int		    		`json:"Len,omitempty"`			// Data Maximum Length
+	Dec		    int		    		`json:"Dec,omitempty"`			// Decimal Positions
+	PrimaryKey  bool	    		`json:"PrimaryKey,omitempty"`
+	Hidden		bool	    		`json:"Hidden,omitempty"`		// Do not display in the browser
+	Nullable	bool				`json:"Null,omitempty"`			// Allow NULL for this field
+	Incr		bool				`json:"Incr,omitempty"`			// true == Auto Increment Field
+	SQLParms	string				`json:"SQLParms,omitempty"`		// Extra SQL Parameters
+	List		bool	    		`json:"List,omitempty"`			// Include in List Report
+	Tbl			*DbTable			`json:"-"`						// (ignored)  Filled in after JSON is parsed
+	Typ			*dbType.TypeDefn	`json:"-"`						// (ignored) Filled in after JSON is parsed
 }
 
 func (f *DbField) TitledName( ) string {
@@ -321,169 +55,13 @@ type DbTable struct {
 	Name		string		`json:"Name,omitempty"`
 	Fields		[]DbField	`json:"Fields,omitempty"`
 	SQLParms	[]string	`json:"SQLParms,omitempty"`		// Extra SQL Parameters
-	DB			*Database
-}
-
-//----------------------------------------------------------------------------
-//						Global/Internal Object Functions
-//----------------------------------------------------------------------------
-
-// CreateInsertStr() creates a string of all the field
-// names which can be used in SQL INSERT statements.
-func (t *DbTable) CreateInsertStr() string {
-	return t.ScanFields("")
-}
-
-func (t *DbTable) CreateSql() string {
-	var str			strings.Builder
-
-	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\\n", t.Name))
-	for i, f := range t.Fields {
-		var cm  		string
-
-		cm = ""
-		if i != (len(t.Fields) - 1) {
-			cm = ","
-		}
-		str.WriteString(fmt.Sprintf("%s\\n", f.CreateSql(cm)))
-	}
-	if len(t.SQLParms) > 0 {
-		str.WriteString(",\\n")
-		for _, l := range t.SQLParms {
-			str.WriteString(fmt.Sprintf("%s\\n", l))
-		}
-	}
-	str.WriteString(fmt.Sprintf(");\\n"))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
-
-	return str.String()
-}
-
-func (t *DbTable) CreateStruct( ) string {
-	var str			strings.Builder
-
-	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName()))
-	for i,_ := range t.Fields {
-		str.WriteString(t.Fields[i].CreateStruct())
-	}
-	str.WriteString("}\n\n")
-
-	// I was generating some of the struct functions here.  It turned out to be a
-	// mistake.  Using the template system and supplement it with small functions
-	// is far easier making it a much better strategy.
-
-	return str.String()
-}
-
-// CreateValueStr() creates a string of $nnn's
-// which can be used in SQL INSERT VALUE statements.
-func (t *DbTable) CreateValueStr() string {
-
-	insertStr := ""
-	for i, _ := range t.Fields {
-		cm := ", "
-		if i == len(t.Fields) - 1 {
-			cm = ""
-		}
-		insertStr += fmt.Sprintf("?%s", cm)
-		//insertStr += fmt.Sprintf("$%d%s", i+1, cm)
-	}
-	return insertStr
-}
-
-func (t *DbTable) DeleteSql() string {
-	var str			strings.Builder
-
-	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s;\\n", t.Name))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
-	return str.String()
+	DB			*Database	`json:"-"`
 }
 
 func (t *DbTable) ForFields(f func(f *DbField) ) {
 	for i,_ := range t.Fields {
 		f(&t.Fields[i])
 	}
-}
-
-func (t *DbTable) FieldIndex(n string) int {
-	for i, f := range t.Fields {
-		if f.Name == n {
-			return i
-		}
-	}
-	return -1
-}
-
-// HasDec returns true if any of the fields are a
-// decimal type which will need string conversion
-func (t *DbTable) HasDec() bool {
-
-	for i,_ := range t.Fields {
-		if t.Fields[i].IsDec() {
-			return true
-		}
-	}
-	return false
-}
-
-// HasFloat returns true if any of the fields are a
-// float which will need float to string conversion
-func (t *DbTable) HasFloat() bool {
-
-	for i,_ := range t.Fields {
-		if t.Fields[i].IsFloat() {
-			return true
-		}
-	}
-	return false
-}
-
-// HasInteger returns true if any of the fields are a
-// integers which will need float to string conversion
-func (t *DbTable) HasInteger() bool {
-
-	for i,_ := range t.Fields {
-		if t.Fields[i].IsInteger() {
-			return true
-		}
-	}
-	return false
-}
-
-// PrimaryKey returns the first field that it finds
-// that is marked as a primary key.
-func (t *DbTable) PrimaryKey() *DbField {
-
-	for i, f := range t.Fields {
-		if f.PrimaryKey {
-			return &t.Fields[i]
-		}
-	}
-	return nil
-}
-
-// ScanFields returns struct fields to be used in
-// a row.Scan.  It assumes that the struct's name
-// is "data"
-func (t *DbTable) ScanFields(prefix string) string {
-	var str			strings.Builder
-
-	for i,f := range t.Fields {
-		cm := ", "
-		if i == len(t.Fields) - 1 {
-			cm = ""
-		}
-		if len(prefix) > 0 {
-			str.WriteString(fmt.Sprintf("%s.%s%s", prefix, f.Name, cm))
-		} else {
-			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
-		}
-	}
-	return str.String()
 }
 
 func (t *DbTable) TitledName( ) string {
@@ -502,55 +80,15 @@ type Database struct {
 	Port		string			`json:"Port,omitempty"`
 	PW			string			`json:"PW,omitempty"`
 	Tables  	[]DbTable		`json:"Tables,omitempty"`
-}
-
-func (d *Database) CreateSql() string {
-	var str			strings.Builder
-
-	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;\\n", d.TitledName()))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
-	str.WriteString(fmt.Sprintf("USE %s;\\n", d.TitledName()))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
-
-	return str.String()
-}
-
-func (d *Database) DeleteSql() string {
-	var str			strings.Builder
-
-	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", d.TitledName()))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
-	return str.String()
+	// There can only be one Plugin per Database Definition.  Once we have decoded
+	// the JSON, we will establish which plugin works with this JSON data if any.
+	Plugin		interface{}		`json:"-"`
 }
 
 func (d *Database) ForTables(f func(t *DbTable) ) {
 	for i,_ := range d.Tables {
 		f(&d.Tables[i])
 	}
-}
-
-func (d *Database) HasFloat( ) bool {
-	for i,_ := range d.Tables {
-		if d.Tables[i].HasFloat() {
-			return true
-		}
-	}
-	return false
-}
-
-func (d *Database) HasMoney( ) bool {
-	for i,_ := range d.Tables {
-		if d.Tables[i].HasFloat() {
-			return true
-		}
-	}
-	return false
 }
 
 func (d *Database) TitledName( ) string {
@@ -583,6 +121,7 @@ func DefaultJsonFileName() string {
 func ReadJsonFile(fn string) error {
 	var err		    error
 	var jsonPath	string
+	var plg			interface{}
 
 	jsonPath, _ = filepath.Abs(fn)
 	if sharedData.Debug() {
@@ -593,6 +132,12 @@ func ReadJsonFile(fn string) error {
 	if err = util.ReadJsonFileToData(jsonPath, &dbStruct); err != nil {
 		return errors.New(fmt.Sprintln("Error: unmarshalling:", jsonPath, ":", err))
 	}
+
+	// Set up Plugin Support for this database type.
+	if plg = dbPlugin.FindPlugin(dbStruct.SqlType); plg == nil {
+		return errors.New(fmt.Sprintf("Error: Can't find plugin for %s!\n\n\n", dbStruct.SqlType))
+	}
+	dbStruct.Plugin = plg
 
 	// Fix up the tables with back pointers that we do not store externally.
 	for i, v := range dbStruct.Tables {
@@ -624,7 +169,7 @@ func TableNames() []string {
 }
 
 func ValidateData() error {
-	var plg		*dbPlugin.PluginData
+	var plg		dbPlugin.Plugin
 
 	// Set up Plugin Support for this database type.
 	if plg = dbPlugin.FindPlugin(dbStruct.SqlType); plg == nil {
@@ -633,6 +178,9 @@ func ValidateData() error {
 
 	if dbStruct.Name == "" {
 		return errors.New(fmt.Sprintf("Database Name is missing!"))
+	}
+	if dbStruct.SqlType == "" {
+		return errors.New(fmt.Sprintf("SQL Type is missing!"))
 	}
 	if len(dbStruct.Tables) == 0 {
 		return errors.New(fmt.Sprintf("There are no tables defined for %s!", dbStruct.Name))
@@ -651,7 +199,7 @@ func ValidateData() error {
 			if f.Name == "" {
 				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
 			}
-			td := plg.Types.FindDefn(f.TypeDefn)
+			td := plg.Types().FindDefn(f.TypeDefn)
 			if td == nil {
 				log.Fatalln("Error - Could not find Type definition for field,",
 					f.Name,"type:",f.TypeDefn)

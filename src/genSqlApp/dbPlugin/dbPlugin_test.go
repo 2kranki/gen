@@ -8,14 +8,14 @@ package dbPlugin
 import (
 	"log"
 	"testing"
-	"time"
+	//"time"
 	"../../shared"
 )
 
 
 func TestRegister(t *testing.T) {
-	var err			error
-	var str			string
+	//var err			error
+	//var str			string
 
 	log.Printf("TestRegister()..\n")
 	sharedData.SetDebug(true)

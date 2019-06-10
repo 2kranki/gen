@@ -13,6 +13,10 @@ import (
 	"../dbPlugin"
 )
 
+const(
+	extName="mariadb"
+)
+
 // Notes:
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
@@ -32,7 +36,38 @@ var tds	= dbPlugin.TypeDefns {
 	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
 }
 
-func FlagsString(name string) string {
+//----------------------------------------------------------------------------
+//								Plugin Data and Methods
+//----------------------------------------------------------------------------
+
+// PluginData defines some of the data for the plugin.  Data within this package may also be
+// used.  However, we use methods based off the PluginData to supply the data or other
+// functionality.
+type	PluginData struct {
+}
+
+// Name simply returns the external name that this plugin is known by
+// or supports.
+// Required method
+func (pd PluginData) Name() string {
+	return extName
+}
+
+// CanCreateDb returns whether this database supports dynamic creation/deletion of databases.
+// (Required method)
+func (pd PluginData) CanDbCreate() bool {
+	return false
+}
+
+// Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
+// Required method
+func (pd PluginData) Types() *dbPlugin.TypeDefns {
+	return &tds
+}
+
+// GenFlagArgDefns generates a string that defines the various CLI options to allow the
+// user to modify the connection string parameters for the Database connection.
+func (pd PluginData) GenFlagArgDefns(name string) string {
 	var str			strings.Builder
 	var wk			string
 
@@ -45,15 +80,20 @@ func FlagsString(name string) string {
 	return str.String()
 }
 
-func ImportString() string {
+// GenImportString returns the Database driver import string for this
+// plugin.
+func (pd PluginData) GenImportString() string {
 	return "\"github.com/go-sql-driver/mysql\""
 }
 
+//----------------------------------------------------------------------------
+//							Global Support Functions
+//----------------------------------------------------------------------------
+
+var plug		dbPlugin.PluginData
+
 func init() {
-	pd :=  dbPlugin.PluginData{
-		Name:"mariadb", Types:&tds, FlagsString:FlagsString, ImportString:ImportString,
-		AddGo:false, CreateDB:false, NeedsUse:true,
-	}
-	dbPlugin.Register(&pd)
+	plug :=  dbPlugin.PluginData{Name:extName, Types:&tds,}
+	dbPlugin.Register(extName, plug)
 }
 

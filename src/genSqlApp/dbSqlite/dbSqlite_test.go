@@ -8,11 +8,12 @@ package dbSqlite
 import (
 	"log"
 	"testing"
-	"time"
 	"../../shared"
+	//"time"
+	"../dbJson"
 )
 
-const jsonTestPath = "../misc/"
+const jsonTestPath = "../../../misc/test01/db.json.txt"
 
 var fld0sql = "\tCustNo\tINT NOT NULL PRIMARY KEY,\n"
 var fld0struct = "\tCustNo\tint64\n"
@@ -28,54 +29,11 @@ func TestCreate(t *testing.T) {
 	log.Printf("TestCreate()..\n")
 	sharedData.SetDebug(true)
 	sharedData.SetMainPath("../misc/test01/db.json.txt")
-	if err = ReadJsonFile(sharedData.MainPath()); err != nil {
+	if err = dbJson.ReadJsonFile(sharedData.MainPath()); err != nil {
 		t.Fatalf("TestCreate() Reading Main JSON failed: %s'\n", sharedData.MainPath())
 	}
-	if err = ValidateData(); err != nil {
+	if err = dbJson.ValidateData(); err != nil {
 		t.Fatalf("TestCreate() Validation failed: %s'\n", sharedData.MainPath())
-	}
-
-	if len(dbStruct.Tables) != 2 {
-		t.Fatalf("TestCreate() failed: len(Tables) should be 2 but is '%d'\n", len(dbStruct.Name))
-	}
-	if len(dbStruct.Tables[0].Fields) != 8 {
-		t.Fatalf("TestCreate() failed: should be 8 Tables but is %d\n", len(dbStruct.Tables[0].Fields))
-	}
-
-	str = dbStruct.Tables[0].Fields[0].CreateSql(",")
-	t.Log("Table[0].Fields[0] CreateSql =", str)
-	if str != fld0sql {
-		t.Fatalf("TestCreate() failed: invalid create sql generated Tables[0].Fields[0]\n")
-	}
-
-	str = dbStruct.Tables[0].Fields[1].CreateSql(",")
-	t.Log("Table[0].Fields[1] CreateSql =", str)
-	if str != fld1sql {
-		t.Fatalf("TestCreate() failed: invalid create sql generated Tables[0].Fields[1]\n")
-	}
-
-	str = dbStruct.Tables[0].CreateSql()
-	t.Log("Table[0] CreateSql =", str)
-	if str != tbl0sql {
-		t.Fatalf("TestCreate() failed: invalid create sql generated\n")
-	}
-
-	str = dbStruct.Tables[0].Fields[0].CreateStruct()
-	t.Log("Table[0].Field[0] Struct =", str)
-	if str != fld0struct {
-		t.Fatalf("TestCreate() failed: invalid struct generated\n")
-	}
-
-	str = dbStruct.Tables[0].Fields[1].CreateStruct()
-	t.Log("Table[0].Field[1] Struct =", str)
-	if str != fld1struct {
-		t.Fatalf("TestCreate() failed: invalid struct generated\n")
-	}
-
-	str = dbStruct.Tables[0].CreateStruct()
-	t.Log("Table[0] Struct =", str)
-	if str != tbl0struct {
-		t.Fatalf("TestCreate() failed: invalid struct generated\n")
 	}
 
 	//t.Log(logData.String())

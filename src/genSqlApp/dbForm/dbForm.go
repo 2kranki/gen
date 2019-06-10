@@ -9,7 +9,6 @@ package dbForm
 
 import (
 	"../dbJson"
-	"io"
 )
 
 //============================================================================
@@ -23,13 +22,13 @@ import (
 type FormWork struct {
 	Name		string		`json:"Name,omitempty"`		// Type Name
 	j			dbJson.Database
-	w			io.Writer
 }
 
 //----------------------------------------------------------------------------
 //						Global/Internal Object Functions
 //----------------------------------------------------------------------------
 
+/***
 func (t FormWork) FindDefn(name string) *FormWork {
 	for i, v := range t {
 		if name == v.Name {
@@ -38,6 +37,7 @@ func (t FormWork) FindDefn(name string) *FormWork {
 	}
 	return nil
 }
+ ***/
 
 func (t FormWork) Write(p []byte) (int, error) {
 	var n		int
@@ -66,10 +66,9 @@ func (t FormWork) WriteString(s string) (int, error) {
 //----------------------------------------------------------------------------
 
 // New provides a factory method to create an Sql Object.
-func New(j *dbJson.Database, w io.Writer) (*FormWork) {
+func New(j *dbJson.Database) (*FormWork) {
 	fw := &FormWork{}
-	fw.j = j
-	fw.w = w
+	fw.j = *j
 	return fw
 }
 

@@ -8,9 +8,13 @@
 package dbMysql
 
 import (
-	"../dbPlugin"
 	"fmt"
 	"strings"
+	"../dbPlugin"
+)
+
+const(
+	extName="mysql"
 )
 
 // Notes:
@@ -32,7 +36,19 @@ var tds	= dbPlugin.TypeDefns {
 	{Name:"url", 		Html:"url",			Sql:"NVARCHAR",		Go:"string",	DftLen:50,},
 }
 
-func FlagsString(name string) string {
+
+//----------------------------------------------------------------------------
+//								Plugin Data and Methods
+//----------------------------------------------------------------------------
+
+// PluginData defines some of the data for the plugin.  Data within this package may also be
+// used.  However, we use methods based off the PluginData to supply the data or other
+// functionality.
+type	PluginData dbPlugin.PluginData
+
+// GenFlagArgDefns generates a string that defines the various CLI options to allow the
+// user to modify the connection string parameters for the Database connection.
+func (pd PluginData) GenFlagArgDefns(name string) string {
 	var str			strings.Builder
 	var wk			string
 
@@ -45,15 +61,20 @@ func FlagsString(name string) string {
 	return str.String()
 }
 
-func ImportString() string {
+// GenImportString returns the Database driver import string for this
+// plugin.
+func (pd PluginData) GenImportString() string {
 	return "\"github.com/go-sql-driver/mysql\""
 }
 
+//----------------------------------------------------------------------------
+//							Global Support Functions
+//----------------------------------------------------------------------------
+
+var plug		PluginData
+
 func init() {
-	pd :=  dbPlugin.PluginData{
-		Name:"mysql", Types:&tds, FlagsString:FlagsString, ImportString:ImportString,
-		AddGo:false, CreateDB:false, NeedsUse:true,
-	}
-	dbPlugin.Register(&pd)
+	plug = PluginData{Name:extName, Types:&tds,}
+	dbPlugin.Register(extName, plug)
 }
 

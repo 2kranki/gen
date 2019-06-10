@@ -23,8 +23,7 @@
         * All HTML forms need to be converted to using html/template and they should
             only have data added no html codes ???
     * table handler
-        * Do csv save handler
-        * tablehndlr.go
+        * Do optional csv transaction update processing
         * form.html per table
             * Try to do all the single record stuff in one form
             * Add ability to switch back to list form or main menu from this record
@@ -40,6 +39,14 @@
     * If we included the field/table tables in doPkg in the io package, we might be
         able to generate a more table-driven application that required less code generation.
 * possibly json to struct converter and vice versa
+* Add optional monitoring/statistics in the handler and io packages,
+    need data extraction as well.
+    * number of times handler is initiated
+    * number of various errors per handler
+    * length of time in various handler functions
+    * ability to send stats to slack
+* Add optional python interpreter and connect the handler and io packages to it. ????
+* Set up dockerfile or docker compose for generated app and build in start up for sql docker containers
 * Check into for possible inclusion:
     * https://github.com/gorilla/mux
     * https://github.com/gin-gonic/gin

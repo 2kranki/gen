@@ -19,7 +19,11 @@
 
 package dbPlugin
 
-import "sync"
+import (
+	//"../dbJson"
+	"../dbType"
+	"sync"
+)
 
 const (
 	DBTYPE_MARIABDB	= 1 << iota
@@ -30,65 +34,21 @@ const (
 )
 
 //============================================================================
-//                        Type Definition Support
+//								Interfaces
 //============================================================================
 
-// TypeDefn, The type definition struct, defines one acceptable type accepted in the JSON
-// defining the Database Structure.  There must be a TypeDefn for each type
-// accepted in each plugin.
-
-type TypeDefn struct {
-	Name		string		`json:"Name,omitempty"`		// Type Name
-	Html		string		`json:"Html,omitempty"`		// HTML Type
-	Sql			string		`json:"Sql,omitempty"`		// SQL Type
-	Go			string		`json:"Go,omitempty"`		// GO Type
-	DftLen		int			`json:"DftLen,omitempty"`	// Default Length (used if length is not
-	//													//	given)(0 == Max Length)
+// GenBaseStringer is the interface that must be defined minimally for each Database
+// Server module supported.
+type GenBaseStringer	interface {
+	GenFlagArgDefns(name string) string
+	GenImportString()	string
 }
 
-// TypeDefns provides a convenient way of defining a Type Definition Table which
-// is used in the plugin environment.
-type TypeDefns []TypeDefn
-
-func (t TypeDefns) DftLen(name string) int {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.DftLen
-	}
-	return -1
-}
-
-func (t TypeDefns) FindDefn(name string) *TypeDefn {
-	for i,v := range t {
-		if name == v.Name {
-			return &t[i]
-		}
-	}
-	return nil
-}
-
-func (t TypeDefns) GoType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Go
-	}
-	return ""
-}
-
-func (t TypeDefns) HtmlType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Html
-	}
-	return ""
-}
-
-func (t TypeDefns) SqlType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Sql
-	}
-	return ""
+// GenTableCreateStringer is the interface that defines the Table Creation and Deletion
+// methods.
+type GenTableCreateStringer	interface {
+	GenCreateTableSQL(table interface{}) string
+	GenDeleteTableSQL(table interface{}) string
 }
 
 //============================================================================
@@ -101,21 +61,10 @@ func (t TypeDefns) SqlType(name string) string {
 
 type PluginData	struct {
 	Name			string				// Name of database
-	Types			*TypeDefns			// Type definitions useable for this database
-	FlagsString 	func(name string) string
-	ImportString 	func() string
-	AddGo			bool			// Add "GO" after major sql statements
-	CreateDB		bool
-	NeedsUse		bool			// Need USE database; before doing anything
+	Types			*dbType.TypeDefns	// Type definitions useable for this database
+	Plugin			interface{}			// Used to supply various interfaces declared above
 }
 
-func (pd PluginData) FlagsStr(name string) string {
-	return pd.FlagsString(name)
-}
-
-func (pd PluginData) ImportStr() string {
-	return pd.ImportString()
-}
 
 //----------------------------------------------------------------------------
 //					Global Plugin Support Functions
@@ -125,12 +74,12 @@ func (pd PluginData) ImportStr() string {
 // into it is the database name as used in the JSON input (ie mariadb, mssql,
 // mysql, postgresql, sqlite) Each plugin registers with this package at init()
 // insuring that the package is available when needed.
-var plugins		map[string]*PluginData
+var plugins		map[string]interface{}
 var mtxPlugins	sync.Mutex
 
 // FindPlugin returns the Plugin interface for a name if possible. NIL is
 // returned if it is not found.
-func FindPlugin(name string) *PluginData {
+func FindPlugin(name string) interface{} {
 	mtxPlugins.Lock()
 	defer mtxPlugins.Unlock()
 	if plugins == nil {
@@ -143,14 +92,13 @@ func FindPlugin(name string) *PluginData {
 }
 
 // Register adds or replaces the given plugin in the plugins map.
-func Register(pd *PluginData) error {
+func Register(name string, plg interface{}) {
 	mtxPlugins.Lock()
 	defer mtxPlugins.Unlock()
 	if plugins == nil {
-		plugins = map[string]*PluginData{}
+		plugins = map[string]interface{}{}
 	}
-	plugins[pd.Name] = pd
-	return nil
+	plugins[name] = plg
 }
 
 // Unregister() deletes a given plugin in the plugin map.

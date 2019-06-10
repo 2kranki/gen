@@ -18,6 +18,7 @@ import (
 	"../../shared"
 	"../../util"
 	"../dbPlugin"
+	"../dbType"
 )
 
 const (
@@ -27,58 +28,6 @@ const (
 	DBTYPE_POSTGRES
 	DBTYPE_SQLITE
 )
-
-type TypeDefn struct {
-	Name		string		`json:"Name,omitempty"`		// Type Name
-	Html		string		`json:"Html,omitempty"`		// HTML Type
-	Sql			string		`json:"Sql,omitempty"`		// SQL Type
-	Go			string		`json:"Go,omitempty"`		// GO Type
-	DftLen		int			`json:"DftLen,omitempty"`	// Default Length (used if length is not
-	//													//	given)(0 == Max Length)
-}
-
-type TypeDefns []TypeDefn
-
-func (t TypeDefns) DftLen(name string) int {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.DftLen
-	}
-	return -1
-}
-
-func (t TypeDefns) FindDefn(name string) *TypeDefn {
-	for i,v := range t {
-		if name == v.Name {
-			return &t[i]
-		}
-	}
-	return nil
-}
-
-func (t TypeDefns) GoType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Go
-	}
-	return ""
-}
-
-func (t TypeDefns) HtmlType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Html
-	}
-	return ""
-}
-
-func (t TypeDefns) SqlType(name string) string {
-	tdd := t.FindDefn(name)
-	if tdd != nil {
-		return tdd.Sql
-	}
-	return ""
-}
 
 // DbField defines a Table's field mostly in terms of
 // SQL.
@@ -103,7 +52,7 @@ func (f *DbField) CreateSql(cm string) string {
 	var pk			string
 	var sp			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -151,7 +100,7 @@ func (f *DbField) FormInput() string {
 	var lbl			string
 	var m			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -198,7 +147,7 @@ func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
 func (f *DbField) GenFromString(dn,sn string) string {
 	var str			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -231,7 +180,7 @@ func (f *DbField) GenFromString(dn,sn string) string {
 func (f *DbField) GenToString(v string, st string) string {
 	var str			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -261,7 +210,7 @@ func (f *DbField) GenToString(v string, st string) string {
 
 func (f *DbField) GoType() string {
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -325,7 +274,7 @@ func (f *DbField) IsText() bool {
 func (f *DbField) RValueToStruct(dn string) string {
 	var str			string
 
-	td := dbPlugin.FindPlugin(dbStruct.SqlType).T.FindDefn(f.TypeDefn)
+	td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
 			f.Name,"type:",f.TypeDefn)
@@ -735,8 +684,7 @@ func ReadJsonFile(fn string) error {
 		dbStruct.Tables[i].DB = &dbStruct
 	}
 	if plg := dbPlugin.FindPlugin(dbStruct.SqlType); plg != nil {
-		dbStruct.ImportStr = plg.ImportString()
-		dbStruct.Plugin = plg
+		dbStruct.Plugin = &plg
 	} else {
 		return errors.New(fmt.Sprintf("Error: Can't find import string for %s!\n\n\n", dbStruct.SqlType))
 	}
@@ -793,7 +741,7 @@ func ValidateData() error {
 			if f.Name == "" {
 				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
 			}
-			td := dbStruct.Plugin.T.FindDefn(f.TypeDefn)
+			td := dbPlugin.FindPlugin(dbStruct.SqlType).Types().FindDefn(f.TypeDefn)
 			if td == nil {
 				log.Fatalln("Error - Could not find Type definition for field,",
 					f.Name,"type:",f.TypeDefn)

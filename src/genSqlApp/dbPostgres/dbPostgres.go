@@ -13,6 +13,10 @@ import (
 	"../dbPlugin"
 )
 
+const(
+	extName="postgres"
+)
+
 // Notes:
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
@@ -32,7 +36,18 @@ var tds	= dbPlugin.TypeDefns {
 	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
 }
 
-func FlagsString(name string) string {
+//----------------------------------------------------------------------------
+//								Plugin Data and Methods
+//----------------------------------------------------------------------------
+
+// PluginData defines some of the data for the plugin.  Data within this package may also be
+// used.  However, we use methods based off the PluginData to supply the data or other
+// functionality.
+type	PluginData dbPlugin.PluginData
+
+// GenFlagArgDefns generates a string that defines the various CLI options to allow the
+// user to modify the connection string parameters for the Database connection.
+func (pd PluginData) GenFlagArgDefns(name string) string {
 	var str			strings.Builder
 	var wk			string
 
@@ -45,15 +60,20 @@ func FlagsString(name string) string {
 	return str.String()
 }
 
-func ImportString() string {
+// GenImportString returns the Database driver import string for this
+// plugin.
+func (pd PluginData) GenImportString() string {
 	return "\"github.com/lib/pq\""
 }
 
+//----------------------------------------------------------------------------
+//							Global Support Functions
+//----------------------------------------------------------------------------
+
+var plug		dbPlugin.PluginData
+
 func init() {
-	pd :=  dbPlugin.PluginData{
-		Name:"postgres", Types:&tds, FlagsString:FlagsString, ImportString:ImportString,
-		AddGo:false, CreateDB:false,
-	}
-	dbPlugin.Register(&pd)
+	plug =  PluginData{Name:extName, Types:&tds,}
+	dbPlugin.Register(extName, plug)
 }
 
