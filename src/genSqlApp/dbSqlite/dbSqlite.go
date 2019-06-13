@@ -72,11 +72,11 @@ func (pd Plugin) GenImportString() string {
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
-var plug		Plugin
+var plug		*Plugin
 
 func init() {
 	log.Printf("\tRegistering SQLite\n")
-	plug = Plugin{}
+	plug = &Plugin{}
 	dbPlugin.Register(extName, dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug})
 }
 

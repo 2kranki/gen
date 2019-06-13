@@ -8,9 +8,11 @@
 package dbMariadb
 
 import (
-	"fmt"
-	"strings"
 	"../dbPlugin"
+	"../dbType"
+	"fmt"
+	"log"
+	"strings"
 )
 
 const(
@@ -20,7 +22,7 @@ const(
 // Notes:
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
-var tds	= dbPlugin.TypeDefns {
+var tds	= dbType.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
@@ -43,31 +45,31 @@ var tds	= dbPlugin.TypeDefns {
 // PluginData defines some of the data for the plugin.  Data within this package may also be
 // used.  However, we use methods based off the PluginData to supply the data or other
 // functionality.
-type	PluginData struct {
+type	Plugin struct {
 }
 
 // Name simply returns the external name that this plugin is known by
 // or supports.
 // Required method
-func (pd PluginData) Name() string {
+func (pd Plugin) Name() string {
 	return extName
 }
 
 // CanCreateDb returns whether this database supports dynamic creation/deletion of databases.
 // (Required method)
-func (pd PluginData) CanDbCreate() bool {
+func (pd Plugin) CanDbCreate() bool {
 	return false
 }
 
 // Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
 // Required method
-func (pd PluginData) Types() *dbPlugin.TypeDefns {
+func (pd Plugin) Types() *dbType.TypeDefns {
 	return &tds
 }
 
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
-func (pd PluginData) GenFlagArgDefns(name string) string {
+func (pd Plugin) GenFlagArgDefns(name string) string {
 	var str			strings.Builder
 	var wk			string
 
@@ -82,7 +84,7 @@ func (pd PluginData) GenFlagArgDefns(name string) string {
 
 // GenImportString returns the Database driver import string for this
 // plugin.
-func (pd PluginData) GenImportString() string {
+func (pd Plugin) GenImportString() string {
 	return "\"github.com/go-sql-driver/mysql\""
 }
 
@@ -90,10 +92,11 @@ func (pd PluginData) GenImportString() string {
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
-var plug		dbPlugin.PluginData
+var plug		*Plugin
 
 func init() {
-	plug :=  dbPlugin.PluginData{Name:extName, Types:&tds,}
-	dbPlugin.Register(extName, plug)
+	log.Printf("\tRegistering MariaDB\n")
+	plug = &Plugin{}
+	dbPlugin.Register(extName, dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug})
 }
 

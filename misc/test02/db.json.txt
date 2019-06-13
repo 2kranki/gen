@@ -15,12 +15,11 @@
     "Tables":[
         {
             "Name":"Movies",
-            "PrimaryKey":"Title",
             "Fields":[
                 {
                     "Name":"Title",
                     "TypeDef":"text",
-                    "PrimaryKey":true,
+                    "KeyNum":1,
                     "List":true
                 },
                 {

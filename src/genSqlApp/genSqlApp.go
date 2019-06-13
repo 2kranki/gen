@@ -46,7 +46,6 @@ import (
 	"../mainData"
 	"../shared"
 	"../util"
-	//"./dbData"
 	_ "./dbForm"
 	"./dbJson"
 	_ "./dbSql"
@@ -237,9 +236,9 @@ var FileDefns []FileDefn = []FileDefn{
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	Data     	*dbData.Database
+	Data     	*dbJson.Database
 	Main     	*mainData.MainData
-	Table		*dbData.DbTable
+	Table		*dbJson.DbTable
 }
 
 var tmplData TmplData
@@ -247,7 +246,7 @@ var tmplData TmplData
 type TaskData struct {
 	FD			*FileDefn
 	TD			*TmplData
-	Table		*dbData.DbTable
+	Table		*dbJson.DbTable
 	PathIn	  	string						// Input File Path
 	PathOut	  	string						// Output File Path
 
@@ -435,7 +434,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 
 	// Set up template data
 	tmplData.Main = mainData.MainStruct()
-	tmplData.Data = dbData.DbStruct()
+	tmplData.Data = dbJson.DbStruct()
 
 	// Set up the output directory structure
     if !sharedData.Noop() {
@@ -520,8 +519,8 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 			inputQueue <- data
 		case 2:
 			// Output File is Titled Table Name in Titled Database Name directory
-			dbData.ForTables(
-				func(v *dbData.DbTable) {
+			dbJson.DbStruct().ForTables(
+				func(v *dbJson.DbTable) {
 					data := TaskData{FD:&FileDefns[i], TD:&tmplData, Table:v, PathIn:pathIn}
 					if data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, v.Name, def.FileName); err != nil {
 						log.Fatalln(err)

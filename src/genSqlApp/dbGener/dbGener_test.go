@@ -1,9 +1,9 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // See License.txt in main repository directory
 
-// Test Generate SQL Application Generator
+// Test Generate dbGener Application Generator
 
-package dbSql
+package dbGener
 
 import (
 	"../../shared"

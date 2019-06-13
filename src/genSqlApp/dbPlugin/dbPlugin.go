@@ -22,6 +22,7 @@ package dbPlugin
 import (
 	//"../dbJson"
 	"../dbType"
+	"fmt"
 	"sync"
 )
 
@@ -74,29 +75,29 @@ type PluginData	struct {
 // into it is the database name as used in the JSON input (ie mariadb, mssql,
 // mysql, postgresql, sqlite) Each plugin registers with this package at init()
 // insuring that the package is available when needed.
-var plugins		map[string]interface{}
+var plugins		map[string]PluginData
 var mtxPlugins	sync.Mutex
 
 // FindPlugin returns the Plugin interface for a name if possible. NIL is
 // returned if it is not found.
-func FindPlugin(name string) interface{} {
+func FindPlugin(name string) (PluginData, error) {
 	mtxPlugins.Lock()
 	defer mtxPlugins.Unlock()
 	if plugins == nil {
-		return nil
+		return PluginData{}, fmt.Errorf("Error: Plugin, %s, not found!\n", name)
 	}
 	if _, ok := plugins[name]; ok {
-		return plugins[name]
+		return plugins[name], nil
 	}
-	return nil
+	return PluginData{}, fmt.Errorf("Error: Plugin, %s, not found!\n", name)
 }
 
 // Register adds or replaces the given plugin in the plugins map.
-func Register(name string, plg interface{}) {
+func Register(name string, plg PluginData) {
 	mtxPlugins.Lock()
 	defer mtxPlugins.Unlock()
 	if plugins == nil {
-		plugins = map[string]interface{}{}
+		plugins = map[string]PluginData{}
 	}
 	plugins[name] = plg
 }

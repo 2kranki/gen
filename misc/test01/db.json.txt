@@ -17,12 +17,11 @@
     "Tables":[
         {
             "Name":"Customer",
-            "PrimaryKey":"Num",
             "Fields":[
                 {
                     "Name":"Num",
                     "TypeDef":"int",
-                    "PrimaryKey":true,
+                    "KeyNum":1,
                     "List":true
                 },
                 {
@@ -73,12 +72,11 @@
         },
         {
             "Name":"Vendor",
-            "PrimaryKey":"Num",
             "Fields":[
                 {
                     "Name":"Num",
                     "TypeDef":"int",
-                    "PrimaryKey":true,
+                    "KeyNum":1,
                     "List":true
                 },
                 {
