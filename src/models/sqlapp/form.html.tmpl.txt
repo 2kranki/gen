@@ -59,6 +59,8 @@
     <p/>
     <p>{{.Msg}}</p>
     <script>
+        keyCnt = [[.Table.KeyCount]];
+        keys = [ [[.Table.KeysListStr]] ];
         function onAdd() {
             document.getElementById("dataForm").action = "/[[.Table.Name]]/insert";
             document.getElementById("dataForm").method = "post";

@@ -77,17 +77,17 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
-func (pd Plugin) GenSqlOpen() []string {
-	var strs		[]string
+func (pd Plugin) GenSqlOpen() string {
+	var str			strings.Builder
 
-	strs = append(strs, "\t// dbName is a CLI argument\n")
-	strs = append(strs, "\tconnStr := fmt.Sprintf(\"%s\", dbName)\n")
+	str.WriteString("\t// dbName is a CLI argument\n")
+	str.WriteString("\tconnStr := fmt.Sprintf(\"%s\", dbName)\n")
 	if sharedData.GenDebugging() {
-		strs = append(strs, "\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n")
+		str.WriteString("\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n")
 	}
-	strs = append(strs, "\tdb, err = sql.Open(\"sqlite3\", connStr)\n")
+	str.WriteString("\tdb, err = sql.Open(\"sqlite3\", connStr)\n")
 
-	return strs
+	return str.String()
 }
 
 // Name simply returns the external name that this plugin is known by

@@ -1,0 +1,401 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+// Generated: [[Time]]
+[[- $dot := .]]
+[[- $n := .TD.Data.TitledName]]
+[[- $t := .Table]]
+
+package hndlr[[.TD.Data.TitledName]]
+[[- $n := .TD.Data.TitledName]]
+
+import (
+    //"fmt"
+    "io/ioutil"
+    "log"
+    "net/http"
+    "net/http/httptest"
+    "net/url"
+	"testing"
+    "../io[[$n]]"
+)
+
+//============================================================================
+//                              Fake DB
+//============================================================================
+
+type [[$t.TitledName]]DB struct {
+    rcds    [][[$t.TitledName]]
+}
+
+//----------------------------------------------------------------------------
+//                             Row Delete
+//----------------------------------------------------------------------------
+
+// RowDelete deletes the row with keys from the provided record, rcd.
+func (db *[[$t.TitledName]]DB) RowDelete(rcd *[[$t.TitledName]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowDelete()\n")
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowDelete()\n")
+    [[end]]
+	return nil
+}
+
+//----------------------------------------------------------------------------
+//                             Row Find
+//----------------------------------------------------------------------------
+
+// RowFind searches the Database for a matching row for the keys found in
+// the given record and returns the output in that same record.
+func (db *[[$t.TitledName]]DB) RowFind(rcd *[[$t.TitledName]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowFind(%+v)\n", rcd)
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowFind(%+v, %s)\n", data, ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row First
+//----------------------------------------------------------------------------
+
+// RowFirst returns the first row in the table, [[.Table.TitledName]].
+// If there are no rows in the table, then a blank/null record is returned
+// without error.
+func (db *[[$t.TitledName]]DB) RowFirst(rcd *[[$t.TitledName]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowFirst()\n")
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowFirst(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Insert
+//----------------------------------------------------------------------------
+
+func (db *[[$t.TitledName]]DB) RowInsert(d *[[$t.TitledName]]) error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowInsert(%+v)\n", d)
+    [[end]]
+
+    // Validate the input record.
+
+    // Add it to the table.
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowInsert(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Last
+//----------------------------------------------------------------------------
+
+func (db *[[$t.TitledName]]DB) RowLast(rcd *[[$t.TitledName]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowLast(%+v)\n", rcd)
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowLast(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Next
+//----------------------------------------------------------------------------
+
+// RowNext returns the next row from the row given. If row after the current
+// one does not exist, then the first row is returned.
+func (db *[[$t.TitledName]]DB) RowNext(rcd *[[$t.TitledName]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowNext(%+v)\n", rcd)
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowNext(%+v, %s)\n", data, ErrorString(err))
+    [[end]]
+    return &data, err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Page
+//----------------------------------------------------------------------------
+
+// RowPage returns a page of rows where a page size is the 'limit' parameter and
+// 'offset' is the offset into the result set ordered by the main index. Both
+// 'limit' and 'offset' are relative to 1. We return an address to the array
+// rows (structs) so that we don't have the overhead of copying them everwhere.
+func (db *[[$t.TitledName]]DB) RowPage(offset int, limit int) ([][[$t.TitledName]], error) {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowPage(%d,%d)\n",offset,limit)
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowPage(%s)\n", ErrorString(err))
+    [[end]]
+    return data, err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Prev
+//----------------------------------------------------------------------------
+
+func (db *[[$t.TitledName]]DB) RowPrev(rcd *[[$t.TitledName]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowPrev(%+v)\n", rcd)
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowPrev(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Update
+//----------------------------------------------------------------------------
+
+func (db *[[$t.TitledName]]DB) RowUpdate(d *[[$t.TitledName]]) error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].RowUpdate(%+v)\n", d)
+    [[end]]
+
+    // Validate the input record.
+
+    // Add it to the table.
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].RowUpdate(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+
+//----------------------------------------------------------------------------
+//                             Table Count
+//----------------------------------------------------------------------------
+
+func (db [[$t.TitledName]]DB) TableCount( ) (int, error) {
+    var err         error
+    var count       int
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].TableCount()\n")
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].TableCount(%s) %d\n", ErrorString(err), count)
+    [[end]]
+    return count, err
+}
+
+//----------------------------------------------------------------------------
+//                             Table Create
+//----------------------------------------------------------------------------
+
+// TableCreate creates the table in the given database deleting the current
+// table if present.
+func (db [[$t.TitledName]]DB) TableCreate() error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].TableCreate()\n")
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].TableCreate(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                             Table Delete
+//----------------------------------------------------------------------------
+
+// TableDelete deletes the table in the given database if present.
+func (db [[$t.TitledName]]DB) TableDelete() error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$t.TitledName]].TableDelete()\n")
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$t.TitledName]].TableDelete(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//============================================================================
+//                              Tests
+//============================================================================
+
+func Test[[$t.TitledName]]ListIndex(t *testing.T) {
+    var err         error
+
+    t.Logf("Test[[$t.TitledName]].HndlrIndex()...\n")
+    SetupParms(t)
+
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+
+    t.Logf("Test[[$t.TitledName]].HndlrIndex() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]Show(t *testing.T) {
+    var rcd         io[[$n]].[[$t.TitledName]]
+    var w           *httptest.ResponseRecorder
+
+    t.Logf("Test[[$t.TitledName]]Show()...\n")
+    SetupParms(t)
+    w = httptest.NewRecorder()
+
+    // First try a blank record.
+    [[$t.TitledName]]Show(w, &rcd, "")
+    resp := w.Result()
+    // fmt.Println(resp.StatusCode)
+    // fmt.Println(resp.Header.Get("Content-Type"))
+    body, _ := ioutil.ReadAll(resp.Body)
+    t.Logf("Output:\n%s\n\n\n", string(body))
+
+    t.Logf("Test[[$t.TitledName]]Show() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]RowDelete(t *testing.T) {
+    var err         error
+
+    t.Logf("Test[[$t.TitledName]]HndlrDelete()...\n")
+    SetupParms(t)
+
+    server := httptest.NewServer([[$t.TitledName]]HndlrDelete)
+    defer server.Close()
+
+    resp, err := http.Get(server.URL)
+    if err != nil {
+        t.Fatal(err)
+    }
+    if resp.StatusCode != 200 {
+        t.Fatalf("Received non-200 response: %d\n", resp.StatusCode)
+    }
+    //expected := fmt.Sprintf("Visitor count: %d.", i)
+    actual, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        t.Fatal(err)
+    }
+    //if expected != string(actual) {
+    //	t.Errorf("Expected the message '%s'\n", expected)
+    //}
+
+    t.Logf("Test[[$t.TitledName]]HndlrDelete() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]RowInsert(t *testing.T) {
+    var err         error
+
+    t.Logf("Test[[$t.TitledName]]HndlrInsert()...\n")
+    SetupParms(t)
+
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+
+    t.Logf("Test[[$t.TitledName]]HndlrInsert() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]RowNext(t *testing.T) {
+    var err         error
+
+    t.Logf("Test[[$t.TitledName]].RowNext()...\n")
+    SetupParms(t)
+
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+
+    t.Logf("Test[[$t.TitledName]].RowNext() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]RowPrev(t *testing.T) {
+    var err         error
+
+    t.Logf("Test[[$t.TitledName]].RowPrev()...\n")
+    SetupParms(t)
+
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+
+    t.Logf("Test[[$t.TitledName]].RowPrev() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]RowShow(t *testing.T) {
+    var w           *httptest.ResponseRecorder
+
+    t.Logf("Test[[$t.TitledName]]HndlrShow()...\n")
+    SetupParms(t)
+    w = httptest.NewRecorder()
+
+    req := httptest.NewRequest("GET", "http://localhost:5000/[[$t.TitledName]]", nil)
+    [[$t.TitledName]]HndlrShow(w, req)
+    resp := w.Result()
+    // fmt.Println(resp.StatusCode)
+    // fmt.Println(resp.Header.Get("Content-Type"))
+    body, _ := ioutil.ReadAll(resp.Body)
+    t.Logf("Output:\n%s\n\n\n", string(body))
+
+    t.Logf("Test[[$t.TitledName]]HndlrShow() - End of Test\n\n\n")
+}
+
+func Test[[$t.TitledName]]RowUpdate(t *testing.T) {
+    var err         error
+
+    t.Logf("Test[[$t.TitledName]].RowUpdate()...\n")
+    SetupParms(t)
+
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+
+    t.Logf("Test[[$t.TitledName]].RowUpdate() - End of Test\n\n\n")
+}
+

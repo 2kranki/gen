@@ -35,48 +35,140 @@ import (
 // Some of these need better names. lol
 
 type DbRowDeleter interface {
-    func RowDelete(rcd *[[.Table.TitledName]]) error
+    // RowDelete deletes the row with keys from the provided record, rcd.
+    RowDelete(rcd *[[.Table.TitledName]]) error
 }
 
 type DbRowFinder interface {
-    func RowFind(rcd *[[.Table.TitledName]]) error
+    // RowFind searches the Database for a matching row for the keys found in
+    // the given record and returns the output in that same record.
+    RowFind(rcd *[[.Table.TitledName]]) error
 }
 
 type DbRowFirster interface {
-    func RowFirst(rcd *[[.Table.TitledName]]) error
+    // RowFirst returns the first row in the table, [[.Table.TitledName]].
+    // If there are no rows in the table, then a blank/null record is returned
+    // without error.
+    RowFirst(rcd *[[.Table.TitledName]]) error
 }
 
 type DbRowInserter interface {
-    func RowInsert(rcd *[[.Table.TitledName]]) error
+    RowInsert(rcd *[[.Table.TitledName]]) error
 }
 
 type DbRowLaster interface {
-    func RowLast(rcd *[[.Table.TitledName]]) error
+    RowLast(rcd *[[.Table.TitledName]]) error
 }
 
 type DbRowNexter interface {
-    func RowNext(rcd *[[.Table.TitledName]]) error
+    // RowNext returns the next row from the row given. If row after the current
+    // one does not exist, then the first row is returned.
+    RowNext(rcd *[[.Table.TitledName]]) error
+}
+
+type DbRowPager interface {
+    // RowPage returns a page of rows where a page size is the 'limit' parameter and
+    // 'offset' is the offset into the result set ordered by the main index. Both
+    // 'limit' and 'offset' are relative to 1. We return an address to the array
+    // rows (structs) so that we don't have the overhead of copying them everwhere.
+    RowPage(offset int, limit int) ([][[.Table.TitledName]], error)
 }
 
 type DbRowPrever interface {
-    func RowPrev(rcd *[[.Table.TitledName]]) error
+    RowPrev(rcd *[[.Table.TitledName]]) error
 }
 
 type DbRowUpdater interface {
-    func RowUpdate(rcd *[[.Table.TitledName]]) error
+    RowUpdate(rcd *[[.Table.TitledName]]) error
 }
 
 type DbTableCounter interface {
-    func TableCount() (int, error)
+    TableCount() (int, error)
 }
 
 type DbTableCreater interface {
-    func TableCreate() error
+    TableCreate() error
 }
 
 type DbTableDeleter interface {
-    func TableDelete() error
+    TableDelete() error
 }
+
+//============================================================================
+//                              Table Struct
+//============================================================================
+
+[[.Table.CreateStruct]]
+
+//----------------------------------------------------------------------------
+//                             List Output
+//----------------------------------------------------------------------------
+
+func (s [[.Table.TitledName]]) ListOutput() string {
+	var str strings.Builder
+    var wrk string
+
+    [[$t := .Table]]
+    [[range $f := .Table.Fields]]
+        [[if $f.List]]
+            // Field: [[$f.TitledName]]
+            str.WriteString("<td>\n")
+            [[$f.GenToString "wrk" "s"]]
+            [[if $f.KeyNum]]
+                {
+                    fstr := fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
+                    str.WriteString(fstr)
+                }
+            [[end]]
+            wrk += "\n"
+            str.WriteString(wrk)
+            [[if $f.KeyNum]]
+                str.WriteString("</a>\n" )
+            [[end]]
+            str.WriteString("</td>\n")
+        [[end]]
+	[[end]]
+
+	return str.String()
+}
+
+//----------------------------------------------------------------------------
+//                             Test Data
+//----------------------------------------------------------------------------
+
+func (s [[.Table.TitledName]]) TestData(i int) {
+    var chr     rune
+
+    if i < 27 {
+        chr = rune(65 + i)      // A
+    } else if i < 55 {
+        chr = rune(97 + i)      // a
+    } else {
+        chr = rune(65)          // A
+    }
+
+    [[$t := .Table]]
+    [[range $f := .Table.Fields]]
+        [[if $f.IsText]]
+            s.[[$f.TitledName]] = string(chr)
+        [[else if $f.IsDec]]
+            s.[[$f.TitledName]] = int64(i)
+        [[else if $f.IsFloat]]
+            s.[[$f.TitledName]] = Float64(i)
+        [[end]]
+	[[end]]
+
+}
+
+//----------------------------------------------------------------------------
+//                             New Struct
+//----------------------------------------------------------------------------
+
+// [[.Table.TitledName]]New creates a new empty struct.
+func [[.Table.TitledName]]New() *[[.Table.TitledName]] {
+    return &[[.Table.TitledName]]{}
+}
+
 
 //============================================================================
 //                              Handlers

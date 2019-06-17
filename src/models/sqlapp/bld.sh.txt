@@ -37,9 +37,9 @@ else
     go get github.com/shopspring/decimal
 fi
 cd src
-echo "Formatting files:"
+echo "...Formatting files:"
 go fmt ./...
-echo "Building Application:"
+echo "...Building Application:"
 mkdir -p /tmp/bin
 go build -o /tmp/bin/[[.TD.Data.TitledName]] -v
 if [ $? -eq 0 ] ; then

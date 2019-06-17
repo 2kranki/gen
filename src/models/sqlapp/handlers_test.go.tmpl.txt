@@ -20,6 +20,10 @@ import (
     "../io[[$n]]"
 )
 
+//============================================================================
+//                              Miscellaneous
+//============================================================================
+
 // SetupParms sets up the environment for testing including
 // creating the test databases needed for testing the handlers.
 func SetupParms(t *testing.T) {
@@ -73,6 +77,10 @@ func SetupParms(t *testing.T) {
 
     t.Logf("...End of SetupParms()\n")
 }
+
+//============================================================================
+//                              Tests
+//============================================================================
 
 [[- range $t := .TD.Data.Tables ]]
     func Test[[$t.TitledName]]Show(t *testing.T) {

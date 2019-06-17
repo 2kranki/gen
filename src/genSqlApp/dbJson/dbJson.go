@@ -430,6 +430,20 @@ func (t *DbTable) HasInteger() bool {
 	return false
 }
 
+// KeyCount returns the number of key fields in the table.
+func (t *DbTable) KeyCount() int {
+	var count		int
+
+	// accumulate the number of key fields
+	for _, v := range t.Fields {
+		if v.KeyNum > 0 {
+			count++
+		}
+	}
+
+	return count
+}
+
 // Keys returns the field names marked as keys in ascending order
 // by KeyNum which is descending order of importance.
 func (t *DbTable) Keys() ([]string, error) {
@@ -456,6 +470,40 @@ func (t *DbTable) Keys() ([]string, error) {
 	}
 
 	return strs, nil
+}
+
+// KeysList returns the table's keys in number order as
+// a comma separated list.
+func (t *DbTable) KeysList() string {
+	var str			strings.Builder
+	var strs		[]string
+
+	strs, _ = t.Keys()
+	for i, fn := range strs {
+		cm := ", "
+		if i == len(strs) - 1 {
+			cm = ""
+		}
+		str.WriteString(fmt.Sprintf("%s%s", fn, cm))
+	}
+	return str.String()
+}
+
+// KeysListStr returns the table's keys in number order as
+// a comma separated list of strings.
+func (t *DbTable) KeysListStr() string {
+	var str			strings.Builder
+	var strs		[]string
+
+	strs, _ = t.Keys()
+	for i, fn := range strs {
+		cm := ", "
+		if i == len(strs) - 1 {
+			cm = ""
+		}
+		str.WriteString(fmt.Sprintf("\"%s\"%s", fn, cm))
+	}
+	return str.String()
 }
 
 // ScanFields returns struct fields to be used in
