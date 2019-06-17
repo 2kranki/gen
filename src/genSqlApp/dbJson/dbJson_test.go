@@ -45,6 +45,7 @@ func TestTableNames(t *testing.T) {
 
 func TestReadJsonFile(t *testing.T) {
 	var err			error
+	var keys		[]string
 
 	t.Logf("TestReadJsonFile()..\n")
 	sharedData.SetDebug(true)
@@ -62,6 +63,18 @@ func TestReadJsonFile(t *testing.T) {
 	}
 	if len(dbStruct.Tables[0].Fields) != 8 {
 		t.Fatalf("TestReadJsonFile() failed: should be 8 Tables but is %d\n", len(dbStruct.Tables[0].Fields))
+	}
+
+	keys, err = dbStruct.Tables[0].Keys()
+	if err != nil {
+		t.Fatalf("TestReadJsonFile() failed: keys() error: %s\n", err.Error())
+	}
+	t.Logf("keys: %v\n", keys)
+	if len(keys) != 1 {
+		t.Fatalf("TestReadJsonFile() failed: invalid keys length\n")
+	}
+	if keys[0] != "Num" {
+		t.Fatalf("TestReadJsonFile() failed: invalid keys data\n")
 	}
 
 	//t.Log(logData.String())

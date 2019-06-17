@@ -1,6 +1,7 @@
 # vi:nu:et:sts=4 ts=4 sw=4
 My objective with this program is to be able to generate applications and objects
-in several programming languages.
+in several programming languages. I found the templating system in Go to have
+every feature that I needed for this project.
 
 In developing this program, I have accidentally overwritten the base files of
 the program several times and had to reconstruct the overwritten files.  Since
@@ -8,19 +9,6 @@ I wasn't doing commits very often, the reconstruction was sometimes a little
 painful.  Now, I am doing lots of commits. So, that any reconstruction is rather
 painless. lol  Live and learn!
 
-When I first started coding this, I moved a lot of code out of the templates and
-into the generation functions.  As time went by, I learned that this was a mistake
-especially when you are generating fmt.Sprintf code.  It is much harder to wrap
-head around generating code that will generate code than just put it in the
-template file and supplement it with small functions.  At a later date, I will
-rewrite some of the code and templates to reflect this.
-
-At first, I only generated and tested with SQLite. I changed this implementation
-to use multiple databases.  When I did this, I went to a plugin type system. This
-code pertains to genSqlApp.  However, to get the plugins registered, I had to in-
-clude them in main.go. I do not like this, but it gets rid of an import cycle in
-between genSqlApp and each db<database>.  I might be able to fix this if I moved
-dbData out of genSqlApp and made it its own package.
 
 
 

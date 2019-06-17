@@ -12,6 +12,7 @@
 package dbSqlite
 
 import (
+	"../../shared"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
@@ -29,17 +30,17 @@ const(
 var tds	= dbType.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
-	{Name:"email", 		Html:"email", 		Sql:"NVARCHAR", 	Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
+	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
+	{Name:"dec", 		Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
+	{Name:"decimal", 	Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
+	{Name:"int", 		Html:"number",		Sql:"INTEGER",		Go:"int64",		DftLen:0,},
+	{Name:"integer", 	Html:"number",		Sql:"INTEGER",		Go:"int64",		DftLen:0,},
+	{Name:"money", 		Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
 	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"tel", 		Html:"tel",			Sql:"NVARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
-	{Name:"text", 		Html:"text",		Sql:"NVARCHAR",		Go:"string",	DftLen:0,},
+	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
+	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},
 	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
-	{Name:"url", 		Html:"url",			Sql:"NVARCHAR",		Go:"string",	DftLen:50,},
+	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
 }
 
 //----------------------------------------------------------------------------
@@ -50,6 +51,12 @@ var tds	= dbType.TypeDefns {
 // used.  However, we use methods based off the PluginData to supply the data or other
 // functionality.
 type	Plugin struct {}
+
+// CreateDatabase indicates if the Database needs to be
+// created before it can be used.
+func (pd Plugin) CreateDatabase() bool {
+	return false
+}
 
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
@@ -68,16 +75,52 @@ func (pd Plugin) GenImportString() string {
 	return "\"github.com/mattn/go-sqlite3\""
 }
 
+// GenSqlOpen generates the code to issue sql.Open() which is unique
+// for each database server.
+func (pd Plugin) GenSqlOpen() []string {
+	var strs		[]string
+
+	strs = append(strs, "\t// dbName is a CLI argument\n")
+	strs = append(strs, "\tconnStr := fmt.Sprintf(\"%s\", dbName)\n")
+	if sharedData.GenDebugging() {
+		strs = append(strs, "\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n")
+	}
+	strs = append(strs, "\tdb, err = sql.Open(\"sqlite3\", connStr)\n")
+
+	return strs
+}
+
+// Name simply returns the external name that this plugin is known by
+// or supports.
+// Required method
+func (pd Plugin) Name() string {
+	return extName
+}
+
+// NeedUse indicates if the Database needs a USE
+// SQL Statement before it can be used.
+func (pd Plugin) NeedUse() bool {
+	return false
+}
+
+// Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
+// Required method
+func (pd Plugin) Types() *dbType.TypeDefns {
+	return &tds
+}
+
 //----------------------------------------------------------------------------
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
 var plug		*Plugin
+var pluginData	*dbPlugin.PluginData
 
 func init() {
 	log.Printf("\tRegistering SQLite\n")
 	plug = &Plugin{}
-	dbPlugin.Register(extName, dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug})
+	pluginData = &dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug}
+	dbPlugin.Register(extName, *pluginData)
 }
 
 

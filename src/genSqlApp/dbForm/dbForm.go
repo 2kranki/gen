@@ -24,21 +24,6 @@ type FormWork struct {
 	j			dbJson.Database
 }
 
-//----------------------------------------------------------------------------
-//						Global/Internal Object Functions
-//----------------------------------------------------------------------------
-
-/***
-func (t FormWork) FindDefn(name string) *FormWork {
-	for i, v := range t {
-		if name == v.Name {
-			return &t[i]
-		}
-	}
-	return nil
-}
- ***/
-
 func (t FormWork) Write(p []byte) (int, error) {
 	var n		int
 	var err		error

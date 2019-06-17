@@ -48,7 +48,7 @@ import (
 	"../util"
 	_ "./dbForm"
 	"./dbJson"
-	_ "./dbSql"
+	_ "./dbGener"
 	"errors"
 	"flag"
 	"fmt"

@@ -65,7 +65,7 @@ func main() {
 [[ if .TD.Main.Flags -]]
     [[ GenFlagSetup ]]
 [[ end -]]
-[[.TD.Data.Plugin.FlagsStr .TD.Data.Name]]
+[[.TD.Data.Plugin.Plugin.GenFlagArgDefns .TD.Data.Name]]
 	flag.StringVar(&http_port, "httpPort", "8081", "server port")
 	flag.StringVar(&http_srvr, "httpServer", "localhost", "server site")
 

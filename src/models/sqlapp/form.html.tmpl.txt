@@ -42,10 +42,7 @@
 </head>
 <body>
     <form id="dataForm" method="get" action="/[[.Table.Name]]">
-        <input type=hidden id=key name=key value="{{.Rcd.[[.Table.PrimaryKey.TitledName]]}}">
-        [[range $f := .Table.Fields]]
-            [[$f.FormInput -]]
-        [[end]]
+        [[GenFormDataDisplay .Table]]
         <p/>
         <p/>
         <p/>
@@ -67,8 +64,8 @@
             document.getElementById("dataForm").method = "post";
         }
         function onDelete() {
-            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/delete?key="+key;
+            [[GenFormDataKeyGet .Table]]
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/delete"+[[GenFormDataKeys .Table]];
             document.getElementById("dataForm").method = "get";
         }
         function onFirst() {
@@ -84,13 +81,13 @@
             document.getElementById("dataForm").method = "get";
         }
         function onNext() {
-            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/next?key="+key;
+            [[GenFormDataKeyGet .Table]]
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/next"+[[GenFormDataKeys .Table]];
             document.getElementById("dataForm").method = "get";
         }
         function onPrev() {
-            key = document.getElementById("[[.Table.PrimaryKey.TitledName]]").value
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/prev?key="+key;
+            [[GenFormDataKeyGet .Table]]
+            document.getElementById("dataForm").action = "/[[.Table.Name]]/prev"+[[GenFormDataKeys .Table]];
             document.getElementById("dataForm").method = "get";
         }
         function onReset() {

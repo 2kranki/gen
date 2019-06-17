@@ -29,6 +29,23 @@ type TypeDefn struct {
 	Go			string		`json:"Go,omitempty"`		// GO Type
 	DftLen		int			`json:"DftLen,omitempty"`	// Default Length (used if length is not
 	//													//	given)(0 == Max Length)
+	GenLen		bool		`json:"GenLen,omitempty"`	// If true, generate the length
+	DftDec		int			`json:"DftDec,omitempty"`	// Default Decimal Positions (used if length is not
+	//													//	given)(0 == Not Used)
+	GenDec		bool		`json:"GenDec,omitempty"`	// If true, generate the decimal positions
+}
+
+// CanGenDec indicates if Decimal Position should be generated in SQL
+// and other
+func (t TypeDefn) CanGenDec( ) bool {
+	if !t.GenLen {
+		return false
+	}
+	return t.GenDec
+}
+
+func (t TypeDefn) CanGenLen( ) bool {
+	return t.GenLen
 }
 
 func (t TypeDefn) GoType( ) string {
@@ -150,18 +167,18 @@ func (t TypeDefns) SqlType(name string) string {
 //  * In this table, we pick the most common types which should be generic to any
 //		SQL Server if possible
 var DefaultTable = TypeDefns {
-	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
-	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
-	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
-	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},
-	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
-	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
+	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",},
+	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",},
+	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50, GenLen:true,},
+	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"string",},
+	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"string",},
+	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",},
+	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",},
+	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"string",},
+	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",},
+	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19, GenLen:true,}, //+nnn (nnn) nnn-nnnn
+	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0, GenLen:true,},
+	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0, GenLen:false,},
+	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50, GenLen:true,},
 }
 

@@ -30,11 +30,11 @@ else
     echo "...Fetching github.com/mattn/go-sqlite3"
     go get github.com/mattn/go-sqlite3
 fi
-if [ -d ~/go/src/github.com/ericlagergren/decimal ]; then   # Decimal Number Support
+if [ -d ~/go/src/github.com/shopspring/decimal ]; then      # Decimal Number Support
     :
 else
-    echo "...Fetching github.com/ericlagergren/decimal"
-    go get github.com/ericlagergren/decimal
+    echo "...Fetching github.com/shopspring/decimal"
+    go get github.com/shopspring/decimal
 fi
 cd src
 echo "Formatting files:"

@@ -8,6 +8,7 @@
 package dbMariadb
 
 import (
+	"../../shared"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
@@ -48,23 +49,10 @@ var tds	= dbType.TypeDefns {
 type	Plugin struct {
 }
 
-// Name simply returns the external name that this plugin is known by
-// or supports.
-// Required method
-func (pd Plugin) Name() string {
-	return extName
-}
-
-// CanCreateDb returns whether this database supports dynamic creation/deletion of databases.
-// (Required method)
-func (pd Plugin) CanDbCreate() bool {
+// CreateDatabase indicates that the Database needs to be
+// created before it can be used.
+func (pd Plugin) CreateDatabase() bool {
 	return false
-}
-
-// Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
-// Required method
-func (pd Plugin) Types() *dbType.TypeDefns {
-	return &tds
 }
 
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
@@ -88,15 +76,53 @@ func (pd Plugin) GenImportString() string {
 	return "\"github.com/go-sql-driver/mysql\""
 }
 
+// GenSqlOpen generates the code to issue sql.Open() which is unique
+// for each database server.
+func (pd Plugin) GenSqlOpen() []string {
+	var strs		[]string
+
+	strs = append(strs, "\tconnStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)\", dbUser, dbPW, dbServer, dbPort)\n")
+	strs = append(strs, "\tif len(dbName) > 0 {\n")
+	strs = append(strs, "\t\tconnStr += fmt.Sprintf(\"/%s\", dbName)\n")
+	strs = append(strs, "\t}\n")
+	if sharedData.GenDebugging() {
+		strs = append(strs, "\tlog.Printf(\"\\tConnecting to mariadb using %s\\n\", connStr)\n")
+	}
+	strs = append(strs, "\tdb, err = sql.Open(\"mysql\", connStr)\n")
+
+	return strs
+}
+
+// Name simply returns the external name that this plugin is known by
+// or supports.
+// Required method
+func (pd Plugin) Name() string {
+	return extName
+}
+
+// NeedUse indicates if the Database needs a USE
+// SQL Statement before it can be used.
+func (pd Plugin) NeedUse() bool {
+	return false
+}
+
+// Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
+// Required method
+func (pd Plugin) Types() *dbType.TypeDefns {
+	return &tds
+}
+
 //----------------------------------------------------------------------------
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
 var plug		*Plugin
+var pluginData	*dbPlugin.PluginData
 
 func init() {
 	log.Printf("\tRegistering MariaDB\n")
 	plug = &Plugin{}
-	dbPlugin.Register(extName, dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug})
+	pluginData = &dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug}
+	dbPlugin.Register(extName, *pluginData)
 }
 

@@ -66,8 +66,8 @@
             document.getElementById("menuForm").method = "post";
         }
         function onDelete[[$t.TitledName]]() {
-            key = document.getElementById("[[$t.PrimaryKey.TitledName]]").value
-            document.getElementById("menuForm").action = "/[[$t.Name]]/delete?key="+key;
+            [[GenFormDataKeyGet $t]]
+            document.getElementById("menuForm").action = "/[[$t.Name]]/delete"+[[GenFormDataKeys $t]];
             document.getElementById("menuForm").method = "get";
         }
         function onRow[[$t.TitledName]]() {

@@ -242,7 +242,7 @@ func (f *DbField) IsText() bool {
 // GenRValueToStruct generates code to convert an r.FormValue
 // to a structure field. The structure's variable is given
 // by dn.
-func (f *DbField) GenRValueToStruct(dn string) string {
+func (f *DbField) GenFormValueToStruct(dn string) string {
 	var str			string
 
 	switch f.Typ.Go {
@@ -450,7 +450,8 @@ func (t *DbTable) Keys() ([]string, error) {
 
 	// generate the keys in ascending order.
 	sort.Ints(mapKeys)
-	for key := range mapKeys {
+	for i := 0; i < len(mapKeys); i++ {
+		key := mapKeys[i]
 		strs = append(strs, keys[key])
 	}
 
@@ -513,6 +514,44 @@ func (d *Database) ForTables(f func(t *DbTable) ) {
 	}
 }
 
+func (d *Database) HasFloat() bool {
+	for _, t := range d.Tables {
+		if t.HasFloat() {
+			return true
+		}
+	}
+	return false
+}
+
+// SetupPlugin sets up the plugin within the database.
+func (d *Database) SetupPlugin(plg dbPlugin.PluginData) error {
+
+	// Validate the Plugin if possible.
+	if plg.Types == nil {
+		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", d.SqlType)
+	}
+	if plg.Plugin == nil {
+		return fmt.Errorf("Error: Plugin missing support for %s!\n\n\n", d.SqlType)
+	}
+
+	// Save the plugin.
+	d.Plugin = plg
+
+	// Fix up the tables with back pointers that we do not store externally.
+	for i, t := range d.Tables {
+		for ii, _ := range t.Fields {
+			t.Fields[ii].Tbl = &t
+			t.Fields[ii].Typ = plg.Types.FindDefn(t.Fields[ii].TypeDefn)
+			if t.Fields[ii].Typ == nil {
+				return fmt.Errorf("Error: Invalid Field Type for %s:%s!\n\n\n", t.Name, t.Fields[ii].Name)
+			}
+		}
+		d.Tables[i].DB = d
+	}
+
+	return nil
+}
+
 func (d *Database) TitledName( ) string {
 	return strings.Title(d.Name)
 }
@@ -559,12 +598,34 @@ func ReadJsonFile(fn string) error {
 	if plg, err = dbPlugin.FindPlugin(dbStruct.SqlType); err != nil {
 		return fmt.Errorf("Error: Can't find plugin for %s!\n\n\n", dbStruct.SqlType)
 	}
+	err = SetupPlugin(plg)
+	if err != nil {
+		return fmt.Errorf("Error: Plugin Setup failed - %s\n", err)
+	}
+
+	if err = ValidateData(); err != nil {
+		return err
+	}
+
+	if sharedData.Debug() {
+		log.Printf("\tdbStruct: %+v\n", dbStruct)
+	}
+
+	return nil
+}
+
+// SetupPlugin sets up the plugin within the database.
+func SetupPlugin(plg dbPlugin.PluginData) error {
+
+	// Validate the Plugin if possible.
 	if plg.Types == nil {
 		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", dbStruct.SqlType)
 	}
 	if plg.Plugin == nil {
 		return fmt.Errorf("Error: Plugin missing support for %s!\n\n\n", dbStruct.SqlType)
 	}
+
+	// Save the plugin.
 	dbStruct.Plugin = plg
 
 	// Fix up the tables with back pointers that we do not store externally.
@@ -577,14 +638,6 @@ func ReadJsonFile(fn string) error {
 			}
 		}
 		dbStruct.Tables[i].DB = &dbStruct
-	}
-
-	if err = ValidateData(); err != nil {
-		return err
-	}
-
-	if sharedData.Debug() {
-		log.Printf("\tdbStruct: %+v\n", dbStruct)
 	}
 
 	return nil
@@ -638,8 +691,8 @@ func ValidateData() error {
 			}
 			td := plg.Types.FindDefn(f.TypeDefn)
 			if td == nil {
-				fmt.Errorf("Error - Could not find Type definition for field,",
-					f.Name,"type:",f.TypeDefn)
+				fmt.Errorf("Error - Could not find Type definition for field: %s  type: %s",
+					f.Name, f.TypeDefn)
 			}
 		}
 	}

@@ -171,7 +171,7 @@ func SetFunc(nm string, d interface{}) {
 }
 
 func GenDebugging() bool {
-	return defns["GenLogging"].(bool)
+	return defns["GenDebugging"].(bool)
 }
 
 func GenLogging() bool {

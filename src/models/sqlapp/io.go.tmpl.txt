@@ -18,7 +18,7 @@ import (
         "strconv"
         "strings"
     [[end]]
-	_ [[.TD.Data.ImportStr]]
+	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
 	//"net/http"
 	//"strconv"
 )
@@ -106,49 +106,8 @@ func SetUser(value string) {
 func Connect() error {
     var err         error
 
-	[[ if eq .TD.Data.SqlType "mariadb" ]]
-	    connStr := fmt.Sprintf("%s:%s@tcp(%s:%s)", dbUser, dbPW, dbServer, dbPort)
-	    if len(dbName) > 0 {
-	        connStr += fmt.Sprintf("/%s", dbName)
-	    }
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to mariadb using: %s\n", connStr)
-        [[end]]
-        db, err = sql.Open("mysql", connStr)
-	[[ else if eq .TD.Data.SqlType "mssql" ]]
-	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
-	                            dbUser,dbPW,dbServer,dbPort,dbName)
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to mssql using: %s\n", connStr)
-        [[end]]
-	    db, err := sql.Open("mssql", connStr)
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
-	    connStr := fmt.Sprintf("%s:'%s'@%s:%s", dbUser, dbPW, dbServer, dbPort)
-	    if len(dbName) > 0 {
-	        connStr += fmt.Sprintf("/%s", dbName)
-	    }
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to mysql using: %s\n", connStr)
-        [[end]]
-        db, err = sql.Open("mysql", connStr)
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
-	    connStr := fmt.Sprintf("user=%s password='%s' host=%s port=%s ",
-	                            dbUser,dbPW,dbServer,dbPort)
-	    if len(dbName) > 0 {
-	        connStr += fmt.Sprintf("dbname='%s' ", dbName)
-	    }
-	    connStr += "sslmode=disable"
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to postgres using: %s\n", connStr)
-        [[end]]
-        db, err = sql.Open("postgres", connStr)
-	[[ else if eq .TD.Data.SqlType "sqlite" ]]
-	    connStr := fmt.Sprintf("%s", dbName)
-        [[if GenDebugging]]
-            log.Printf("\tConnecting to %s\n", connStr)
-        [[end]]
-	    db, err = sql.Open("sqlite3", connStr)
-	[[ end ]]
+	[[.TD.Data.Plugin.Plugin.GenSqlOpen]]
+
     if err != nil {
         log.Fatalln("Error: Cannot Connect: ", err)
     }
@@ -158,7 +117,7 @@ func Connect() error {
         log.Fatalln("Error: Cannot Ping: ", err)
     }
 
-    [[if .TD.Data.Plugin.CreateDB]]
+    [[if .TD.Data.Plugin.Plugin.CreateDatabase]]
         err = DatabaseCreate()
         if err != nil {
             Disconnect( )
@@ -166,7 +125,7 @@ func Connect() error {
         }
     [[end]]
 
-    [[if .TD.Data.Plugin.NeedUse]]
+    [[if .TD.Data.Plugin.Plugin.NeedUse]]
         err = DatabaseUse()
         if err != nil {
             Disconnect( )
@@ -210,7 +169,7 @@ func IsConnected() bool {
 // given database deleting the current table if
 // present.
 func DatabaseCreate() error {
-    var createSql = "[[.TD.Data.CreateSql]]"
+    var sqlStmt = "[[GenDatabaseCreateStmt .TD.Data]]"
     var err     error
 
     [[if GenDebugging]]
@@ -224,7 +183,7 @@ func DatabaseCreate() error {
         [[end]]
         return err
     }
-    _, err = db.Exec(createSql)
+    _, err = db.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
@@ -235,14 +194,14 @@ func DatabaseCreate() error {
 // DatabaseDelete deletes the table in the
 // given database if present.
 func DatabaseDelete() error {
-    var deleteSql = "[[.TD.Data.DeleteSql]]"
+    var sqlStmt = "[[GenDatabaseDeleteStmt .TD.Data]]"
     var err     error
 
     [[if GenDebugging]]
         log.Printf("DatabaseDelete()\n")
     [[end]]
 
-    _, err = db.Exec(deleteSql)
+    _, err = db.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
