@@ -23,9 +23,11 @@ definition and having them control the generation process.
 **Project Futures**:
 
 
+- [ ] Finish Table Handler Testing
+- [ ] Finish Table I/O Testing for SQLite
 - [ ] Finish MS-SQL Support
 - [ ] Finish MySQL/MariaDB Support
-- [x] Finish Postgres Support
+- [ ] Finish Postgres Support
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
 - [ ] Add **csv** save/restore per table
