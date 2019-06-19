@@ -1,0 +1,250 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+//  Struct and Methods for [[.TD.Data.TitledName]][[.Table.TitledName]]
+
+// Generated: [[Time]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
+[[- $t  := .Table]]
+[[- $tn := .Table.TitledName]]
+
+
+package [[$dn]][[$tn]]
+
+import (
+    "fmt"
+    [[if GenDebugging]]
+        "log"
+    [[end]]
+	"net/http"
+	"strconv"
+	"strings"
+	"net/url"
+)
+
+//============================================================================
+//                              Miscellaneous
+//============================================================================
+
+[[if GenDebugging]]
+func ErrorString(err error) string {
+    if err == nil {
+        return "ok"
+    } else {
+        return err.Error()
+    }
+}
+[[end]]
+
+//============================================================================
+//                              Table Struct
+//============================================================================
+
+[[$t.CreateStruct]]
+
+//----------------------------------------------------------------------------
+//                              Compare
+//----------------------------------------------------------------------------
+
+// CompareKeys compares our struct to another using keys returning the normal
+// -1, 0, 1 for less than, equal and greater than.
+func (s *[[$tn]]) CompareKeys(r *[[$tn]]) int {
+    // Accumulate the key value(s) in KeyNum order.
+    [[range $fn := $t.Keys -]]
+        [[ $f := $t.FindField $fn -]]
+            // Field: [[$f.TitledName]]
+            if s.[[$f.TitledName]] != r.[[$f.TitledName]] {
+                if s.[[$f.TitledName]] < r.[[$f.TitledName]] {
+                    return -1
+                } else {
+                    return 1
+                }
+            }
+	[[end -]]
+
+	return 0
+}
+
+//----------------------------------------------------------------------------
+//                             Empty
+//----------------------------------------------------------------------------
+
+// Empty resets the struct values to their null values.
+func (s *[[$tn]]) Empty() {
+[[if $t.HasInteger -]]
+    var i64     int64 = 0
+[[end -]]
+[[if $t.HasFloat -]]
+    var f64     float64 = 0.0
+[[end -]]
+[[if $t.HasText -]]
+    var str     string = ""
+[[end]]
+
+[[range $f := $t.Fields -]]
+    [[if $f.IsText -]]
+        s.[[$f.TitledName]] = str
+    [[else if $f.IsInteger -]]
+        s.[[$f.TitledName]] = i64
+    [[else if $f.IsFloat -]]
+        s.[[$f.TitledName]] = f64
+    [[end -]]
+[[end]]
+}
+
+//----------------------------------------------------------------------------
+//                      Keys to URL Value String
+//----------------------------------------------------------------------------
+
+// KeysToValue creates a URL Value map from the
+// the table's key(s).
+func (s *[[$tn]]) KeysToValue() string {
+    var wrk string
+
+    v := url.Values{}
+    // Accumulate the key value(s) in KeyNum order.
+    [[range $fn := $t.Keys -]]
+        [[ $f := $t.FindField $fn -]]
+            // Field: [[$f.TitledName]]
+            [[$f.GenToString "wrk" "s" -]]
+            v.Add("key", wrk)
+	[[end -]]
+
+	return v.Encode()
+}
+
+//----------------------------------------------------------------------------
+//                             List Output
+//----------------------------------------------------------------------------
+
+func (s *[[$tn]]) ListOutput() string {
+	var str strings.Builder
+    var wrk string
+
+    [[range $f := $t.Fields -]]
+        [[if $f.List -]]
+            // Field: [[$f.TitledName]]
+            str.WriteString("<td>\n")
+            [[$f.GenToString "wrk" "s" -]]
+            [[if $f.KeyNum -]]
+                {
+                    fstr := fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
+                    str.WriteString(fstr)
+                }
+            [[end -]]
+            wrk += "\n"
+            str.WriteString(wrk)
+            [[if $f.KeyNum -]]
+                str.WriteString("</a>\n" )
+            [[end -]]
+            str.WriteString("</td>\n")
+        [[end -]]
+	[[end -]]
+
+	return str.String()
+}
+
+//----------------------------------------------------------------------------
+//                  Request Form Value(s) to Struct
+//----------------------------------------------------------------------------
+
+// [[.Table.TitledName]]Request2Struct converts the form values to a struct. FormValue(s) are available
+// for both, GET and POST.  It is just that all your parameters are present in the URL if you use
+// GET.  In general, you should use POST with this function for security reasons.
+func (s *[[$tn]]) Request2Struct(r *http.Request) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].Request2Struct()\n")
+        log.Printf("\tr.FormValue: %q\n", r.Form)
+    [[end]]
+
+    [[range $f := .Table.Fields -]]
+        [[$f.GenFormValueToStruct "s" -]]
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]]Request2Struct(%+v, %s)\n", s, ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                      Set Keys from a Slice of Strings
+//----------------------------------------------------------------------------
+
+// KeysToValue creates a URL Value map from the
+// the table's key(s).
+func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
+    var i   int
+
+    if len(strs) != [[$t.KeyCount]] {
+        return fmt.Errorf("Error - Invalid key count of %d, need %d!\n", len(strs), [[$t.KeyCount]])
+    }
+    // Accumulate the key value(s) in KeyNum order.
+    [[range $fn := $t.Keys -]]
+        [[ $f := $t.FindField $fn -]]
+            [[$f.GenFromString "s" "strs[i]" -]]
+            i++
+	[[end -]]
+
+	return nil
+}
+
+//----------------------------------------------------------------------------
+//                             Test Data
+//----------------------------------------------------------------------------
+
+// TestData takes the given integer and uses it to fill most of the fields in
+// with data derived from it.
+func (s *[[$tn]]) TestData(i int) {
+    var chr     rune
+[[if $t.HasInteger -]]
+    var i64     int64
+[[end -]]
+[[if $t.HasFloat -]]
+    var f64     float64
+[[end -]]
+[[if $t.HasText -]]
+    var str     string
+[[end]]
+    if i < 27 {
+        chr = rune(65 + i)      // A
+    } else if i < 55 {
+        chr = rune(97 + i)      // a
+    } else {
+        chr = rune(65)          // A
+    }
+[[if $t.HasInteger ]]
+    i64 = int64(i)
+[[end -]]
+[[if $t.HasFloat -]]
+    f64 = float64(i)
+[[end -]]
+[[if $t.HasText -]]
+    str = string(chr)
+[[end]]
+
+    [[range $f := $t.Fields -]]
+        [[if $f.IsText -]]
+            s.[[$f.TitledName]] = str
+        [[else if $f.IsInteger -]]
+            s.[[$f.TitledName]] = i64
+        [[else if $f.IsFloat -]]
+            s.[[$f.TitledName]] = f64
+        [[end -]]
+	[[end]]
+}
+
+//----------------------------------------------------------------------------
+//                             New Struct
+//----------------------------------------------------------------------------
+
+// [[$tn]]New creates a new empty struct.
+func [[$tn]]New() *[[$tn]] {
+    return &[[$tn]]{}
+}
+
+

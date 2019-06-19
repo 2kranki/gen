@@ -396,9 +396,15 @@ func (db [[.Table.TitledName]]DB) TableCount( ) (int, error) {
         log.Printf("[[.Table.TitledName]].TableCount()\n")
     [[end]]
 
-    row := db.QueryRow(sqlStmt)
+    row, err := db.dbSql.Query(sqlStmt)
+    if err != nil {
+        return 0, err
+    }
 
 	err = row.Scan(&count)
+    if err != nil {
+        return 0, err
+    }
 
     [[if GenDebugging]]
         log.Printf("...end [[.Table.TitledName]].TableCount(%s) %d\n", ErrorString(err), count)
@@ -428,7 +434,7 @@ func (db [[.Table.TitledName]]DB) TableCreate() error {
         [[end]]
         return err
     }
-    _, err = db.Exec(sqlStmt)
+    _, err = db.dbSql.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end [[.Table.TitledName]].TableCreate(%s)\n", ErrorString(err))
@@ -450,7 +456,7 @@ func (db [[.Table.TitledName]]DB) TableDelete() error {
         log.Printf("\tSQL:\n%s\n", sqlStmt)
     [[end]]
 
-    _, err = db.Exec(sqlStmt)
+    _, err = db.dbSql.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end [[.Table.TitledName]].TableDelete(%s)\n", ErrorString(err))

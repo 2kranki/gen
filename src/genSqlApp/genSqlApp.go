@@ -179,7 +179,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"single",
 		0,
 	},
-	{"handlers_test.go.tmpl.txt",
+	{"handlers.test.go.tmpl.txt",
 		"/src/hndlr${DbName}",
 		"hndlr${DbName}_test.go",
 		"text",
@@ -187,19 +187,51 @@ var FileDefns []FileDefn = []FileDefn{
 		"single",
 		0,
 	},
+	{"table.go.tmpl.txt",
+		"/src/${DbName}${TblName}",
+		"${DbName}${TblName}.go",
+		"text",
+		0644,
+		"single",
+		2,
+	},
+	{"table.test.go.tmpl.txt",
+		"/src/${DbName}${TblName}",
+		"${DbName}${TblName}_test.go",
+		"text",
+		0644,
+		"single",
+		2,
+	},
+	{"tst.sh.txt",
+		"/src/${DbName}${TblName}",
+		"t.sh",
+		"copy",
+		0755,
+		"single",
+		2,
+	},
 	{"handlers.table.go.tmpl.txt",
-		"/src/hndlr${DbName}",
-		"${TblName}.go",
+		"/src/hndlr${DbName}${TblName}",
+		"${DbName}${TblName}.go",
 		"text",
 		0644,
 		"single",
 		2,
 	},
 	{"handlers.table.test.go.tmpl.txt",
-		"/src/hndlr${DbName}",
-		"${TblName}_test.go",
+		"/src/hndlr${DbName}${TblName}",
+		"${DbName}${TblName}_test.go",
 		"text",
 		0644,
+		"single",
+		2,
+	},
+	{"tst.sh.txt",
+		"/src/hndlr${DbName}${TblName}",
+		"t.sh",
+		"copy",
+		0755,
 		"single",
 		2,
 	},
@@ -295,10 +327,10 @@ func (t *TaskData) genFile() {
 		if err = GenTextFile(t.PathIn, t.PathOut, t); err == nil {
 			os.Chmod(t.PathOut, t.FD.FilePerms)
 			if !sharedData.Quiet() {
-				log.Printf("\tGenerated HTML from %s to %s\n", t.PathIn, t.PathOut)
+				log.Printf("\tGenerated text from %s to %s\n", t.PathIn, t.PathOut)
 			}
 		} else {
-			log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
+			log.Fatalf("Error - Generated text from %s to %s with error %s\n",
 				t.PathIn, t.PathOut, err)
 		}
 	default:
@@ -382,18 +414,20 @@ func createOutputPath(dir string, dn string, tn string, fn string) (string, erro
 		outPath += "/"
 	}
 	outPath += fn
-	if len(dn) > 0 {
-		outPath = strings.Replace(outPath, "${DbName}", strings.Title(dn), -1)
+	mapper := func(placeholderName string) string {
+		switch placeholderName {
+		case "DbName":
+			if len(dn) > 0 {
+				return strings.Title(dn)
+			}
+		case "TblName":
+			if len(tn) > 0 {
+				return strings.Title(tn)
+			}
+		}
+		return ""
 	}
-	if len(tn) > 0 {
-		outPath = strings.Replace(outPath, "${TblName}", strings.Title(tn), -1)
-	}
-	if sharedData.Debug() && strings.Contains(outPath, "${DbName}") {
-		log.Fatalf("Error: output path, %s, contains $DbName request!.  args: %q\n", outPath)
-	}
-	if sharedData.Debug() && strings.Contains(outPath, "${TblName}") {
-		log.Fatalf("Error: output path, %s, contains $TblName request!.  args: %q\n", outPath)
-	}
+	outPath = os.Expand(outPath, mapper)
 	outPath, err = util.IsPathRegularFile(outPath)
 	if err == nil {
 		if !sharedData.Replace() {
@@ -474,6 +508,16 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
+        for _, t := range tmplData.Data.Tables {
+			tmpName = path.Clean(sharedData.OutDir() + "/src/hndlr" + tmplData.Data.TitledName() + t.TitledName())
+			if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+				log.Fatalln("Error: Could not create output directory:", tmpName, err)
+			}
+			tmpName = path.Clean(sharedData.OutDir() + "/src/" + tmplData.Data.TitledName() + t.TitledName())
+			if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+				log.Fatalln("Error: Could not create output directory:", tmpName, err)
+			}
+		}
         tmpName = path.Clean(sharedData.OutDir() + "/src/io" + tmplData.Data.TitledName())
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)

@@ -1,0 +1,59 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+// Generated: [[Time]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
+[[- $t  := .Table]]
+[[- $tn := .Table.TitledName]]
+
+package [[$dn]][[$tn]]
+
+import (
+	"testing"
+)
+
+//============================================================================
+//                              Tests
+//============================================================================
+
+func TestTestData(t *testing.T) {
+    var chr         rune
+    var str         string
+    var i64         int64
+
+    t.Logf("Test.TestData()...\n")
+    i64 = 65 + 1
+    chr = rune(i64)
+    str = string(chr)
+    t.Logf("\t i64 = %d\n", i64)
+    t.Logf("\t chr = %c\n", chr)
+    t.Logf("\t str = (%d)%s\n", len(str), str)
+
+    rcd := [[$tn]]New()
+    if rcd == nil {
+        t.Fatalf("Error: Could not create rcd!\n\n\n")
+    }
+    rcd.TestData(1)
+
+    [[range $f := $t.Fields]]
+        [[if $f.IsText]]
+            if rcd.[[$f.TitledName]] != string(chr) {
+                t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of (%d)%s!\n\n\n",
+                                    len(rcd.[[$f.TitledName]]), rcd.[[$f.TitledName]])
+            }
+        [[else if $f.IsDec]]
+            if rcd.[[$f.TitledName]] != i64 {
+                t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of %d!\n\n\n", rcd.[[$f.TitledName]])
+            }
+        [[end]]
+    [[end]]
+
+
+    t.Logf("Test.TestData() - End of Test\n\n\n")
+}
+

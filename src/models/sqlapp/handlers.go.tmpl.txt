@@ -19,7 +19,6 @@ import (
     _ "os"
     "text/template"
 	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
-    //"../io[[.TD.Data.TitledName]]"
 )
 
 var tmplsDir        string

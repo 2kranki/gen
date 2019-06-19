@@ -34,7 +34,8 @@ type DbField struct {
 	KeyNum  	int	    			`json:"KeyNum,omitempty"`		// If not a key field, then 0. Otherwise, 1 for
 	//																// highest level key, 2 for 2nd highest, ...
 	Hidden		bool	    		`json:"Hidden,omitempty"`		// Do not display in the browser
-	Nullable	bool				`json:"Null,omitempty"`			// Allow NULL for this field
+	Nullable	bool				`json:"Null,omitempty"`			// Add NULL for this field
+	Unique		bool				`json:"Unique,omitempty"`		// Add UNIQUE to this field
 	Incr		bool				`json:"Incr,omitempty"`			// true == Auto Increment Field
 	SQLParms	string				`json:"SQLParms,omitempty"`		// Extra SQL Parameters
 	List		bool	    		`json:"List,omitempty"`			// Include in List Report
@@ -232,7 +233,8 @@ func (f *DbField) IsInteger() bool {
 
 func (f *DbField) IsText() bool {
 
-	if f.TypeDefn == "text" {
+	tdd := f.Typ.GoType()
+	if tdd == "string" {
 		return true
 	}
 
@@ -424,6 +426,18 @@ func (t *DbTable) HasInteger() bool {
 
 	for _, f := range t.Fields {
 		if f.IsInteger() {
+			return true
+		}
+	}
+	return false
+}
+
+// HasText returns true if any of the fields are a
+// string types
+func (t *DbTable) HasText() bool {
+
+	for _, f := range t.Fields {
+		if f.IsText() {
 			return true
 		}
 	}
