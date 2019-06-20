@@ -5,9 +5,11 @@
 // and data to interact with the SQL Database.
 
 // Generated: [[Time]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
 
-package io[[.TD.Data.TitledName]]
-[[- $n := .TD.Data.TitledName]]
+package io[[$dn]]
 
 import (
     //"fmt"
@@ -17,27 +19,27 @@ import (
 
 
 func SetupConnectParms() {
-	[[ if eq .TD.Data.SqlType "mariadb" ]]
+	[[ if eq $d.SqlType "mariadb" ]]
 		SetPort("4306")
 		SetPW("Passw0rd!")
 		SetServer("127.0.0.1")
 		SetUser("root")
-	[[ else if eq .TD.Data.SqlType  "mssql" ]]
+	[[ else if eq $d.SqlType  "mssql" ]]
 		SetPort("1401")
 		SetPW("Passw0rd!")
 		SetServer("localhost")
 		SetUser("SA")
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
+	[[ else if eq $d.SqlType "mysql" ]]
 		SetPort("3306")
 		SetPW("Passw0rd!")
 		SetServer("127.0.0.1")
 		SetUser("root")
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
+	[[ else if eq $d.SqlType "postgres" ]]
 		SetPort("5432")
 		SetPW("Passw0rd!")
 		SetServer("localhost")
 		SetUser("postgres")
-	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+	[[ else if eq $d.SqlType "sqlite" ]]
 		SetServer("test.db")
 	[[ end ]]
 }
@@ -120,7 +122,7 @@ func TestDisconnect(t *testing.T) {
 	t.Logf("TestDisconnect() - End of Test\n\n\n")
 }
 
-[[- range $t := .TD.Data.Tables ]]
+[[- range $t := $d.Tables ]]
     func Test[[$t.TitledName]]RowDelete(t *testing.T) {
         var err         error
 

@@ -12,6 +12,11 @@
 
 // Generated: [[Time]]
 [[$td := .TD]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
+[[- $t  := .Table]]
+[[- $tn := .Table.TitledName]]
 
 package io[[.TD.Data.TitledName]]
 
@@ -27,6 +32,7 @@ import (
 	_ "strconv"
     "strings"
 	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
+	"../[[$dn]][[$tn]]"
 )
 
 
@@ -34,78 +40,6 @@ import (
 //============================================================================
 //                              Miscellaneous
 //============================================================================
-
-[[.Table.CreateStruct]]
-
-//----------------------------------------------------------------------------
-//                             List Output
-//----------------------------------------------------------------------------
-
-func (s [[.Table.TitledName]]) ListOutput() string {
-	var str strings.Builder
-    var wrk string
-
-    [[$t := .Table]]
-    [[range $f := .Table.Fields]]
-        [[if $f.List]]
-            // Field: [[$f.TitledName]]
-            str.WriteString("<td>\n")
-            [[$f.GenToString "wrk" "s"]]
-            [[if $f.KeyNum]]
-                {
-                    fstr := fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
-                    str.WriteString(fstr)
-                }
-            [[end]]
-            wrk += "\n"
-            str.WriteString(wrk)
-            [[if $f.KeyNum]]
-                str.WriteString("</a>\n" )
-            [[end]]
-            str.WriteString("</td>\n")
-        [[end]]
-	[[end]]
-
-	return str.String()
-}
-
-//----------------------------------------------------------------------------
-//                             Test Data
-//----------------------------------------------------------------------------
-
-func (s [[.Table.TitledName]]) TestData(i int) {
-    var chr     rune
-
-    if i < 27 {
-        chr = rune(65 + i)      // A
-    } else if i < 55 {
-        chr = rune(97 + i)      // a
-    } else {
-        chr = rune(65)          // A
-    }
-
-    [[$t := .Table]]
-    [[range $f := .Table.Fields]]
-        [[if $f.IsText]]
-            s.[[$f.TitledName]] = string(chr)
-        [[else if $f.IsDec]]
-            s.[[$f.TitledName]] = int64(i)
-        [[else if $f.IsFloat]]
-            s.[[$f.TitledName]] = Float64(i)
-        [[end]]
-	[[end]]
-
-}
-
-//----------------------------------------------------------------------------
-//                             New Struct
-//----------------------------------------------------------------------------
-
-// [[.Table.TitledName]]New creates a new empty struct.
-func [[.Table.TitledName]]New() *[[.Table.TitledName]] {
-    return &[[.Table.TitledName]]{}
-}
-
 
 //============================================================================
 //                            [[.Table.TitledName]]DB
@@ -120,7 +54,7 @@ type [[.Table.TitledName]]DB struct {
 //----------------------------------------------------------------------------
 
 // RowDelete deletes the row with keys from the provided record, rcd.
-func (db [[.Table.TitledName]]DB) RowDelete(rcd *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowDeleteStmt .Table]]"
 
@@ -148,7 +82,7 @@ func (db [[.Table.TitledName]]DB) RowDelete(rcd *[[.Table.TitledName]]) error {
 
 // RowFind searches the Database for a matching row for the keys found in
 // the given record and returns the output in that same record.
-func (db [[.Table.TitledName]]DB) RowFind(rcd *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt     = "[[GenRowFindStmt .Table]]"
 
@@ -180,7 +114,7 @@ func (db [[.Table.TitledName]]DB) RowFind(rcd *[[.Table.TitledName]]) error {
 // RowFirst returns the first row in the table, [[.Table.TitledName]].
 // If there are no rows in the table, then a blank/null record is returned
 // without error.
-func (db [[.Table.TitledName]]DB) RowFirst(rcd *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowFirstStmt .Table]]"
 
@@ -208,7 +142,7 @@ func (db [[.Table.TitledName]]DB) RowFirst(rcd *[[.Table.TitledName]]) error {
 //                             Row Insert
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowInsert(d *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
@@ -237,7 +171,7 @@ func (db [[.Table.TitledName]]DB) RowInsert(d *[[.Table.TitledName]]) error {
 //                             Row Last
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowLast(rcd *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowLastStmt .Table]]"
 
@@ -267,7 +201,7 @@ func (db [[.Table.TitledName]]DB) RowLast(rcd *[[.Table.TitledName]]) error {
 
 // RowNext returns the next row from the row given. If row after the current
 // one does not exist, then the first row is returned.
-func (db [[.Table.TitledName]]DB) RowNext(rcd *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowNextStmt .Table]]"
 
@@ -296,10 +230,10 @@ func (db [[.Table.TitledName]]DB) RowNext(rcd *[[.Table.TitledName]]) error {
 // 'offset' is the offset into the result set ordered by the main index. Both
 // 'limit' and 'offset' are relative to 1. We return an address to the array
 // rows (structs) so that we don't have the overhead of copying them everwhere.
-func (db [[.Table.TitledName]]DB) RowPage(offset int, limit int) ([][[.Table.TitledName]], error) {
+func (db [[.Table.TitledName]]DB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
     var err         error
     var sqlStmt = "[[GenRowPageStmt .Table]]"
-    data := [][[.Table.TitledName]]{}
+    data := [][[$dn]][[$tn]].[[$tn]]{}
 
     [[if GenDebugging]]
         log.Printf("[[.Table.TitledName]].RowPage(%d,%d)\n",offset,limit)
@@ -331,7 +265,7 @@ func (db [[.Table.TitledName]]DB) RowPage(offset int, limit int) ([][[.Table.Tit
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowPrev(rcd *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowPrevStmt .Table]]"
 
@@ -357,7 +291,7 @@ func (db [[.Table.TitledName]]DB) RowPrev(rcd *[[.Table.TitledName]]) error {
 //                             Row Update
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowUpdate(d *[[.Table.TitledName]]) error {
+func (db [[.Table.TitledName]]DB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 

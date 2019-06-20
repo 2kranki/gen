@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2ab8454-5cac-44c2-8c87-7804cbe075e4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,7 +18,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="132">
+            <state relative-caret-position="2250">
               <caret line="137" column="31" selection-start-line="137" selection-start-column="18" selection-end-line="137" selection-end-column="31" />
             </state>
           </provider>
@@ -39,35 +39,44 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="197" column="35" selection-start-line="197" selection-start-column="35" selection-end-line="197" selection-end-column="35" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="753" column="31" lean-forward="true" selection-start-line="753" selection-start-column="31" selection-end-line="753" selection-end-column="31" />
+            <state relative-caret-position="-925">
+              <caret line="92" column="19" selection-start-line="92" selection-start-column="19" selection-end-line="92" selection-end-column="19" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.go.tmpl.txt">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="235">
-              <caret line="99" column="10" selection-start-line="99" selection-start-column="10" selection-end-line="99" selection-end-column="10" />
+            <state relative-caret-position="277">
+              <caret line="680" column="41" selection-start-line="680" selection-start-column="41" selection-end-line="680" selection-end-column="41" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-639">
-              <caret line="150" column="43" selection-start-line="150" selection-start-column="43" selection-end-line="150" selection-end-column="43" />
+            <state relative-caret-position="-2390">
+              <caret line="36" column="20" selection-start-line="36" selection-start-column="20" selection-end-line="36" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="342">
+              <caret line="19" selection-start-line="14" selection-end-line="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1944">
+              <caret line="108" column="39" selection-start-line="108" selection-start-column="39" selection-end-line="108" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -95,7 +104,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/models/sqlapp/menu.html.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/mainExec.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbData/dbData_test.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin_test.go" />
@@ -134,18 +142,19 @@
         <option value="$PROJECT_DIR$/src/models/sqlapp/form.html.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.tmpl.txt" />
-        <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers_test.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/table..test.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/table.test.go.tmpl.txt" />
-        <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/fakedb.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" />
-        <option value="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.go.tmpl.txt" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" />
       </list>
     </option>
   </component>
@@ -170,7 +179,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -301,6 +309,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -344,7 +353,7 @@
     <frame x="88" y="81" width="1520" height="963" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4981774" visible="true" weight="0.22888283" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4981774" visible="true" weight="0.23228882" />
       <window_info id="Structure" order="1" sideWeight="0.5018226" side_tool="true" weight="0.22547685" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -652,33 +661,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1944">
-          <caret line="108" column="39" selection-start-line="108" selection-start-column="39" selection-end-line="108" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.tmpl.txt" />
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="402" lean-forward="true" selection-start-line="402" selection-end-line="402" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers_test.go.tmpl.txt" />
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.go.tmpl.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="283">
           <caret line="25" lean-forward="true" selection-start-line="24" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="85" column="34" lean-forward="true" selection-start-line="85" selection-start-column="22" selection-end-line="85" selection-end-column="34" />
         </state>
       </provider>
     </entry>
@@ -691,6 +679,20 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/fakedb.go.tmpl.txt" />
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.test.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="32" selection-start-line="9" selection-start-column="32" selection-end-line="9" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2250">
+          <caret line="137" column="31" selection-start-line="137" selection-start-column="18" selection-end-line="137" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4158">
@@ -701,38 +703,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.test.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="32" selection-start-line="9" selection-start-column="32" selection-end-line="9" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-639">
+        <state relative-caret-position="2700">
           <caret line="150" column="43" selection-start-line="150" selection-start-column="43" selection-end-line="150" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="753" column="31" lean-forward="true" selection-start-line="753" selection-start-column="31" selection-end-line="753" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="137" column="31" selection-start-line="137" selection-start-column="18" selection-end-line="137" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="197" column="35" selection-start-line="197" selection-start-column="35" selection-end-line="197" selection-end-column="35" />
         </state>
       </provider>
     </entry>
@@ -740,6 +714,41 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="235">
           <caret line="99" column="10" selection-start-line="99" selection-start-column="10" selection-end-line="99" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1944">
+          <caret line="108" column="39" selection-start-line="108" selection-start-column="39" selection-end-line="108" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="19" selection-start-line="14" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2390">
+          <caret line="36" column="20" selection-start-line="36" selection-start-column="20" selection-end-line="36" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-925">
+          <caret line="92" column="19" selection-start-line="92" selection-start-column="19" selection-end-line="92" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="680" column="41" selection-start-line="680" selection-start-column="41" selection-end-line="680" selection-end-column="41" />
         </state>
       </provider>
     </entry>

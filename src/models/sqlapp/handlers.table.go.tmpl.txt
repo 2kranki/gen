@@ -35,73 +35,6 @@ var Tmpls           *template.Template
 
 
 //============================================================================
-//                             Database Interfaces
-//============================================================================
-
-type DbRowDeleter interface {
-    // RowDelete deletes the row with keys from the provided record, rcd.
-    RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowFinder interface {
-    // RowFind searches the Database for a matching row for the keys found in
-    // the given record and returns the output in that same record.
-    RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowFirster interface {
-    // RowFirst returns the first row in the table, [[$tn]].
-    // If there are no rows in the table, then a blank/null record is returned
-    // without error.
-    RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowInserter interface {
-    RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowLaster interface {
-    // RowLast returns the last row in the table, [[$tn]].
-    // If there are no rows in the table, then a blank/null record is returned
-    // without error.
-    RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowNexter interface {
-    // RowNext returns the next row from the row given. If row after the current
-    // one does not exist, then the first row is returned.
-    RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowPager interface {
-    // RowPage returns a page of rows where a page size is the 'limit' parameter and
-    // 'offset' is the offset into the result set ordered by the main index. Both
-    // 'limit' and 'offset' are relative to 1. We return an address to the array
-    // rows (structs) so that we don't have the overhead of copying them everwhere.
-    RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error)
-}
-
-type DbRowPrever interface {
-    RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbRowUpdater interface {
-    RowUpdate(rcd *[[$dn]][[$tn]].[[$tn]]) error
-}
-
-type DbTableCounter interface {
-    TableCount() (int, error)
-}
-
-type DbTableCreater interface {
-    TableCreate() error
-}
-
-type DbTableDeleter interface {
-    TableDelete() error
-}
-
-//============================================================================
 //                              Miscellaneous
 //============================================================================
 
@@ -221,7 +154,7 @@ func (h Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
-    var counter DbTableCounter
+    var counter [[$dn]][[$tn]].DbTableCounter
     var ok      bool
 
     [[if GenDebugging]]
@@ -235,7 +168,7 @@ func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if counter, ok = h.db.(DbTableCounter); !ok {
+    if counter, ok = h.db.([[$dn]][[$tn]].DbTableCounter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -270,7 +203,7 @@ func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
     var cTable  int
-    var counter DbTableCounter
+    var counter [[$dn]][[$tn]].DbTableCounter
     var ok      bool
 
     [[if GenDebugging]]
@@ -284,7 +217,7 @@ func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if counter, ok = h.db.(DbTableCounter); !ok {
+    if counter, ok = h.db.([[$dn]][[$tn]].DbTableCounter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -321,7 +254,7 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
     var offset  int
     var begin   int
     var cTable  int
-    var counter DbTableCounter
+    var counter [[$dn]][[$tn]].DbTableCounter
     var ok      bool
 
     [[if GenDebugging]]
@@ -335,7 +268,7 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if counter, ok = h.db.(DbTableCounter); !ok {
+    if counter, ok = h.db.([[$dn]][[$tn]].DbTableCounter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -426,8 +359,8 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     var err     error
     var keys    []string
     var rcd     [[$dn]][[$tn]].[[$tn]]
-    var deleter DbRowDeleter
-    var nexter  DbRowNexter
+    var deleter [[$dn]][[$tn]].DbRowDeleter
+    var nexter  [[$dn]][[$tn]].DbRowNexter
     var ok      bool
 
     [[if GenDebugging]]
@@ -440,11 +373,11 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if deleter, ok = h.db.(DbRowDeleter); !ok {
+    if deleter, ok = h.db.([[$dn]][[$tn]].DbRowDeleter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if nexter, ok = h.db.(DbRowNexter); !ok {
+    if nexter, ok = h.db.([[$dn]][[$tn]].DbRowNexter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -575,8 +508,8 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     var err     error
     var keys    []string
     var rcd     [[$dn]][[$tn]].[[$tn]]
-    var finder  DbRowFinder
-    var firster DbRowFirster
+    var finder  [[$dn]][[$tn]].DbRowFinder
+    var firster [[$dn]][[$tn]].DbRowFirster
     var ok      bool
 
     [[if GenDebugging]]
@@ -589,11 +522,11 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if finder, ok = h.db.(DbRowFinder); !ok {
+    if finder, ok = h.db.([[$dn]][[$tn]].DbRowFinder); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if firster, ok = h.db.(DbRowFirster); !ok {
+    if firster, ok = h.db.([[$dn]][[$tn]].DbRowFirster); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -656,7 +589,7 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
     var rcd     [[$dn]][[$tn]].[[$tn]]
     var err     error
-    var firster DbRowFirster
+    var firster [[$dn]][[$tn]].DbRowFirster
     var ok      bool
 
     [[if GenDebugging]]
@@ -670,7 +603,7 @@ func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if firster, ok = h.db.(DbRowFirster); !ok {
+    if firster, ok = h.db.([[$dn]][[$tn]].DbRowFirster); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -730,8 +663,8 @@ func (h Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
-    var inserter    DbRowInserter
-    var laster      DbRowLaster
+    var inserter    [[$dn]][[$tn]].DbRowInserter
+    var laster      [[$dn]][[$tn]].DbRowLaster
     var ok          bool
 
     [[if GenDebugging]]
@@ -741,11 +674,11 @@ func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if inserter, ok = h.db.(DbRowInserter); !ok {
+    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if laster, ok = h.db.(DbRowLaster); !ok {
+    if laster, ok = h.db.([[$dn]][[$tn]].DbRowLaster); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -783,7 +716,7 @@ func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
-    var laster      DbRowLaster
+    var laster      [[$dn]][[$tn]].DbRowLaster
     var ok          bool
 
     [[if GenDebugging]]
@@ -796,7 +729,7 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if laster, ok = h.db.(DbRowLaster); !ok {
+    if laster, ok = h.db.([[$dn]][[$tn]].DbRowLaster); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -829,7 +762,7 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
     var key         string
-    var nexter      DbRowNexter
+    var nexter      [[$dn]][[$tn]].DbRowNexter
     var ok          bool
 
     [[if GenDebugging]]
@@ -839,7 +772,7 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if nexter, ok = h.db.(DbRowNexter); !ok {
+    if nexter, ok = h.db.([[$dn]][[$tn]].DbRowNexter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -883,7 +816,7 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
     var key         string
-    var prever      DbRowPrever
+    var prever      [[$dn]][[$tn]].DbRowPrever
     var ok          bool
 
     [[if GenDebugging]]
@@ -893,7 +826,7 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if prever, ok = h.db.(DbRowPrever); !ok {
+    if prever, ok = h.db.([[$dn]][[$tn]].DbRowPrever); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -936,8 +869,8 @@ func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
     var rcd         [[$dn]][[$tn]].[[$tn]]
-    var finder      DbRowFinder
-    var firster     DbRowFirster
+    var finder      [[$dn]][[$tn]].DbRowFinder
+    var firster     [[$dn]][[$tn]].DbRowFirster
     var ok          bool
 
     [[if GenDebugging]]
@@ -950,11 +883,11 @@ func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if finder, ok = h.db.(DbRowFinder); !ok {
+    if finder, ok = h.db.([[$dn]][[$tn]].DbRowFinder); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if firster, ok = h.db.(DbRowFirster); !ok {
+    if firster, ok = h.db.([[$dn]][[$tn]].DbRowFirster); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -997,8 +930,8 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
     var rcd         [[$dn]][[$tn]].[[$tn]]
-    var deleter     DbRowDeleter
-    var inserter    DbRowInserter
+    var deleter     [[$dn]][[$tn]].DbRowDeleter
+    var inserter    [[$dn]][[$tn]].DbRowInserter
     var ok          bool
 
     [[if GenDebugging]]
@@ -1008,11 +941,11 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if deleter, ok = h.db.(DbRowDeleter); !ok {
+    if deleter, ok = h.db.([[$dn]][[$tn]].DbRowDeleter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if inserter, ok = h.db.(DbRowInserter); !ok {
+    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -1078,7 +1011,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
 // TableCreate creates the table deleting any current ones.
 func (h Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var creater     DbTableCreater
+    var creater     [[$dn]][[$tn]].DbTableCreater
     var ok          bool
 
     [[if GenDebugging]]
@@ -1088,7 +1021,7 @@ func (h Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if creater, ok = h.db.(DbTableCreater); !ok {
+    if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -1118,8 +1051,8 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     var fileIn      multipart.File
     var cnt         int
     var maxMem      int64
-    var inserter    DbRowInserter
-    var creater     DbTableCreater
+    var inserter    [[$dn]][[$tn]].DbRowInserter
+    var creater     [[$dn]][[$tn]].DbTableCreater
     var ok          bool
 
     [[if GenDebugging]]
@@ -1129,11 +1062,11 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if inserter, ok = h.db.(DbRowInserter); !ok {
+    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if creater, ok = h.db.(DbTableCreater); !ok {
+    if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
@@ -1223,8 +1156,8 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var err         error
     var rcd         [[$dn]][[$tn]].[[$tn]]
-    var inserter    DbRowInserter
-    var creater     DbTableCreater
+    var inserter    [[$dn]][[$tn]].DbRowInserter
+    var creater     [[$dn]][[$tn]].DbTableCreater
     var ok          bool
 
     [[if GenDebugging]]
@@ -1234,11 +1167,11 @@ func (h Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if inserter, ok = h.db.(DbRowInserter); !ok {
+    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
-    if creater, ok = h.db.(DbTableCreater); !ok {
+    if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }

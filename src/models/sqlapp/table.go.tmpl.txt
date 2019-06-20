@@ -39,6 +39,73 @@ func ErrorString(err error) string {
 [[end]]
 
 //============================================================================
+//                             Database Interfaces
+//============================================================================
+
+type DbRowDeleter interface {
+    // RowDelete deletes the row with keys from the provided record, rcd.
+    RowDelete(rcd *[[$tn]]) error
+}
+
+type DbRowFinder interface {
+    // RowFind searches the Database for a matching row for the keys found in
+    // the given record and returns the output in that same record.
+    RowFind(rcd *[[$tn]]) error
+}
+
+type DbRowFirster interface {
+    // RowFirst returns the first row in the table, [[$tn]].
+    // If there are no rows in the table, then a blank/null record is returned
+    // without error.
+    RowFirst(rcd *[[$tn]]) error
+}
+
+type DbRowInserter interface {
+    RowInsert(rcd *[[$tn]]) error
+}
+
+type DbRowLaster interface {
+    // RowLast returns the last row in the table, [[$tn]].
+    // If there are no rows in the table, then a blank/null record is returned
+    // without error.
+    RowLast(rcd *[[$tn]]) error
+}
+
+type DbRowNexter interface {
+    // RowNext returns the next row from the row given. If row after the current
+    // one does not exist, then the first row is returned.
+    RowNext(rcd *[[$tn]]) error
+}
+
+type DbRowPager interface {
+    // RowPage returns a page of rows where a page size is the 'limit' parameter and
+    // 'offset' is the offset into the result set ordered by the main index. Both
+    // 'limit' and 'offset' are relative to 1. We return an address to the array
+    // rows (structs) so that we don't have the overhead of copying them everwhere.
+    RowPage(offset int, limit int) ([][[$tn]], error)
+}
+
+type DbRowPrever interface {
+    RowPrev(rcd *[[$tn]]) error
+}
+
+type DbRowUpdater interface {
+    RowUpdate(rcd *[[$tn]]) error
+}
+
+type DbTableCounter interface {
+    TableCount() (int, error)
+}
+
+type DbTableCreater interface {
+    TableCreate() error
+}
+
+type DbTableDeleter interface {
+    TableDelete() error
+}
+
+//============================================================================
 //                              Table Struct
 //============================================================================
 
