@@ -17,374 +17,204 @@ import (
 	"../[[$dn]][[$tn]]"
     "fmt"
     "io/ioutil"
-    "log"
     "net/http"
     "net/http/httptest"
-    //"net/url"
-    "sort"
     "strings"
 	"testing"
 )
 
 //============================================================================
-//                              Fake DB
+//                              Test Data
 //============================================================================
 
-type FakeDB struct {
-    rcds        map[string][[$dn]][[$tn]].[[$tn]]
-    errorOut    bool
-}
-
-func (db *FakeDB) SetErrorOut(f bool) {
-    db.errorOut = f
+type TestData struct {
+    T           *testing.T
+    Fdb         *FakeDB
+    H           *Handlers
+    Mux         *http.ServeMux
+    w           *httptest.ResponseRecorder
+    Req         *http.Request
+    Resp        *http.Response
 }
 
 //----------------------------------------------------------------------------
-//                             Row Delete
+//                            Check Status Code
 //----------------------------------------------------------------------------
 
-// RowDelete deletes the row with keys from the provided record, rcd.
-func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
-    var err         error
-    var ok          bool
+// CheckStatus checks the request status code for a specific status.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) CheckStatus(status int) {
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowDelete()\n")
+        td.T.Logf("[[$tn]].CheckStatus()\n")
     [[end]]
+    if td.Resp == nil {
+        td.T.Fatalf("Error: Missing HTTP Response\n")
+    }
 
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        key := rcd.KeysToValue()
-        log.Printf("\tkey: (%d)%s\n", len(key), key)
-        if *rcd, ok = db.rcds[key]; !ok {
-            err = fmt.Errorf("Error - Record Not Found!\n")
-        }
-        delete(db.rcds, key)
+    if td.Resp.StatusCode != status {
+        td.T.Fatalf("Error: Invalid Status Code of %d, needed %d\n", td.Resp.StatusCode, status)
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowDelete(%s)\n", ErrorString(err))
+        td.T.Logf("...end [[$tn]].Setup\n")
     [[end]]
-	return err
 }
 
 //----------------------------------------------------------------------------
-//                             Row Find
+//                              GET Request
 //----------------------------------------------------------------------------
 
-// RowFind searches the Database for a matching row for the keys found in
-// the given record and returns the output in that same record.
-func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
-    var err         error
-    var ok          bool
+// GetReq initializes the http.Request for a GET.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) GetReq(target string, body string) {
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowFind(%+v)\n", rcd)
+        td.T.Logf("[[$tn]].Setup()\n")
     [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        key := rcd.KeysToValue()
-        log.Printf("\tkey: (%d)%s\n", len(key), key)
-        if *rcd, ok = db.rcds[key]; !ok {
-            err = fmt.Errorf("Error - Record Not Found!\n")
-        }
+    if target == "" {
+        td.T.Fatalf("Error: Missing Target String\n")
     }
 
+    td.Req = httptest.NewRequest(http.MethodGet, target, strings.NewReader(body))
+    td.ServeHttp()          // Perform the test through the mux.
+
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowFind(%s)\n", ErrorString(err))
+        td.T.Logf("...end [[$tn]].Setup\n")
     [[end]]
-	return err
 }
 
 //----------------------------------------------------------------------------
-//                             Row First
+//                            POST Request
 //----------------------------------------------------------------------------
 
-// RowFirst returns the first row in the table, [[$tn]].
-// If there are no rows in the table, then a blank/null record is returned
-// without error.
-func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
-    var err         error
-    var keys        []string
+// SetupPostReq initializes the http.Request for a POST.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) PostReq(target string, body string) {
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowFirst()\n")
+        td.T.Logf("[[$tn]].Setup()\n")
     [[end]]
 
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        for key := range db.rcds {
-            keys = append(keys, key)
-        }
-        sort.Strings(keys)
-        if len(keys) > 0 {
-            *rcd = db.rcds[keys[0]]
-        } else {
-            rcd.Empty()
-        }
+    td.Req = httptest.NewRequest(http.MethodPost, target, strings.NewReader(body))
+    td.Req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+    td.ServeHttp()          // Perform the test through the mux.
+
+    [[if GenDebugging]]
+        td.T.Logf("...end [[$tn]].Setup\n")
+    [[end]]
+}
+
+//----------------------------------------------------------------------------
+//                            Response Body
+//----------------------------------------------------------------------------
+
+// ResponseBody returns the response body converted to a string.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) ResponseBody() string {
+    var str     string
+
+    [[if GenDebugging]]
+        td.T.Logf("[[$tn]].ResponseBody()\n")
+    [[end]]
+    if td.Resp == nil {
+        td.T.Fatalf("Error: Missing HTTP Response\n")
     }
 
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowFirst(%s)\n", ErrorString(err))
-    [[end]]
-	return err
-}
-
-//----------------------------------------------------------------------------
-//                             Row Insert
-//----------------------------------------------------------------------------
-
-func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
-    var err         error
-
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowInsert(%+v)\n", rcd)
-    [[end]]
-
-    // Validate the input record.
-
-    // Add it to the table.
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        key := rcd.KeysToValue()
-        log.Printf("\tkey: (%d)%s\n", len(key), key)
-        db.rcds[key] = *rcd
+    body, err := ioutil.ReadAll(td.Resp.Body)
+    if err != nil {
+        td.T.Fatal(err)
     }
+    str = string(body)
+    td.T.Logf("\tResponse Body: %s\n", body)
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowInsert(%s)\n", ErrorString(err))
+        td.T.Logf("...end [[$tn]].ResponseBody\n")
     [[end]]
-	return err
+    return str
 }
 
 //----------------------------------------------------------------------------
-//                             Row Last
+//                             Serve HTTP
 //----------------------------------------------------------------------------
 
-func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
-    var err         error
-    var keys        []string
+// ServeHttp executes the handler through the mux.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) ServeHttp( ) {
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowLast(%+v)\n", rcd)
+        td.T.Logf("[[$tn]].ServeHttp()\n")
     [[end]]
 
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        for key := range db.rcds {
-            keys = append(keys, key)
-        }
-        sort.Strings(keys)
-        if len(keys) > 0 {
-            *rcd = db.rcds[keys[len(keys)-1]]
-        }
-    }
+    td.w = httptest.NewRecorder()
+    td.Mux.ServeHTTP(td.w, td.Req)
+    td.Resp = td.w.Result()
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowLast(%s)\n", ErrorString(err))
+        td.T.Logf("...end [[$tn]].ServeHttp\n")
     [[end]]
-	return err
 }
 
 //----------------------------------------------------------------------------
-//                             Row Next
+//                             Set up
 //----------------------------------------------------------------------------
 
-// RowNext returns the next row from the row given. If row after the current
-// one does not exist, then the first row is returned.
-func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+// Setup initializes the Test Data.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) Setup(t *testing.T) {
+
+    td.T = t
+    td.SetupFakeDB()
+    td.SetupHandlers()
+
+}
+
+//----------------------------------------------------------------------------
+//                             Set up FakeDB
+//----------------------------------------------------------------------------
+
+// SetupFakeDB initializes the FakeDB with 2 records.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) SetupFakeDB( ) {
     var err         error
-    var keys        []string
-    var i           int
+    var rcd         [[$dn]][[$tn]].[[$tn]]
 
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowNext(%+v)\n", rcd)
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
+    td.Fdb = &FakeDB{rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false,}
+    if td.Fdb == nil {
+        td.T.Fatalf("Error: Unable to allocate FakeDB!\n")
     } else {
-        var wrkRcd  [[$dn]][[$tn]].[[$tn]]
-        for key := range db.rcds {
-            keys = append(keys, key)
-        }
-        sort.Strings(keys)
-        if len(keys) > 0 {
-            for i=0; i<len(keys); i++ {
-                wrkRcd = db.rcds[ keys[i] ]
-                j := rcd.CompareKeys(&wrkRcd)
-                if j > 0 {
-                    break
-                }
+        for i:=0; i<2; i++ {
+            rcd.TestData(i)
+            err = td.Fdb.RowInsert(&rcd)
+            if err != nil {
+                td.T.Fatalf("Error: Insert %d Failed: %s \n", i, ErrorString(err))
             }
-            if i < len(db.rcds) {
-                *rcd = db.rcds[ keys[i] ]
-            } else {
-                err = fmt.Errorf("Error - Record Not Found!\n")
-            }
-        } else {
-            err = fmt.Errorf("Error - Empty Database!\n")
         }
     }
 
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowNext(%s)\n", ErrorString(err))
-    [[end]]
-	return err
 }
 
 //----------------------------------------------------------------------------
-//                             Row Page
+//                             Set up Handlers
 //----------------------------------------------------------------------------
 
-// RowPage returns a page of rows where a page size is the 'limit' parameter and
-// 'offset' is the offset into the result set ordered by the main index. Both
-// 'limit' and 'offset' are relative to 1. We return an address to the array
-// rows (structs) so that we don't have the overhead of copying them everwhere.
-func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
-    var err         error
+// SetupHandlers initializes HTTP Test Handlers.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *TestData) SetupHandlers( ) {
 
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowPage(%d,%d)\n",offset,limit)
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        err = fmt.Errorf("Error - Not Implemented!\n")
+    // Set up the Handler object.
+    td.H = &Handlers{db:td.Fdb, rowsPerPage:2}
+    if td.H == nil {
+        td.T.Fatalf("Error: Unable to allocate Handlers\n")
     }
 
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowPage(%s)\n", ErrorString(err))
-    [[end]]
-    return nil, err
-}
-
-//----------------------------------------------------------------------------
-//                             Row Prev
-//----------------------------------------------------------------------------
-
-func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
-    var err         error
-
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowPrev(%+v)\n", rcd)
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        err = fmt.Errorf("Error - Not Implemented!\n")
+    // Now set up the Server mux for the test.
+    td.Mux = http.NewServeMux()
+    if td.Mux == nil {
+        td.T.Fatalf("Error: Unable to allocate HTTP mux\n")
     }
+    td.H.SetupHandlers(td.Mux)
 
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowPrev(%s)\n", ErrorString(err))
-    [[end]]
-    return err
-}
-
-//----------------------------------------------------------------------------
-//                             Row Update
-//----------------------------------------------------------------------------
-
-func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBRowUpdate(%+v)\n", d)
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        err = fmt.Errorf("Error - Not Implemented!\n")
-    }
-
-
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowUpdate(%s)\n", ErrorString(err))
-    [[end]]
-	return err
-}
-
-
-//----------------------------------------------------------------------------
-//                             Table Count
-//----------------------------------------------------------------------------
-
-func (db FakeDB) TableCount( ) (int, error) {
-    var err         error
-    var count       int
-
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBTableCount()\n")
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        count = len(db.rcds)
-    }
-
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBTableCount(%s) %d\n", ErrorString(err), count)
-    [[end]]
-    return count, err
-}
-
-//----------------------------------------------------------------------------
-//                             Table Create
-//----------------------------------------------------------------------------
-
-// TableCreate creates the table in the given database deleting the current
-// table if present.
-func (db FakeDB) TableCreate() error {
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBTableCreate()\n")
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        err = fmt.Errorf("Error - Not Implemented!\n")
-    }
-
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBTableCreate(%s)\n", ErrorString(err))
-    [[end]]
-    return err
-}
-
-//----------------------------------------------------------------------------
-//                             Table Delete
-//----------------------------------------------------------------------------
-
-// TableDelete deletes the table in the given database if present.
-func (db FakeDB) TableDelete() error {
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("[[$tn]].DBTableDelete()\n")
-    [[end]]
-
-    if db.errorOut {
-        err = fmt.Errorf("Error - Error Out!\n")
-    } else {
-        err = fmt.Errorf("Error - Not Implemented!\n")
-    }
-
-    [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBTableDelete(%s)\n", ErrorString(err))
-    [[end]]
-    return err
 }
 
 //============================================================================
@@ -392,37 +222,29 @@ func (db FakeDB) TableDelete() error {
 //============================================================================
 
 //----------------------------------------------------------------------------
-//                          FakeDB First/Next
+//                          FakeDB
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]DBFirstNext(t *testing.T) {
+func Test[[$tn]]FakeDB(t *testing.T) {
     var err         error
-    var fdb         *FakeDB
+    var td          *TestData
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var rcd2        [[$dn]][[$tn]].[[$tn]]
 
-    t.Logf("Test[[$tn]].DBFirstNext()...\n")
-    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    t.Logf("\tAdding test records...\n")
-    for i:=0; i<20; i++ {
-        rcd.TestData(i)
-        err = fdb.RowInsert(&rcd)
-        if err == nil {
-            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
-        }
-    }
+    t.Logf("Test[[$tn]].FakeDB()...\n")
+    td = &TestData{}
+    td.Setup(t)
 
-    // Now check first.
-    err = fdb.RowFirst(&rcd2)
+    t.Logf("\tChecking First()...\n")
+    if err = td.Fdb.RowFirst(&rcd2); err != nil {
+        t.Fatalf("Error - Read First failed: %s\n", err.Error())
+    }
     rcd.TestData(0)
     if 0 != rcd.CompareKeys(&rcd2) {
-        t.Errorf("Error - First did not work, need A, got %q\n", rcd2)
+        t.Fatalf("Error - First did not work, need A, got %q\n", rcd2)
     }
 
-    t.Logf("Test[[$tn]].DBFirstNext() - End of Test\n\n\n")
+    t.Logf("Test[[$tn]].FakeDB() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
@@ -431,25 +253,18 @@ func Test[[$tn]]DBFirstNext(t *testing.T) {
 
 func Test[[$tn]]ListIndex(t *testing.T) {
     var err         error
-    var fdb         *FakeDB
-    var h           *Handlers
+    var td          *TestData
 
-    t.Logf("Test[[$tn]].HndlrIndex()...\n")
-    fdb = &FakeDB{}
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
+    t.Logf("Test[[$tn]].HndlrListIndex()...\n")
+    td = &TestData{}
+    td.Setup(t)
 
     //TODO: err = db.Ping()
     if err != nil {
         t.Fatalf("Error: Cannot connect: %s\n", err.Error())
     }
 
-    t.Logf("Test[[$tn]].HndlrIndex() - End of Test\n\n\n")
+    t.Logf("Test[[$tn]].HndlrListIndex() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
@@ -457,29 +272,13 @@ func Test[[$tn]]ListIndex(t *testing.T) {
 //----------------------------------------------------------------------------
 
 func TestListShow(t *testing.T) {
-    var fdb         *FakeDB
-    var h           *Handlers
-    //TODO: var rcd         [[$dn]][[$tn]].[[$tn]]
-    //TODO: var w           *httptest.ResponseRecorder
+    var td          *TestData
 
     t.Logf("TestListShow()...\n")
-    fdb = &FakeDB{}
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
-    //TODO: w = httptest.NewRecorder()
+    td = &TestData{}
+    td.Setup(t)
 
     // First try a blank record.
-    //TODO: h.ListShow(w, &rcd, "")
-    //TODO: resp := w.Result()
-    // fmt.Println(resp.StatusCode)
-    // fmt.Println(resp.Header.Get("Content-Type"))
-    //TODO: body, _ := ioutil.ReadAll(resp.Body)
-    //TODO: t.Logf("Output:\n%s\n\n\n", string(body))
 
     t.Logf("TestListShow() - End of Test\n\n\n")
 }
@@ -490,77 +289,73 @@ func TestListShow(t *testing.T) {
 
 func TestRowDelete(t *testing.T) {
     var err         error
-    var fdb         *FakeDB
-    var h           *Handlers
+    var td          *TestData
     var rcd         [[$dn]][[$tn]].[[$tn]]
-    var mux         *http.ServeMux
-    var w           *httptest.ResponseRecorder
-    var resp        *http.Response
     expectedBody    := ""
 
     t.Logf("TestRowDelete()...\n")
-    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    t.Logf("\tAdding test records...\n")
-    for i:=0; i<20; i++ {
-        rcd.TestData(i)
-        err = fdb.RowInsert(&rcd)
-        if fdb == nil {
-            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
-        }
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
+    td = &TestData{}
+    td.Setup(t)
+
+    // Delete a record.
+    rcd.TestData(1)             // "B"
+    keys := rcd.KeysToValue()
+    t.Logf("\tSetting up to delete (%d)\"%s\" row...\n", len(keys), keys)
+    urlStr := fmt.Sprintf("/[[$tn]]/delete?%s", keys)
+    td.GetReq(urlStr, "")
+
+    // Now get the Response and check it.
+    td.CheckStatus(http.StatusOK)
+    t.Logf("\t actualHeader: %q\n", td.Resp.Header)
+    actualBody := td.ResponseBody()
+    t.Logf("\t actualBody: %s\n", string(actualBody))
+    if expectedBody != string(actualBody) {
+        t.Errorf("Expected the message '%s', but got '%s''\n", expectedBody, actualBody)
     }
 
-    // Now set up the Server mux for the test.
-    mux = http.NewServeMux()
-    if mux == nil {
-        t.Fatalf("Error: Unable to allocate HTTP mux\n")
+    rcd.TestData(1)             // "B"
+    err = td.Fdb.RowFind(&rcd)
+    if err == nil {
+        t.Fatalf("Expected Not Found error from RowFind, got ok\n")
     }
-    h.SetupHandlers(mux)
+
+    t.Logf("TestRowDelete() - End of Test\n\n\n")
+}
+
+//----------------------------------------------------------------------------
+//                             Row First
+//----------------------------------------------------------------------------
+
+func Test[[$tn]]RowFirst(t *testing.T) {
+    var td          *TestData
+    var rcd         [[$dn]][[$tn]].[[$tn]]
+/*****
+    expectedBody    := ""
+ *****/
+
+    t.Logf("Test[[$tn]].RowFirst()...\n")
+    td = &TestData{}
+    td.Setup(t)
 
     // Delete a record.
     rcd.TestData(2)             // "C"
     keys := rcd.KeysToValue()
-    t.Logf("\tSetting up to delete (%d)\"%s\" row...\n", len(keys), keys)
-    urlStr := fmt.Sprintf("/[[$tn]]/delete?%s", keys)
-    r := httptest.NewRequest("GET", urlStr, nil)
-    t.Logf("\tKeys: %q\n", r.URL.Query()["key"])
-    w = httptest.NewRecorder()
-    mux.ServeHTTP(w, r)             // Perform the test through the mux.
+    t.Logf("\tSetting up to find first (%d)\"%s\" row...\n", len(keys), keys)
+    urlStr := fmt.Sprintf("/[[$tn]]/first?%s", keys)
+    td.GetReq(urlStr, "")
 
     // Now get the Response and check it.
-    resp = w.Result()
-    if resp == nil {
-        t.Fatalf("Error: Unable to get response!\n")
-    }
-    if resp.StatusCode != http.StatusOK {
-        t.Errorf("Unexpected status code %d", resp.StatusCode)
-    }
-    if resp.StatusCode != 200 {
-        t.Fatalf("Received non-200 response: %d\n", resp.StatusCode)
-    }
-    t.Logf("\t actualHeader: %q\n", resp.Header)
-    actualBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        t.Fatal(err)
-    }
+    td.CheckStatus(http.StatusOK)
+    t.Logf("\t actualHeader: %q\n", td.Resp.Header)
+    actualBody := td.ResponseBody()
     t.Logf("\t actualBody: %s\n", string(actualBody))
+/*****
     if expectedBody != string(actualBody) {
         t.Errorf("Expected the message '%s'\n", expectedBody)
     }
+ *****/
 
-    rcd.TestData(2)             // "B"
-    err = fdb.RowFind(&rcd)
-    if err == nil {
-        t.Errorf("Expected Not Found error from RowFind, got ok\n")
-    }
-
-    t.Logf("TestRowDelete() - End of Test\n\n\n")
+    t.Logf("Test[[$tn]].RowFirst() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
@@ -569,38 +364,13 @@ func TestRowDelete(t *testing.T) {
 
 func Test[[$tn]]RowInsert(t *testing.T) {
     var err         error
-    var fdb         *FakeDB
-    var h           *Handlers
+    var td          *TestData
     var rcd         [[$dn]][[$tn]].[[$tn]]
-    var mux         *http.ServeMux
-    var w           *httptest.ResponseRecorder
-    var resp        *http.Response
     expectedBody    := ""
 
     t.Logf("Test[[$tn]]RowInsert()...\n")
-    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    t.Logf("\tAdding test records...\n")
-    for i:=0; i<20; i++ {
-        rcd.TestData(i)
-        err = fdb.RowInsert(&rcd)
-        if fdb == nil {
-            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
-        }
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
-
-    // Now set up the Server mux for the test.
-    mux = http.NewServeMux()
-    if mux == nil {
-        t.Fatalf("Error: Unable to allocate HTTP mux\n")
-    }
-    h.SetupHandlers(mux)
+    td = &TestData{}
+    td.Setup(t)
 
     // Insert a record.
     rcd.TestData(25)        // "Z"
@@ -608,112 +378,24 @@ func Test[[$tn]]RowInsert(t *testing.T) {
     data := rcd.FieldsToValue()
     urlStr := fmt.Sprintf("/[[$tn]]/insert?%s", keys)
     t.Logf("\tSetting up to insert (%d)\"%s\" row...\n", len(keys), keys)
-    r := httptest.NewRequest("POST", urlStr, strings.NewReader(data))
-    t.Logf("\tKeys: %q\n", r.URL.Query()["key"])
-    w = httptest.NewRecorder()
-    mux.ServeHTTP(w, r)             // Perform the test through the mux.
+    td.PostReq(urlStr, data)
 
     // Now get the Response and check it.
-    resp = w.Result()
-    if resp == nil {
-        t.Fatalf("Error: Unable to get response!\n")
-    }
-    if resp.StatusCode != http.StatusOK {
-        t.Errorf("Unexpected status code %d", resp.StatusCode)
-    }
-    if resp.StatusCode != 200 {
-        t.Fatalf("Received non-200 response: %d\n", resp.StatusCode)
-    }
-    t.Logf("\t actualHeader: %q\n", resp.Header)
-    actualBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        t.Fatal(err)
-    }
+    td.CheckStatus(http.StatusOK)
+    t.Logf("\t actualHeader: %q\n", td.Resp.Header)
+    actualBody := td.ResponseBody()
     t.Logf("\t actualBody: %s\n", string(actualBody))
     if expectedBody != string(actualBody) {
         t.Errorf("Expected the message '%s'\n", expectedBody)
     }
 
-    rcd.TestData(25)             // "Z"
-    err = fdb.RowFind(&rcd)
-    if err == nil {
-        t.Errorf("Expected Not Found error from RowFind, got ok\n")
+    rcd.TestData(25)        // "Z"
+    err = td.Fdb.RowFind(&rcd)
+    if err != nil {
+        t.Errorf("Expected Found error from RowFind, got ok\n")
     }
 
     t.Logf("Test[[$tn]]RowInsert() - End of Test\n\n\n")
-}
-
-//----------------------------------------------------------------------------
-//                             Row First
-//----------------------------------------------------------------------------
-
-func Test[[$tn]]RowFirst(t *testing.T) {
-    var err         error
-    var fdb         *FakeDB
-    var h           *Handlers
-    var rcd         [[$dn]][[$tn]].[[$tn]]
-    var mux         *http.ServeMux
-    var w           *httptest.ResponseRecorder
-    var resp        *http.Response
-    expectedBody    := ""
-
-    t.Logf("Test[[$tn]].RowFirst()...\n")
-    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    t.Logf("\tAdding test records...\n")
-    for i:=0; i<20; i++ {
-        rcd.TestData(i)
-        err = fdb.RowInsert(&rcd)
-        if fdb == nil {
-            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
-        }
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
-
-    // Now set up the Server mux for the test.
-    mux = http.NewServeMux()
-    if mux == nil {
-        t.Fatalf("Error: Unable to allocate HTTP mux\n")
-    }
-    h.SetupHandlers(mux)
-
-    // Delete a record.
-    rcd.TestData(2)             // "C"
-    keys := rcd.KeysToValue()
-    t.Logf("\tSetting up to delete (%d)\"%s\" row...\n", len(keys), keys)
-    urlStr := fmt.Sprintf("/[[$tn]]/delete?%s", keys)
-    r := httptest.NewRequest("GET", urlStr, nil)
-    t.Logf("\tKeys: %q\n", r.URL.Query()["key"])
-    w = httptest.NewRecorder()
-    mux.ServeHTTP(w, r)             // Perform the test through the mux.
-
-    // Now get the Response and check it.
-    resp = w.Result()
-    if resp == nil {
-        t.Fatalf("Error: Unable to get response!\n")
-    }
-    if resp.StatusCode != http.StatusOK {
-        t.Errorf("Unexpected status code %d", resp.StatusCode)
-    }
-    if resp.StatusCode != 200 {
-        t.Fatalf("Received non-200 response: %d\n", resp.StatusCode)
-    }
-    t.Logf("\t actualHeader: %q\n", resp.Header)
-    actualBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        t.Fatal(err)
-    }
-    t.Logf("\t actualBody: %s\n", string(actualBody))
-    if expectedBody != string(actualBody) {
-        t.Errorf("Expected the message '%s'\n", expectedBody)
-    }
-
-    t.Logf("Test[[$tn]].RowFirst() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
@@ -721,24 +403,11 @@ func Test[[$tn]]RowFirst(t *testing.T) {
 //----------------------------------------------------------------------------
 
 func Test[[$tn]]RowLastPrev(t *testing.T) {
-    var err         error
-    var fdb         *FakeDB
-    var h           *Handlers
+    var td          *TestData
 
     t.Logf("Test[[$tn]].RowPrev()...\n")
-    fdb = &FakeDB{}
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
-
-    //TODO: err = db.Ping()
-    if err != nil {
-        t.Fatalf("Error: Cannot connect: %s\n", err.Error())
-    }
+    td = &TestData{}
+    td.Setup(t)
 
     t.Logf("Test[[$tn]].RowPrev() - End of Test\n\n\n")
 }
@@ -748,28 +417,11 @@ func Test[[$tn]]RowLastPrev(t *testing.T) {
 //----------------------------------------------------------------------------
 
 func Test[[$tn]]RowDisplay(t *testing.T) {
-    var fdb         *FakeDB
-    var h           *Handlers
-    //TODO: var w           *httptest.ResponseRecorder
+    var td          *TestData
 
     t.Logf("Test[[$tn]].RowDisplay()...\n")
-    fdb = &FakeDB{}
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
-    //TODO: w = httptest.NewRecorder()
-
-    //TODO: req := httptest.NewRequest("GET", "http://localhost:5000/[[$tn]]", nil)
-    //TODO: h.RowShow(w, req)
-    //TODO: resp := w.Result()
-    // fmt.Println(resp.StatusCode)
-    // fmt.Println(resp.Header.Get("Content-Type"))
-    //TODO: body, _ := ioutil.ReadAll(resp.Body)
-    //TODO: t.Logf("Output:\n%s\n\n\n", string(body))
+    td = &TestData{}
+    td.Setup(t)
 
     t.Logf("Test[[$tn]]RowShow() - End of Test\n\n\n")
 }
@@ -779,24 +431,11 @@ func Test[[$tn]]RowDisplay(t *testing.T) {
 //----------------------------------------------------------------------------
 
 func Test[[$tn]]RowUpdate(t *testing.T) {
-    var err         error
-    var fdb         *FakeDB
-    var h           *Handlers
+    var td          *TestData
 
     t.Logf("Test[[$tn]].RowUpdate()...\n")
-    fdb = &FakeDB{}
-    if fdb == nil {
-        t.Fatalf("Error: Unable to allocate FakeDB\n")
-    }
-    h = &Handlers{db:fdb, rowsPerPage:2}
-    if h == nil {
-        t.Fatalf("Error: Unable to allocate Handlers\n")
-    }
-
-    //TODO: err = db.Ping()
-    if err != nil {
-        t.Fatalf("Error: Cannot connect: %s\n", err)
-    }
+    td = &TestData{}
+    td.Setup(t)
 
     t.Logf("Test[[$tn]].RowUpdate() - End of Test\n\n\n")
 }

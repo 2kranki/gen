@@ -241,41 +241,6 @@ func (f *DbField) IsText() bool {
 	return false
 }
 
-// GenRValueToStruct generates code to convert an r.FormValue
-// to a structure field. The structure's variable is given
-// by dn.
-func (f *DbField) GenFormValueToStruct(dn string) string {
-	var str			string
-
-	switch f.Typ.Go {
-	case "int":
-		fallthrough
-	case "int32":
-		fallthrough
-	case "int64":
-		{
-			wrk := "\t{\n\t\twrk := r.FormValue(\"%s\")\n" +
-				"\t\t%s.%s, err = strconv.ParseInt(wrk,0,64)\n" +
-				"\t}\n"
-			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
-		}
-	case "float":
-		fallthrough
-	case "float32":
-		fallthrough
-	case "float64":
-		{
-			wrk := 	"\t{\n\t\twrk := r.FormValue(\"%s\")\n" +
-				"\t\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n\t}\n"
-			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
-		}
-	default:
-		str = fmt.Sprintf("\t%s.%s = r.FormValue(\"%s\")\n", dn, f.TitledName(), f.TitledName())
-	}
-
-	return str
-}
-
 func (f *DbField) TitledName( ) string {
 	return strings.Title(f.Name)
 }

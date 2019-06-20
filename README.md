@@ -23,7 +23,7 @@ definition and having them control the generation process.
 **Project Futures**:
 
 
-- [ ] Finish Table Handler Testing
+- [x] Finish Table Handler Testing
 - [ ] Finish Table I/O Testing for SQLite
 - [ ] Finish MS-SQL Support
 - [ ] Finish MySQL/MariaDB Support

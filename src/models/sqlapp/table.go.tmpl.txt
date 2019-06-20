@@ -48,6 +48,19 @@ func ErrorString(err error) string {
 //                              Compare
 //----------------------------------------------------------------------------
 
+// Compare compares our struct to another returning
+// 0, 1 for equal and not equal.
+func (s *[[$tn]]) Compare(r *[[$tn]]) int {
+    // Accumulate the key value(s) in KeyNum order.
+    [[range $f := $t.Fields -]]
+        if s.[[$f.TitledName]] != r.[[$f.TitledName]] {
+            return 1
+        }
+	[[end -]]
+
+	return 0
+}
+
 // CompareKeys compares our struct to another using keys returning the normal
 // -1, 0, 1 for less than, equal and greater than.
 func (s *[[$tn]]) CompareKeys(r *[[$tn]]) int {
@@ -117,8 +130,7 @@ func (s *[[$tn]]) FieldsToValue() string {
 //                      Keys to URL Value String
 //----------------------------------------------------------------------------
 
-// KeysToValue creates a URL Value map from the
-// the table's key(s).
+// KeysToValue creates a URL Value map from the table's key(s).
 func (s *[[$tn]]) KeysToValue() string {
     var wrk string
 
@@ -153,8 +165,7 @@ func (s *[[$tn]]) ListOutput() string {
                     str.WriteString(fstr)
                 }
             [[end -]]
-            wrk += "\n"
-            str.WriteString(wrk)
+            str.WriteString("\n")
             [[if $f.KeyNum -]]
                 str.WriteString("</a>\n" )
             [[end -]]
@@ -174,14 +185,17 @@ func (s *[[$tn]]) ListOutput() string {
 // GET.  In general, you should use POST with this function for security reasons.
 func (s *[[$tn]]) Request2Struct(r *http.Request) error {
     var err         error
+    var str         string
 
     [[if GenDebugging]]
         log.Printf("[[$tn]].Request2Struct()\n")
         log.Printf("\tr.FormValue: %q\n", r.Form)
     [[end]]
 
+    s.Empty()
     [[range $f := .Table.Fields -]]
-        [[$f.GenFormValueToStruct "s" -]]
+        str = r.FormValue("[[$f.TitledName]]")
+        [[$f.GenFromString "s" "str" -]]
     [[end]]
 
     [[if GenDebugging]]
@@ -194,8 +208,8 @@ func (s *[[$tn]]) Request2Struct(r *http.Request) error {
 //                      Set Keys from a Slice of Strings
 //----------------------------------------------------------------------------
 
-// KeysToValue creates a URL Value map from the
-// the table's key(s).
+// KeysToValue creates a URL Value map from the table's key(s). The slice
+// is in field order within the struct, not sorted by field name.
 func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
     var i   int
 

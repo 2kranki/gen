@@ -18,7 +18,6 @@ import (
     "fmt"
     "log"
     "sort"
-    "strings"
 )
 
 //============================================================================
@@ -117,7 +116,7 @@ func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         }
         sort.Strings(keys)
         if len(keys) > 0 {
-            *rcd = db.rcds[keys[0]]
+            *rcd = db.rcds[ keys[0] ]
         } else {
             rcd.Empty()
         }
@@ -148,6 +147,9 @@ func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     } else {
         key := rcd.KeysToValue()
         log.Printf("\tkey: (%d)%s\n", len(key), key)
+        if _, ok := db.rcds[key]; ok {
+            err = fmt.Errorf("Error - Record already exists!\n")
+        }
         db.rcds[key] = *rcd
     }
 
