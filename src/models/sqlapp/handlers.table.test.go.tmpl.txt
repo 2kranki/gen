@@ -22,6 +22,7 @@ import (
     "net/http/httptest"
     //"net/url"
     "sort"
+    "strings"
 	"testing"
 )
 
@@ -48,7 +49,7 @@ func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowDelete()\n")
+        log.Printf("[[$tn]].DBRowDelete()\n")
     [[end]]
 
     if db.errorOut {
@@ -63,7 +64,7 @@ func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowDelete(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowDelete(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -79,7 +80,7 @@ func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowFind(%+v)\n", rcd)
+        log.Printf("[[$tn]].DBRowFind(%+v)\n", rcd)
     [[end]]
 
     if db.errorOut {
@@ -93,7 +94,7 @@ func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowFind(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowFind(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -110,7 +111,7 @@ func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var keys        []string
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowFirst()\n")
+        log.Printf("[[$tn]].DBRowFirst()\n")
     [[end]]
 
     if db.errorOut {
@@ -128,7 +129,7 @@ func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowFirst(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowFirst(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -141,7 +142,7 @@ func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowInsert(%+v)\n", rcd)
+        log.Printf("[[$tn]].DBRowInsert(%+v)\n", rcd)
     [[end]]
 
     // Validate the input record.
@@ -156,7 +157,7 @@ func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowInsert(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowInsert(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -170,7 +171,7 @@ func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var keys        []string
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowLast(%+v)\n", rcd)
+        log.Printf("[[$tn]].DBRowLast(%+v)\n", rcd)
     [[end]]
 
     if db.errorOut {
@@ -186,7 +187,7 @@ func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowLast(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowLast(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -203,7 +204,7 @@ func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var i           int
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowNext(%+v)\n", rcd)
+        log.Printf("[[$tn]].DBRowNext(%+v)\n", rcd)
     [[end]]
 
     if db.errorOut {
@@ -228,12 +229,12 @@ func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
                 err = fmt.Errorf("Error - Record Not Found!\n")
             }
         } else {
-            err = fmt.Errorf("Error - No Keys!\n")
+            err = fmt.Errorf("Error - Empty Database!\n")
         }
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowNext(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowNext(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -250,7 +251,7 @@ func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], erro
     var err         error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowPage(%d,%d)\n",offset,limit)
+        log.Printf("[[$tn]].DBRowPage(%d,%d)\n",offset,limit)
     [[end]]
 
     if db.errorOut {
@@ -260,7 +261,7 @@ func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], erro
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowPage(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowPage(%s)\n", ErrorString(err))
     [[end]]
     return nil, err
 }
@@ -273,7 +274,7 @@ func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowPrev(%+v)\n", rcd)
+        log.Printf("[[$tn]].DBRowPrev(%+v)\n", rcd)
     [[end]]
 
     if db.errorOut {
@@ -283,7 +284,7 @@ func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowPrev(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowPrev(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -296,7 +297,7 @@ func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowUpdate(%+v)\n", d)
+        log.Printf("[[$tn]].DBRowUpdate(%+v)\n", d)
     [[end]]
 
     if db.errorOut {
@@ -307,7 +308,7 @@ func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
 
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowUpdate(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowUpdate(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -322,17 +323,17 @@ func (db FakeDB) TableCount( ) (int, error) {
     var count       int
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].TableCount()\n")
+        log.Printf("[[$tn]].DBTableCount()\n")
     [[end]]
 
     if db.errorOut {
         err = fmt.Errorf("Error - Error Out!\n")
     } else {
-        err = fmt.Errorf("Error - Not Implemented!\n")
+        count = len(db.rcds)
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableCount(%s) %d\n", ErrorString(err), count)
+        log.Printf("...end [[$tn]].DBTableCount(%s) %d\n", ErrorString(err), count)
     [[end]]
     return count, err
 }
@@ -347,7 +348,7 @@ func (db FakeDB) TableCreate() error {
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].TableCreate()\n")
+        log.Printf("[[$tn]].DBTableCreate()\n")
     [[end]]
 
     if db.errorOut {
@@ -357,7 +358,7 @@ func (db FakeDB) TableCreate() error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableCreate(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBTableCreate(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -371,7 +372,7 @@ func (db FakeDB) TableDelete() error {
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].TableDelete()\n")
+        log.Printf("[[$tn]].DBTableDelete()\n")
     [[end]]
 
     if db.errorOut {
@@ -381,7 +382,7 @@ func (db FakeDB) TableDelete() error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableDelete(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBTableDelete(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -389,6 +390,40 @@ func (db FakeDB) TableDelete() error {
 //============================================================================
 //                              Tests
 //============================================================================
+
+//----------------------------------------------------------------------------
+//                          FakeDB First/Next
+//----------------------------------------------------------------------------
+
+func Test[[$tn]]DBFirstNext(t *testing.T) {
+    var err         error
+    var fdb         *FakeDB
+    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var rcd2        [[$dn]][[$tn]].[[$tn]]
+
+    t.Logf("Test[[$tn]].DBFirstNext()...\n")
+    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
+    if fdb == nil {
+        t.Fatalf("Error: Unable to allocate FakeDB\n")
+    }
+    t.Logf("\tAdding test records...\n")
+    for i:=0; i<20; i++ {
+        rcd.TestData(i)
+        err = fdb.RowInsert(&rcd)
+        if err == nil {
+            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
+        }
+    }
+
+    // Now check first.
+    err = fdb.RowFirst(&rcd2)
+    rcd.TestData(0)
+    if 0 != rcd.CompareKeys(&rcd2) {
+        t.Errorf("Error - First did not work, need A, got %q\n", rcd2)
+    }
+
+    t.Logf("Test[[$tn]].DBFirstNext() - End of Test\n\n\n")
+}
 
 //----------------------------------------------------------------------------
 //                             List Index
@@ -536,57 +571,156 @@ func Test[[$tn]]RowInsert(t *testing.T) {
     var err         error
     var fdb         *FakeDB
     var h           *Handlers
+    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var mux         *http.ServeMux
+    var w           *httptest.ResponseRecorder
+    var resp        *http.Response
+    expectedBody    := ""
 
     t.Logf("Test[[$tn]]RowInsert()...\n")
-    fdb = &FakeDB{}
+    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
     if fdb == nil {
         t.Fatalf("Error: Unable to allocate FakeDB\n")
+    }
+    t.Logf("\tAdding test records...\n")
+    for i:=0; i<20; i++ {
+        rcd.TestData(i)
+        err = fdb.RowInsert(&rcd)
+        if fdb == nil {
+            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
+        }
     }
     h = &Handlers{db:fdb, rowsPerPage:2}
     if h == nil {
         t.Fatalf("Error: Unable to allocate Handlers\n")
     }
 
-    //TODO: err = db.Ping()
+    // Now set up the Server mux for the test.
+    mux = http.NewServeMux()
+    if mux == nil {
+        t.Fatalf("Error: Unable to allocate HTTP mux\n")
+    }
+    h.SetupHandlers(mux)
+
+    // Insert a record.
+    rcd.TestData(25)        // "Z"
+    keys := rcd.KeysToValue()
+    data := rcd.FieldsToValue()
+    urlStr := fmt.Sprintf("/[[$tn]]/insert?%s", keys)
+    t.Logf("\tSetting up to insert (%d)\"%s\" row...\n", len(keys), keys)
+    r := httptest.NewRequest("POST", urlStr, strings.NewReader(data))
+    t.Logf("\tKeys: %q\n", r.URL.Query()["key"])
+    w = httptest.NewRecorder()
+    mux.ServeHTTP(w, r)             // Perform the test through the mux.
+
+    // Now get the Response and check it.
+    resp = w.Result()
+    if resp == nil {
+        t.Fatalf("Error: Unable to get response!\n")
+    }
+    if resp.StatusCode != http.StatusOK {
+        t.Errorf("Unexpected status code %d", resp.StatusCode)
+    }
+    if resp.StatusCode != 200 {
+        t.Fatalf("Received non-200 response: %d\n", resp.StatusCode)
+    }
+    t.Logf("\t actualHeader: %q\n", resp.Header)
+    actualBody, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        t.Fatalf("Error: Cannot connect: %s\n", err.Error())
+        t.Fatal(err)
+    }
+    t.Logf("\t actualBody: %s\n", string(actualBody))
+    if expectedBody != string(actualBody) {
+        t.Errorf("Expected the message '%s'\n", expectedBody)
+    }
+
+    rcd.TestData(25)             // "Z"
+    err = fdb.RowFind(&rcd)
+    if err == nil {
+        t.Errorf("Expected Not Found error from RowFind, got ok\n")
     }
 
     t.Logf("Test[[$tn]]RowInsert() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
-//                             Row Next
+//                             Row First
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowNext(t *testing.T) {
+func Test[[$tn]]RowFirst(t *testing.T) {
     var err         error
     var fdb         *FakeDB
     var h           *Handlers
+    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var mux         *http.ServeMux
+    var w           *httptest.ResponseRecorder
+    var resp        *http.Response
+    expectedBody    := ""
 
-    t.Logf("Test[[$tn]].RowNext()...\n")
-    fdb = &FakeDB{}
+    t.Logf("Test[[$tn]].RowFirst()...\n")
+    fdb = &FakeDB{ rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false, }
     if fdb == nil {
         t.Fatalf("Error: Unable to allocate FakeDB\n")
+    }
+    t.Logf("\tAdding test records...\n")
+    for i:=0; i<20; i++ {
+        rcd.TestData(i)
+        err = fdb.RowInsert(&rcd)
+        if fdb == nil {
+            t.Fatalf("Error: Unable to insert test record %d in FakeDB!\n", i)
+        }
     }
     h = &Handlers{db:fdb, rowsPerPage:2}
     if h == nil {
         t.Fatalf("Error: Unable to allocate Handlers\n")
     }
 
-    //TODO: err = db.Ping()
+    // Now set up the Server mux for the test.
+    mux = http.NewServeMux()
+    if mux == nil {
+        t.Fatalf("Error: Unable to allocate HTTP mux\n")
+    }
+    h.SetupHandlers(mux)
+
+    // Delete a record.
+    rcd.TestData(2)             // "C"
+    keys := rcd.KeysToValue()
+    t.Logf("\tSetting up to delete (%d)\"%s\" row...\n", len(keys), keys)
+    urlStr := fmt.Sprintf("/[[$tn]]/delete?%s", keys)
+    r := httptest.NewRequest("GET", urlStr, nil)
+    t.Logf("\tKeys: %q\n", r.URL.Query()["key"])
+    w = httptest.NewRecorder()
+    mux.ServeHTTP(w, r)             // Perform the test through the mux.
+
+    // Now get the Response and check it.
+    resp = w.Result()
+    if resp == nil {
+        t.Fatalf("Error: Unable to get response!\n")
+    }
+    if resp.StatusCode != http.StatusOK {
+        t.Errorf("Unexpected status code %d", resp.StatusCode)
+    }
+    if resp.StatusCode != 200 {
+        t.Fatalf("Received non-200 response: %d\n", resp.StatusCode)
+    }
+    t.Logf("\t actualHeader: %q\n", resp.Header)
+    actualBody, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        t.Fatalf("Error: Cannot connect: %s\n", err.Error())
+        t.Fatal(err)
+    }
+    t.Logf("\t actualBody: %s\n", string(actualBody))
+    if expectedBody != string(actualBody) {
+        t.Errorf("Expected the message '%s'\n", expectedBody)
     }
 
-    t.Logf("Test[[$tn]].RowNext() - End of Test\n\n\n")
+    t.Logf("Test[[$tn]].RowFirst() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowPrev(t *testing.T) {
+func Test[[$tn]]RowLastPrev(t *testing.T) {
     var err         error
     var fdb         *FakeDB
     var h           *Handlers

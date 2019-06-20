@@ -95,6 +95,25 @@ func (s *[[$tn]]) Empty() {
 }
 
 //----------------------------------------------------------------------------
+//                      Fields to URL Value String
+//----------------------------------------------------------------------------
+
+// FieldsToValue creates a URL Value map from the the table's field(s).
+func (s *[[$tn]]) FieldsToValue() string {
+    var wrk string
+
+    v := url.Values{}
+    // Accumulate the value(s) from the fields.
+    [[range $f := $t.Fields -]]
+            // Field: [[$f.TitledName]]
+            [[$f.GenToString "wrk" "s" -]]
+            v.Add("[[$f.TitledName]]", wrk)
+	[[end -]]
+
+	return v.Encode()
+}
+
+//----------------------------------------------------------------------------
 //                      Keys to URL Value String
 //----------------------------------------------------------------------------
 

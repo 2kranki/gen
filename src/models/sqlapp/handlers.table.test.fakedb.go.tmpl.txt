@@ -1,0 +1,384 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+// Generated: [[Time]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
+[[- $t := .Table]]
+[[- $tn := .Table.TitledName]]
+
+package hndlr[[$dn]][[$tn]]
+
+import (
+	"../[[$dn]][[$tn]]"
+    "fmt"
+    "log"
+    "sort"
+    "strings"
+)
+
+//============================================================================
+//                              Fake DB
+//============================================================================
+
+type FakeDB struct {
+    rcds        map[string][[$dn]][[$tn]].[[$tn]]
+    errorOut    bool
+}
+
+func (db *FakeDB) SetErrorOut(f bool) {
+    db.errorOut = f
+}
+
+//----------------------------------------------------------------------------
+//                             Row Delete
+//----------------------------------------------------------------------------
+
+// RowDelete deletes the row with keys from the provided record, rcd.
+func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+    var ok          bool
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowDelete()\n")
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        key := rcd.KeysToValue()
+        log.Printf("\tkey: (%d)%s\n", len(key), key)
+        if *rcd, ok = db.rcds[key]; !ok {
+            err = fmt.Errorf("Error - Record Not Found!\n")
+        }
+        delete(db.rcds, key)
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowDelete(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Find
+//----------------------------------------------------------------------------
+
+// RowFind searches the Database for a matching row for the keys found in
+// the given record and returns the output in that same record.
+func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+    var ok          bool
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowFind(%+v)\n", rcd)
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        key := rcd.KeysToValue()
+        log.Printf("\tkey: (%d)%s\n", len(key), key)
+        if *rcd, ok = db.rcds[key]; !ok {
+            err = fmt.Errorf("Error - Record Not Found!\n")
+        }
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowFind(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row First
+//----------------------------------------------------------------------------
+
+// RowFirst returns the first row in the table, [[$tn]].
+// If there are no rows in the table, then a blank/null record is returned
+// without error.
+func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+    var keys        []string
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowFirst()\n")
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        for key := range db.rcds {
+            keys = append(keys, key)
+        }
+        sort.Strings(keys)
+        if len(keys) > 0 {
+            *rcd = db.rcds[keys[0]]
+        } else {
+            rcd.Empty()
+        }
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowFirst(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Insert
+//----------------------------------------------------------------------------
+
+func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowInsert(%+v)\n", rcd)
+    [[end]]
+
+    // Validate the input record.
+
+    // Add it to the table.
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        key := rcd.KeysToValue()
+        log.Printf("\tkey: (%d)%s\n", len(key), key)
+        db.rcds[key] = *rcd
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowInsert(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Last
+//----------------------------------------------------------------------------
+
+func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+    var keys        []string
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowLast(%+v)\n", rcd)
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        for key := range db.rcds {
+            keys = append(keys, key)
+        }
+        sort.Strings(keys)
+        if len(keys) > 0 {
+            *rcd = db.rcds[keys[len(keys)-1]]
+        }
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowLast(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Next
+//----------------------------------------------------------------------------
+
+// RowNext returns the next row from the row given. If row after the current
+// one does not exist, then the first row is returned.
+func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+    var keys        []string
+    var i           int
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowNext(%+v)\n", rcd)
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        var wrkRcd  [[$dn]][[$tn]].[[$tn]]
+        for key := range db.rcds {
+            keys = append(keys, key)
+        }
+        sort.Strings(keys)
+        if len(keys) > 0 {
+            for i=0; i<len(keys); i++ {
+                wrkRcd = db.rcds[ keys[i] ]
+                j := rcd.CompareKeys(&wrkRcd)
+                if j > 0 {
+                    break
+                }
+            }
+            if i < len(db.rcds) {
+                *rcd = db.rcds[ keys[i] ]
+            } else {
+                err = fmt.Errorf("Error - Record Not Found!\n")
+            }
+        } else {
+            err = fmt.Errorf("Error - Empty Database!\n")
+        }
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowNext(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Page
+//----------------------------------------------------------------------------
+
+// RowPage returns a page of rows where a page size is the 'limit' parameter and
+// 'offset' is the offset into the result set ordered by the main index. Both
+// 'limit' and 'offset' are relative to 1. We return an address to the array
+// rows (structs) so that we don't have the overhead of copying them everwhere.
+func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowPage(%d,%d)\n",offset,limit)
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        err = fmt.Errorf("Error - Not Implemented!\n")
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowPage(%s)\n", ErrorString(err))
+    [[end]]
+    return nil, err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Prev
+//----------------------------------------------------------------------------
+
+func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+    var err         error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowPrev(%+v)\n", rcd)
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        err = fmt.Errorf("Error - Not Implemented!\n")
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowPrev(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                             Row Update
+//----------------------------------------------------------------------------
+
+func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBRowUpdate(%+v)\n", d)
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        err = fmt.Errorf("Error - Not Implemented!\n")
+    }
+
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBRowUpdate(%s)\n", ErrorString(err))
+    [[end]]
+	return err
+}
+
+
+//----------------------------------------------------------------------------
+//                             Table Count
+//----------------------------------------------------------------------------
+
+func (db FakeDB) TableCount( ) (int, error) {
+    var err         error
+    var count       int
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBTableCount()\n")
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        count = len(db.rcds)
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBTableCount(%s) %d\n", ErrorString(err), count)
+    [[end]]
+    return count, err
+}
+
+//----------------------------------------------------------------------------
+//                             Table Create
+//----------------------------------------------------------------------------
+
+// TableCreate creates the table in the given database deleting the current
+// table if present.
+func (db FakeDB) TableCreate() error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBTableCreate()\n")
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        err = fmt.Errorf("Error - Not Implemented!\n")
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBTableCreate(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+//----------------------------------------------------------------------------
+//                             Table Delete
+//----------------------------------------------------------------------------
+
+// TableDelete deletes the table in the given database if present.
+func (db FakeDB) TableDelete() error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("[[$tn]].DBTableDelete()\n")
+    [[end]]
+
+    if db.errorOut {
+        err = fmt.Errorf("Error - Error Out!\n")
+    } else {
+        err = fmt.Errorf("Error - Not Implemented!\n")
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end [[$tn]].DBTableDelete(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
