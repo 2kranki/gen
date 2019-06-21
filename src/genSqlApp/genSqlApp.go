@@ -260,10 +260,26 @@ var FileDefns []FileDefn = []FileDefn{
 		0,
 	},
 	{"io.table.go.tmpl.txt",
-		"/src/io${DbName}",
+		"/src/io${DbName}${TblName}",
 		"${TblName}.go",
 		"text",
 		0644,
+		"single",
+		2,
+	},
+	{"io.table.test.go.tmpl.txt",
+		"/src/io${DbName}${TblName}",
+		"${TblName}_test.go",
+		"text",
+		0644,
+		"single",
+		2,
+	},
+	{"tst.sh.txt",
+		"/src/io${DbName}${TblName}",
+		"t.sh",
+		"copy",
+		0755,
 		"single",
 		2,
 	},
@@ -346,6 +362,43 @@ func (t *TaskData) genFile() {
 	}
 
 
+}
+
+//----------------------------------------------------------------------------
+//								copyDir
+//----------------------------------------------------------------------------
+
+func copyDir(modelPath, outPath string) (int64, error) {
+	var dst *os.File
+	var err error
+	var src *os.File
+
+	if _, err = util.IsPathDir(modelPath); err != nil {
+		return 0, errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
+	}
+
+	if outPath, err = util.IsPathDir(outPath); err == nil {
+		if sharedData.Replace() {
+			if err = os.Remove(outPath); err != nil {
+				return 0, errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
+			}
+		} else {
+			return 0, errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+		}
+	}
+	if dst, err = os.Create(outPath); err != nil {
+		return 0, errors.New(fmt.Sprint("Error - could not create:", outPath, err))
+	}
+	defer dst.Close()
+
+	if src, err = os.Open(modelPath); err != nil {
+		return 0, errors.New(fmt.Sprint("Error - could not open model file:", modelPath, err))
+	}
+	defer src.Close()
+
+	amt, err := io.Copy(dst, src)
+
+	return amt, err
 }
 
 //----------------------------------------------------------------------------
@@ -530,6 +583,12 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
+		for _, t := range tmplData.Data.Tables {
+			tmpName = path.Clean(sharedData.OutDir() + "/src/io" + tmplData.Data.TitledName() + t.TitledName())
+			if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+				log.Fatalln("Error: Could not create output directory:", tmpName, err)
+			}
+		}
 		tmpName = path.Clean(sharedData.OutDir() + "/src/util")
 		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
 			log.Fatalln("Error: Could not create output directory:", tmpName, err)

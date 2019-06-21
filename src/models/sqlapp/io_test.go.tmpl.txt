@@ -12,109 +12,72 @@
 package io[[$dn]]
 
 import (
-    //"fmt"
-    "log"
 	"testing"
 )
 
 
-func SetupConnectParms() {
-	[[ if eq $d.SqlType "mariadb" ]]
-		SetPort("4306")
-		SetPW("Passw0rd!")
-		SetServer("127.0.0.1")
-		SetUser("root")
-	[[ else if eq $d.SqlType  "mssql" ]]
-		SetPort("1401")
-		SetPW("Passw0rd!")
-		SetServer("localhost")
-		SetUser("SA")
-	[[ else if eq $d.SqlType "mysql" ]]
-		SetPort("3306")
-		SetPW("Passw0rd!")
-		SetServer("127.0.0.1")
-		SetUser("root")
-	[[ else if eq $d.SqlType "postgres" ]]
-		SetPort("5432")
-		SetPW("Passw0rd!")
-		SetServer("localhost")
-		SetUser("postgres")
-	[[ else if eq $d.SqlType "sqlite" ]]
-		SetServer("test.db")
-	[[ end ]]
-}
+var io      *IO_[[$dn]]
+
+
+//============================================================================
+//                              Tests
+//============================================================================
+
+//----------------------------------------------------------------------------
+//                              Connect
+//----------------------------------------------------------------------------
 
 func TestConnect(t *testing.T) {
     var err         error
 
 	t.Logf("TestConnect()...\n")
-	SetupConnectParms()
-    err = Connect()
+	io = [[$dn]]New()
+	io.DefaultParms()
+    err = io.Connect()
     if err == nil {
-	    err = Disconnect()
+	    err = io.Disconnect()
         if err != nil {
             t.Fatalf("Error: %s\n\n", err)
         }
+        io = nil
     } else {
             t.Fatalf("Error: %s\n\n", err)
     }
 	t.Logf("TestConnect() - End of Test\n\n\n")
 }
 
-func TestCreateTables(t *testing.T) {
-    var err         error
-
-	t.Logf("TestCreateTables()...\n")
-	SetupConnectParms()
-
-    err = Connect()
-    if err != nil {
-        t.Fatal("Error: Cannot connect: ", err)
-    }
-
-    err = TablesCreate()
-    if err != nil {
-        t.Fatal("Error: Cannot create tables: ", err)
-    }
-
-    err = Disconnect()
-    if err != nil {
-        t.Fatal("Error: Cannot disconnect: ", err)
-    }
-
-	t.Logf("TestCreateTables() - End of Test\n\n\n")
-}
-
-func TestDeleteTables(t *testing.T) {
-    var err         error
-
-	t.Logf("TestDeleteTables()...\n")
-	SetupConnectParms()
-    //err = db.Ping()
-    if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
-    }
-	t.Logf("TestDeleteTables() - End of Test\n\n\n")
-}
+//----------------------------------------------------------------------------
+//                              Disconnect
+//----------------------------------------------------------------------------
 
 func TestDisconnect(t *testing.T) {
     var err         error
 
 	t.Logf("TestDisconnect()...\n")
-	SetupConnectParms()
+	io = [[$dn]]New()
+	io.DefaultParms()
 
 	// Disconnect before a connection has been made.
-    err = Disconnect()
+    err = io.Disconnect()
     if err == nil {
         t.Fatal("Error: Never Connected!\n\n\n")
     }
 
+    if io.IsConnected() {
+        t.Fatal("Error: Never Connected!\n\n\n")
+    }
+
     // Now connect then disconnect.
-    err = Connect()
+    err = io.Connect()
     if err != nil {
         t.Fatal("Error: Cannot connect: ", err)
     }
-    err = Disconnect()
+
+    if !io.IsConnected() {
+        t.Fatal("Error: Never Connected!\n\n\n")
+    }
+
+    err = io.Disconnect()
     if err != nil {
         t.Fatal("Error: Cannot disconnect: ", err)
     }
@@ -122,236 +85,3 @@ func TestDisconnect(t *testing.T) {
 	t.Logf("TestDisconnect() - End of Test\n\n\n")
 }
 
-[[- range $t := $d.Tables ]]
-    func Test[[$t.TitledName]]RowDelete(t *testing.T) {
-        var err         error
-
-        t.Logf("Test[[$t.TitledName]]RowDelete()...\n")
-	    SetupConnectParms()
-        //err = db.Ping()
-        if err != nil {
-            log.Fatalln("Error: Cannot connect: ", err)
-        }
-	    t.Logf("Test[[$t.TitledName]]RowDelete() - End of Test\n\n\n")
-    }
-
-    func Test[[$t.TitledName]]RowInsert(t *testing.T) {
-        var err         error
-        var rcd         [[$t.TitledName]]
-        var rcdp        *[[$t.TitledName]]
-
-    	t.Logf("Test[[$t.TitledName]]RowInsert()...\n")
-	    SetupConnectParms()
-
-        // Start clean with new empty tables.
-        err = Connect()
-        if err != nil {
-            t.Fatal("Error: Cannot connect: ", err)
-        }
-        err = TablesCreate()
-        if err != nil {
-            t.Fatal("Error: Cannot create tables: ", err)
-        }
-
-        // Now add some records.
-        for i := 0; i < 5; i++ {
-            t.Logf("\tInserting Record %d\n", i)
-            chr := 'A' + i
-            rcd.Name = string(chr)
-            rcd.Num = i
-            err = [[$t.TitledName]]RowInsert(&rcd)
-            if err != nil {
-                t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)
-            }
-        }
-
-        // Now read the first record.
-        t.Logf("\tReading First Record\n")
-        rcdp, err = [[$t.TitledName]]RowFirst()
-        if err != nil {
-            t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
-        }
-        if rcdp.Num != 0 {
-            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
-        }
-        if rcdp.Name != "A" {
-            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
-        }
-
-        // Now read the last record.
-        t.Logf("\tReading Last Record\n")
-        rcdp, err = [[$t.TitledName]]RowLast()
-        if err != nil {
-            t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
-        }
-        if rcdp.Num != 4 {
-            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
-        }
-        if rcdp.Name != "E" {
-            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
-        }
-
-        // Now read the middle record.
-        t.Logf("\tReading via Find the Middle Record\n")
-        rcdp, err = [[$t.TitledName]]RowFind("2")
-        if err != nil {
-            t.Fatalf("Error: : Record Middle Failed: %s\n\n\n", err)
-        }
-        if rcdp.Num != 2 {
-            t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
-        }
-        if rcdp.Name != "C" {
-            t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
-        }
-
-        // Now read the first record via Find.
-        t.Logf("\tReading via Find the First Record\n")
-        rcdp, err = [[$t.TitledName]]RowFind("0")
-        if err != nil {
-            t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
-        }
-        if rcdp.Num != 0 {
-            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
-        }
-        if rcdp.Name != "A" {
-            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
-        }
-
-        // Now read the last record via Find.
-        t.Logf("\tReading via Find the Last Record\n")
-        rcdp, err = [[$t.TitledName]]RowFind("4")
-        if err != nil {
-            t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
-        }
-        if rcdp.Num != 4 {
-            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
-        }
-        if rcdp.Name != "E" {
-            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
-        }
-
-        //err = TablesDelete()
-        if err != nil {
-            t.Fatal("Error: Cannot delete tables: ", err)
-        }
-        err = Disconnect()
-        if err != nil {
-            t.Fatal("Error: Cannot disconnect: ", err)
-        }
-
-	    t.Logf("Test[[$t.TitledName]]RowInsert() - End of Test\n\n\n")
-    }
-
-    func Test[[$t.TitledName]]RowPage(t *testing.T) {
-        var err         error
-        var rcd         [[$t.TitledName]]
-        var rcds        [][[$t.TitledName]]
-
-    	t.Logf("Test[[$t.TitledName]]RowPage()...\n")
-	    SetupConnectParms()
-
-        // Start clean with new empty tables.
-        err = Connect()
-        if err != nil {
-            t.Fatal("Error: Cannot connect: ", err)
-        }
-        err = TablesCreate()
-        if err != nil {
-            t.Fatal("Error: Cannot create tables: ", err)
-        }
-
-        // Now add some records.
-        for i := 0; i < 10; i++ {
-            chr := 'A' + i
-            t.Logf("\tInserting Row %d - %c\n", i, chr)
-            rcd.Name = string(chr)
-            rcd.Num = i
-            err = [[$t.TitledName]]RowInsert(&rcd)
-            if err != nil {
-                t.Fatalf("Error: : Row Insertion Failed: %s\n\n\n", err)
-            }
-        }
-
-        t.Logf("\tReading First Set of 4 Records\n")
-        rcds, err = [[$t.TitledName]]RowPage(0, 4)
-        if err != nil {
-            t.Fatalf("Error: First Record Set Failed: %s\n\n\n", err)
-        }
-        t.Logf("1 rcds(%d): %+v\n",len(rcds),rcds)
-        if len(rcds) != 4 {
-            t.Fatalf("Error: Number of Record Verification Failed\n\n\n")
-        }
-        if rcds[0].Name != "A" {
-            t.Fatalf("Error: : First Record Verification Failed, %s\n\n\n", rcds[0].Name)
-        }
-        if rcds[1].Name != "B" {
-            t.Fatalf("Error: : Second Record Verification Failed\n\n\n")
-        }
-        if rcds[2].Name != "C" {
-            t.Fatalf("Error: : Third Record Verification Failed\n\n\n")
-        }
-        if rcds[3].Name != "D" {
-            t.Fatalf("Error: : Fourth Record Verification Failed\n\n\n")
-        }
-
-        t.Logf("\tReading Second set of 4 Records\n")
-        rcds, err = [[$t.TitledName]]RowPage(4, 4)
-        if err != nil {
-            t.Fatalf("Error: : First Record Set Failed: %s\n\n\n", err)
-        }
-        t.Logf("2 rcds(%d): %+v\n",len(rcds),rcds)
-        if len(rcds) != 4 {
-            t.Fatalf("Error: : Number of Record Verification Failed\n\n\n")
-        }
-        if rcds[0].Name != "E" {
-            t.Fatalf("Error: : First Record Verification Failed\n\n\n")
-        }
-        if rcds[1].Name != "F" {
-            t.Fatalf("Error: : Second Record Verification Failed\n\n\n")
-        }
-        if rcds[2].Name != "G" {
-            t.Fatalf("Error: : Third Record Verification Failed\n\n\n")
-        }
-        if rcds[3].Name != "H" {
-            t.Fatalf("Error: : Fourth Record Verification Failed\n\n\n")
-        }
-
-        t.Logf("\tReading Third set of Records\n")
-        rcds, err = [[$t.TitledName]]RowPage(8, 4)
-        if err != nil {
-            t.Fatalf("Error: : First Record Set Failed: %s\n\n\n", err)
-        }
-        t.Logf("3 rcds(%d): %+v\n",len(rcds),rcds)
-        if len(rcds) != 2 {
-            t.Fatalf("Error: : Number of Record Verification Failed\n\n\n")
-        }
-        if rcds[0].Name != "I" {
-            t.Fatalf("Error: : First Record Verification Failed\n\n\n")
-        }
-        if rcds[1].Name != "J" {
-            t.Fatalf("Error: : Second Record Verification Failed\n\n\n")
-        }
-
-        // Now read the Fourth set of records. (That don't exist!)
-        t.Logf("\tReading Fourth set of Records\n")
-        rcds, err = [[$t.TitledName]]RowPage(13, 4)
-        if err != nil {
-            t.Fatalf("Error: : Fourth Record Set Failed: %s\n\n\n", err)
-        }
-        if len(rcds) != 0 {
-            t.Fatalf("Error: : Number of Record Verification Failed\n\n\n")
-        }
-
-        //err = TablesDelete()
-        if err != nil {
-            t.Fatal("Error: Cannot delete tables: ", err)
-        }
-        err = Disconnect()
-        if err != nil {
-            t.Fatal("Error: Cannot disconnect: ", err)
-        }
-
-	    t.Logf("Test[[$t.TitledName]]RowInsert() - End of Test\n\n\n")
-    }
-
-[[ end ]]

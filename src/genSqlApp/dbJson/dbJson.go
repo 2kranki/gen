@@ -337,9 +337,13 @@ func (t *DbTable) DeleteSql() string {
 	return str.String()
 }
 
-func (t *DbTable) FieldIndex(n string) int {
+func (t *DbTable) FieldCount() int {
+	return len(t.Fields)
+}
+
+func (t *DbTable) FieldIndex(name string) int {
 	for i, f := range t.Fields {
-		if f.Name == n {
+		if f.Name == name {
 			return i
 		}
 	}
@@ -351,6 +355,13 @@ func (t *DbTable) FindField(name string) *DbField {
 		if f.Name == name {
 			return &t.Fields[i]
 		}
+	}
+	return nil
+}
+
+func (t *DbTable) FindIndex(idx int) *DbField {
+	if idx < len(t.Fields) && idx >= 0 {
+		return &t.Fields[idx]
 	}
 	return nil
 }
@@ -453,7 +464,7 @@ func (t *DbTable) Keys() ([]string, error) {
 
 // KeysList returns the table's keys in number order as
 // a comma separated list.
-func (t *DbTable) KeysList() string {
+func (t *DbTable) KeysList(prefix string) string {
 	var str			strings.Builder
 	var strs		[]string
 
@@ -463,7 +474,11 @@ func (t *DbTable) KeysList() string {
 		if i == len(strs) - 1 {
 			cm = ""
 		}
-		str.WriteString(fmt.Sprintf("%s%s", fn, cm))
+		pref := ""
+		if len(prefix) > 0 {
+			pref = prefix + "."
+		}
+		str.WriteString(fmt.Sprintf("%s%s%s", pref, fn, cm))
 	}
 	return str.String()
 }

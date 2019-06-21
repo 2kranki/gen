@@ -77,20 +77,34 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
-func (pd Plugin) GenSqlOpen() []string {
-	var strs		[]string
+func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+	var str			strings.Builder
 
-	strs = append(strs, "\tconnStr := fmt.Sprintf(\"user=%s password='%s' host=%s port=%s \", dbUser, dbPW, dbServer, dbPort)\n")
-	strs = append(strs, "\tif len(dbName) > 0 {\n")
-	strs = append(strs, "\t\tconnStr += fmt.Sprintf(\"dbname='%s' \", dbName)\n")
-	strs = append(strs, "\t}\n")
-	strs = append(strs, "\tconnStr += \"sslmode=disable\"\n")
+	str.WriteString("\tconnStr := fmt.Sprintf(\"user=%s password='%s' host=%s port=%s \", ")
+	str.WriteString(dbUser)
+	str.WriteString(", ")
+	str.WriteString(dbPW)
+	str.WriteString(", ")
+	str.WriteString(dbServer)
+	str.WriteString(", ")
+	str.WriteString(dbPort)
+	str.WriteString(")\n")
+	str.WriteString("\tif len(")
+	str.WriteString(dbName)
+	str.WriteString(") > 0 {\n")
+	str.WriteString("\t\tconnStr += fmt.Sprintf(\"dbname='%s' \", ")
+	str.WriteString(dbName)
+	str.WriteString(")\n")
+	str.WriteString("\t}\n")
+	str.WriteString("\tconnStr += \"sslmode=disable\"\n")
 	if sharedData.GenDebugging() {
-		strs = append(strs, "\tlog.Printf(\"\\tConnecting to postgres using %s\\n\", connStr)\n")
+		str.WriteString("\tlog.Printf(\"\\tConnecting to postgres using %s\\n\", connStr)\n")
 	}
-	strs = append(strs, "\tdb, err = sql.Open(\"postgres\", connStr)\n")
+	str.WriteString("\t")
+	str.WriteString(dbSql)
+	str.WriteString(", err = sql.Open(\"postgres\", connStr)\n")
 
-	return strs
+	return str.String()
 }
 
 // Name simply returns the external name that this plugin is known by

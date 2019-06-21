@@ -1,36 +1,85 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // See License.txt in main repository directory
 
-// io[[.TD.Data.TitledName]] contains all the functions
-// and data to interact with the SQL Database.
+// io[[.TD.Data.TitledName]] contains all the methods for
+// manipulating an SQL Database such as connections, database
+// creation and deletion if needed. It does not include the
+// specific Table Maintenance Methods. Those are maintained
+// in separate packages.
 
 // Generated: [[Time]]
-[[$td := .TD]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
 
-package io[[.TD.Data.TitledName]]
+package io[[$dn]]
 
 import (
     "database/sql"
 	"errors"
     "fmt"
-    "log"
-    [[if .TD.Data.HasFloat]]
+    [[if GenDebugging]]
+        "log"
+    [[end]]
+     [[if $d.HasFloat]]
         "strconv"
         "strings"
     [[end]]
-	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
-	//"net/http"
-	//"strconv"
+	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
 
-var db          *sql.DB
-var	dbName      string
-var	dbPW       	string
-var dbPort     	string
-var dbServer    string
-var dbUser     	string
+//============================================================================
+//                            IO_[[$dn]]
+//============================================================================
 
+type IO_[[$dn]] struct {
+    dbSql       *sql.DB
+    dbName      string
+    dbPW       	string
+    dbPort     	string
+    dbServer    string
+    dbUser     	string
+}
+
+func (io *IO_[[$dn]]) Name () string {
+    return io.dbName
+}
+func (io *IO_[[$dn]]) SetName (str string) {
+    io.dbName = str
+}
+
+func (io *IO_[[$dn]]) PW () string {
+    return io.dbPW
+}
+func (io *IO_[[$dn]]) SetPW (str string) {
+    io.dbPW = str
+}
+
+func (io *IO_[[$dn]]) Port () string {
+    return io.dbPort
+}
+func (io *IO_[[$dn]]) SetPort (str string) {
+    io.dbPort = str
+}
+
+func (io *IO_[[$dn]]) Server () string {
+    return io.dbServer
+}
+func (io *IO_[[$dn]]) SetServer (str string) {
+    io.dbServer = str
+}
+
+func (io *IO_[[$dn]]) Sql () *sql.DB {
+    return io.dbSql
+}
+
+func (io *IO_[[$dn]]) User () string {
+    return io.dbUser
+}
+func (io *IO_[[$dn]]) SetUser (str string) {
+    io.dbUser = str
+}
 
 //============================================================================
 //                              Miscellaneous
@@ -46,7 +95,7 @@ var dbUser     	string
     }
 [[end]]
 
-[[if .TD.Data.HasFloat]]
+[[if $d.HasFloat]]
 
     func FloatToString(num float64) string {
         s := fmt.Sprintf("%.4f", num)
@@ -61,74 +110,65 @@ var dbUser     	string
 
 [[end]]
 
-func Name() string {
-    return dbName
+// Set up default parameters for the needed SQL Type.
+func (io *IO_[[$dn]]) DefaultParms() {
+	[[ if eq $d.SqlType "mariadb" ]]
+		io.SetPort("4306")
+		io.SetPW("Passw0rd!")
+		io.SetServer("127.0.0.1")
+		io.SetUser("root")
+	[[ else if eq $d.SqlType  "mssql" ]]
+		io.SetPort("1401")
+		io.SetPW("Passw0rd!")
+		io.SetServer("localhost")
+		io.SetUser("SA")
+	[[ else if eq $d.SqlType "mysql" ]]
+		io.SetPort("3306")
+		io.SetPW("Passw0rd!")
+		io.SetServer("127.0.0.1")
+		io.SetUser("root")
+	[[ else if eq $d.SqlType "postgres" ]]
+		io.SetPort("5432")
+		io.SetPW("Passw0rd!")
+		io.SetServer("localhost")
+		io.SetUser("postgres")
+	[[ else if eq $d.SqlType "sqlite" ]]
+		io.SetName("test.db")
+	[[ end ]]
 }
 
-func SetName(value string) {
-   dbName = value
-}
-
-func Port() string {
-   return dbPort
-}
-
-func SetPort(value string) {
-   dbPort = value
-}
-
-func PW() string {
-   return dbPW
-}
-
-func SetPW(value string) {
-   dbPW = value
-}
-
-func Server() string {
-   return dbServer
-}
-
-func SetServer(value string) {
-   dbServer = value
-}
-
-func User() string {
-   return dbServer
-}
-
-func SetUser(value string) {
-   dbUser = value
-}
+//============================================================================
+//                              Database Methods
+//============================================================================
 
 // Connect connects the database/sql/driver to the appropriate
 //database using the given parameters.
-func Connect() error {
+func (io *IO_[[$dn]]) Connect() error {
     var err         error
 
-	[[.TD.Data.Plugin.Plugin.GenSqlOpen]]
+	[[$d.Plugin.Plugin.GenSqlOpen "io.dbSql" "io.dbServer" "io.dbPort" "io.dbUser" "io.dbPW" "io.dbName"]]
 
     if err != nil {
         log.Fatalln("Error: Cannot Connect: ", err)
     }
-    err = db.Ping()
+    err = io.dbSql.Ping()
     if err != nil {
-        Disconnect( )
+        io.Disconnect( )
         log.Fatalln("Error: Cannot Ping: ", err)
     }
 
-    [[if .TD.Data.Plugin.Plugin.CreateDatabase]]
-        err = DatabaseCreate()
+    [[if $d.Plugin.Plugin.CreateDatabase]]
+        err = io.DatabaseCreate()
         if err != nil {
-            Disconnect( )
+            io.Disconnect( )
             log.Fatalln("Error: Cannot Ping: ", err)
         }
     [[end]]
 
-    [[if .TD.Data.Plugin.Plugin.NeedUse]]
-        err = DatabaseUse()
+    [[if $d.Plugin.Plugin.NeedUse]]
+        err = io.DatabaseUse()
         if err != nil {
-            Disconnect( )
+            io.Disconnect( )
             log.Fatalln("Error: Cannot Ping: ", err)
         }
     [[end]]
@@ -138,15 +178,15 @@ func Connect() error {
 // Disconnect() cleans up anything that needs to be
 // accomplished before the database is closed
 // and then closes the database connection.
-func Disconnect() error {
+func (io *IO_[[$dn]]) Disconnect() error {
     var err         error
 
     [[if GenDebugging]]
         log.Printf("\tDisconnecting from Database\n")
     [[end]]
-    if IsConnected() {
-        err = db.Close()
-        db = nil
+    if io.IsConnected() {
+        err = io.dbSql.Close()
+        io.dbSql = nil
     } else {
         err = errors.New("Error: Database was not connected!")
     }
@@ -154,8 +194,8 @@ func Disconnect() error {
     return err
 }
 
-func IsConnected() bool {
-    if db != nil {
+func (io *IO_[[$dn]]) IsConnected() bool {
+    if io.dbSql != nil {
         return true
     }
     return false
@@ -168,22 +208,22 @@ func IsConnected() bool {
 // DatabaseCreate creates the table in the
 // given database deleting the current table if
 // present.
-func DatabaseCreate() error {
-    var sqlStmt = "[[GenDatabaseCreateStmt .TD.Data]]"
+func (io *IO_[[$dn]]) DatabaseCreate() error {
+    var sqlStmt = "[[GenDatabaseCreateStmt $d]]"
     var err     error
 
     [[if GenDebugging]]
         log.Printf("DatabaseCreate()\n")
     [[end]]
 
-    err = DatabaseDelete()
+    err = io.DatabaseDelete()
     if err != nil {
         [[if GenDebugging]]
             log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
         [[end]]
         return err
     }
-    _, err = db.Exec(sqlStmt)
+    _, err = io.dbSql.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
@@ -193,15 +233,15 @@ func DatabaseCreate() error {
 
 // DatabaseDelete deletes the table in the
 // given database if present.
-func DatabaseDelete() error {
-    var sqlStmt = "[[GenDatabaseDeleteStmt .TD.Data]]"
+func (io *IO_[[$dn]]) DatabaseDelete() error {
+    var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
     var err     error
 
     [[if GenDebugging]]
         log.Printf("DatabaseDelete()\n")
     [[end]]
 
-    _, err = db.Exec(sqlStmt)
+    _, err = io.dbSql.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
@@ -210,15 +250,15 @@ func DatabaseDelete() error {
 }
 
 // DatabaseUse issues the database USE command.
-func DatabaseUse() error {
-    var sql = "USE [[.TD.Data.TitledName]];"
+func (io *IO_[[$dn]]) DatabaseUse() error {
+    var sql = "USE [[$dn]];"
     var err     error
 
     [[if GenDebugging]]
         log.Printf("DatabaseUse()\n")
     [[end]]
 
-    _, err = db.Exec(sql)
+    _, err = io.dbSql.Exec(sql)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
@@ -226,32 +266,13 @@ func DatabaseUse() error {
     return err
 }
 
-//============================================================================
-//                          Table Maintenance/Select
-//============================================================================
+//----------------------------------------------------------------------------
+//                                  New
+//----------------------------------------------------------------------------
 
-func TablesCreate() error {
-    var err         error
-
-	[[range $t := .TD.Data.Tables -]]
-        err = [[$t.TitledName]]TableCreate()
-        if err != nil {
-            log.Fatalln("Error: Cannot create table: ", err)
-        }
-	[[ end ]]
-
-	return err
+// New creates a new struct.
+func [[$dn]]New() *IO_[[$dn]] {
+    db := IO_[[$dn]]{}
+    return &db
 }
 
-func TablesDelete() error {
-    var err         error
-
-	[[range $t := .TD.Data.Tables -]]
-        err = [[$t.TitledName]]TableDelete()
-        if err != nil {
-            log.Fatalln("Error: Cannot delete table: ", err)
-        }
-	[[ end ]]
-
-	return err
-}

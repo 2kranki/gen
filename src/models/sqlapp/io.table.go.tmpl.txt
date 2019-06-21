@@ -18,19 +18,16 @@
 [[- $t  := .Table]]
 [[- $tn := .Table.TitledName]]
 
-package io[[.TD.Data.TitledName]]
+package io[[$dn]][[$tn]]
 
 import (
     "database/sql"
 	"errors"
-	"fmt"
     _ "github.com/shopspring/decimal"
     [[if GenDebugging]]
         "log"
     [[end]]
-	//"net/http"
 	_ "strconv"
-    "strings"
 	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
 	"../[[$dn]][[$tn]]"
 )
@@ -41,11 +38,21 @@ import (
 //                              Miscellaneous
 //============================================================================
 
+[[if GenDebugging]]
+func ErrorString(err error) string {
+    if err == nil {
+        return "ok"
+    } else {
+        return err.Error()
+    }
+}
+[[end]]
+
 //============================================================================
-//                            [[.Table.TitledName]]DB
+//                            IO_[[$tn]]
 //============================================================================
 
-type [[.Table.TitledName]]DB struct {
+type IO_[[$tn]] struct {
     dbSql       *sql.DB
 }
 
@@ -54,24 +61,24 @@ type [[.Table.TitledName]]DB struct {
 //----------------------------------------------------------------------------
 
 // RowDelete deletes the row with keys from the provided record, rcd.
-func (db [[.Table.TitledName]]DB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowDeleteStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowDelete()\n")
+        log.Printf("io[[$tn]].RowDelete()\n")
     [[end]]
 
-	//_, err = db.dbSql.Exec(sqlStmt, key)
+	_, err = io.dbSql.Exec(sqlStmt, [[$t.KeysList "rcd"]])
 	if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[.Table.TitledName]].RowDelete(Error:500) - Internal Error\n")
+            log.Printf("...end io[[$tn]].RowDelete(Error:500) - Internal Error\n")
         [[end]]
 		return errors.New("500. Internal Server Error")
 	}
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowDelete()\n")
+        log.Printf("...end io[[$tn]].RowDelete()\n")
     [[end]]
 	return nil
 }
@@ -82,27 +89,20 @@ func (db [[.Table.TitledName]]DB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
 // RowFind searches the Database for a matching row for the keys found in
 // the given record and returns the output in that same record.
-func (db [[.Table.TitledName]]DB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
-    var sqlStmt     = "[[GenRowFindStmt .Table]]"
+    var sqlStmt     = "[[GenRowFindStmt $t]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowFind(%+v)\n", rcd)
+        log.Printf("io[[$tn]].RowFind(%+v)\n", rcd)
     [[end]]
 
-    if key == "" {
-    [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowFind(Error:400) - No Key given\n")
-    [[end]]
-	    return errors.New("400. Bad Request.")
-    }
+	row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd"]])
 
-	row := db.dbSql.QueryRow(sqlStmt, key)
-
-	err = row.Scan([[.Table.ScanFields "rcd"]])
+	err = row.Scan([[$t.ScanFields "rcd"]])
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowFind(%+v, %s)\n", data, ErrorString(err))
+        log.Printf("...end io[[$tn]].RowFind(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -114,17 +114,17 @@ func (db [[.Table.TitledName]]DB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 // RowFirst returns the first row in the table, [[.Table.TitledName]].
 // If there are no rows in the table, then a blank/null record is returned
 // without error.
-func (db [[.Table.TitledName]]DB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowFirstStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowFirst()\n")
+        log.Printf("io[[$tn]].RowFirst()\n")
     [[end]]
 
-    row := db.dbSql.QueryRow(sqlStmt)
+    row := io.dbSql.QueryRow(sqlStmt)
 
-	err = row.Scan([[.Table.ScanFields "rcd"]])
+	err = row.Scan([[$t.ScanFields "rcd"]])
 	if err == sql.ErrNoRows {
         [[if GenDebugging]]
             log.Printf("\tNo Rows found!\n")
@@ -133,7 +133,7 @@ func (db [[.Table.TitledName]]DB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowFirst(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].RowFirst(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -142,27 +142,27 @@ func (db [[.Table.TitledName]]DB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Insert
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowInsert(%+v)\n", d)
+        log.Printf("io[[$tn]].RowInsert(%+v)\n", d)
     [[end]]
 
     // Validate the input record.
 
     // Add it to the table.
-    _, err = db.dbSql.Exec(sqlStmt, [[.Table.ScanFields "d"]])
+    _, err = io.dbSql.Exec(sqlStmt, [[$t.ScanFields "d"]])
 	if err != nil {
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowInsert(Error:500) - Internal Error\n")
+        log.Printf("...end io[[$tn]].RowInsert(Error:500) - Internal Error\n")
     [[end]]
 		err = errors.New("500. Internal Server Error." + err.Error())
 	}
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowInsert(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].RowInsert(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -171,17 +171,17 @@ func (db [[.Table.TitledName]]DB) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Last
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowLastStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowLast(%+v)\n", rcd)
+        log.Printf("io[[$tn]].RowLast(%+v)\n", rcd)
     [[end]]
 
-    row := db.dbSql.QueryRow(sqlStmt)
+    row := io.dbSql.QueryRow(sqlStmt)
 
-	err = row.Scan([[.Table.ScanFields "rcd"]])
+	err = row.Scan([[$t.ScanFields "rcd"]])
 	if err == sql.ErrNoRows {
         [[if GenDebugging]]
             log.Printf("\tNo Rows found!\n")
@@ -190,7 +190,7 @@ func (db [[.Table.TitledName]]DB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowLast(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].RowLast(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -201,25 +201,25 @@ func (db [[.Table.TitledName]]DB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
 // RowNext returns the next row from the row given. If row after the current
 // one does not exist, then the first row is returned.
-func (db [[.Table.TitledName]]DB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowNextStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowNext(%+v)\n", rcd)
+        log.Printf("io[[$tn]].RowNext(%+v)\n", rcd)
     [[end]]
 
-    row := db.dbSql.QueryRow(sqlStmt, key)
+    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd"]])
 
-	err = row.Scan([[.Table.ScanFields "rcd"]])
+	err = row.Scan([[$t.ScanFields "rcd"]])
 	if err != nil {
 	    err = db.RowFirst(rcd)
 	}
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowNext(%+v, %s)\n", data, ErrorString(err))
+        log.Printf("...end io[[$tn]].RowNext(%s)\n", ErrorString(err))
     [[end]]
-    return &data, err
+    return err
 }
 
 //----------------------------------------------------------------------------
@@ -230,23 +230,23 @@ func (db [[.Table.TitledName]]DB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 // 'offset' is the offset into the result set ordered by the main index. Both
 // 'limit' and 'offset' are relative to 1. We return an address to the array
 // rows (structs) so that we don't have the overhead of copying them everwhere.
-func (db [[.Table.TitledName]]DB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
+func (io IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
     var err         error
-    var sqlStmt = "[[GenRowPageStmt .Table]]"
+    var sqlStmt = "[[GenRowPageStmt $t]]"
     data := [][[$dn]][[$tn]].[[$tn]]{}
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowPage(%d,%d)\n",offset,limit)
+        log.Printf("io[[$tn]].RowPage(%d,%d)\n",offset,limit)
     [[end]]
 
-    rows, err := db.dbSql.Query(sqlStmt, limit, offset)
+    rows, err := io.dbSql.Query(sqlStmt, limit, offset)
 	if err != nil {
 	    return data, err
 	}
 
 	for rows.Next() {
-		var rcd     [[.Table.TitledName]]
-		if err = rows.Scan([[.Table.ScanFields "&rcd"]]); err != nil {
+		var rcd     [[$dn]][[$tn]].[[$tn]]
+		if err = rows.Scan([[$t.ScanFields "&rcd"]]); err != nil {
 			log.Fatal(err)
 		} else {
 		    data = append(data, rcd)
@@ -256,7 +256,7 @@ func (db [[.Table.TitledName]]DB) RowPage(offset int, limit int) ([][[$dn]][[$tn
 	rows.Close()
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowPage(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].RowPage(%s)\n", ErrorString(err))
     [[end]]
     return data, err
 }
@@ -265,24 +265,23 @@ func (db [[.Table.TitledName]]DB) RowPage(offset int, limit int) ([][[$dn]][[$tn
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowPrevStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowPrev(%+v)\n", rcd)
+        log.Printf("io[[$tn]].RowPrev(%+v)\n", rcd)
     [[end]]
 
-    row := db.dbSql.QueryRow(sqlStmt, rcd)
+    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd"]])
 
-	err = row.Scan([[.Table.ScanFields "&rcd"]])
+	err = row.Scan([[$t.ScanFields "&rcd"]])
 	if err != nil {
-	    var datap   *[[.Table.TitledName]]
 	    err = db.RowLast(rcd)
 	}
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowPrev(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].RowPrev(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -291,27 +290,27 @@ func (db [[.Table.TitledName]]DB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Update
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
+func (io IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].RowUpdate(%+v)\n", d)
+        log.Printf("io[[$tn]].RowUpdate(%+v)\n", d)
     [[end]]
 
     // Validate the input record.
 
     // Add it to the table.
-    _, err = db.dbSql.Exec(sqlStmt, [[.Table.ScanFields "d"]])
+    _, err = io.dbSql.Exec(sqlStmt, [[$t.ScanFields "d"]])
 	if err != nil {
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowUpdate(Error:500) - Internal Error\n")
+        log.Printf("...end io[[$tn]].RowUpdate(Error:500) - Internal Error\n")
     [[end]]
 		err = errors.New("500. Internal Server Error." + err.Error())
 	}
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].RowUpdate(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].RowUpdate(%s)\n", ErrorString(err))
     [[end]]
 	return err
 }
@@ -321,16 +320,16 @@ func (db [[.Table.TitledName]]DB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Table Count
 //----------------------------------------------------------------------------
 
-func (db [[.Table.TitledName]]DB) TableCount( ) (int, error) {
+func (io IO_[[$tn]]) TableCount( ) (int, error) {
     var err         error
     var count       int
     var sqlStmt = "[[GenTableCountStmt .Table]]"
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].TableCount()\n")
+        log.Printf("io[[$tn]].TableCount()\n")
     [[end]]
 
-    row, err := db.dbSql.Query(sqlStmt)
+    row, err := io.dbSql.Query(sqlStmt)
     if err != nil {
         return 0, err
     }
@@ -341,7 +340,7 @@ func (db [[.Table.TitledName]]DB) TableCount( ) (int, error) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].TableCount(%s) %d\n", ErrorString(err), count)
+        log.Printf("...end io[[$tn]].TableCount(%s) %d\n", ErrorString(err), count)
     [[end]]
     return count, err
 }
@@ -352,26 +351,26 @@ func (db [[.Table.TitledName]]DB) TableCount( ) (int, error) {
 
 // TableCreate creates the table in the given database deleting the current
 // table if present.
-func (db [[.Table.TitledName]]DB) TableCreate() error {
+func (io IO_[[$tn]]) TableCreate() error {
     var sqlStmt = "[[GenTableCreateStmt .Table]]"
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].TableCreate()\n")
+        log.Printf("io[[$tn]].TableCreate()\n")
         log.Printf("\tSQL:\n%s\n", sqlStmt)
     [[end]]
 
-    err = [[.Table.TitledName]]TableDelete()
+    err = io.TableDelete()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[.Table.TitledName]].TableCreate(Error:%s)\n", err.Error())
+            log.Printf("...end io[[$tn]].TableCreate(Error:%s)\n", err.Error())
         [[end]]
         return err
     }
-    _, err = db.dbSql.Exec(sqlStmt)
+    _, err = io.dbSql.Exec(sqlStmt)
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].TableCreate(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].TableCreate(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -381,19 +380,19 @@ func (db [[.Table.TitledName]]DB) TableCreate() error {
 //----------------------------------------------------------------------------
 
 // TableDelete deletes the table in the given database if present.
-func (db [[.Table.TitledName]]DB) TableDelete() error {
+func (io IO_[[$tn]]) TableDelete() error {
     var sqlStmt = "[[GenTableDeleteStmt .Table]]"
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[.Table.TitledName]].TableDelete()\n")
+        log.Printf("io[[$tn]].TableDelete()\n")
         log.Printf("\tSQL:\n%s\n", sqlStmt)
     [[end]]
 
-    _, err = db.dbSql.Exec(sqlStmt)
+    _, err = io.dbSql.Exec(sqlStmt)
 
     [[if GenDebugging]]
-        log.Printf("...end [[.Table.TitledName]].TableDelete(%s)\n", ErrorString(err))
+        log.Printf("...end io[[$tn]].TableDelete(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -402,9 +401,9 @@ func (db [[.Table.TitledName]]DB) TableDelete() error {
 //                                  New
 //----------------------------------------------------------------------------
 
-// NewDB creates a new DB struct.
-func [[.Table.TitledName]]NewDB(dbSql *sql.DB) *[[.Table.TitledName]]DB {
-    db := [[.Table.TitledName]]DB{}
+// New creates a new io struct.
+func [[$tn]]New(dbSql *sql.DB) *IO_[[$tn]] {
+    db := IO_[[$tn]]{}
     db.dbSql = dbSql
     return &db
 }

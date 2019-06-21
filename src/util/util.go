@@ -18,9 +18,13 @@ import (
 	"strings"
 )
 
-// CopyDir copies from the given directory (src)
-// and all of its files to the destination (dst).
-func CopyDir(src, dst string) (error) {
+//----------------------------------------------------------------------------
+//                             CopyDir
+//----------------------------------------------------------------------------
+
+// CopyDir copies from the given directory (src) and all of its files to the
+// destination (dst).
+func CopyDir(src, dst string) error {
 	var err error
 
 	src, err = IsPathRegularFile(src)
@@ -50,8 +54,10 @@ func CopyDir(src, dst string) (error) {
 
 	fis, err := dir.Readdir(-1)
 	if err != nil {
+		dir.Close()
 		return err
 	}
+	dir.Close()
 
 	for _, fi := range fis {
 		srcpath := src + "/" + fi.Name()
@@ -68,14 +74,18 @@ func CopyDir(src, dst string) (error) {
 				return err
 			}
 		}
-
 	}
+
 	return nil
 }
 
+//----------------------------------------------------------------------------
+//                             CopyFile
+//----------------------------------------------------------------------------
+
 // CopyFile copies a file given by its path (src) creating
 // an output file given its path (dst)
-func CopyFile(src, dst string) (error) {
+func CopyFile(src, dst string) error {
 	var err error
 
 	// Clean up the input file path and check for its existence.
@@ -111,6 +121,22 @@ func CopyFile(src, dst string) (error) {
 
 	return nil
 }
+
+//----------------------------------------------------------------------------
+//                             ErrorString
+//----------------------------------------------------------------------------
+
+func ErrorString(err error) string {
+	if err == nil {
+		return "ok"
+	} else {
+		return err.Error()
+	}
+}
+
+//----------------------------------------------------------------------------
+//                             FileCompare
+//----------------------------------------------------------------------------
 
 // FileCompare compares two files returning true
 // if they are equal.
@@ -181,6 +207,10 @@ func FileCompare(file1, file2 string) bool {
 	return false
 }
 
+//----------------------------------------------------------------------------
+//                             IsPathDir
+//----------------------------------------------------------------------------
+
 // IsPathDir cleans up the supplied file path
 // and then checks the cleaned file path to see
 // if it is an existing standard directory. Return the
@@ -205,6 +235,10 @@ func IsPathDir(fp string) (string, error) {
 	return path, errors.New("path not regular file")
 }
 
+//----------------------------------------------------------------------------
+//                            IsPathRegularFile
+//----------------------------------------------------------------------------
+
 // IsPathRegularFile cleans up the supplied file path
 // and then checks the cleaned file path to see
 // if it is an existing standard file. Return the
@@ -228,6 +262,10 @@ func IsPathRegularFile(fp string) (string, error) {
 	}
 	return path, errors.New("path not regular file")
 }
+
+//----------------------------------------------------------------------------
+//                            ReadJsonFile
+//----------------------------------------------------------------------------
 
 // ReadJsonFile preprocesses out comments and then unmarshals the data
 // generically.
@@ -255,6 +293,10 @@ func ReadJsonFile(jsonPath string) (interface{}, error) {
 	return jsonOut, err
 }
 
+//----------------------------------------------------------------------------
+//                            ReadJsonFileToData
+//----------------------------------------------------------------------------
+
 // ReadJsonFileToData preprocesses out comments and then unmarshals the data
 // into a data structure previously defined.
 func ReadJsonFileToData(jsonPath string, jsonOut interface{}) error {
@@ -279,6 +321,10 @@ func ReadJsonFileToData(jsonPath string, jsonOut interface{}) error {
 
 	return err
 }
+
+//----------------------------------------------------------------------------
+//                            		Workers
+//----------------------------------------------------------------------------
 
 // Workers allows us to perform r number of task(s) at a time until
 // all tasks are completed.  The input channel to run the task is
