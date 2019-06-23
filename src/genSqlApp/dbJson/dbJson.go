@@ -16,7 +16,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unsafe"
 )
 
 //============================================================================
@@ -154,6 +153,11 @@ func (f *DbField) GenFromString(dn,sn string) string {
 				"\t\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n\t}\n"
 			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
 		}
+	case "time.Time":
+		{
+			wrk := "\t%s.%s, err = time.Parse(time.RFC3339, %s)\n"
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
+		}
 	default:
 		str = fmt.Sprintf("\t%s.%s = %s\n", dn, f.TitledName(), sn)
 	}
@@ -179,6 +183,12 @@ func (f *DbField) GenToString(v string, st string) string {
 		str += fmt.Sprintf("\t\ts := fmt.Sprintf(\"%s.4f\", %s.%s)\n", "%", st, f.TitledName())
 		str += fmt.Sprintf("\t\t%s = strings.TrimRight(strings.TrimRight(s, \"0\"), \".\")\n", v)
 		str += "\t}\n"
+	case "time.Time":
+		{
+			wrk := "\t{\n\t\twrk, _ := %s.%s.MarshalText()\n" +
+				"\t\t%s = wrk\n\t}\n"
+			str = fmt.Sprintf(wrk, st, f.TitledName(), v)
+		}
 	default:
 		str = fmt.Sprintf("\t%s = %s.%s\n", v, st, f.TitledName())
 	}
@@ -188,6 +198,18 @@ func (f *DbField) GenToString(v string, st string) string {
 
 func (f *DbField) GoType() string {
 	return f.Typ.GoType()
+}
+
+func (f *DbField) IsDate() bool {
+
+	if f.TypeDefn == "date" {
+		return true
+	}
+	if f.TypeDefn == "datetime" {
+		return true
+	}
+
+	return false
 }
 
 func (f *DbField) IsDec() bool {
@@ -260,41 +282,6 @@ type DbTable struct {
 	DB				*Database	`json:"-"`
 }
 
-// CreateInsertStr() creates a string of all the field
-// names which can be used in SQL INSERT statements.
-func (t *DbTable) CreateInsertStr() string {
-	return t.ScanFields("")
-}
-
-func (t *DbTable) CreateSql() string {
-	var str			strings.Builder
-	var ff			*DbField
-
-	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\\n", t.Name))
-	for i, f := range t.Fields {
-		var cm  		string
-
-		cm = ""
-		if i != (len(t.Fields) - 1) {
-			cm = ","
-		}
-		ff = (*DbField)(unsafe.Pointer(&f))
-		str.WriteString(fmt.Sprintf("%s\\n", ff.CreateSql(cm)))
-	}
-	if len(t.SQLParms) > 0 {
-		str.WriteString(",\\n")
-		for _, l := range t.SQLParms {
-			str.WriteString(fmt.Sprintf("%s\\n", l))
-		}
-	}
-	str.WriteString(fmt.Sprintf(");\\n"))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
-
-	return str.String()
-}
-
 func (t *DbTable) CreateStruct( ) string {
 	var str			strings.Builder
 
@@ -309,22 +296,6 @@ func (t *DbTable) CreateStruct( ) string {
 	// is far easier making it a much better strategy.
 
 	return str.String()
-}
-
-// CreateValueStr() creates a string of $nnn's
-// which can be used in SQL INSERT VALUE statements.
-func (t *DbTable) CreateValueStr() string {
-
-	insertStr := ""
-	for i, _ := range t.Fields {
-		cm := ", "
-		if i == len(t.Fields) - 1 {
-			cm = ""
-		}
-		insertStr += fmt.Sprintf("?%s", cm)
-		//insertStr += fmt.Sprintf("$%d%s", i+1, cm)
-	}
-	return insertStr
 }
 
 func (t *DbTable) DeleteSql() string {
@@ -350,6 +321,25 @@ func (t *DbTable) FieldIndex(name string) int {
 	return -1
 }
 
+// FieldNameList returns struct fields separated by
+// commas with an optional per field prefix.
+func (t *DbTable) FieldNameList(prefix string) string {
+	var str			strings.Builder
+
+	for i,f := range t.Fields {
+		cm := ", "
+		if i == len(t.Fields) - 1 {
+			cm = ""
+		}
+		if len(prefix) > 0 {
+			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
+		} else {
+			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+		}
+	}
+	return str.String()
+}
+
 func (t *DbTable) FindField(name string) *DbField {
 	for i, f := range t.Fields {
 		if f.Name == name {
@@ -370,6 +360,18 @@ func (t *DbTable) ForFields(f func(f *DbField) ) {
 	for i, _ := range t.Fields {
 		f(&t.Fields[i])
 	}
+}
+
+// HasDate returns true if any of the fields are a
+// date or datetime type.
+func (t *DbTable) HasDate() bool {
+
+	for i,_ := range t.Fields {
+		if t.Fields[i].IsDate() {
+			return true
+		}
+	}
+	return false
 }
 
 // HasDec returns true if any of the fields are a
@@ -464,7 +466,7 @@ func (t *DbTable) Keys() ([]string, error) {
 
 // KeysList returns the table's keys in number order as
 // a comma separated list.
-func (t *DbTable) KeysList(prefix string) string {
+func (t *DbTable) KeysList(prefix, suffix string) string {
 	var str			strings.Builder
 	var strs		[]string
 
@@ -476,9 +478,13 @@ func (t *DbTable) KeysList(prefix string) string {
 		}
 		pref := ""
 		if len(prefix) > 0 {
-			pref = prefix + "."
+			pref = prefix
 		}
-		str.WriteString(fmt.Sprintf("%s%s%s", pref, fn, cm))
+		suf := ""
+		if len(suffix) > 0 {
+			suf = suffix
+		}
+		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, fn, suf, cm))
 	}
 	return str.String()
 }
@@ -496,26 +502,6 @@ func (t *DbTable) KeysListStr() string {
 			cm = ""
 		}
 		str.WriteString(fmt.Sprintf("\"%s\"%s", fn, cm))
-	}
-	return str.String()
-}
-
-// ScanFields returns struct fields to be used in
-// a row.Scan.  It assumes that the struct's name
-// is "data"
-func (t *DbTable) ScanFields(prefix string) string {
-	var str			strings.Builder
-
-	for i,f := range t.Fields {
-		cm := ", "
-		if i == len(t.Fields) - 1 {
-			cm = ""
-		}
-		if len(prefix) > 0 {
-			str.WriteString(fmt.Sprintf("%s.%s%s", prefix, f.Name, cm))
-		} else {
-			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
-		}
 	}
 	return str.String()
 }
@@ -554,6 +540,15 @@ func (d *Database) ForTables(f func(t *DbTable) ) {
 	for i, _ := range d.Tables {
 		f(&d.Tables[i])
 	}
+}
+
+func (d *Database) HasDate() bool {
+	for _, t := range d.Tables {
+		if t.HasDate() {
+			return true
+		}
+	}
+	return false
 }
 
 func (d *Database) HasFloat() bool {

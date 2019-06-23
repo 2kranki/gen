@@ -28,8 +28,8 @@ const(
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
 var tds	= dbType.TypeDefns {
-	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
-	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
+	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"time.Time",	DftLen:0,},
+	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"time.Time",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
 	{Name:"dec", 		Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
 	{Name:"decimal", 	Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},

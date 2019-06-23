@@ -23,10 +23,10 @@ definition and having them control the generation process.
 **Project Futures**:
 
 
-- [ ] Finish Database Handler Testing
 - [x] Finish Table Handler Testing
 - [x] Finish Database I/O Testing for SQLite
-- [ ] Finish Table I/O Testing for SQLite
+- [x] Finish Table I/O Testing for SQLite
+- [ ] Finish Database Handler Testing
 - [ ] Finish MS-SQL Support
 - [ ] Finish MySQL/MariaDB Support
 - [ ] Finish Postgres Support

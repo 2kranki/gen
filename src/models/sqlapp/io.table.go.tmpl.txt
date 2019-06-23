@@ -2,7 +2,9 @@
 // See License.txt in main repository directory
 
 // This portion of io[[.TD.Data.TitledName]] handles all the
-// i/o and manipulation for the [[.Table.Name]] table.
+// i/o and manipulation for the [[.Table.Name]] table. Any
+// table manipulation should be added to this package as
+// methods in IO_[[.Table.Name]]
 
 // Notes:
 //  1. Any Database Query that returns "rows" must have an associated
@@ -69,7 +71,7 @@ func (io IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowDelete()\n")
     [[end]]
 
-	_, err = io.dbSql.Exec(sqlStmt, [[$t.KeysList "rcd"]])
+	_, err = io.dbSql.Exec(sqlStmt, [[$t.KeysList "rcd." ""]])
 	if err != nil {
         [[if GenDebugging]]
             log.Printf("...end io[[$tn]].RowDelete(Error:500) - Internal Error\n")
@@ -97,9 +99,9 @@ func (io IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowFind(%+v)\n", rcd)
     [[end]]
 
-	row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd"]])
+	row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
-	err = row.Scan([[$t.ScanFields "rcd"]])
+	err = row.Scan([[$t.FieldNameList "&rcd."]])
 
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowFind(%s)\n", ErrorString(err))
@@ -124,7 +126,7 @@ func (io IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
     row := io.dbSql.QueryRow(sqlStmt)
 
-	err = row.Scan([[$t.ScanFields "rcd"]])
+	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
         [[if GenDebugging]]
             log.Printf("\tNo Rows found!\n")
@@ -148,12 +150,13 @@ func (io IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
 
     [[if GenDebugging]]
         log.Printf("io[[$tn]].RowInsert(%+v)\n", d)
+        log.Printf("\tSQL:\n%s\n", sqlStmt)
     [[end]]
 
     // Validate the input record.
 
     // Add it to the table.
-    _, err = io.dbSql.Exec(sqlStmt, [[$t.ScanFields "d"]])
+    _, err = io.dbSql.Exec(sqlStmt, [[$t.FieldNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowInsert(Error:500) - Internal Error\n")
@@ -181,7 +184,7 @@ func (io IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
     row := io.dbSql.QueryRow(sqlStmt)
 
-	err = row.Scan([[$t.ScanFields "rcd"]])
+	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
         [[if GenDebugging]]
             log.Printf("\tNo Rows found!\n")
@@ -209,11 +212,11 @@ func (io IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowNext(%+v)\n", rcd)
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd"]])
+    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
-	err = row.Scan([[$t.ScanFields "rcd"]])
+	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err != nil {
-	    err = db.RowFirst(rcd)
+	    err = io.RowFirst(rcd)
 	}
 
     [[if GenDebugging]]
@@ -246,7 +249,7 @@ func (io IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], e
 
 	for rows.Next() {
 		var rcd     [[$dn]][[$tn]].[[$tn]]
-		if err = rows.Scan([[$t.ScanFields "&rcd"]]); err != nil {
+		if err = rows.Scan([[$t.FieldNameList "&rcd."]]); err != nil {
 			log.Fatal(err)
 		} else {
 		    data = append(data, rcd)
@@ -273,11 +276,11 @@ func (io IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowPrev(%+v)\n", rcd)
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd"]])
+    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
-	err = row.Scan([[$t.ScanFields "&rcd"]])
+	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err != nil {
-	    err = db.RowLast(rcd)
+	    err = io.RowLast(rcd)
 	}
 
     [[if GenDebugging]]
@@ -301,7 +304,7 @@ func (io IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    _, err = io.dbSql.Exec(sqlStmt, [[$t.ScanFields "d"]])
+    _, err = io.dbSql.Exec(sqlStmt, [[$t.FieldNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowUpdate(Error:500) - Internal Error\n")

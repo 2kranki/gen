@@ -124,6 +124,34 @@ type GenFormDataKeyser interface {
 
 
 //----------------------------------------------------------------------------
+//                        	Miscellaneous Interface Support
+//----------------------------------------------------------------------------
+
+// GenPlaceHolderer includes the methods responsible for generating place holders
+// for SQL statements.
+// Note: Some SQL Drivers use '?' as a placeholder and others use "$nn" where
+// nn is a number starting at 1..(number of columns). Since all placeholders
+// are consistant per driver, we combined the interface methods into one inter-
+// face.
+
+type GenPlaceHolderer interface {
+	// GenDataPlaceHolder generates the string for table columns when a list of them
+	// is involved such as used in RowInsert().  Example: "?, ?, ?"
+	GenDataPlaceHolder(tb *dbJson.DbTable) string
+
+	// GenKeySearchPlaceHolder generates the string for multiple keys when an expression
+	// is involved such as used in RowFind(). The expression is constrolled by rel which
+	// defines it. Possibilities are '=', '<', '>', ... and will apply to all keys in the
+	// table. Example: "key1 = $1 AND key2 = $2"
+	GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string
+
+	// GenKeysPlaceHolder generates the string for multiple keys when a list of key
+	// is involved such as used in RowFind().  Example: "$1, $2, $3"
+	GenKeysPlaceHolder(tb *dbJson.DbTable) string
+}
+
+
+//----------------------------------------------------------------------------
 //						Global Database Support Functions
 //----------------------------------------------------------------------------
 
@@ -182,7 +210,7 @@ func GenTableCountStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCountStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s;\\n", t.TitledName()))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -194,6 +222,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 	var str			strings.Builder
 	var intr		GenTableCreateStmter
 	var ok			bool
+	var hasKeys		bool
 
 	db := t.DB
 	intr, ok = db.Plugin.(GenTableCreateStmter)
@@ -214,6 +243,10 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		cm = ""
 		if i != (len(t.Fields) - 1) {
 			cm = ","
+		} else {
+			if hasKeys {
+				cm = ","
+			}
 		}
 
 		td := f.Typ
@@ -237,15 +270,19 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 			nl = ""
 		}
 		pk = ""
-		//FIXME: if f.PrimaryKey {
-		//pk = " PRIMARY KEY"
-		//}
+		if f.KeyNum > 0 {
+			hasKeys = true
+		}
 		sp = ""
 		if len(f.SQLParms) > 0 {
 			sp = " " + f.SQLParms
 		}
 
 		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
+	}
+	if hasKeys {
+		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.TitledName(), t.KeysList("", ""))
+		str.WriteString(wrk)
 	}
 	str.WriteString(")")
 	if len(t.SQLParms) > 0 {
@@ -297,7 +334,7 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Delete SQL
-	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE [[.Table.PrimaryKey.Name]] = $1;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE [[.Table.PrimaryKey.Name]] = $1;\\n", t.TitledName()))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -316,8 +353,7 @@ func GenRowFindStmt(t *dbJson.DbTable) string {
 		return intr.GenRowFindStmt(t)
 	}
 
-	//TODO: Finish Row Find SQL
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE [[.Table.PrimaryKey.Name]] = $1;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE %s;\\n", t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -336,8 +372,7 @@ func GenRowFirstStmt(t *dbJson.DbTable) string {
 		return intr.GenRowFirstStmt(t)
 	}
 
-	//TODO: Finish Row First SQL
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY [[.Table.PrimaryKey.Name]] LIMIT 1;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT 1;\\n", t.TitledName(), t.KeysList("", " ASC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -356,8 +391,7 @@ func GenRowInsertStmt(t *dbJson.DbTable) string {
 		return intr.GenRowInsertStmt(t)
 	}
 
-	//TODO: Finish Row Insert SQL
-	str.WriteString(fmt.Sprintf("INSERT INTO %s ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]]);\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s);\\n", t.TitledName(), t.FieldNameList(""), GenDataPlaceHolder(t)))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -376,8 +410,7 @@ func GenRowLastStmt(t *dbJson.DbTable) string {
 		return intr.GenRowLastStmt(t)
 	}
 
-	//TODO: Finish Row Last SQL
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT 1;\\n", t.TitledName(), t.KeysList("", " DESC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -396,8 +429,7 @@ func GenRowNextStmt(t *dbJson.DbTable) string {
 		return intr.GenRowNextStmt(t)
 	}
 
-	//TODO: Finish Row Next SQL
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT $1 OFFSET $2 ;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT ? OFFSET ? ;\\n", t.TitledName(), t.KeysList(""," ASC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -416,7 +448,7 @@ func GenRowPageStmt(t *dbJson.DbTable) string {
 		return intr.GenRowPageStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT $1 OFFSET $2 ;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT ? OFFSET ? ;\\n", t.TitledName(), t.KeysList("", " ASC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -435,8 +467,7 @@ func GenRowPrevStmt(t *dbJson.DbTable) string {
 		return intr.GenRowPrevStmt(t)
 	}
 
-	//TODO: Finish Row Prev SQL
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE [[.Table.PrimaryKey.Name]] < $1 ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE %s ORDER BY %s LIMIT 1;\\n", t.TitledName(), GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -456,7 +487,7 @@ func GenRowUpdateStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Update SQL
-	str.WriteString(fmt.Sprintf("INSERT INTO %s ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]]);\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("INSERT INTO %s ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]]);\\n", t.TitledName()))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -586,11 +617,11 @@ func GenFormDataKeyGet(tb *dbJson.DbTable) []string {
 }
 
 func GenFormDataKeys(tb *dbJson.DbTable) string {
+	var err			error
 	var str			strings.Builder
 	var intr		GenFormDataKeyser
 	var ok			bool
 	var keys  		[]string
-	var err			error
 
 	db := tb.DB
 	intr, ok = db.Plugin.(GenFormDataKeyser)
@@ -615,6 +646,87 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 
 	return str.String()
 }
+
+//----------------------------------------------------------------------------
+//                        	Miscellaneous Interface Support
+//----------------------------------------------------------------------------
+
+// GenDataPlaceHolder generates the string for table columns when a list of them
+// is involved such as used in RowInsert().  Example: "?, ?, ?"
+func GenDataPlaceHolder(tb *dbJson.DbTable) string {
+	var intr		GenPlaceHolderer
+	var ok			bool
+
+	db := tb.DB
+	intr, ok = db.Plugin.(GenPlaceHolderer)
+	if ok {
+		return intr.GenDataPlaceHolder(tb)
+	}
+
+	insertStr := ""
+	for i, _ := range tb.Fields {
+		cm := ", "
+		if i == len(tb.Fields) - 1 {
+			cm = ""
+		}
+		insertStr += fmt.Sprintf("?%s", cm)
+		//insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+	}
+	return insertStr
+}
+
+// GenKeySearchPlaceHolder generates the string for multiple keys when an expression
+// is involved such as used in RowFind(). The expression will always be '=' and will
+// apply to all keys in the table. Example: "key1 = $1 AND key2 = $2"
+func GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
+	var intr		GenPlaceHolderer
+	var ok			bool
+
+	db := tb.DB
+	intr, ok = db.Plugin.(GenPlaceHolderer)
+	if ok {
+		return intr.GenKeySearchPlaceHolder(tb, rel)
+	}
+
+	insertStr := ""
+	keys, _ := tb.Keys()
+	for i, _ := range keys {
+		cm := " AND "
+		if i == len(keys) - 1 {
+			cm = ""
+		}
+		insertStr += fmt.Sprintf("%s %s ?%s", keys[i], rel, cm)
+	}
+
+	return insertStr
+}
+
+// GenKeysPlaceHolder generates the string for multiple keys when a list of key
+// is involved such as used in RowFind().  Example: "?, ?, ?"
+func GenKeysPlaceHolder(tb *dbJson.DbTable) string {
+	var intr		GenPlaceHolderer
+	var ok			bool
+
+	db := tb.DB
+	intr, ok = db.Plugin.(GenPlaceHolderer)
+	if ok {
+		return intr.GenKeysPlaceHolder(tb)
+	}
+
+	insertStr := ""
+	keys, _ := tb.Keys()
+	for i:=0; i < len(keys); i++ {
+		cm := ", "
+		if i == len(tb.Fields) - 1 {
+			cm = ""
+		}
+		insertStr += fmt.Sprintf("?%s", cm)
+		//insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+	}
+	return insertStr
+}
+
+
 
 //----------------------------------------------------------------------------
 //							Global Support Functions

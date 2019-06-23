@@ -21,6 +21,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+     [[if $d.HasDate]]
+        "time"
+    [[end]]
 	"net/url"
 )
 
@@ -301,6 +304,9 @@ func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
 // with data derived from it.
 func (s *[[$tn]]) TestData(i int) {
     var chr     rune
+[[if $t.HasDate -]]
+    var date    time.Time
+[[end -]]
 [[if $t.HasInteger -]]
     var i64     int64
 [[end -]]
@@ -330,6 +336,8 @@ func (s *[[$tn]]) TestData(i int) {
     [[range $f := $t.Fields -]]
         [[if $f.IsText -]]
             s.[[$f.TitledName]] = str
+        [[else if $f.IsDate -]]
+            s.[[$f.TitledName]] = date
         [[else if $f.IsInteger -]]
             s.[[$f.TitledName]] = i64
         [[else if $f.IsFloat -]]
