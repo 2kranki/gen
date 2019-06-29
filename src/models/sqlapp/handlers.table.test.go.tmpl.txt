@@ -15,6 +15,7 @@ package hndlr[[$dn]][[$tn]]
 
 import (
 	"../[[$dn]][[$tn]]"
+	"../hndlr[[$dn]]"
     "fmt"
     "io/ioutil"
     "net/http"
@@ -202,6 +203,11 @@ func (td *TestData) SetupFakeDB( ) {
 // If it fails at something, it must issue a t.Fatalf().
 func (td *TestData) SetupHandlers( ) {
 
+	// Set up main Handler which parses the templates.
+	hndlr[[$dn]].SetTmplsDir("../../tmpl")
+	hndlr[[$dn]].SetupTmpls()
+	Tmpls = hndlr[[$dn]].Tmpls
+
     // Set up the Handler object.
     td.H = &Handlers{db:td.Fdb, rowsPerPage:2}
     if td.H == nil {
@@ -323,6 +329,39 @@ func TestRowDelete(t *testing.T) {
 }
 
 //----------------------------------------------------------------------------
+//                             Row Empty
+//----------------------------------------------------------------------------
+
+func Test[[$tn]]RowEmpty(t *testing.T) {
+    var td          *TestData
+/*****
+    expectedBody    := ""
+ *****/
+
+    t.Logf("Test[[$tn]].RowEmpty()...\n")
+    td = &TestData{}
+    td.Setup(t)
+
+    // Display empty record.
+    t.Logf("\tSetting up for Empty...\n")
+    urlStr := fmt.Sprintf("/[[$tn]]/empty")
+    td.GetReq(urlStr, "")
+
+    // Now get the Response and check it.
+    td.CheckStatus(http.StatusOK)
+    t.Logf("\t actualHeader: %q\n", td.Resp.Header)
+    actualBody := td.ResponseBody()
+    t.Logf("\t actualBody: %s\n", string(actualBody))
+/*****
+    if expectedBody != string(actualBody) {
+        t.Errorf("Expected the message '%s'\n", expectedBody)
+    }
+ *****/
+
+    t.Logf("Test[[$tn]].RowEmpty() - End of Test\n\n\n")
+}
+
+//----------------------------------------------------------------------------
 //                             Row First
 //----------------------------------------------------------------------------
 
@@ -396,6 +435,28 @@ func Test[[$tn]]RowInsert(t *testing.T) {
     }
 
     t.Logf("Test[[$tn]]RowInsert() - End of Test\n\n\n")
+}
+
+//----------------------------------------------------------------------------
+//                             Row Next
+//----------------------------------------------------------------------------
+
+func Test[[$tn]]RowNext(t *testing.T) {
+    var td          *TestData
+    var rcd         [[$dn]][[$tn]].[[$tn]]
+
+    t.Logf("Test[[$tn]].RowNext()...\n")
+    td = &TestData{}
+    td.Setup(t)
+
+    // Build and execute a URL.
+    rcd.TestData(0)             // "A"
+    keys := rcd.KeysToValue()
+    t.Logf("\tSetting up for next with keys of (%d)\"%s\"\n", len(keys), keys)
+    urlStr := fmt.Sprintf("/[[$tn]]/next?%s", keys)
+    td.GetReq(urlStr, "")
+
+    t.Logf("Test[[$tn]].RowNext() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------

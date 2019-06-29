@@ -4,7 +4,9 @@
 // SQL Application main program
 
 // Generated: [[Time]]
-[[- $n := .TD.Data.TitledName]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
 
 package main
 
@@ -14,10 +16,21 @@ import (
 	"net/http"
 	"os"
     "os/signal"
-	"./hndlr[[$n]]"
-	"./io[[$n]]"
+	"./hndlr[[$dn]]"
+	"./io[[$dn]]"
+	[[range $t := $d.Tables -]]
+        [[- $tn := $t.TitledName]]
+        "./hndlr[[$dn]][[$tn]]"
+	    "./io[[$dn]][[$tn]]"
+	[[end]]
 )
 
+const (
+    RowsPerPage = 15
+)
+
+// HndlrFavIcon is the default Favorite Icon Handler.  It defaults to
+// returning a 405 status to indicate that no Icon is available.
 func HndlrFavIcon(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
@@ -34,6 +47,8 @@ func HndlrFavIcon(w http.ResponseWriter, r *http.Request) {
     [[end]]
 }
 
+// HndlrHome responds to a URL with no sub-elements.  It defaults to
+// providing the default Menu to the browser/caller.
 func HndlrHome(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
@@ -42,16 +57,16 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
 
     if r.URL.Path != "/" {
         [[if GenDebugging]]
-            fmt.Printf("HndlrHome(Error 404) Not '/' URL\n")
+            fmt.Printf("...end HndlrHome(Error 404) Not '/' URL\n")
         [[end]]
         http.NotFound(w, r)
         return
     }
 
     [[if GenDebugging]]
-        fmt.Printf("HndlrHome(%s) Serving File: ./html/[[$n]].menu.htm\n")
+        fmt.Printf("\tHndlrHome Serving File: ./html/[[$dn]].menu.html\n")
     [[end]]
-    http.ServeFile(w, r, "./html/[[$n]].menu.html")
+    http.ServeFile(w, r, baseDir+"/html/[[$dn]].menu.html")
 
     [[if GenDebugging]]
         fmt.Printf("...end HndlrHome()\n")
@@ -61,7 +76,7 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
 [[if GenDebugging]]
     func HndlrDebug(w http.ResponseWriter, r *http.Request) {
         fmt.Printf("HndlrDebug(%s)\n", r.Method)
-        http.ServeFile(w, r, "./html/form.html")
+        http.ServeFile(w, r, baseDir+"/html/form.html")
         fmt.Printf("...end HndlrDebug()\n")
     }
 
@@ -118,31 +133,49 @@ func exec() {
     [[if GenDebugging]]
         log.Printf("\tConnecting to the Database...\n")
     [[end]]
-    io[[$n]].SetName(db_name)
-    io[[$n]].SetPort(db_port)
-    io[[$n]].SetPW(db_pw)
-    io[[$n]].SetPort(db_port)
-    io[[$n]].SetServer(db_srvr)
-    io[[$n]].SetUser(db_user)
-    err := io[[$n]].Connect()
+    io[[$dn]] := io[[$dn]].[[$dn]]New()
+    io[[$dn]].SetName(db_name)
+    io[[$dn]].SetPort(db_port)
+    io[[$dn]].SetPW(db_pw)
+    io[[$dn]].SetPort(db_port)
+    io[[$dn]].SetServer(db_srvr)
+    io[[$dn]].SetUser(db_user)
+    err := io[[$dn]].Connect()
     if err != nil {
-        log.Fatalf("ERROR - Failed to Connect Databases\n\n\n")
+        log.Fatalf("ERROR - Failed to Connect Database\n\n\n")
     }
     chnl := make(chan os.Signal, 1)
     signal.Notify(chnl, os.Interrupt, os.Kill)
     go func(){
         <-chnl
-        if io[[$n]].IsConnected() {
-            io[[$n]].Disconnect()
+        if io[[$dn]].IsConnected() {
+            io[[$dn]].Disconnect()
         }
         os.Exit(1)
     }()
+
+    // Set up the Table I/O.
+	[[range $t := $d.Tables -]]
+        [[- $tn := $t.TitledName]]
+	    io[[$dn]][[$tn]] := io[[$dn]][[$tn]].[[$tn]]New(io[[$dn]].Sql())
+        if io[[$dn]][[$tn]] == nil {
+            log.Fatalf("ERROR - Failed to Connect to Table, [[$dn]][[$tn]]\n\n\n")
+        }
+	[[end]]
 
     // Set up templates.
     [[if GenDebugging]]
         log.Printf("\tSetting up the Templates...\n")
     [[end]]
-    hndlr[[$n]].SetupTmpls()
+    hndlr[[$dn]].SetTmplsDir(baseDir + "/tmpl")
+    hndlr[[$dn]].SetupTmpls()
+	[[range $t := $d.Tables -]]
+        [[- $tn := $t.TitledName]]
+	    hndlr[[$dn]][[$tn]].Tmpls = hndlr[[$dn]].Tmpls
+        if hndlr[[$dn]][[$tn]].Tmpls == nil {
+            log.Fatalf("ERROR - Failed to load templates from hndlr[[$dn]]\n\n\n")
+        }
+	[[end]]
 
     // Set up default URL handlers
     [[if GenDebugging]]
@@ -163,32 +196,15 @@ func exec() {
         mux.HandleFunc("/debugUpdate", HndlrDebugUpdate)
     [[end]]
 
-	[[range $t := .TD.Data.Tables -]]
-	    // [[$t.Name]] URL handlers for table maintenance
-	    mux.HandleFunc("/[[$t.Name]]/list/first",         hndlr[[$n]].[[$t.TitledName]]HndlrListFirst)
-	    mux.HandleFunc("/[[$t.Name]]/list/last",          hndlr[[$n]].[[$t.TitledName]]HndlrListLast)
-	    mux.HandleFunc("/[[$t.Name]]/list/next",          hndlr[[$n]].[[$t.TitledName]]HndlrListNext)
-	    mux.HandleFunc("/[[$t.Name]]/list/prev",          hndlr[[$n]].[[$t.TitledName]]HndlrListPrev)
-	    mux.HandleFunc("/[[$t.Name]]/table/create",       hndlr[[$n]].[[$t.TitledName]]HndlrTableCreate)
-	    mux.HandleFunc("/[[$t.Name]]/table/load/csv",     hndlr[[$n]].[[$t.TitledName]]HndlrTableLoadCSV)
-	    mux.HandleFunc("/[[$t.Name]]/table/load/test",    hndlr[[$n]].[[$t.TitledName]]HndlrTableLoadTestData)
-	    mux.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.TitledName]]HndlrDelete)
-	    mux.HandleFunc("/[[$t.Name]]/empty",              hndlr[[$n]].[[$t.TitledName]]HndlrEmpty)
-	    mux.HandleFunc("/[[$t.Name]]/find",               hndlr[[$n]].[[$t.TitledName]]HndlrFind)
-	    mux.HandleFunc("/[[$t.Name]]/first",              hndlr[[$n]].[[$t.TitledName]]HndlrFirst)
-	    mux.HandleFunc("/[[$t.Name]]/form",               hndlr[[$n]].[[$t.TitledName]]HndlrForm)
-	    mux.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.TitledName]]HndlrInsert)
-	    mux.HandleFunc("/[[$t.Name]]/last",               hndlr[[$n]].[[$t.TitledName]]HndlrLast)
-	    mux.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.TitledName]]HndlrNext)
-	    mux.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.TitledName]]HndlrPrev)
-	    mux.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.TitledName]]HndlrShow)
-	    mux.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.TitledName]]HndlrUpdate)
-	    mux.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.TitledName]]HndlrIndex)
+	[[range $t := $d.Tables -]]
+	    [[ $tn := $t.TitledName -]]
+	    // [[$dn]].[[$tn]] URL handlers for table maintenance
+	    _ = hndlr[[$dn]][[$tn]].New(io[[$dn]][[$tn]], RowsPerPage, mux)
 	[[ end -]]
 
 	// Start the HTTP Server.
     [[if GenDebugging]]
-        log.Printf("\tStasrting Server at %:%s...\n", http_srvr, http_port)
+        log.Printf("\tStarting Server at %s:%s...\n", http_srvr, http_port)
     [[end]]
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
 	log.Fatal(http.ListenAndServe(srvrStr, mux))

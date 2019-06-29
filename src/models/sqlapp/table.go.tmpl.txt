@@ -156,19 +156,24 @@ func (s *[[$tn]]) CompareKeys(r *[[$tn]]) int {
 
 // Empty resets the struct values to their null values.
 func (s *[[$tn]]) Empty() {
+[[if $t.HasDate -]]
+    var date    time.Time
+[[end -]]
 [[if $t.HasInteger -]]
-    var i64     int64 = 0
+    var i64     int64
 [[end -]]
 [[if $t.HasFloat -]]
-    var f64     float64 = 0.0
+    var f64     float64
 [[end -]]
 [[if $t.HasText -]]
-    var str     string = ""
+    var str     string
 [[end]]
 
 [[range $f := $t.Fields -]]
     [[if $f.IsText -]]
         s.[[$f.TitledName]] = str
+    [[else if $f.IsDate -]]
+        s.[[$f.TitledName]] = date
     [[else if $f.IsInteger -]]
         s.[[$f.TitledName]] = i64
     [[else if $f.IsFloat -]]
@@ -224,21 +229,27 @@ func (s *[[$tn]]) ListOutput() string {
 	var str strings.Builder
     var wrk string
 
+    if s == nil {
+        return ""
+    }
+
     [[range $f := $t.Fields -]]
         [[if $f.List -]]
             // Field: [[$f.TitledName]]
             str.WriteString("<td>\n")
             [[$f.GenToString "wrk" "s" -]]
+            /***
             [[if $f.KeyNum -]]
-                {
-                    fstr := fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
-                    str.WriteString(fstr)
-                }
+                wrk = fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
             [[end -]]
+            ***/
+            str.WriteString(wrk)
             str.WriteString("\n")
+            /***
             [[if $f.KeyNum -]]
                 str.WriteString("</a>\n" )
             [[end -]]
+            ***/
             str.WriteString("</td>\n")
         [[end -]]
 	[[end -]]

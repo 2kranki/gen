@@ -29,6 +29,7 @@ import (
 	//"strings"
 	"sync"
     "text/template"
+	"time"
 )
 
 var Tmpls           *template.Template
@@ -49,7 +50,7 @@ func ErrorString(err error) string {
 [[end]]
 
 //============================================================================
-//                              Handlers
+//                        Handlers for [[$dn]].[[$tn]]
 //============================================================================
 
 type Handlers struct {
@@ -87,7 +88,7 @@ func (h Handlers) SetRowsPerPage(r int) {
 func (h Handlers) SetupHandlers(mux *http.ServeMux) {
 
     [[if GenDebugging]]
-        log.Printf("\t[[$tn]].SetupHandlers()\n")
+        log.Printf("\thndlr[[$tn]].SetupHandlers()\n")
     [[end]]
 
 	    mux.HandleFunc("/[[$tn]]/list/first",         h.ListFirst)
@@ -111,8 +112,27 @@ func (h Handlers) SetupHandlers(mux *http.ServeMux) {
 	    mux.HandleFunc("/[[$tn]]/table/load/test",    h.TableLoadTestData)
 
     [[if GenDebugging]]
-        log.Printf("\tend of [[$tn]].SetupHandlers()\n")
+        log.Printf("\tend of hndlr[[$tn]].SetupHandlers()\n")
     [[end]]
+}
+
+//----------------------------------------------------------------------------
+//                                  New
+//----------------------------------------------------------------------------
+
+// New creates a new Handlers object given the parameters needed by the handlers
+// and returns it to the caller if successful.  If it fails to properly create
+// the handlers then it must fail rather than return an error indicator.
+func New(db interface{}, rowsPerPage int, mux *http.ServeMux) *Handlers {
+    var h       *Handlers
+
+ 	h = &Handlers{db:db, rowsPerPage:rowsPerPage}
+    if h == nil {
+        log.Fatalf("Error: Unable to allocate Handlers for hndlr[[$dn]][[$tn]]!\n")
+    }
+    h.SetupHandlers(mux)
+
+    return h
 }
 
 //============================================================================
@@ -127,12 +147,12 @@ func (h Handlers) SetupHandlers(mux *http.ServeMux) {
 func (h Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].ListFirst(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].ListFirst(%s)\n", r.Method)
     [[end]]
 
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListFirst(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].ListFirst(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -142,7 +162,7 @@ func (h Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
     h.ListShow(w, 0)
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].ListFirst()\n")
+        log.Printf("...end hndlr[[$tn]].ListFirst()\n")
     [[end]]
 }
 
@@ -158,12 +178,12 @@ func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
     var ok      bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].ListLast(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].ListLast(%s)\n", r.Method)
     [[end]]
 
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListLast(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -177,7 +197,7 @@ func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
     offset, err = counter.TableCount()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
     }
@@ -190,7 +210,7 @@ func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
     h.ListShow(w, offset)
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].ListLast()\n")
+        log.Printf("...end hndlr[[$tn]].ListLast()\n")
     [[end]]
 }
 
@@ -207,12 +227,12 @@ func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
     var ok      bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].ListNext(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].ListNext(%s)\n", r.Method)
     [[end]]
 
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListNext(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].ListNext(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -226,7 +246,7 @@ func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
     cTable, err = counter.TableCount()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
     }
@@ -240,7 +260,7 @@ func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
     h.ListShow(w, offset)
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].ListNext()\n")
+        log.Printf("...end hndlr[[$tn]].ListNext()\n")
     [[end]]
 }
 
@@ -258,12 +278,12 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
     var ok      bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].ListPrev(%s, %s)\n", r.Method, r.FormValue("offset"))
+        log.Printf("hndlr[[$tn]].ListPrev(%s, %s)\n", r.Method, r.FormValue("offset"))
     [[end]]
 
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListPrev(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].ListPrev(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -277,7 +297,7 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
     cTable, err = counter.TableCount()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
     }
@@ -298,7 +318,7 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
     h.ListShow(w, offset)
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].ListPrev()\n")
+        log.Printf("...end hndlr[[$tn]].ListPrev()\n")
     [[end]]
 }
 
@@ -309,19 +329,25 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
 // ListShow displays a list page given a starting offset.
 func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
     var err     error
+    var ok      bool
     var rcds    [][[$dn]][[$tn]].[[$tn]]
     var name    = "[[$dn]].[[$tn]].list.gohtml"
+    var pager   [[$dn]][[$tn]].DbRowPager
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].ListShow(%d)\n", offset)
+        log.Printf("hndlr[[$tn]].ListShow(%d)\n", offset)
         log.Printf("\tname: %s\n", name)
     [[end]]
+    if pager, ok = h.db.([[$dn]][[$tn]].DbRowPager); !ok {
+        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+        return
+    }
 
     // Get the records to display
-    //TODO: rcds, err = io[[$dn]].[[$tn]]RowPage(offset, h.rowsPerPage)
+    rcds, err = pager.RowPage(offset, h.rowsPerPage)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].ListShow(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].ListShow(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -336,13 +362,16 @@ func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
         log.Printf("\tData: %q\n", data)
     [[end]]
 
+    [[if GenDebugging -]]
+        log.Printf("\tExecuting template: %s\n", name)
+    [[end -]]
     err = Tmpls.ExecuteTemplate(w, name, data)
     if err != nil {
         fmt.Fprintf(w, err.Error())
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].ListShow(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].ListShow(%s)\n", ErrorString(err))
     [[end]]
 }
 
@@ -364,11 +393,11 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     var ok      bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowDelete(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowDelete(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowDelete(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -389,14 +418,14 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     // get the keys from there.
     if keys, ok = r.URL.Query()["key"]; !ok {
          [[if GenDebugging]]
-             log.Printf("...end RowDelete(Error:400) - No keys\n")
+             log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - No keys\n")
          [[end]]
          http.Error(w, http.StatusText(400), http.StatusBadRequest)
          return
     }
     if len(keys) != [[$t.KeyCount]] {
         [[if GenDebugging]]
-            log.Printf("...end RowDelete(Error:400) - Invalid Number of keys - %d\n", len(keys))
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - Invalid Number of keys - %d\n", len(keys))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -406,7 +435,7 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if err = rcd.SetKeysFromStrings(keys); err != nil {
         [[if GenDebugging]]
-            log.Printf("...end RowDelete(Error:400) - %s\n", err.Error())
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", err.Error())
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -416,7 +445,7 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     err = deleter.RowDelete(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowDelete(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -426,7 +455,7 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     err = nexter.RowNext(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowDelete(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -434,7 +463,7 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "Row deleted!")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowDelete(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].RowDelete(%s)\n", ErrorString(err))
     [[end]]
 }
 
@@ -447,7 +476,7 @@ func (h Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]]
     var err     error
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowDisplay(%+v, %s)\n", rcd, msg)
+        log.Printf("hndlr[[$tn]].RowDisplay(%+v, %s)\n", rcd, msg)
     [[end]]
 
     if Tmpls != nil {
@@ -468,7 +497,7 @@ func (h Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]]
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowDisplay(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].RowDisplay(%s)\n", ErrorString(err))
     [[end]]
 }
 
@@ -481,11 +510,11 @@ func (h Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
     var rcd     [[$dn]][[$tn]].[[$tn]]
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowEmpty(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowEmpty(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowEmpty(Error:405) - Not GET\n")
+        log.Printf("...end hndlr[[$tn]].RowEmpty(Error:405) - Not GET\n")
     [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -495,7 +524,7 @@ func (h Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowEmpty()\n")
+        log.Printf("...end hndlr[[$tn]].RowEmpty()\n")
     [[end]]
 }
 
@@ -513,11 +542,11 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     var ok      bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowFind(%s, %s)\n", r.Method, r.FormValue("key"))
+        log.Printf("hndlr[[$tn]].RowFind(%s, %s)\n", r.Method, r.FormValue("key"))
     [[end]]
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowFind(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].RowFind(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -538,14 +567,14 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     // get the keys from there.
     if keys, ok = r.URL.Query()["key"]; !ok {
          [[if GenDebugging]]
-             log.Printf("...end RowDelete(Error:400) - No keys\n")
+             log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - No keys\n")
          [[end]]
          http.Error(w, http.StatusText(400), http.StatusBadRequest)
          return
     }
     if len(keys) != [[$t.KeyCount]] {
         [[if GenDebugging]]
-            log.Printf("...end RowDelete(Error:400) - Invalid Number of keys - %d\n", len(keys))
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - Invalid Number of keys - %d\n", len(keys))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -555,7 +584,7 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if err = rcd.SetKeysFromStrings(keys); err != nil {
         [[if GenDebugging]]
-            log.Printf("...end RowDelete(Error:400) - %s\n", err.Error())
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", err.Error())
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -569,7 +598,7 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     }
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowFind(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowFind(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -577,7 +606,7 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowFind()\n")
+        log.Printf("...end hndlr[[$tn]].RowFind()\n")
     [[end]]
 }
 
@@ -593,12 +622,12 @@ func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
     var ok      bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowFirst(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowFirst(%s)\n", r.Method)
     [[end]]
 
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowFirst(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].RowFirst(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -612,7 +641,7 @@ func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
     err = firster.RowFirst(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowFirst(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].RowFirst(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -621,7 +650,7 @@ func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
 
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowFirst()\n")
+        log.Printf("...end hndlr[[$tn]].RowFirst()\n")
     [[end]]
 }
 
@@ -633,11 +662,11 @@ func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowForm(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowForm(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowForm(Error:405) - Not GET\n")
+        log.Printf("...end hndlr[[$tn]].RowForm(Error:405) - Not GET\n")
     [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -651,7 +680,7 @@ func (h Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, "./tmpl/[[$dn]].[[$tn]].form.gohtml")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowForm()\n")
+        log.Printf("...end hndlr[[$tn]].RowForm()\n")
     [[end]]
 }
 
@@ -668,7 +697,7 @@ func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowInsert(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowInsert(%s)\n", r.Method)
     [[end]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -704,7 +733,7 @@ func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "Row added!")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowInsert(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].RowInsert(%s)\n", ErrorString(err))
     [[end]]
 }
 
@@ -720,11 +749,11 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowLast(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowLast(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowLast(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]].RowLast(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -738,7 +767,7 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
     err = laster.RowLast(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowLast(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].RowLast(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -748,7 +777,7 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowLast()\n")
+        log.Printf("...end hndlr[[$tn]].RowLast()\n")
     [[end]]
 }
 
@@ -761,12 +790,12 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
-    var key         string
+    var keys        []string
     var nexter      [[$dn]][[$tn]].DbRowNexter
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowNext(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowNext(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -777,14 +806,17 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Get the prior key.
-    //key = r.FormValue("[.Table.PrimaryKey.Name]")
+    // Get the prior key(s).
+    // The keys are encoded as keynnn where nnn is a non-zero filled number
+    // representing the index into the keys array. So, we search for the
+    // keys and build a record from them to supply to get the next record.
+    key := r.Form["key"]
     [[if GenDebugging]]
-        log.Printf("\tkey: %s\n", key)
+        log.Printf("\tkey(s): %q\n", key)
     [[end]]
-    if key == "" {
+    if len(key) == 0 {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowNext(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -794,7 +826,7 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     err = nexter.RowNext(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowNext(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -802,7 +834,7 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowNext()\n")
+        log.Printf("...end hndlr[[$tn]].RowNext()\n")
     [[end]]
 }
 
@@ -820,7 +852,7 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowPrev(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowPrev(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -838,7 +870,7 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if key == "" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowPrev(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].RowPrev(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -856,7 +888,7 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowPrev()\n")
+        log.Printf("...end hndlr[[$tn]].RowPrev()\n")
     [[end]]
 }
 
@@ -874,11 +906,11 @@ func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowShow(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowShow(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]]HndlrShow(Error:405) - Not GET\n")
+            log.Printf("...end hndlr[[$tn]]HndlrShow(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -907,7 +939,7 @@ func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
     }
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowShow(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowShow(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -917,7 +949,7 @@ func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowShow()\n")
+        log.Printf("...end hndlr[[$tn]].RowShow()\n")
     [[end]]
 }
 
@@ -935,7 +967,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].RowUpdate(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].RowUpdate(%s)\n", r.Method)
     [[end]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -962,7 +994,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if key == "" {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowUpdate(Error:400) - No Key\n")
+            log.Printf("...end hndlr[[$tn]].RowUpdate(Error:400) - No Key\n")
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -972,7 +1004,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     err = deleter.RowDelete(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end [[$tn]].RowNext(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - %s\n", ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -996,7 +1028,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "Record updated")
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].RowUpdate()\n")
+        log.Printf("...end hndlr[[$tn]].RowUpdate()\n")
     [[end]]
 }
 
@@ -1015,7 +1047,7 @@ func (h Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].TableCreate(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].TableCreate(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -1035,7 +1067,7 @@ func (h Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableCreate(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableCreate(%s)\n", ErrorString(err))
     [[end]]
 }
 
@@ -1056,7 +1088,7 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].TableLoadCSV(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].TableLoadCSV(%s)\n", r.Method)
     [[end]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -1088,7 +1120,7 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     fileIn, handler, err := r.FormFile(name)
     if err != nil {
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableLoadCSV(Error:500) - %s\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableLoadCSV(Error:500) - %s\n", ErrorString(err))
     [[end]]
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
@@ -1143,7 +1175,7 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableLoadCSV(ok) - %d\n", cnt)
+        log.Printf("...end hndlr[[$tn]].TableLoadCSV(ok) - %d\n", cnt)
     [[end]]
 }
 
@@ -1161,7 +1193,7 @@ func (h Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var ok          bool
 
     [[if GenDebugging]]
-        log.Printf("[[$tn]].TableLoadTestData(%s)\n", r.Method)
+        log.Printf("hndlr[[$tn]].TableLoadTestData(%s)\n", r.Method)
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -1223,7 +1255,7 @@ func (h Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].TableLoadTestData(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableLoadTestData(%s)\n", ErrorString(err))
     [[end]]
 }
 

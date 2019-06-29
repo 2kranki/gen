@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[.TD.Data.TitledName]]/[[.Table.Name]] Maintenance</title>
+    <title>[[.TD.Data.TitledName]]/[[.Table.TitledName]] Maintenance</title>
     <style>
         html, body, p {
             padding: 0;
@@ -41,7 +41,7 @@
     </style>
 </head>
 <body>
-    <form id="dataForm" method="get" action="/[[.Table.Name]]">
+    <form id="dataForm" method="get" action="/[[.Table.TitledName]]">
         [[GenFormDataDisplay .Table]]
         <p/>
         <p/>
@@ -59,23 +59,28 @@
     <p/>
     <p>{{.Msg}}</p>
     <script>
+        // The keys will be hidden in this page as keynnn where nnn is a non-zero filled number
+        // representing the index into the keys array. We transmit those keys back via the URL
+        // using no numbering.  When the URL is parsed the 'key' value will be an array if there
+        // is more than one key for the table.
         keyCnt = [[.Table.KeyCount]];
         keys = [ [[.Table.KeysListStr]] ];
         function onAdd() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/insert";
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/insert";
             document.getElementById("dataForm").method = "post";
         }
         function onDelete() {
-            [[GenFormDataKeyGet .Table]]
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/delete"+[[GenFormDataKeys .Table]];
+            [[GenFormDataKeyGet .Table]]        // Grab the keys locally.
+            // Now build the URL with the keys included based on importance.
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/delete"+[[GenFormDataKeys .Table]];
             document.getElementById("dataForm").method = "get";
         }
         function onFirst() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/first";
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/first";
             document.getElementById("dataForm").method = "get";
         }
         function onLast() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/last";
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/last";
             document.getElementById("dataForm").method = "get";
         }
         function onMenu() {
@@ -83,21 +88,22 @@
             document.getElementById("dataForm").method = "get";
         }
         function onNext() {
-            [[GenFormDataKeyGet .Table]]
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/next"+[[GenFormDataKeys .Table]];
+            [[GenFormDataKeyGet .Table]]        // Grab the keys locally.
+            // Now build the URL with the keys included based on importance.
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/next"+[[GenFormDataKeys .Table]];
             document.getElementById("dataForm").method = "get";
         }
         function onPrev() {
             [[GenFormDataKeyGet .Table]]
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/prev"+[[GenFormDataKeys .Table]];
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/prev"+[[GenFormDataKeys .Table]];
             document.getElementById("dataForm").method = "get";
         }
         function onReset() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/reset";
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/reset";
             //document.getElementById("dataForm").method = "get";
         }
         function onUpdate() {
-            document.getElementById("dataForm").action = "/[[.Table.Name]]/update";
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/update";
             document.getElementById("dataForm").method = "post";
         }
     </script>

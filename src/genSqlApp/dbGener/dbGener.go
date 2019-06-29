@@ -111,11 +111,11 @@ type GenRowUpdateStmter interface {
 //----------------------------------------------------------------------------
 
 type GenFormDataDisplayer interface {
-	GenFormDataDisplay(tb *dbJson.DbTable) []string
+	GenFormDataDisplay(tb *dbJson.DbTable) string
 }
 
 type GenFormDataKeyGetter interface {
-	GenFormDataKeyGet(tb *dbJson.DbTable) []string
+	GenFormDataKeyGet(tb *dbJson.DbTable) string
 }
 
 type GenFormDataKeyser interface {
@@ -499,9 +499,8 @@ func GenRowUpdateStmt(t *dbJson.DbTable) string {
 //						Global Form Functions
 //----------------------------------------------------------------------------
 
-func GenFormDataDisplay(tb *dbJson.DbTable) []string {
+func GenFormDataDisplay(tb *dbJson.DbTable) string {
 	var str			strings.Builder
-	var strs  		[]string
 	var lbl			string
 	var m			string
 	var intr		GenFormDataDisplayer
@@ -516,7 +515,7 @@ func GenFormDataDisplay(tb *dbJson.DbTable) []string {
 	}
 
 	// Put non-hidden fields in a table to align columns
-	strs = append(strs, "<table>\n")
+	str.WriteString("<table>\n")
 	for _, f := range tb.Fields {
 
 		if !f.Hidden {
@@ -532,13 +531,11 @@ func GenFormDataDisplay(tb *dbJson.DbTable) []string {
 			default:
 				m = ""
 			}
-			str.Reset()
 			str.WriteString(fmt.Sprintf("\t<tr><td><label>%s</label></td> <td><input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></td></tr>\n",
 				lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
-			strs = append(strs, str.String())
 		}
 	}
-	strs = append(strs, "</table>\n")
+	str.WriteString("</table>\n")
 
 	// Process Hidden fields outside of the table
 	for _, f := range tb.Fields {
@@ -555,10 +552,8 @@ func GenFormDataDisplay(tb *dbJson.DbTable) []string {
 			default:
 				m = ""
 			}
-			str.Reset()
 			str.WriteString(fmt.Sprintf("\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
 				f.TitledName(), f.TitledName(), m, f.TitledName()))
-			strs = append(strs, str.String())
 		}
 	}
 
@@ -583,17 +578,15 @@ func GenFormDataDisplay(tb *dbJson.DbTable) []string {
 		default:
 			m = ""
 		}
-		str.Reset()
 		str.WriteString(fmt.Sprintf("<input type=\"hidden\" id=\"key%d\" name=\"key%d\"%svalue=\"{{.Rcd.%s}}\">\n",
 			i, i, m, f.TitledName()))
-		strs = append(strs, str.String())
 	}
 
-	return strs
+	return str.String()
 }
 
-func GenFormDataKeyGet(tb *dbJson.DbTable) []string {
-	var strs		[]string
+func GenFormDataKeyGet(tb *dbJson.DbTable) string {
+	var str			strings.Builder
 	var intr		GenFormDataKeyGetter
 	var ok			bool
 	var keys  		[]string
@@ -610,10 +603,10 @@ func GenFormDataKeyGet(tb *dbJson.DbTable) []string {
 		panic("GenFormDataDisplay: error getting keys!")
 	}
 	for i, _ := range keys {
-		strs = append(strs, fmt.Sprintf("\t\t\tkey%d = document.getElementById(\"key%d\").value\n",i,i))
+		str.WriteString(fmt.Sprintf("\t\t\tkey%d = document.getElementById(\"key%d\").value\n",i,i))
 	}
 
-	return strs
+	return str.String()
 }
 
 func GenFormDataKeys(tb *dbJson.DbTable) string {
@@ -637,7 +630,7 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 		str.WriteString("\"?\"")
 	}
 	for i, _ := range keys {
-		str.WriteString(fmt.Sprintf("+\"key%d=\"+key%d",i,i))
+		str.WriteString(fmt.Sprintf("+\"key=\"+key%d",i))
 		//tdd := f.Typ.Html
 		if i < len(keys) - 1 {
 			str.WriteString("+\",\"+")

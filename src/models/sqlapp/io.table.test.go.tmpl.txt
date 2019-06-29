@@ -6,10 +6,10 @@
 
 // Generated: [[Time]]
 [[- $dot := .]]
-[[- $d  := .TD.Data]]
-[[- $dn := .TD.Data.TitledName]]
-[[- $t := .Table]]
-[[- $tn := .Table.TitledName]]
+[[- $d   := .TD.Data]]
+[[- $dn  := .TD.Data.TitledName]]
+[[- $t   := .Table]]
+[[- $tn  := .Table.TitledName]]
 
 package io[[$dn]][[$tn]]
 

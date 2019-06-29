@@ -1,9 +1,11 @@
-[[$td := .TD -]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[.TD.Data.TitledName]] Tables</title>
+    <title>[[$dn]] Tables</title>
     <style>
         html, body, p {
             padding: 0;
@@ -30,48 +32,49 @@
 <body>
     <ul>
 [[- range $t := .TD.Data.Tables]]
-    <li>[[$t.TitledName]] Actions:</li>
-    <form id="menuForm" method="get" action="/[[$t.Name]]">
-            <li>[[$t.Name]] Table</li>
+    [[- $tn := $t.TitledName]]
+    <li>[[$tn]] Actions:</li>
+    <form id="menuForm" method="get" action="/[[$tn]]">
+            <li>[[$tn]] Table</li>
             <ul>
-                <li><input type=submit onclick='onCreate[[$t.TitledName]]()' value="Create Table"></li>
-                <li><input type=submit onclick='onList[[$t.TitledName]]()' value="List Rows"></li>
-                <li><input type=submit onclick='onRow[[$t.TitledName]]()' value="Maintain Rows"></li>
+                <li><input type=submit onclick='onCreate[[$tn]]()' value="Create Table"></li>
+                <li><input type=submit onclick='onList[[$tn]]()' value="List Rows"></li>
+                <li><input type=submit onclick='onRow[[$tn]]()' value="Maintain Rows"></li>
                 <li><label>Add data from CSV file</label>
-                    <input type=file onclick='onCsvFile[[$t.TitledName]]()' name=csvFile value="">
-                    <input type=submit onclick='onCsvLoad[[$t.TitledName]]()' value="Create Table and load CSV File">
+                    <input type=file onclick='onCsvFile[[$tn]]()' name=csvFile value="">
+                    <input type=submit onclick='onCsvLoad[[$tn]]()' value="Create Table and load CSV File">
                 </li>
-                <li><input type=submit onclick='onLoadTest[[$t.TitledName]]()' value="Create Table and load test data"></li>
+                <li><input type=submit onclick='onLoadTest[[$tn]]()' value="Create Table and load test data"></li>
             </ul>
     </form>
     <script>
-        function onCreate[[$t.TitledName]]() {
-            document.getElementById("menuForm").action = "/[[$t.Name]]/table/create";
+        function onCreate[[$tn]]() {
+            document.getElementById("menuForm").action = "/[[$tn]]/table/create";
             document.getElementById("menuForm").method = "get";
         }
-        function onList[[$t.TitledName]]() {
-            document.getElementById("menuForm").action = "/[[$t.Name]]/list/first";
+        function onList[[$tn]]() {
+            document.getElementById("menuForm").action = "/[[$tn]]/list/first";
             document.getElementById("menuForm").method = "get";
         }
-        function onCsvFile[[$t.TitledName]]() {
+        function onCsvFile[[$tn]]() {
             document.getElementById("menuForm").enctype = "multipart/form-data";
         }
-        function onCsvLoad[[$t.TitledName]]() {
+        function onCsvLoad[[$tn]]() {
             //document.getElementById("menuForm").enctype = "multipart/form-data";
-            document.getElementById("menuForm").action  = "/[[$t.Name]]/table/load/csv";
+            document.getElementById("menuForm").action  = "/[[$tn]]/table/load/csv";
             document.getElementById("menuForm").method  = "post";
         }
-        function onLoadTest[[$t.TitledName]]() {
-            document.getElementById("menuForm").action = "/[[$t.Name]]/table/load/test";
-            document.getElementById("menuForm").method = "post";
-        }
-        function onDelete[[$t.TitledName]]() {
-            [[GenFormDataKeyGet $t]]
-            document.getElementById("menuForm").action = "/[[$t.Name]]/delete"+[[GenFormDataKeys $t]];
+        function onLoadTest[[$tn]]() {
+            document.getElementById("menuForm").action = "/[[$tn]]/table/load/test";
             document.getElementById("menuForm").method = "get";
         }
-        function onRow[[$t.TitledName]]() {
-            document.getElementById("menuForm").action = "/[[$t.Name]]/show";
+        function onDelete[[$tn]]() {
+            [[GenFormDataKeyGet $t]]
+            document.getElementById("menuForm").action = "/[[$tn]]/delete"+[[GenFormDataKeys $t]];
+            document.getElementById("menuForm").method = "get";
+        }
+        function onRow[[$tn]]() {
+            document.getElementById("menuForm").action = "/[[$tn]]/show";
             document.getElementById("menuForm").method = "get";
         }
     </script>

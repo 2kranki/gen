@@ -4,7 +4,9 @@
 // SQL Application main program
 
 // Generated: [[Time]]
-[[- $n := .TD.Data.TitledName]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
 
 package main
 
@@ -27,6 +29,7 @@ var (
 	db_user     string
 	http_srvr   string
 	http_port   string
+	baseDir     string
 [[ if .TD.Main.Flags -]]
     [[GenVarDefns]]
 [[- end -]]
@@ -41,12 +44,15 @@ func usage() {
         [[ end ]]
 	    fmt.Fprintf(flag.CommandLine.Output(), "\nOptions:\n")
 	    flag.PrintDefaults()
+	    fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
+        fmt.Fprintf(flag.CommandLine.Output(), "'baseDir' is assumed to point to a directory where the application\n")
+        fmt.Fprintf(flag.CommandLine.Output(), " can find 'html', 'css' and 'tmpl' sub-directories.\n\n")
 	    [[ if .TD.Main.Usage.Notes -]]
-	        fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
             [[ range $t := .TD.Main.Usage.Notes ]]
                 fmt.Fprintf(flag.CommandLine.Output(), "[[ $t ]]")
             [[- end -]]
         [[ end ]]
+
 }
 [[- end ]]
 
@@ -65,9 +71,10 @@ func main() {
 [[ if .TD.Main.Flags -]]
     [[ GenFlagSetup ]]
 [[ end -]]
-[[.TD.Data.Plugin.Plugin.GenFlagArgDefns .TD.Data.Name]]
-	flag.StringVar(&http_port, "httpPort", "8081", "server port")
+    [[$d.Plugin.Plugin.GenFlagArgDefns $dn]]
+	flag.StringVar(&http_port, "httpPort", "8080", "server port")
 	flag.StringVar(&http_srvr, "httpServer", "localhost", "server site")
+	flag.StringVar(&baseDir, "basedir", ".", "Base Directory for Templates, HTML and CSS")
 
     // Parse the flags and check them
 	flag.Parse()

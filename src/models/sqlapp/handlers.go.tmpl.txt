@@ -4,9 +4,12 @@
 //  Handle HTTP Events
 
 // Generated: [[Time]]
+[[- $dot := .]]
+[[- $d   := .TD.Data]]
+[[- $dn  := .TD.Data.TitledName]]
 
 
-package hndlr[[.TD.Data.TitledName]]
+package hndlr[[$dn]]
 
 import (
 	_ "fmt"
@@ -17,8 +20,9 @@ import (
         "log"
     [[end]]
     _ "os"
+    "sort"
     "text/template"
-	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
+	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
 var tmplsDir        string
@@ -58,6 +62,12 @@ func SetTmplsDir(d string) {
 // SetupTmpls initializes the functions used in the templates
 // and loads them.
 func SetupTmpls() {
+    [[if GenDebugging]]
+        var templates   []*template.Template
+        var t           *template.Template
+        var names       []string
+        var name        string
+    [[end]]
 
     [[if GenDebugging]]
         log.Printf("\tSetupTmpls(%s/*.gohtml)\n", tmplsDir)
@@ -68,6 +78,14 @@ func SetupTmpls() {
 	Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
 
     [[if GenDebugging]]
+        templates = Tmpls.Templates()
+        for _, t = range templates {
+            names = append(names, t.Name())
+        }
+        sort.Strings(names)
+        for _, name = range names {
+            log.Printf("\t\t template: %s\n", name)
+        }
         log.Printf("\tend of SetupTmpls()\n")
     [[end]]
 }
