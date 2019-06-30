@@ -22,11 +22,12 @@ import (
     [[if GenDebugging]]
         "log"
     [[end]]
-    //"io"
     "mime/multipart"
 	"net/http"
 	"strconv"
-	//"strings"
+    [[if GenDebugging]]
+	    "strings"
+    [[end]]
 	"sync"
     "text/template"
 	"time"
@@ -333,10 +334,14 @@ func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
     var rcds    [][[$dn]][[$tn]].[[$tn]]
     var name    = "[[$dn]].[[$tn]].list.gohtml"
     var pager   [[$dn]][[$tn]].DbRowPager
+    [[if GenDebugging]]
+        var str     strings.Builder
+    [[end]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].ListShow(%d)\n", offset)
         log.Printf("\tname: %s\n", name)
+        w2 := io.MultiWriter(w, &str)
     [[end]]
     if pager, ok = h.db.([[$dn]][[$tn]].DbRowPager); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
@@ -364,13 +369,16 @@ func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
 
     [[if GenDebugging -]]
         log.Printf("\tExecuting template: %s\n", name)
+        err = Tmpls.ExecuteTemplate(w2, name, data)
+    [[else]]
+        err = Tmpls.ExecuteTemplate(w, name, data)
     [[end -]]
-    err = Tmpls.ExecuteTemplate(w, name, data)
     if err != nil {
         fmt.Fprintf(w, err.Error())
     }
 
     [[if GenDebugging]]
+        log.Printf("\t output: %s\n", str.String())
         log.Printf("...end hndlr[[$tn]].ListShow(%s)\n", ErrorString(err))
     [[end]]
 }
@@ -386,11 +394,12 @@ func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
 // RowDelete handles an delete request which comes from the row display form.
 func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     var err     error
-    var keys    []string
     var rcd     [[$dn]][[$tn]].[[$tn]]
     var deleter [[$dn]][[$tn]].DbRowDeleter
     var nexter  [[$dn]][[$tn]].DbRowNexter
     var ok      bool
+    var i       int
+    var key     string
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowDelete(%s)\n", r.Method)
@@ -411,35 +420,17 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Construct the keys in the record.
-    // Note: For GET, there is no Form or PostForm data since both of those
-    // are related to PUT or POST.  The URL contains any data passed in it.
-    // Fortunately, the parsed URL is available in the Http Request. So, we
-    // get the keys from there.
-    if keys, ok = r.URL.Query()["key"]; !ok {
-         [[if GenDebugging]]
-             log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - No keys\n")
-         [[end]]
-         http.Error(w, http.StatusText(400), http.StatusBadRequest)
-         return
-    }
-    if len(keys) != [[$t.KeyCount]] {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - Invalid Number of keys - %d\n", len(keys))
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
+    // Get the key(s).
+    i = 0
+    [[range $k := $t.Keys -]]
+        [[ $f := $t.FindField $k -]]
+        key = r.FormValue(fmt.Sprintf("key%d", i))
+        [[$f.GenFromString "rcd" "key"]]
+        i++
+    [[- end]]
     [[if GenDebugging]]
-        log.Printf("\tkeys: %+v\n", keys)
+        log.Printf("\t rcd: %+v\n", rcd)
     [[end]]
-    if err = rcd.SetKeysFromStrings(keys); err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", err.Error())
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
 
     // Delete the row with data given.
     err = deleter.RowDelete(&rcd)
@@ -535,11 +526,13 @@ func (h Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
 // RowFind handles displaying of the table row form display.
 func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     var err     error
-    var keys    []string
     var rcd     [[$dn]][[$tn]].[[$tn]]
     var finder  [[$dn]][[$tn]].DbRowFinder
     var firster [[$dn]][[$tn]].DbRowFirster
     var ok      bool
+    var msg     string
+    var i       int
+    var key     string
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowFind(%s, %s)\n", r.Method, r.FormValue("key"))
@@ -560,40 +553,19 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Construct the keys in the record.
-    // Note: For GET, there is no Form or PostForm data since both of those
-    // are related to PUT or POST.  The URL contains any data passed in it.
-    // Fortunately, the parsed URL is available in the Http Request. So, we
-    // get the keys from there.
-    if keys, ok = r.URL.Query()["key"]; !ok {
-         [[if GenDebugging]]
-             log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - No keys\n")
-         [[end]]
-         http.Error(w, http.StatusText(400), http.StatusBadRequest)
-         return
-    }
-    if len(keys) != [[$t.KeyCount]] {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - Invalid Number of keys - %d\n", len(keys))
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
-    [[if GenDebugging]]
-        log.Printf("\tkeys: %+v\n", keys)
-    [[end]]
-    if err = rcd.SetKeysFromStrings(keys); err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", err.Error())
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
+    // Get the key(s).
+    i = 0
+    [[range $k := $t.Keys -]]
+        [[ $f := $t.FindField $k -]]
+        key = r.FormValue(fmt.Sprintf("key%d", i))
+        [[$f.GenFromString "rcd" "key"]]
+        i++
+    [[- end]]
 
     // Get the row and display it.
-    if len(keys) == [[$t.KeyCount]] {
-        err = finder.RowFind(&rcd)
-    } else {
+    err = finder.RowFind(&rcd)
+    if err != nil {
+        msg = "Row NOT Found!"
         err = firster.RowFirst(&rcd)
     }
     if err != nil {
@@ -603,7 +575,7 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
     }
-    h.RowDisplay(w, &rcd, "")
+    h.RowDisplay(w, &rcd, msg)
 
     [[if GenDebugging]]
         log.Printf("...end hndlr[[$tn]].RowFind()\n")
@@ -790,12 +762,14 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
-    var keys        []string
     var nexter      [[$dn]][[$tn]].DbRowNexter
     var ok          bool
+    var i           int
+    var key         string
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowNext(%s)\n", r.Method)
+        log.Printf("\tURL: %q\n", r.URL)
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -807,20 +781,13 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     }
 
     // Get the prior key(s).
-    // The keys are encoded as keynnn where nnn is a non-zero filled number
-    // representing the index into the keys array. So, we search for the
-    // keys and build a record from them to supply to get the next record.
-    key := r.Form["key"]
-    [[if GenDebugging]]
-        log.Printf("\tkey(s): %q\n", key)
-    [[end]]
-    if len(key) == 0 {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - No Key\n")
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
+    i = 0
+    [[range $k := $t.Keys -]]
+        [[ $f := $t.FindField $k -]]
+        key = r.FormValue(fmt.Sprintf("key%d", i))
+        [[$f.GenFromString "rcd" "key"]]
+        i++
+    [[- end]]
 
     // Get the next row and display it.
     err = nexter.RowNext(&rcd)
@@ -847,9 +814,10 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
 func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
-    var key         string
     var prever      [[$dn]][[$tn]].DbRowPrever
     var ok          bool
+    var i           int
+    var key         string
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowPrev(%s)\n", r.Method)
@@ -863,18 +831,14 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Get the prior key.
-    //key = r.FormValue("[.Table.PrimaryKey.Name]")
-    [[if GenDebugging]]
-        log.Printf("\tkey: %s\n", key)
-    [[end]]
-    if key == "" {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowPrev(Error:400) - No Key\n")
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
+    // Get the prior key(s).
+    i = 0
+    [[range $k := $t.Keys -]]
+        [[ $f := $t.FindField $k -]]
+        key = r.FormValue(fmt.Sprintf("key%d", i))
+        [[$f.GenFromString "rcd" "key"]]
+        i++
+    [[- end]]
 
     // Get the next row and display it.
     err = prever.RowPrev(&rcd)
@@ -965,6 +929,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     var deleter     [[$dn]][[$tn]].DbRowDeleter
     var inserter    [[$dn]][[$tn]].DbRowInserter
     var ok          bool
+    var i           int
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowUpdate(%s)\n", r.Method)
@@ -986,19 +951,14 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     [[/* is much different than insert. Right now, we are accessing the rows using an index. So, delete/insert */]]
     [[/* will work fine for now. */]]
 
-    // Verify any fields that need it.
-    //TODO: key = r.FormValue("[.Table.PrimaryKey.Name]")
-    // if key is not present, assume first record.
-    [[if GenDebugging]]
-        log.Printf("\tkey: %s\n", key)
-    [[end]]
-    if key == "" {
-        [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowUpdate(Error:400) - No Key\n")
-        [[end]]
-        http.Error(w, http.StatusText(400), http.StatusBadRequest)
-        return
-    }
+    // Get the prior key(s).
+    i = 0
+    [[range $k := $t.Keys -]]
+        [[ $f := $t.FindField $k -]]
+        key = r.FormValue(fmt.Sprintf("key%d", i))
+        [[$f.GenFromString "rcd" "key"]]
+        i++
+    [[- end]]
 
     // Delete the row.
     err = deleter.RowDelete(&rcd)

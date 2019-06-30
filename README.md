@@ -17,7 +17,7 @@ definition and having them control the generation process.
 * Version is 0.1
 * Supports only SQLite
 * Still a work in progress
-* WARNING - genapp should generate an app, but the app will NOT work! Right now, I am just backing up so that I don't lose any work. I will remove this line when I have the apps working again. I have significantly changed things and am in the middle of it.
+* WARNING - genapp should generate an app, but the app will only work with SQLite! I will fix this in the near future.
 
 
 **Project Futures**:
@@ -26,7 +26,7 @@ definition and having them control the generation process.
 - [x] Finish Table Handler Testing
 - [x] Finish Database I/O Testing for SQLite
 - [x] Finish Table I/O Testing for SQLite
-- [ ] Finish Database Handler Testing
+- [x] Finish Database Handler Testing
 - [ ] Finish MS-SQL Support
 - [ ] Finish MySQL/MariaDB Support
 - [ ] Finish Postgres Support

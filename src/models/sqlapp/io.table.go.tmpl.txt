@@ -256,7 +256,7 @@ func (io IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], e
 		}
 	}
 
-	rows.Close()
+	err = rows.Close()
 
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowPage(%s)\n", ErrorString(err))
@@ -332,13 +332,13 @@ func (io IO_[[$tn]]) TableCount( ) (int, error) {
         log.Printf("io[[$tn]].TableCount()\n")
     [[end]]
 
-    row, err := io.dbSql.Query(sqlStmt)
-    if err != nil {
-        return 0, err
-    }
+    row := io.dbSql.QueryRow(sqlStmt)
 
 	err = row.Scan(&count)
     if err != nil {
+        [[if GenDebugging]]
+            log.Printf("...end io[[$tn]].TableCount(%s) %d\n", ErrorString(err), count)
+        [[end]]
         return 0, err
     }
 

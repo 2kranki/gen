@@ -88,9 +88,7 @@
             document.getElementById("dataForm").method = "get";
         }
         function onNext() {
-            [[GenFormDataKeyGet .Table]]        // Grab the keys locally.
-            // Now build the URL with the keys included based on importance.
-            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/next"+[[GenFormDataKeys .Table]];
+            document.getElementById("dataForm").action = "/[[.Table.TitledName]]/next";
             document.getElementById("dataForm").method = "get";
         }
         function onPrev() {

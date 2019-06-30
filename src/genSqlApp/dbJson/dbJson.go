@@ -133,7 +133,7 @@ func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
 }
 
 // GenFromString generates the code to go from a string (sn) to
-// a field (dn).  sn and dn are variable names.
+// a field of (dn).  sn and dn are variable names.
 func (f *DbField) GenFromString(dn,sn string) string {
 	var str			string
 

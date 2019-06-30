@@ -334,7 +334,7 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Delete SQL
-	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE [[.Table.PrimaryKey.Name]] = $1;\\n", t.TitledName()))
+	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE %s;\\n", t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -429,7 +429,8 @@ func GenRowNextStmt(t *dbJson.DbTable) string {
 		return intr.GenRowNextStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT ? OFFSET ? ;\\n", t.TitledName(), t.KeysList(""," ASC")))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE %s ORDER BY %s LIMIT 1;\\n",
+					t.TitledName(), GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -448,7 +449,8 @@ func GenRowPageStmt(t *dbJson.DbTable) string {
 		return intr.GenRowPageStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT ? OFFSET ? ;\\n", t.TitledName(), t.KeysList("", " ASC")))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT ? OFFSET ? ;\\n",
+						t.TitledName(), t.KeysList("", " ASC")))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}

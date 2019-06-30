@@ -208,14 +208,17 @@ func (s *[[$tn]]) FieldsToValue() string {
 // KeysToValue creates a URL Value map from the table's key(s).
 func (s *[[$tn]]) KeysToValue() string {
     var wrk string
+    var i   int
 
+    i = 0
     v := url.Values{}
     // Accumulate the key value(s) in KeyNum order.
     [[range $fn := $t.Keys -]]
         [[ $f := $t.FindField $fn -]]
             // Field: [[$f.TitledName]]
             [[$f.GenToString "wrk" "s" -]]
-            v.Add("key", wrk)
+            v.Add(fmt.Sprintf("key%d", i), wrk)
+            i++
 	[[end -]]
 
 	return v.Encode()
@@ -236,20 +239,17 @@ func (s *[[$tn]]) ListOutput() string {
     [[range $f := $t.Fields -]]
         [[if $f.List -]]
             // Field: [[$f.TitledName]]
-            str.WriteString("<td>\n")
+            str.WriteString("<td>")
+            [[if $f.KeyNum -]]
+                wrk = fmt.Sprintf("<a href=\"/[[$tn]]/find?%s\">", s.KeysToValue())
+                str.WriteString(wrk)
+            [[end -]]
             [[$f.GenToString "wrk" "s" -]]
-            /***
-            [[if $f.KeyNum -]]
-                wrk = fmt.Sprintf("<a href=\"/[[$t.TitledName]]/find?key=\"%s\">\n", wrk)
-            [[end -]]
-            ***/
             str.WriteString(wrk)
-            str.WriteString("\n")
-            /***
+            //str.WriteString("\n")
             [[if $f.KeyNum -]]
-                str.WriteString("</a>\n" )
+                str.WriteString("</a>" )
             [[end -]]
-            ***/
             str.WriteString("</td>\n")
         [[end -]]
 	[[end -]]
