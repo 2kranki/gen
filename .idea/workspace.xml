@@ -294,12 +294,12 @@
     <frame x="64" y="63" width="1520" height="963" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6025641" visible="true" weight="0.2527248" />
-      <window_info id="Structure" order="1" sideWeight="0.3974359" side_tool="true" visible="true" weight="0.2527248" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6038882" visible="true" weight="0.2527248" />
+      <window_info id="Structure" order="1" sideWeight="0.3961118" side_tool="true" visible="true" weight="0.2527248" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49928573" visible="true" weight="0.3365735" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49928573" weight="0.3365735" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39976415" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
