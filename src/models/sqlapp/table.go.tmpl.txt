@@ -289,7 +289,7 @@ func (s *[[$tn]]) Request2Struct(r *http.Request) error {
 //                      Set Keys from a Slice of Strings
 //----------------------------------------------------------------------------
 
-// KeysToValue creates a URL Value map from the table's key(s). The slice
+// SetKeysFromStrings creates a URL Value map from the table's key(s). The slice
 // is in field order within the struct, not sorted by field name.
 func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
     var i   int

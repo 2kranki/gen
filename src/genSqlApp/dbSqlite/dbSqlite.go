@@ -25,17 +25,19 @@ const(
 )
 
 // Notes:
-//	* We are now using a Decimal Package for support of decimal operations including
+//	* SQLite does We will be using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
+//    Currently, we just have decimal as text. SQLite does not handle decimal only
+//		text, real64 and int64.
 var tds	= dbType.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"time.Time",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"time.Time",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
+	{Name:"dec", 		Html:"number",		Sql:"TEXT",			Go:"string",	DftLen:0,},
+	{Name:"decimal", 	Html:"number",		Sql:"TEXT",			Go:"string",	DftLen:0,},
 	{Name:"int", 		Html:"number",		Sql:"INTEGER",		Go:"int64",		DftLen:0,},
 	{Name:"integer", 	Html:"number",		Sql:"INTEGER",		Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"TEXT",			Go:"Decimal",	DftLen:0,},
+	{Name:"money", 		Html:"number",		Sql:"TEXT",			Go:"string",	DftLen:0,},
 	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
 	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},

@@ -14,7 +14,7 @@
 package hndlr[[$dn]][[$t.TitledName]]
 
 import (
-	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
+	_ [[$d.Plugin.Plugin.GenImportString]]
 	"../[[$dn]][[$tn]]"
 	"encoding/csv"
     "fmt"
@@ -30,7 +30,9 @@ import (
     [[end]]
 	"sync"
     "text/template"
-	"time"
+    [[if $t.HasDate]]
+	    "time"
+	[[end]]
 )
 
 var Tmpls           *template.Template

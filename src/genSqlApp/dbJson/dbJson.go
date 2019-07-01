@@ -144,18 +144,17 @@ func (f *DbField) GenFromString(dn,sn string) string {
 		fallthrough
 	case "int64":
 		{
-			wrk := "\t%s.%s, err = strconv.ParseInt(%s,0,64)\n"
+			wrk := "\t%s.%s, _ = strconv.ParseInt(%s,0,64)\n"
 			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
 		}
 	case "float64":
 		{
-			wrk := 	"\t{\n\t\twrk := r.FormValue(\"%s\")\n" +
-				"\t\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n\t}\n"
-			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
+			wrk := 	"\t\t%s.%s, _ = strconv.ParseFloat(%s, 64)\n"
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn)
 		}
 	case "time.Time":
 		{
-			wrk := "\t%s.%s, err = time.Parse(time.RFC3339, %s)\n"
+			wrk := "\t%s.%s, _ = time.Parse(time.RFC3339, %s)\n"
 			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
 		}
 	default:
@@ -545,6 +544,15 @@ func (d *Database) ForTables(f func(t *DbTable) ) {
 func (d *Database) HasDate() bool {
 	for _, t := range d.Tables {
 		if t.HasDate() {
+			return true
+		}
+	}
+	return false
+}
+
+func (d *Database) HasDec() bool {
+	for _, t := range d.Tables {
+		if t.HasDec() {
 			return true
 		}
 	}

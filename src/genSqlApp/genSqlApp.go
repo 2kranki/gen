@@ -658,5 +658,17 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 
 	<-done
 
+	if dbJson.DbStruct().SqlType == "sqlite" && dbJson.DbStruct().HasDec() {
+		log.Printf("========================== WARNING ==========================\n")
+		log.Printf("SQLite does not directly support DEC, DECIMAL or MONEY! It\n")
+		log.Printf("internally converts decimal types to float. So, rounding\n")
+		log.Printf("errors can creep in! So, we define decimal types as string\n")
+		log.Printf("in Golang and recommend that you not do any calculations\n")
+		log.Printf("in SQL, but rather pull the rows out, convert the data\n")
+		log.Printf("to any of the IEEE 754R libraries and do your calculations\n")
+		log.Printf("there.\n")
+		log.Printf("=============================================================\n")
+	}
+
 	return nil
 }
