@@ -65,6 +65,22 @@ func (t *defineFlags) Set(value string) error {
 
 var defnFlags defineFlags
 
+func ChkSetMdlDir(s string) {
+	var err		error
+
+	if len(s) == 0 {
+		s = "./models"
+	}
+	if s, err = util.IsPathDir(s); err != nil {
+		s = os.ExpandEnv("${GENAPP_MODELS}")
+		if s, err = util.IsPathDir(s); err != nil {
+			panic("Error - Missing Model Directory! Set with Env(GENAPP_MODELS) or -mdldir flag.")
+		}
+	}
+	mdldir = s
+	sharedData.SetMdlDir(s)
+}
+
 // SetupShared combines several sources of program options into
 // one shared package used throughout the program.
 func SetupShared(execPath string, cmd string) error {
@@ -81,14 +97,7 @@ func SetupShared(execPath string, cmd string) error {
 	sharedData.SetForce(force)
 	sharedData.SetDefn("GenDebugging", genDebugging)
 	sharedData.SetDefn("GenLogging", genLogging)
-	if len(mdldir) > 0 {
-		sharedData.SetMdlDir(mdldir)
-	} else {
-		dir := os.ExpandEnv("${GENMODELDIR}")
-		if len(dir) > 0 {
-			sharedData.SetMdlDir(dir)
-		}
-	}
+	ChkSetMdlDir(mdldir)
 	sharedData.SetNoop(noop)
 	if len(outdir) > 0 {
 		sharedData.SetOutDir(outdir)
@@ -135,7 +144,8 @@ func SetupShared(execPath string, cmd string) error {
 			sharedData.SetMainPath(wrk.(string))
 		}
 		if wrk, ok = m["mdldir"]; ok {
-			sharedData.SetMdlDir(wrk.(string))
+			wrkDir := wrk.(string)
+			ChkSetMdlDir(wrkDir)
 		}
 		if wrk, ok = m["noop"]; ok {
 			sharedData.SetNoop(wrk.(bool))

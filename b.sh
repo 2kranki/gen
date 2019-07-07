@@ -8,7 +8,7 @@
 fDebug=
 fForce=
 fQuiet=
-pgmname="gen"
+pgmname="genApp"
 srcDir="src"
 dstDir="/tmp/bin"
 pgmPath="${dstDir}/${pgmname}"
@@ -36,10 +36,13 @@ buildApp () {
     cd -
 
     if [ -x ${pgmPath} ] ; then
-        test -z "$fQuiet" && echo "...Installing executable in:"
         if [ -d "${HOME}/Support" ] ; then
-            test -z "$fQuiet" && echo "   ${HOME}/Support/bin"
+            test -z "$fQuiet" && echo "...Installing executable, ${pgmname}, in: ${HOME}/Support/bin"
             cp ${pgmPath} ${HOME}/Support/bin/
+            test -z "$fQuiet" && echo "...Installing models in ${HOME}/Support/${pgmname}"
+            rm -fr    ${HOME}/Support/${pgmname}
+            mkdir -p  ${HOME}/Support/${pgmname}
+            cp -R ./src/models ${HOME}/Support/${pgmname}/
         fi
     fi
 
