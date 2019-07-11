@@ -3,6 +3,9 @@
 
 // Miscellaneous utility functions
 
+// Some functions were taken from https://blog.kowalczyk.info/book/go-cookbook.html
+// which was declared public domain at the time that the functions were taken.
+
 package util
 
 import (
@@ -14,9 +17,78 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
+	"os/user"
 	"path/filepath"
 	"strings"
 )
+
+//----------------------------------------------------------------------------
+//                             Command Execution
+//----------------------------------------------------------------------------
+
+// os.Exec contains further details
+type ExecCmd struct {
+	cmd       	*exec.Cmd
+}
+
+func (c *ExecCmd) Cmd( ) *exec.Cmd {
+	return c.cmd
+}
+
+func (c *ExecCmd) CommandString( ) string {
+	n := len(c.cmd.Args)
+	a := make([]string, n, n)
+	for i := 0; i < n; i++ {
+		a[i] = c.QuoteArgIfNeeded(i)
+	}
+	return strings.Join(a, " ")
+}
+
+func (c *ExecCmd) QuoteArgIfNeeded(n int) string {
+	var s		string
+
+	s = c.cmd.Args[n]
+	if strings.Contains(s, " ") || strings.Contains(s, "\"") {
+		s = strings.Replace(s, `"`, `\"`, -1)
+		return `"` + s + `"`
+	}
+	return s
+}
+
+// Runt runs the previously set up command.
+func (c *ExecCmd) Run( ) error {
+	var err		error
+
+	err = c.cmd.Run()
+
+	return err
+}
+
+// RunWithOutput runs the previously set up command, gets the combined output
+// of sysout and syserr, trims whitespace from it and returns if error free.
+// If any error occurs, it is simply returned.
+func (c *ExecCmd) RunWithOutput( ) (string, error) {
+	var err		error
+
+	outBytes, err := c.cmd.CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+	s := string(outBytes)
+	s = strings.TrimSpace(s)
+
+	return s, nil
+}
+
+func NewExecCmd(name string, args ...string) *ExecCmd {
+	ce := ExecCmd{}
+	if len(name) > 0 {
+		ce.cmd = exec.Command(name, args...)
+	}
+	return &ce
+}
+
 
 //----------------------------------------------------------------------------
 //                             CopyDir
@@ -208,6 +280,36 @@ func FileCompare(file1, file2 string) bool {
 }
 
 //----------------------------------------------------------------------------
+//                             		FormatArgs
+//----------------------------------------------------------------------------
+
+func FormatArgs(args ...interface{}) string {
+	if len(args) == 0 {
+		return ""
+	}
+	format := args[0].(string)
+	if len(args) == 1 {
+		return format
+	}
+	return fmt.Sprintf(format, args[1:]...)
+}
+
+//----------------------------------------------------------------------------
+//                             HomeDir
+//----------------------------------------------------------------------------
+
+// HomeDir returns $HOME diretory of the current user
+func HomeDir() string {
+
+	// user.Current() returns nil if cross-compiled e.g. on mac for linux
+	if usr, _ := user.Current(); usr != nil {
+		return usr.HomeDir
+	}
+
+	return os.Getenv("HOME")
+}
+
+//----------------------------------------------------------------------------
 //                             IsPathDir
 //----------------------------------------------------------------------------
 
@@ -219,12 +321,7 @@ func IsPathDir(fp string) (string, error) {
 	var err error
 	var path string
 
-	fp = os.ExpandEnv(fp)
-	fp = filepath.Clean(fp)
-	path, err = filepath.Abs(fp)
-	if err != nil {
-		return path, errors.New(fmt.Sprint("Error getting absolute path for:", fp, err))
-	}
+	path = PathClean(fp)
 	fi, err := os.Lstat(path)
 	if err != nil {
 		return path, errors.New("path not found")
@@ -247,12 +344,7 @@ func IsPathRegularFile(fp string) (string, error) {
 	var err error
 	var path string
 
-	fp = os.ExpandEnv(fp)
-	fp = filepath.Clean(fp)
-	path, err = filepath.Abs(fp)
-	if err != nil {
-		return path, errors.New(fmt.Sprint("Error getting absolute path for:", fp, err))
-	}
+	path = PathClean(fp)
 	fi, err := os.Lstat(path)
 	if err != nil {
 		return path, errors.New("path not found")
@@ -261,6 +353,54 @@ func IsPathRegularFile(fp string) (string, error) {
 		return path, nil
 	}
 	return path, errors.New("path not regular file")
+}
+
+//----------------------------------------------------------------------------
+//                             PanicIf
+//----------------------------------------------------------------------------
+
+func PanicIf(cond bool, args ...interface{}) {
+	if !cond {
+		return
+	}
+	s := FormatArgs(args...)
+	if s == "" {
+		s = "fatalIf: cond is false"
+	}
+	panic(s)
+}
+
+//----------------------------------------------------------------------------
+//                             PanicIfErr
+//----------------------------------------------------------------------------
+
+func PanicIfErr(err error, args ...interface{}) {
+	if err == nil {
+		return
+	}
+	s := FormatArgs(args...)
+	if s == "" {
+		s = err.Error()
+	}
+	panic(s)
+}
+
+//----------------------------------------------------------------------------
+//                             PathClean
+//----------------------------------------------------------------------------
+
+// PathClean cleans up the supplied file path.
+func PathClean(fp string) string {
+	var path string
+
+	if strings.HasPrefix(fp, "~") {
+		fp = HomeDir() + fp[1:]
+	}
+	fp = os.ExpandEnv(fp)
+	fp = filepath.Clean(fp)
+	path, _ = filepath.Abs(fp)
+
+	return path
 }
 
 //----------------------------------------------------------------------------

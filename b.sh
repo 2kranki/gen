@@ -8,7 +8,7 @@
 fDebug=
 fForce=
 fQuiet=
-pgmname="genApp"
+pgmname="genapp"
 srcDir="src"
 dstDir="/tmp/bin"
 pgmPath="${dstDir}/${pgmname}"

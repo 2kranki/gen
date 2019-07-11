@@ -22,8 +22,28 @@ type jsonData struct {
 	Outdir  string `json:"outdir,omitempty"`
 }
 
-func (j jsonData) TestFunc() string {
-	return "xyzzy"
+func TestExecCmd(t *testing.T) {
+	var err 	error
+	var cmd		*ExecCmd
+
+	t.Log("TestExecCmd()")
+
+	cmd = NewExecCmd("")
+	if cmd == nil {
+		t.Errorf("NewExecCmd(\"\") failed to allocate!\n")
+	}
+
+	cmd = NewExecCmd("ls")
+	if cmd == nil {
+		t.Errorf("NewExecCmd(\"ls\") failed to allocate!\n")
+	}
+	out, err := cmd.RunWithOutput()
+	if err != nil {
+		t.Errorf("RunWithOutput(\"ls\") failed: %s\n", err.Error())
+	}
+	t.Logf("\tls output: %s", out)
+
+	t.Log("\tend: TestExecCmd")
 }
 
 func TestFileCompare(t *testing.T) {
@@ -111,6 +131,7 @@ func TestIsPathDir(t *testing.T) {
 }
 
 func TestIsPathRegularFile(t *testing.T) {
+	var input	string
 	var path string
 	var err error
 
@@ -122,13 +143,62 @@ func TestIsPathRegularFile(t *testing.T) {
 	}
 	fmt.Println("./files.go path:", path)
 
-	path, err = IsPathRegularFile("./xyzzy.go")
+	input = "./xyzzy.go"
+	path, err = IsPathRegularFile(input)
 	if err == nil {
-		t.Errorf("IsPathRegularFile(./xyzzy.go) should have failed!\n")
+		t.Errorf("IsPathRegularFile(%s) failed: %s\n", path, err)
 	}
-	fmt.Println("./xyzzy.go path:", path)
+	t.Logf("\t%s => %s\n", input, path)
 
 	t.Log("\tend: TestIsPathRegularFile")
+}
+
+func TestPathClean(t *testing.T) {
+	var err			error
+	var expected	string
+	var input		string
+	var path 		string
+	homeDir := HomeDir()
+	curDir, err := os.Getwd()
+	if err != nil {
+		t.Errorf("Error: Getting Current Directory: %s\n", err)
+	}
+
+	t.Log("\tend: TestPathClean")
+
+	input = "./util.go"
+	expected = curDir + "/util.go"
+	path = PathClean(input)
+	t.Logf("\t%s => %s\n", input, path)
+	if path != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
+	}
+
+	input = "./xyzzy.go"
+	expected = curDir + "/xyzzy.go"
+	path = PathClean(input)
+	t.Logf("\t%s => %s\n", input, path)
+	if path != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
+	}
+
+	input = "~"
+	expected = homeDir
+	path = PathClean(input)
+	t.Logf("\t%s => %s\n", input, path)
+	if path != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
+	}
+
+	input = "~/.ssh"
+	expected = homeDir + "/.ssh"
+	path = PathClean(input)
+	t.Logf("\t%s => %s\n", input, path)
+	if path != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
+	}
+
+	t.Log("\tend: TestPathClean")
 }
 
 func TestReadJson(t *testing.T) {

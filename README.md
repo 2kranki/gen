@@ -1,6 +1,6 @@
-                        *genApp* - Go SQL Application Generator - v0.1.0
+                        *genapp* - Go SQL Application Generator - v0.1.0
 
-The idea for the *genApp* project came about when I became aware of how powerful the templating system in Go is.  So, as I was taking the udemy.com course, "Web Development with Google's Golang" by Todd McLeod, I decided to write a program generator for simple SQL Table websites.
+The idea for the *genapp* project came about when I became aware of how powerful the templating system in Go is.  So, as I was taking the udemy.com course, "Web Development with Google's Golang" by Todd McLeod, I decided to write a program generator for simple SQL Table websites.
 
 I want the generated code to stand on its own and provide a starting
 point for further development.  I do not see the generation process
@@ -17,7 +17,7 @@ definition and having them control the generation process.
 * Version is 0.1
 * Supports only SQLite
 * Still a work in progress
-* WARNING - genApp should generate an app, but the app will only work with SQLite! I will fix this in the near future.
+* WARNING - genapp should generate an app, but the app will only work with SQLite! I will fix this in the near future.
 
 
 **Project Futures**:
