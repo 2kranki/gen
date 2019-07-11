@@ -63,7 +63,7 @@ type IO_[[$tn]] struct {
 //----------------------------------------------------------------------------
 
 // RowDelete deletes the row with keys from the provided record, rcd.
-func (io IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowDeleteStmt .Table]]"
 
@@ -91,7 +91,7 @@ func (io IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
 // RowFind searches the Database for a matching row for the keys found in
 // the given record and returns the output in that same record.
-func (io IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt     = "[[GenRowFindStmt $t]]"
 
@@ -116,7 +116,7 @@ func (io IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 // RowFirst returns the first row in the table, [[.Table.TitledName]].
 // If there are no rows in the table, then a blank/null record is returned
 // without error.
-func (io IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowFirstStmt .Table]]"
 
@@ -144,7 +144,7 @@ func (io IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Insert
 //----------------------------------------------------------------------------
 
-func (io IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
@@ -156,7 +156,7 @@ func (io IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    _, err = io.dbSql.Exec(sqlStmt, [[$t.FieldNameList "d."]])
+    _, err = io.dbSql.Exec(sqlStmt, [[$t.InsertNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowInsert(Error:500) - Internal Error\n")
@@ -174,7 +174,7 @@ func (io IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Last
 //----------------------------------------------------------------------------
 
-func (io IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowLastStmt .Table]]"
 
@@ -204,7 +204,7 @@ func (io IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
 // RowNext returns the next row from the row given. If row after the current
 // one does not exist, then the first row is returned.
-func (io IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowNextStmt .Table]]"
 
@@ -233,7 +233,7 @@ func (io IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 // 'offset' is the offset into the result set ordered by the main index. Both
 // 'limit' and 'offset' are relative to 1. We return an address to the array
 // rows (structs) so that we don't have the overhead of copying them everwhere.
-func (io IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
+func (io *IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
     var err         error
     var sqlStmt = "[[GenRowPageStmt $t]]"
     data := [][[$dn]][[$tn]].[[$tn]]{}
@@ -268,7 +268,7 @@ func (io IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], e
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func (io IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowPrevStmt .Table]]"
 
@@ -293,7 +293,7 @@ func (io IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Update
 //----------------------------------------------------------------------------
 
-func (io IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
+func (io *IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
@@ -323,7 +323,7 @@ func (io IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Table Count
 //----------------------------------------------------------------------------
 
-func (io IO_[[$tn]]) TableCount( ) (int, error) {
+func (io *IO_[[$tn]]) TableCount( ) (int, error) {
     var err         error
     var count       int
     var sqlStmt = "[[GenTableCountStmt .Table]]"
@@ -354,7 +354,7 @@ func (io IO_[[$tn]]) TableCount( ) (int, error) {
 
 // TableCreate creates the table in the given database deleting the current
 // table if present.
-func (io IO_[[$tn]]) TableCreate() error {
+func (io *IO_[[$tn]]) TableCreate() error {
     var sqlStmt = "[[GenTableCreateStmt .Table]]"
     var err     error
 
@@ -383,7 +383,7 @@ func (io IO_[[$tn]]) TableCreate() error {
 //----------------------------------------------------------------------------
 
 // TableDelete deletes the table in the given database if present.
-func (io IO_[[$tn]]) TableDelete() error {
+func (io *IO_[[$tn]]) TableDelete() error {
     var sqlStmt = "[[GenTableDeleteStmt .Table]]"
     var err     error
 
@@ -406,8 +406,8 @@ func (io IO_[[$tn]]) TableDelete() error {
 
 // New creates a new io struct.
 func [[$tn]]New(dbSql *sql.DB) *IO_[[$tn]] {
-    db := IO_[[$tn]]{}
+    db := &IO_[[$tn]]{}
     db.dbSql = dbSql
-    return &db
+    return db
 }
 

@@ -66,19 +66,19 @@ type Handlers struct {
 //                             Accessors
 //----------------------------------------------------------------------------
 
-func (h Handlers) DB() interface{} {
+func (h *Handlers) DB() interface{} {
     return h.db
 }
 
-func (h Handlers) SetDB(db interface{}) {
+func (h *Handlers) SetDB(db interface{}) {
     h.db = db
 }
 
-func (h Handlers) RowsPerPage() int {
+func (h *Handlers) RowsPerPage() int {
     return h.rowsPerPage
 }
 
-func (h Handlers) SetRowsPerPage(r int) {
+func (h *Handlers) SetRowsPerPage(r int) {
     h.rowsPerPage = r
 }
 
@@ -88,7 +88,7 @@ func (h Handlers) SetRowsPerPage(r int) {
 
 // SetupHandlers creates a Handler object and sets up each of the handlers
 // with it given a mux.
-func (h Handlers) SetupHandlers(mux *http.ServeMux) {
+func (h *Handlers) SetupHandlers(mux *http.ServeMux) {
 
     [[if GenDebugging]]
         log.Printf("\thndlr[[$tn]].SetupHandlers()\n")
@@ -147,7 +147,7 @@ func New(db interface{}, rowsPerPage int, mux *http.ServeMux) *Handlers {
 //----------------------------------------------------------------------------
 
 // ListFirst displays the first page of rows.
-func (h Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].ListFirst(%s)\n", r.Method)
@@ -174,7 +174,7 @@ func (h Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListLast displays the last page of rows.
-func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
     var counter [[$dn]][[$tn]].DbTableCounter
@@ -222,7 +222,7 @@ func (h Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListNext displays the next page of rows.
-func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
     var cTable  int
@@ -272,7 +272,7 @@ func (h Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListPrev displays the next page of rows.
-func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
     var begin   int
@@ -330,7 +330,7 @@ func (h Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListShow displays a list page given a starting offset.
-func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
+func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
     var err     error
     var ok      bool
     var rcds    [][[$dn]][[$tn]].[[$tn]]
@@ -394,7 +394,7 @@ func (h Handlers) ListShow(w http.ResponseWriter, offset int) {
 //----------------------------------------------------------------------------
 
 // RowDelete handles an delete request which comes from the row display form.
-func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     var err     error
     var rcd     [[$dn]][[$tn]].[[$tn]]
     var deleter [[$dn]][[$tn]].DbRowDeleter
@@ -465,7 +465,7 @@ func (h Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowDisplay displays the given record.
-func (h Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]], msg string) {
+func (h *Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]], msg string) {
     var err     error
 
     [[if GenDebugging]]
@@ -499,7 +499,7 @@ func (h Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]]
 //----------------------------------------------------------------------------
 
 // RowEmpty displays the table row form with an empty row.
-func (h Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
     var rcd     [[$dn]][[$tn]].[[$tn]]
 
     [[if GenDebugging]]
@@ -526,7 +526,7 @@ func (h Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowFind handles displaying of the table row form display.
-func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     var err     error
     var rcd     [[$dn]][[$tn]].[[$tn]]
     var finder  [[$dn]][[$tn]].DbRowFinder
@@ -589,7 +589,7 @@ func (h Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowFirst displays the first row.
-func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
     var rcd     [[$dn]][[$tn]].[[$tn]]
     var err     error
     var firster [[$dn]][[$tn]].DbRowFirster
@@ -633,7 +633,7 @@ func (h Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowForm displays the raw table row form without data.
-func (h Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowForm(%s)\n", r.Method)
@@ -663,7 +663,7 @@ func (h Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowInsert handles an add row request which comes from the row display form.
-func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
     var inserter    [[$dn]][[$tn]].DbRowInserter
@@ -716,7 +716,7 @@ func (h Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowLast displays the first row.
-func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
     var laster      [[$dn]][[$tn]].DbRowLaster
@@ -761,7 +761,7 @@ func (h Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
 
 // RowNext handles an next request which comes from the row display form and
 // should display the next row from the current one.
-func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
     var nexter      [[$dn]][[$tn]].DbRowNexter
@@ -813,7 +813,7 @@ func (h Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
 
 // RowPrev handles an previous request which comes from the row display form
 // and should display the previous row from the current one.
-func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var err         error
     var prever      [[$dn]][[$tn]].DbRowPrever
@@ -863,7 +863,7 @@ func (h Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowShow handles displaying of the table row form display.
-func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
     var rcd         [[$dn]][[$tn]].[[$tn]]
@@ -924,7 +924,7 @@ func (h Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowUpdate handles an update request which comes from the row display form.
-func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
     var rcd         [[$dn]][[$tn]].[[$tn]]
@@ -1003,7 +1003,7 @@ func (h Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // TableCreate creates the table deleting any current ones.
-func (h Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
     var err         error
     var creater     [[$dn]][[$tn]].DbTableCreater
     var ok          bool
@@ -1039,7 +1039,7 @@ func (h Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
 
 // TableLoadCSV creates the table deleting any current ones and loads in
 // data from a CSV file.
-func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     var err         error
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var fileIn      multipart.File
@@ -1147,7 +1147,7 @@ func (h Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
 
 // TableLoadTestData creates the table deleting any current ones and loads
 // in some test rows.
-func (h Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var err         error
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var inserter    [[$dn]][[$tn]].DbRowInserter
@@ -1192,15 +1192,12 @@ func (h Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     // Now add some records.
     for i := 0; i < 26; i++ {
         chr := 'A' + i
-        //[if .Table.PrimaryKey.IsInteger]
-        //    rcd.[.Table.PrimaryKey.TitledName] = int64(i)
-        //[else if .Table.PrimaryKey.IsFloat]
-        //    rcd.[.Table.PrimaryKey.TitledName] = float64(i)
-        //[else]
-        //    rcd.[.Table.PrimaryKey.TitledName] = string(chr)
-        //[end]
         [[range $f := .Table.Fields]]
-            [[if $f.IsText]]
+            [[if $f.IsFloat]]
+                rcd.[[$f.TitledName]] = float64(i)
+            [[else if $f.IsInteger]]
+                rcd.[[$f.TitledName]] = int64(i)
+            [[else if $f.IsText]]
                 rcd.[[$f.TitledName]] = string(chr)
             [[else if $f.IsDec]]
                 rcd.[[$f.TitledName]] = fmt.Sprintf("%d.00", i)

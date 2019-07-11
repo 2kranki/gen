@@ -421,6 +421,33 @@ func (t *DbTable) HasText() bool {
 	return false
 }
 
+// InsertNameList returns struct fields separated by
+// commas with an optional per field prefix. If a field
+// is an auto-increment field then nil is returned for it.
+func (t *DbTable) InsertNameList(prefix string) string {
+	var str			strings.Builder
+
+	for i,f := range t.Fields {
+		cm := ", "
+		if i == len(t.Fields) - 1 {
+			cm = ""
+		}
+		if f.Incr {
+			str.WriteString("nil")
+			if len(cm) > 0 {
+				str.WriteString(cm)
+			}
+		} else {
+			if len(prefix) > 0 {
+				str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
+			} else {
+				str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+			}
+		}
+	}
+	return str.String()
+}
+
 // KeyCount returns the number of key fields in the table.
 func (t *DbTable) KeyCount() int {
 	var count		int

@@ -34,7 +34,7 @@
 [[- range $t := .TD.Data.Tables]]
     [[- $tn := $t.TitledName]]
     <li>[[$tn]] Actions:</li>
-    <form id="menuForm" method="get" action="/[[$tn]]">
+    <form id="menuForm[[$tn]]" method="get" action="/[[$tn]]">
             <li>[[$tn]] Table</li>
             <ul>
                 <li><input type=submit onclick='onCreate[[$tn]]()' value="Create Table"></li>
@@ -49,33 +49,33 @@
     </form>
     <script>
         function onCreate[[$tn]]() {
-            document.getElementById("menuForm").action = "/[[$tn]]/table/create";
-            document.getElementById("menuForm").method = "get";
+            document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/table/create";
+            document.getElementById("menuForm[[$tn]]").method = "get";
         }
         function onList[[$tn]]() {
-            document.getElementById("menuForm").action = "/[[$tn]]/list/first";
-            document.getElementById("menuForm").method = "get";
+            document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/list/first";
+            document.getElementById("menuForm[[$tn]]").method = "get";
         }
         function onCsvFile[[$tn]]() {
-            document.getElementById("menuForm").enctype = "multipart/form-data";
+            document.getElementById("menuForm[[$tn]]").enctype = "multipart/form-data";
         }
         function onCsvLoad[[$tn]]() {
-            //document.getElementById("menuForm").enctype = "multipart/form-data";
-            document.getElementById("menuForm").action  = "/[[$tn]]/table/load/csv";
-            document.getElementById("menuForm").method  = "post";
+            //document.getElementById("menuForm[[$tn]]").enctype = "multipart/form-data";
+            document.getElementById("menuForm[[$tn]]").action  = "/[[$tn]]/table/load/csv";
+            document.getElementById("menuForm[[$tn]]").method  = "post";
         }
         function onLoadTest[[$tn]]() {
-            document.getElementById("menuForm").action = "/[[$tn]]/table/load/test";
-            document.getElementById("menuForm").method = "get";
+            document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/table/load/test";
+            document.getElementById("menuForm[[$tn]]").method = "get";
         }
         function onDelete[[$tn]]() {
             [[GenFormDataKeyGet $t]]
-            document.getElementById("menuForm").action = "/[[$tn]]/delete"+[[GenFormDataKeys $t]];
-            document.getElementById("menuForm").method = "get";
+            document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/delete"+[[GenFormDataKeys $t]];
+            document.getElementById("menuForm[[$tn]]").method = "get";
         }
         function onRow[[$tn]]() {
-            document.getElementById("menuForm").action = "/[[$tn]]/show";
-            document.getElementById("menuForm").method = "get";
+            document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/show";
+            document.getElementById("menuForm[[$tn]]").method = "get";
         }
     </script>
 [[end -]]

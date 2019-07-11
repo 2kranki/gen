@@ -27,7 +27,7 @@
     * table I/O
         * tableio.go - change to <database_name>DB so that we can have
             several db's per JSON definition
-    * dbData
+    * dbGener
         * Add Foreign Key support into the JSON (needs table name and key name)
     * If we included the field/table tables in doPkg in the io package, we might be
         able to generate a more table-driven application that required less code generation.

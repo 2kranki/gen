@@ -272,7 +272,7 @@ func (io *IO_[[$dn]]) DatabaseUse() error {
 
 // New creates a new struct.
 func [[$dn]]New() *IO_[[$dn]] {
-    db := IO_[[$dn]]{}
-    return &db
+    db := &IO_[[$dn]]{}
+    return db
 }
 

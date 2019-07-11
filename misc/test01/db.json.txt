@@ -22,6 +22,7 @@
                     "Name":"Num",
                     "TypeDef":"int",
                     "KeyNum":1,
+                    //"Incr":true,
                     "List":true
                 },
                 {
@@ -77,6 +78,7 @@
                     "Name":"Num",
                     "TypeDef":"int",
                     "KeyNum":1,
+                    "Incr":true,
                     "List":true
                 },
                 {
