@@ -5,73 +5,24 @@
 // and data to interact with the SQL Database.
 
 // Generated: [[Time]]
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
 
-package hndlr[[.TD.Data.TitledName]]
-[[- $n := .TD.Data.TitledName]]
+package hndlr[[$dn]]
 
 import (
 	"testing"
 )
 
 //============================================================================
-//                              Miscellaneous
-//============================================================================
-
-// SetupParms sets up the environment for testing including
-// creating the test databases needed for testing the handlers.
-func SetupParms(t *testing.T) {
-    var err         error
-[[- range $t := .TD.Data.Tables ]]
-    var rcd[[$t.TitledName]]    io[[$n]].[[$t.TitledName]]
-[[- end]]
-
-    t.Logf("SetupParms()...\n")
-    SetTmplsDir("../tmpl")
-    SetupTmpls()
-
-    io[[$n]].SetServer("test.db")
-
-    // Start clean with new empty tables.
-    err = io[[$n]].Connect()
-    if err != nil {
-        t.Fatal("Error: Cannot connect: ", err)
-    }
-    err = io[[$n]].TablesCreate()
-    if err != nil {
-        t.Fatal("Error: Cannot create tables: ", err)
-    }
-
-    // Now add some records.
-    for i := 0; i < 5; i++ {
-        t.Logf("\tInserting Record %d\n", i)
-        chr := 'A' + i
-[[- range $t := .TD.Data.Tables ]]
-        [[range $fn := $t.Keys]]
-            [[$f := $t.FindField $fn]]
-            [[if $f.IsInteger]]
-                rcd.[[$f.TitledName]] = i
-            [[else if $f.IsFloat]]
-                rcd.[[$f.TitledName]] = float64(i)
-            [[else]]
-                rcd.[[$f.TitledName]] = string(chr)
-            [[end]]
-        [[end]]
-        [[range $f := $t.Fields]]
-            [[if $f.IsText]]
-                rcd.[[$f.TitledName]] = string(chr)
-            [[end]]
-        [[end]]
-        err = io[[$n]].[[$t.TitledName]]RowInsert(&rcd[[$t.TitledName]])
-        if err != nil {
-            t.Fatalf("Error: : Record Insertion Failed: %s\n\n\n", err)
-        }
-[[- end]]
-    }
-
-    t.Logf("...End of SetupParms()\n")
-}
-
-//============================================================================
 //                              Tests
 //============================================================================
+
+func TestSomething(t *testing.T) {
+
+	t.Logf("TestSomething()...\n")
+
+	t.Logf("TestSomething() - End of Test\n\n\n")
+}
 

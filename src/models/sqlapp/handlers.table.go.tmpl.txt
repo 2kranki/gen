@@ -1192,17 +1192,7 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     // Now add some records.
     for i := 0; i < 26; i++ {
         chr := 'A' + i
-        [[range $f := .Table.Fields]]
-            [[if $f.IsFloat]]
-                rcd.[[$f.TitledName]] = float64(i)
-            [[else if $f.IsInteger]]
-                rcd.[[$f.TitledName]] = int64(i)
-            [[else if $f.IsText]]
-                rcd.[[$f.TitledName]] = string(chr)
-            [[else if $f.IsDec]]
-                rcd.[[$f.TitledName]] = fmt.Sprintf("%d.00", i)
-            [[end]]
-        [[end]]
+        rcd.TestData(i)
         err = inserter.RowInsert(&rcd)
         if err == nil {
             str := fmt.Sprintf("Added row: %c\n", chr)

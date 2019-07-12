@@ -397,6 +397,18 @@ func (t *DbTable) HasFloat() bool {
 	return false
 }
 
+// HasIncr returns true if any of the key fields are a
+// auto-increment field
+func (t *DbTable) HasIncr() bool {
+
+	for _, f := range t.Fields {
+		if f.Incr {
+			return true
+		}
+	}
+	return false
+}
+
 // HasInteger returns true if any of the fields are a
 // integers which will need float to string conversion
 func (t *DbTable) HasInteger() bool {

@@ -2,4 +2,6 @@
 
 echo "Testing the package:"
 go test -v ./...
+echo "Removing created test data:"
+rm *.db
 

@@ -312,7 +312,7 @@ func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
 //----------------------------------------------------------------------------
 
 // TestData takes the given integer and uses it to fill most of the fields in
-// with data derived from it.
+// with data derived from it. 'i' is relative to zero.
 func (s *[[$tn]]) TestData(i int) {
     var chr     rune
 [[if $t.HasDate -]]
@@ -351,6 +351,9 @@ func (s *[[$tn]]) TestData(i int) {
             s.[[$f.TitledName]] = date
         [[else if $f.IsInteger -]]
             s.[[$f.TitledName]] = i64
+            [[if $f.Incr -]]
+                s.[[$f.TitledName]]++       // auto-increment fields are relative to one not zero
+            [[end -]]
         [[else if $f.IsFloat -]]
             s.[[$f.TitledName]] = f64
         [[end -]]
