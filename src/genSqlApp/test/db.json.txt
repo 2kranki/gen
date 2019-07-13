@@ -1,78 +1,65 @@
 # vi:nu:et:sts=4 ts=4 sw=4
 
 {
-    "Name":"Finances",
-    "SqlType":"postgres",                   # mariadb | mssql | mysql | postgres | sqlite (required)
+    "Name":"MovieDB",
+    "SqlType":"sqlite",         # mariadb | mssql | mysql | postgres | sqlite (required)
+    "dbName":"movies.db",       # sqlite file path
+    #"dbServer":"localhost",
+    #"dbPort":"4306",           # mariadb  default port
+    #"dbPort":"1433",           # mssql    default port
+    #"dbPort":"3306",           # mysql    default port
+    #"dbPort":"5432",           # postgres default port
+    "dbPort":"",                # sqlite   default port
+    "GenDebugging":true,
+    "GenLogging":true,
     "Tables":[
         {
-            "Name":"Customer",
-            "PrimaryKey":"CustNo",
+            "Name":"Movies",
             "Fields":[
                 {
-                    "Name":"CustNo",
-                    "Type":"INT",
-                    "PrimaryKey":true,
+                    "Name":"Title",
+                    "TypeDef":"text",
+                    "KeyNum":1,
                     "List":true
                 },
                 {
-                    "Name":"CustName",
-                    "Type":"NVARCHAR",
-                    "Len":30,
+                    "Name":"ImdbURL",
+                    "TypeDef":"text",
                     "List":true
                 },
                 {
-                    "Name":"CustCurBal",
-                    "Type":"DEC",
-                    "Len": 15,
-                    "Dec":2
-                }
-            ]
-        },
-        {
-            "Name":"Vendor",
-            "PrimaryKey":"VendNo",
-            "Fields":[
-                {
-                    "Name":"VendNo",
-                    "Type":"int",
-                    "PrimaryKey":true,
+                    "Name":"LastWatched",
+                    "TypeDef":"date",
                     "List":true
                 },
                 {
-                    "Name":"VendName",
-                    "Type":"string",
-                    "Len":30,
+                    "Name":"Stars",                 # 0 - 10
+                    "TypeDef":"int",
                     "List":true
                 },
                 {
-                    "Name":"VendAddr1",
-                    "Type":"string",
-                    "Len":30
+                    "Name":"EndingEmotion",         # h-happy, n-neutral, s-sad
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendAddr2",
-                    "Type":"string",
-                    "Len":30
+                    "Name":"EndingType",            # f-final, n-neutral, o-open
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendCity",
-                    "Type":"string",
-                    "Len":20
+                    "Name":"Source",                # dvd, file, spectrum
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendState",
-                    "Type":"string",
-                    "Len":10
+                    "Name":"NextInSeries",
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendZip",
-                    "Type":"int64"
+                    "Name":"Keywords",
+                    "TypeDef":"text"
                 },
                 {
-                    "Name":"VendCurBal",
-                    "Type":"DEC",
-                    "Len": 15,
-                    "Dec":2
+                    "Name":"SelectType",
+                    "TypeDef":"text"
                 }
             ]
         }

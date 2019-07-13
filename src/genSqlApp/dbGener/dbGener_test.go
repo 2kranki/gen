@@ -23,7 +23,7 @@ import (
 	_ "../dbSqlite"
 )
 
-const jsonTestPath = "../../../misc/test01/db.json.txt"
+const jsonTestPath = "../test/db.json.txt"
 
 var jsonData	*dbJson.Database
 
@@ -46,7 +46,7 @@ func ReadJsonFile(t *testing.T) {
 		t.Fatalf("ReadJsonFile() Returned JSON tables are nil for: %s\n", sharedData.MainPath())
 	}
 
-	t.Logf("ReadJsonFile: end of test\n")
+	t.Logf("ReadJsonFile: end\n")
 
 }
 
@@ -56,19 +56,8 @@ func ReadJsonFile(t *testing.T) {
 //----------------------------------------------------------------------------
 
 func TestGenFormDataDisplay(t *testing.T) {
-	var strs		[]string
-	var dataTest	= []string{"<table>\n",
-		"\t<tr><td><label>Num</label></td> <td><input type=\"number\" name=\"Num\" id=\"Num\" value=\"{{.Rcd.Num}}\"></td></tr>\n",
-		"\t<tr><td><label>Name</label></td> <td><input type=\"text\" name=\"Name\" id=\"Name\" value=\"{{.Rcd.Name}}\"></td></tr>\n",
-		"\t<tr><td><label>Addr1</label></td> <td><input type=\"text\" name=\"Addr1\" id=\"Addr1\" value=\"{{.Rcd.Addr1}}\"></td></tr>\n",
-		"\t<tr><td><label>Addr2</label></td> <td><input type=\"text\" name=\"Addr2\" id=\"Addr2\" value=\"{{.Rcd.Addr2}}\"></td></tr>\n",
-		"\t<tr><td><label>City</label></td> <td><input type=\"text\" name=\"City\" id=\"City\" value=\"{{.Rcd.City}}\"></td></tr>\n",
-		"\t<tr><td><label>State</label></td> <td><input type=\"text\" name=\"State\" id=\"State\" value=\"{{.Rcd.State}}\"></td></tr>\n",
-		"\t<tr><td><label>Zip</label></td> <td><input type=\"text\" name=\"Zip\" id=\"Zip\" value=\"{{.Rcd.Zip}}\"></td></tr>\n",
-		"\t<tr><td><label>CurBal</label></td> <td><input type=\"number\" name=\"CurBal\" id=\"CurBal\" value=\"{{.Rcd.CurBal}}\"></td></tr>\n",
-		"</table>\n",
-		"<input type=\"hidden\" id=\"key0\" name=\"key0\"value=\"{{.Rcd.Num}}\">\n",
-	}
+	var str		    string
+	var dataTest	= "<table>\n\t<tr><td><label>Num</label></td> <td><input type=\"number\" name=\"Num\" id=\"Num\" value=\"{{.Rcd.Num}}\"></td></tr>\n\t<tr><td><label>Name</label></td> <td><input type=\"text\" name=\"Name\" id=\"Name\" value=\"{{.Rcd.Name}}\"></td></tr>\n\t<tr><td><label>Addr1</label></td> <td><input type=\"text\" name=\"Addr1\" id=\"Addr1\" value=\"{{.Rcd.Addr1}}\"></td></tr>\n\t<tr><td><label>Addr2</label></td> <td><input type=\"text\" name=\"Addr2\" id=\"Addr2\" value=\"{{.Rcd.Addr2}}\"></td></tr>\n\t<tr><td><label>City</label></td> <td><input type=\"text\" name=\"City\" id=\"City\" value=\"{{.Rcd.City}}\"></td></tr>\n\t<tr><td><label>State</label></td> <td><input type=\"text\" name=\"State\" id=\"State\" value=\"{{.Rcd.State}}\"></td></tr>\n\t<tr><td><label>Zip</label></td> <td><input type=\"text\" name=\"Zip\" id=\"Zip\" value=\"{{.Rcd.Zip}}\"></td></tr>\n\t<tr><td><label>CurBal</label></td> <td><input type=\"number\" name=\"CurBal\" id=\"CurBal\" value=\"{{.Rcd.CurBal}}\"></td></tr>\n</table>\n<input type=\"hidden\" id=\"key0\" name=\"key0\"value=\"{{.Rcd.Num}}\">\n"
 
 	log.Printf("TestGenFormDataDisplay()..\n")
 	sharedData.SetDebug(true)
@@ -76,19 +65,17 @@ func TestGenFormDataDisplay(t *testing.T) {
 	// Read the test JSON Tables
 	ReadJsonFile(t)
 
-	strs = GenFormDataDisplay(&jsonData.Tables[0])
+	str = GenFormDataDisplay(&jsonData.Tables[0])
 	t.Log("===")
-	t.Log(strs)
+	t.Log(str)
 	t.Log("===")
-	if len(strs) != len(dataTest) {
+	if len(str) != len(dataTest) {
 		t.Fatalf("TestGenFormDataDisplay() generated data did not match saved data - length\n")
 	}
-	for i, v := range strs {
-		if v != dataTest[i] {
-			t.Errorf(" gen: %s", v)
-			t.Errorf("data: %s", dataTest[i])
-			t.Fatalf("TestGenFormDataDisplay() generated data did not match saved data - line %d\n", i)
-		}
+    if str != dataTest {
+		t.Errorf(" generated: %s", str)
+			t.Errorf("expected: %s", dataTest)
+			t.Fatalf("TestGenFormDataKeyGet() generated data did not match saved data!\n")
 	}
 
 	t.Log("TestGenFormDataDisplay: end of test\n")
@@ -96,8 +83,8 @@ func TestGenFormDataDisplay(t *testing.T) {
 }
 
 func TestGenFormDataKeyGet(t *testing.T) {
-	var strs		[]string
-	var dataTest	= []string{"\t\t\tkey0 = document.getElementById(\"key0\").value\n",}
+	var str		    string
+	var dataTest	= "\t\t\tkey0 = document.getElementById(\"key0\").value\n"
 
 	log.Printf("TestGenFormDataKeyGet()..\n")
 	sharedData.SetDebug(true)
@@ -105,19 +92,17 @@ func TestGenFormDataKeyGet(t *testing.T) {
 	// Read the test JSON Tables
 	ReadJsonFile(t)
 
-	strs = GenFormDataKeyGet(&jsonData.Tables[0])
+	str = GenFormDataKeyGet(&jsonData.Tables[0])
 	t.Log("===")
-	t.Log(strs)
+	t.Log(str)
 	t.Log("===")
-	if len(strs) != len(dataTest) {
+	if len(str) != len(dataTest) {
 		t.Fatalf("TestGenFormDataKeyGet() generated data did not match saved data - length\n")
 	}
-	for i, v := range strs {
-		if v != dataTest[i] {
-			t.Errorf(" gen: %s", v)
-			t.Errorf("data: %s", dataTest[i])
-			t.Fatalf("TestGenFormDataKeyGet() generated data did not match saved data - line %d\n", i)
-		}
+    if str != dataTest {
+		t.Errorf(" generated: %s", str)
+			t.Errorf("expected: %s", dataTest)
+			t.Fatalf("TestGenFormDataKeyGet() generated data did not match saved data!\n")
 	}
 
 	t.Log("TestGenFormDataKeyGet: end of test\n")
@@ -126,7 +111,7 @@ func TestGenFormDataKeyGet(t *testing.T) {
 
 func TestGenFormDataKeys(t *testing.T) {
 	var str			string
-	var dataTest	= "\"?\"+\"key0=\"+key0"
+	var dataTest	= "\"?\"+\"key=\"+key0"
 
 	log.Printf("TestGenFormDataKeys()..\n")
 	sharedData.SetDebug(true)
@@ -136,10 +121,10 @@ func TestGenFormDataKeys(t *testing.T) {
 
 	str = GenFormDataKeys(&jsonData.Tables[0])
 	t.Log("===")
-	t.Log(str)
+	t.Logf("\"%s\"\n", str)
 	t.Log("===")
 	if len(str) != len(dataTest) {
-		t.Fatalf("TestGenFormDataKeys() generated data did not match saved data - length\n")
+		t.Fatalf("TestGenFormDataKeys() generated data did not match saved data - length - %d vs %d\n", len(str), len(dataTest))
 	}
 	if str != dataTest {
 		t.Errorf(" str: %s", str)
@@ -153,7 +138,7 @@ func TestGenFormDataKeys(t *testing.T) {
 
 func TestGenTableCreateStmt(t *testing.T) {
 	var str			string
-	var dataTest	= "\"CREATE TABLE IF NOT EXISTS Customer (\n\tNum\tINT NOT NULL,\n\tName\tNVARCHAR(30),\n\tAddr1\tNVARCHAR(30),\n\tAddr2\tNVARCHAR(30),\n\tCity\tNVARCHAR(20),\n\tState\tNVARCHAR(10),\n\tZip\tNVARCHAR(15),\n\tCurBal\tDEC(15,2)\n);\n\""
+	var dataTest	= "CREATE TABLE IF NOT EXISTS Customer (\\n\\tNum\\tINTEGER NOT NULL,\\n\\tName\\tVARCHAR(30),\\n\\tAddr1\\tVARCHAR(30),\\n\\tAddr2\\tVARCHAR(30),\\n\\tCity\\tVARCHAR(20),\\n\\tState\\tVARCHAR(10),\\n\\tZip\\tVARCHAR(15),\\n\\tCurBal\\tTEXT(15,2),\\n\\tCONSTRAINT PK_Customer PRIMARY KEY(Num)\\n);\\n"
 	var err		    error
 	var plg			dbPlugin.PluginData
 

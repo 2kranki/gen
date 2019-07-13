@@ -291,10 +291,18 @@ var FileDefns []FileDefn = []FileDefn{
 		"single",
 		2,
 	},
-	{"util.go.txt",
-		"/src/util",
-		"util.go",
-		"text",
+	{"docker",
+		"/src/",
+		"",
+		"copyDir",
+		0644,
+		"single",
+		0,
+	},
+	{"util",
+		"/src/",
+		"",
+		"copyDir",
 		0644,
 		"single",
 		0,
@@ -336,6 +344,22 @@ func (t *TaskData) genFile() {
 			}
 		} else {
 			if amt, err := copyFile(t.PathIn, t.PathOut); err == nil {
+				os.Chmod(t.PathOut, t.FD.FilePerms)
+				if !sharedData.Quiet() {
+					log.Printf("\tCopied %d bytes from %s to %s\n", amt, t.PathIn, t.PathOut)
+				}
+			} else {
+				log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
+					amt, t.PathIn, t.PathOut, err)
+			}
+		}
+	case "copyDir":
+		if sharedData.Noop() {
+			if !sharedData.Quiet() {
+				log.Printf("\tShould have copied from %s to %s\n", t.PathIn, t.PathOut)
+			}
+		} else {
+			if amt, err := copyDir(t.PathIn, t.PathOut); err == nil {
 				os.Chmod(t.PathOut, t.FD.FilePerms)
 				if !sharedData.Quiet() {
 					log.Printf("\tCopied %d bytes from %s to %s\n", amt, t.PathIn, t.PathOut)
@@ -450,6 +474,8 @@ func copyFile(modelPath, outPath string) (int64, error) {
 //								createModelPath
 //----------------------------------------------------------------------------
 
+// createModelPath creates an input path from our models and verifies that it
+// exists.  Regular files and directories are acceptable.
 func createModelPath(fn string) (string, error) {
 	var modelPath   string
 	var err         error
@@ -465,6 +491,13 @@ func createModelPath(fn string) (string, error) {
 	modelPath += fn
 	modelPath, err = util.IsPathRegularFile(modelPath)
 
+	if err != nil {
+		modelPath2, err2 := util.IsPathDir(modelPath)
+		if err2 == nil {
+			return modelPath2, nil
+		}
+	}
+
 	return modelPath, err
 }
 
@@ -472,7 +505,11 @@ func createModelPath(fn string) (string, error) {
 //								createOutputPath
 //----------------------------------------------------------------------------
 
-func createOutputPath(dir string, dn string, tn string, fn string) (string, error) {
+// createOutputPath creates an output path from a directory (dir),
+// file name (fn), optional database name (dn) and optional table
+// name (tn). The dn and tn are only used if "$(DbName}" or "${TblName}"
+// are found in the file name.
+func createOutputPath(dir, dn, tn, fn string) (string, error) {
 	var outPath string
 	var err error
 
@@ -649,7 +686,8 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 			dbJson.DbStruct().ForTables(
 				func(v *dbJson.DbTable) {
 					data := TaskData{FD:&FileDefns[i], TD:&tmplData, Table:v, PathIn:pathIn}
-					if data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, v.Name, def.FileName); err != nil {
+					data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, v.Name, def.FileName)
+					if err != nil {
 						log.Fatalln(err)
 					}
 					if sharedData.Debug() {

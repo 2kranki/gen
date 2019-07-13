@@ -1,5 +1,5 @@
 #!/bin/sh
 
 echo "Testing the package:"
-go test -v
+go test -v ./...
 

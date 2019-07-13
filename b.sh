@@ -28,6 +28,7 @@ buildApp () {
         rebuild="-a"
     fi
 
+    ./modelSetup.sh
     cd ${srcDir}
     mkdir -p ${dstDir}
    if go build -o ${pgmPath} -v -race ${rebuild} ; then

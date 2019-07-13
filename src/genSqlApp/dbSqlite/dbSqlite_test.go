@@ -39,29 +39,26 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGenSqlOpen(t *testing.T) {
-	var strs		[]string
+	var str		    string
 	var plg			= Plugin{}
-	var dataTest	= []string{
-		"\t// dbName is a CLI argument\n",
-		"\tconnStr := fmt.Sprintf(\"%s\", dbName)\n",
-		"\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n",
-		"\tdb, err = sql.Open(\"sqlite3\", connStr)\n",
-	}
+	var dataTest	= "\tconnStr := fmt.Sprintf(\"%s\", dbName)\n\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n\tdbSql, err = sql.Open(\"sqlite3\", connStr)\n"
 
 	log.Printf("TestGenSqlOpen()..\n")
 
 	sharedData.SetDebug(true)
 	sharedData.SetDefn("GenDebugging", true)
-	strs = plg.GenSqlOpen()
-	if len(strs) != 4 {
-		t.Fatalf("TestGenSqlOpen() Invalid generation: should be 4 lines but was %d\n", len(strs))
+	str = plg.GenSqlOpen("dbSql", "dbServer", "dbPort", "dbUser", "dbPW", "dbName")
+    t.Log("===")
+    t.Logf("Generated: \"%s\"\n", str)
+    t.Logf("Expected:  \"%s\"\n", dataTest)
+    t.Log("===")
+	if len(str) != len(dataTest) {
+		t.Fatalf("TestGenSqlOpen() Invalid generation: length was %d vs %d\n", len(str), len(dataTest))
 	}
-	for i :=0; i < len(strs); i++ {
-		if strs[i] != dataTest[i] {
-			t.Errorf(" gen: %s", strs[i])
-			t.Errorf("data: %s", dataTest[i])
-			t.Fatalf("TestGenSqlOpen() generated data did not match saved data - line %d\n", i)
-		}
+    if str != dataTest {
+        t.Errorf(" generated: %s\n", str)
+        t.Errorf("expected: %s\n", dataTest)
+        t.Fatalf("TestGenSqlOpen() generated data did not match saved data!\n")
 	}
 
 	t.Log("TestGenSqlOpen: end of test\n")
