@@ -6,7 +6,6 @@
 package util
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"testing"
@@ -93,6 +92,7 @@ func TestCopyDir(t *testing.T) {
 
 	src := "./test"
 	dst := "./test2"
+	t.Logf("\tcopying %s -> %s\n", src, dst)
 	err = CopyDir(src, dst)
 	if err != nil {
 		t.Errorf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
@@ -119,13 +119,13 @@ func TestIsPathDir(t *testing.T) {
 	if err == nil {
 		t.Errorf("IsPathDir(./files.go) failed: %s\n", err)
 	}
-	fmt.Println("./files.go path:", path)
+	t.Log("./files.go path:", path)
 
 	path, err = IsPathDir("./test")
 	if err != nil {
 		t.Errorf("IsPathRegularFile(./xyzzy.go) should have failed!\n")
 	}
-	fmt.Println("./test path:", path)
+	t.Log("./test path:", path)
 
 	t.Log("\tend: TestIsPathDir")
 }
@@ -135,13 +135,13 @@ func TestIsPathRegularFile(t *testing.T) {
 	var path string
 	var err error
 
-	t.Log("\tend: TestIsPathRegularFile")
+	t.Log("TestIsPathRegularFile()")
 
 	path, err = IsPathRegularFile("./util.go")
 	if err != nil {
 		t.Errorf("IsPathRegularFile(./files.go) failed: %s\n", err)
 	}
-	fmt.Println("./files.go path:", path)
+	t.Log("./files.go path:", path)
 
 	input = "./xyzzy.go"
 	path, err = IsPathRegularFile(input)
@@ -164,7 +164,7 @@ func TestPathClean(t *testing.T) {
 		t.Errorf("Error: Getting Current Directory: %s\n", err)
 	}
 
-	t.Log("\tend: TestPathClean")
+	t.Log("TestPathClean()")
 
 	input = "./util.go"
 	expected = curDir + "/util.go"
@@ -196,6 +196,60 @@ func TestPathClean(t *testing.T) {
 	t.Logf("\t%s => %s\n", input, path)
 	if path != expected {
 		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
+	}
+
+	t.Log("\tend: TestPathClean")
+}
+
+func TestPath(t *testing.T) {
+	var err			error
+	var expected	string
+	var input		string
+	var path 		Path
+	var pth			string
+	homeDir := HomeDir()
+	curDir, err := os.Getwd()
+	if err != nil {
+		t.Errorf("Error: Getting Current Directory: %s\n", err)
+	}
+
+	t.Log("TestPathClean()")
+
+	input = "./util.go"
+	expected = curDir + "/util.go"
+	path = NewPath(input)
+	pth = path.Clean()
+	t.Logf("\t%s => %s\n", input, pth)
+	if pth != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
+	}
+
+	input = "./xyzzy.go"
+	expected = curDir + "/xyzzy.go"
+	path = NewPath(input)
+	pth = path.Clean()
+	t.Logf("\t%s => %s\n", input, pth)
+	if pth != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
+	}
+
+	input = "~"
+	expected = homeDir
+	path = NewPath(input)
+	path.Clean()
+	pth = path.Absolute()
+	t.Logf("\t%s => %s\n", input, pth)
+	if pth != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
+	}
+
+	input = "~/.ssh"
+	expected = homeDir + "/.ssh"
+	path = NewPath(input)
+	pth = path.Clean()
+	t.Logf("\t%s => %s\n", input, pth)
+	if pth != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
 	}
 
 	t.Log("\tend: TestPathClean")

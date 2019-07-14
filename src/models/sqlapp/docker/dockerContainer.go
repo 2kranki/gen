@@ -28,9 +28,10 @@ import (
 // docker images.
 type ContainerInfo struct {
 	id       	string
+	imageName   string
+	imageTag	string
 	name     	string
 	status		string
-	tag			string
 }
 
 func (c *ContainerInfo) Id( ) string {
@@ -39,6 +40,22 @@ func (c *ContainerInfo) Id( ) string {
 
 func (c *ContainerInfo) SetId(s string) {
 	c.id = s
+}
+
+func (c *ContainerInfo) ImageName( ) string {
+	return c.imageName
+}
+
+func (c *ContainerInfo) SetImageName(s string) {
+	c.imageName = s
+}
+
+func (c *ContainerInfo) ImageTag( ) string {
+	return c.imageTag
+}
+
+func (c *ContainerInfo) SetImageTag(s string) {
+	c.imageTag = s
 }
 
 func (c *ContainerInfo) Name( ) string {
@@ -55,14 +72,6 @@ func (c *ContainerInfo) Status( ) string {
 
 func (c *ContainerInfo) SetStatus(s string) {
 	c.status = s
-}
-
-func (c *ContainerInfo) Tag( ) string {
-	return c.tag
-}
-
-func (c *ContainerInfo) SetTag(s string) {
-	c.tag = s
 }
 
 func (i *ContainerInfo) Setup( ) {
@@ -164,7 +173,7 @@ func (i *ContainerInfos) RemoveImage(name, tag string) error {
 
 func (i *ContainerInfos) Setup( ) {
 
-	cmd := util.NewExecCmd("docker", "container","ps", "-a", "--format", "{{.ID}}|{{.Names}}|{{.Status}}")
+	cmd := util.NewExecCmd("docker", "container","ps", "-a", "--format", "{{.ID}}|{{.Names}}|{{.Image}}|{{.Labels}}|{{.Status}}")
 	s, err := cmd.RunWithOutput()
 	util.PanicIfErr(err, "Error - docker container ps -a failed with %s", err)
 	if len(s) > 0 {

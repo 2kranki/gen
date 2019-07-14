@@ -124,14 +124,14 @@ func CopyDir(src, dst string) error {
 		return err
 	}
 
-	fis, err := dir.Readdir(-1)
+	entries, err := dir.Readdir(-1)
 	if err != nil {
 		dir.Close()
 		return err
 	}
 	dir.Close()
 
-	for _, fi := range fis {
+	for _, fi := range entries {
 		srcpath := src + "/" + fi.Name()
 		dstpath := dst + "/" + fi.Name()
 
@@ -191,7 +191,7 @@ func CopyFile(src, dst string) error {
 		}
 	}
 
-	return nil
+	return err
 }
 
 //----------------------------------------------------------------------------
@@ -383,6 +383,136 @@ func PanicIfErr(err error, args ...interface{}) {
 		s = err.Error()
 	}
 	panic(s)
+}
+
+//----------------------------------------------------------------------------
+//                             		Path
+//----------------------------------------------------------------------------
+
+// Path provides a centralized
+type Path struct {
+	str       	string
+}
+
+// Absolute returns the absolute file path for
+// this path.
+func (p *Path) Absolute( ) string {
+	pth, _ := filepath.Abs(p.str)
+	return pth
+}
+
+func (p *Path) Append(s string) Path {
+	pth := Path{}
+	pth.str = p.str + "/" + s
+	pth.str = filepath.Clean(pth.str)
+	return pth
+}
+
+// Base returns the last component of the path. If the
+// path is empty, "." is returned.
+func (p *Path) Base( ) string {
+	b := filepath.Base(p.str)
+	return b
+}
+
+// Clean cleans up the file path. It returns the absolute
+// file path if needed.
+func (p *Path) Clean( ) string {
+	var path string
+
+	if strings.HasPrefix(p.str, "~") {
+		p.str = HomeDir() + p.str[1:]
+	}
+	p.str = os.ExpandEnv(p.str)
+	p.str = filepath.Clean(p.str)
+	path, _ = filepath.Abs(p.str)
+
+	return path
+}
+
+// CreateDir assumes that this path represents a
+// directory and creates it along with any parent
+// directories needed as well.
+func (p *Path) CreateDir( ) error {
+	var err error
+
+	b := p.Clean()
+	if len(b) > 0 {
+		err = os.MkdirAll(b, 0x777)
+	}
+
+	return err
+}
+
+// IsPathDir cleans up the supplied file path
+// and then checks the cleaned file path to see
+// if it is an existing standard directory.
+func (p *Path) IsPathDir( ) bool {
+	var err error
+	var pth string
+
+	pth = p.Clean( )
+	fi, err := os.Lstat(pth)
+	if err != nil {
+		return false
+	}
+	if fi.Mode().IsDir() {
+		return true
+	}
+	return false
+}
+
+// IsPathRegularFile cleans up the supplied file path
+// and then checks the cleaned file path to see
+// if it is an existing standard file.
+func (p *Path) IsPathRegularFile( ) bool {
+	var err error
+	var pth string
+
+	pth = p.Clean()
+	fi, err := os.Lstat(pth)
+	if err != nil {
+		return false
+	}
+	if fi.Mode().IsRegular() {
+		return true
+	}
+	return false
+}
+
+// RemoveDir assumes that this path represents a
+// directory and deletes it along with any parent
+// directories that it can as well.
+func (p *Path) RemoveDir( ) error {
+	var err error
+
+	b := p.Clean()
+	if len(b) > 0 {
+		err = os.RemoveAll(b)
+	}
+
+	return err
+}
+
+func (p *Path) SetStr(s string) {
+	p.str = s
+}
+
+func (p *Path) String( ) string {
+	return p.str
+}
+
+func NewPath(s string) Path {
+	p := Path{}
+	p.str = s
+	return p
+}
+
+// NewPWD returns the current working directory as a Path.
+func NewPWD() Path {
+	p := Path{}
+	p.str, _ = os.Getwd()
+	return p
 }
 
 //----------------------------------------------------------------------------

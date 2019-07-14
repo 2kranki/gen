@@ -110,4 +110,30 @@ func TestCreateOutputPath(t *testing.T) {
 	t.Log("...End of TestCreateOutputPath")
 }
 
+func TestCopyDir(t *testing.T) {
+	var name        string
+	var err         error
+
+	sharedData.SetDebug(true)
+	sharedData.SetForce(false)
+	sharedData.SetNoop(true)
+	sharedData.SetQuiet(false)
+	sharedData.SetMdlDir("../models/")
+	sharedData.SetOutDir("/tmp/gen")
+	sharedData.SetTime(time.Now().Format("Mon Jan _2, 2006 15:04"))
+	sharedData.SetFunc("Time", sharedData.Time)
+	sharedData.SetDataPath("./test/db.json.txt")
+	sharedData.SetMainPath("./test/main.json.txt")
+
+	if name, err = createOutputPath("dir", "dn", "tn", "fn"); err != nil {
+		t.Errorf("createModelPath() failed: %s\n", err)
+	}
+	t.Logf("\t -> '%s'\n", name)
+	if name != "/tmp/gen/dir/fn" {
+		t.Errorf("createOutputPath() file path isn't correct!\n")
+	}
+
+	t.Log("...End of TestCreateOutputPath")
+}
+
 

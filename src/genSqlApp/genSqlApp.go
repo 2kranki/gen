@@ -47,8 +47,8 @@ import (
 	"../shared"
 	"../util"
 	_ "./dbForm"
-	"./dbJson"
 	_ "./dbGener"
+	"./dbJson"
 	"errors"
 	"flag"
 	"fmt"
@@ -56,6 +56,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	// Include the various Database Plugins so that they will register
 	// with dbPlugin.
@@ -356,17 +357,16 @@ func (t *TaskData) genFile() {
 	case "copyDir":
 		if sharedData.Noop() {
 			if !sharedData.Quiet() {
-				log.Printf("\tShould have copied from %s to %s\n", t.PathIn, t.PathOut)
+				log.Printf("\tShould have copied directory from %s to %s\n", t.PathIn, t.PathOut)
 			}
 		} else {
-			if amt, err := copyDir(t.PathIn, t.PathOut); err == nil {
-				os.Chmod(t.PathOut, t.FD.FilePerms)
+			if err := copyDir(t.PathIn, t.PathOut); err == nil {
 				if !sharedData.Quiet() {
-					log.Printf("\tCopied %d bytes from %s to %s\n", amt, t.PathIn, t.PathOut)
+					log.Printf("\tCopied from %s to %s\n", t.PathIn, t.PathOut)
 				}
 			} else {
-				log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
-					amt, t.PathIn, t.PathOut, err)
+				log.Fatalf("Error - Copied from %s to %s with error %s\n",
+					t.PathIn, t.PathOut, err)
 			}
 		}
 	case "html":
@@ -400,37 +400,29 @@ func (t *TaskData) genFile() {
 //								copyDir
 //----------------------------------------------------------------------------
 
-func copyDir(modelPath, outPath string) (int64, error) {
-	var dst *os.File
-	var err error
-	var src *os.File
+func copyDir(modelPath, outPath string) error {
+	var err 	error
+	var base	string
 
 	if _, err = util.IsPathDir(modelPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
+		return errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
 	}
+	base = filepath.Base(modelPath)
 
+	outPath = outPath + "/" + base
 	if outPath, err = util.IsPathDir(outPath); err == nil {
 		if sharedData.Replace() {
 			if err = os.Remove(outPath); err != nil {
-				return 0, errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
+				return errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
 			}
 		} else {
-			return 0, errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+			return errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
 		}
 	}
-	if dst, err = os.Create(outPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - could not create:", outPath, err))
-	}
-	defer dst.Close()
 
-	if src, err = os.Open(modelPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - could not open model file:", modelPath, err))
-	}
-	defer src.Close()
+	err = util.CopyDir(modelPath, outPath)
 
-	amt, err := io.Copy(dst, src)
-
-	return amt, err
+	return err
 }
 
 //----------------------------------------------------------------------------
