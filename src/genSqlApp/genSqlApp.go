@@ -55,8 +55,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
-	"path/filepath"
 	"strings"
 	// Include the various Database Plugins so that they will register
 	// with dbPlugin.
@@ -292,6 +290,9 @@ var FileDefns []FileDefn = []FileDefn{
 		"single",
 		2,
 	},
+}
+
+var FileDefns2 []FileDefn = []FileDefn{
 	{"docker",
 		"/src/",
 		"",
@@ -328,8 +329,8 @@ type TaskData struct {
 	FD			*FileDefn
 	TD			*TmplData
 	Table		*dbJson.DbTable
-	PathIn	  	string						// Input File Path
-	PathOut	  	string						// Output File Path
+	PathIn	  	util.Path					// Input File Path
+	PathOut	  	util.Path					// Output File Path
 
 }
 
@@ -345,7 +346,7 @@ func (t *TaskData) genFile() {
 			}
 		} else {
 			if amt, err := copyFile(t.PathIn, t.PathOut); err == nil {
-				os.Chmod(t.PathOut, t.FD.FilePerms)
+				t.PathOut.Chmod(t.FD.FilePerms)
 				if !sharedData.Quiet() {
 					log.Printf("\tCopied %d bytes from %s to %s\n", amt, t.PathIn, t.PathOut)
 				}
@@ -371,7 +372,7 @@ func (t *TaskData) genFile() {
 		}
 	case "html":
 		if err = GenHtmlFile(t.PathIn, t.PathOut, t); err == nil {
-			os.Chmod(t.PathOut, t.FD.FilePerms)
+			t.PathOut.Chmod(t.FD.FilePerms)
 			if !sharedData.Quiet() {
 				log.Printf("\tGenerated HTML from %s to %s\n", t.PathIn, t.PathOut)
 			}
@@ -381,7 +382,7 @@ func (t *TaskData) genFile() {
 		}
 	case "text":
 		if err = GenTextFile(t.PathIn, t.PathOut, t); err == nil {
-			os.Chmod(t.PathOut, t.FD.FilePerms)
+			t.PathOut.Chmod(t.FD.FilePerms)
 			if !sharedData.Quiet() {
 				log.Printf("\tGenerated text from %s to %s\n", t.PathIn, t.PathOut)
 			}
@@ -400,27 +401,35 @@ func (t *TaskData) genFile() {
 //								copyDir
 //----------------------------------------------------------------------------
 
-func copyDir(modelPath, outPath string) error {
+func copyDir(modelPath, outPath util.Path) error {
 	var err 	error
 	var base	string
+	var pathIn	util.Path
+	var pathOut	util.Path
 
-	if _, err = util.IsPathDir(modelPath); err != nil {
-		return errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
+	if !modelPath.IsPathDir( ) {
+		return fmt.Errorf("Error - model directory, %s, does not exist!\n", pathIn.String())
 	}
-	base = filepath.Base(modelPath)
+	base = modelPath.Base( )
+	if len(base) == 0 {
+		return fmt.Errorf("Error - model directory, %s, does not have base directory!\n", pathIn.String())
+	}
 
-	outPath = outPath + "/" + base
-	if outPath, err = util.IsPathDir(outPath); err == nil {
+	pathOut = outPath.Append(base)
+	log.Printf("\tcopyDir:  inPath: %s\n", pathIn.String())
+	log.Printf("\tcopyDir: outPath: %s base: %s\n", pathOut.String(), base)
+	if outPath.IsPathDir( ) {
 		if sharedData.Replace() {
-			if err = os.Remove(outPath); err != nil {
-				return errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
+			log.Printf("\tcopyDir: Removing %s\n", pathOut.String())
+			if err = pathOut.RemoveDir( ); err != nil {
+				return fmt.Errorf("Error - could not delete %s: %s\n", pathOut.String(), err.Error())
 			}
 		} else {
-			return errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+			return fmt.Errorf("Error - overwrite error of %s\n", pathOut.String())
 		}
 	}
 
-	err = util.CopyDir(modelPath, outPath)
+	err = util.CopyDir(pathIn.String(), pathOut.String())
 
 	return err
 }
@@ -429,31 +438,27 @@ func copyDir(modelPath, outPath string) error {
 //								copyFile
 //----------------------------------------------------------------------------
 
-func copyFile(modelPath, outPath string) (int64, error) {
+func copyFile(modelPath, outPath util.Path) (int64, error) {
 	var dst *os.File
 	var err error
 	var src *os.File
 
-	if _, err = util.IsPathRegularFile(modelPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
+	if !modelPath.IsPathRegularFile( ) {
+		return 0, fmt.Errorf("Error - model file does not exist for %s: %s\n", modelPath.String(), err.Error())
 	}
 
-	if outPath, err = util.IsPathRegularFile(outPath); err == nil {
-		if sharedData.Replace() {
-			if err = os.Remove(outPath); err != nil {
-				return 0, errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
-			}
-		} else {
-			return 0, errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+	if outPath.IsPathRegularFile( ) {
+		if !sharedData.Replace() {
+			return 0, fmt.Errorf("Error - overwrite error of %s\n", outPath.String())
 		}
 	}
-	if dst, err = os.Create(outPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - could not create:", outPath, err))
+	if dst, err = os.Create(outPath.Absolute()); err != nil {
+		return 0, fmt.Errorf("Error - could not create %s: %s\n", outPath.String(), err.Error())
 	}
 	defer dst.Close()
 
-	if src, err = os.Open(modelPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - could not open model file:", modelPath, err))
+	if src, err = os.Open(modelPath.Absolute()); err != nil {
+		return 0, fmt.Errorf("Error - could not open model file, %s: %s\n", modelPath.String(), err.Error())
 	}
 	defer src.Close()
 
@@ -467,14 +472,11 @@ func copyFile(modelPath, outPath string) (int64, error) {
 //----------------------------------------------------------------------------
 
 // createModelPath creates an input path from our models and verifies that it
-// exists.  Regular files and directories are acceptable.
-func createModelPath(fn string) (string, error) {
+// exists.  Regular files and directories that are found in the "models"
+// directory are acceptable.
+func createModelPath(fn string) (util.Path, error) {
 	var modelPath   string
 	var err         error
-
-	if modelPath, err = util.IsPathRegularFile(fn); err == nil {
-		return modelPath, err
-	}
 
 	// Calculate the model path.
 	modelPath = sharedData.MdlDir()
@@ -486,11 +488,140 @@ func createModelPath(fn string) (string, error) {
 	if err != nil {
 		modelPath2, err2 := util.IsPathDir(modelPath)
 		if err2 == nil {
-			return modelPath2, nil
+			modelPath = modelPath2
+			err = nil
 		}
 	}
 
-	return modelPath, err
+	return util.NewPath(modelPath), err
+}
+
+//----------------------------------------------------------------------------
+//								createOutputDir
+//----------------------------------------------------------------------------
+
+// createOutputDir creates the output directory on disk given a
+// subdirectory (dir).
+func createOutputDir(dir, dn, tn string) error {
+	var err error
+	var outPath string
+	var pathOut util.Path
+
+	outPath = sharedData.OutDir()
+	outPath += "/"
+	if len(dir) > 0 {
+		outPath += dir
+	}
+	mapper := func(placeholderName string) string {
+		switch placeholderName {
+		case "DbName":
+			if len(dn) > 0 {
+				return strings.Title(dn)
+			}
+		case "TblName":
+			if len(tn) > 0 {
+				return strings.Title(tn)
+			}
+		}
+		return ""
+	}
+	outPath = os.Expand(outPath, mapper)
+
+	pathOut = util.NewPath(outPath)
+	if !pathOut.IsPathDir() {
+		log.Printf("\t\tCreating directory: %s...\n", pathOut.String())
+		err = pathOut.CreateDir()
+	}
+
+	return err
+}
+
+//----------------------------------------------------------------------------
+//								createOutputDirs
+//----------------------------------------------------------------------------
+
+// createOutputDir creates the output directory on disk given a
+// subdirectory (dir).
+func createOutputDirs(dn string, Tables []dbJson.DbTable) error {
+	var err 	error
+	var outDir	util.Path
+
+	if sharedData.Noop() {
+		log.Printf("NOOP -- Skipping Creating directories\n")
+		return nil
+	}
+	outDir = util.NewPath(sharedData.OutDir())
+
+	// We only delete main directory if forced to. Otherwise, we
+	// will simply replace our files within it.
+	if sharedData.Force() {
+		log.Printf("\tRemoving directory: %s...\n", outDir.String())
+		if err = outDir.RemoveDir(); err != nil {
+			return fmt.Errorf("Error: Could not remove output directory: %s: %s\n",
+				outDir.String(), err.Error())
+		}
+	}
+
+	// Create the main directory if needed.
+	if !outDir.IsPathDir() {
+		log.Printf("\tCreating directory: %s...\n", outDir.String())
+		if err = outDir.CreateDir(); err != nil {
+			return fmt.Errorf("Error: Could not crete output directory: %s: %s\n",
+				outDir.String(), err.Error())
+		}
+	}
+
+	log.Printf("\tCreating general directories...\n")
+	err = createOutputDir("/html", dn, "")
+	if err != nil {
+		return err
+	}
+	err = createOutputDir("/static", dn, "")
+	if err != nil {
+		return err
+	}
+	err = createOutputDir("/style", dn, "")
+	if err != nil {
+		return err
+	}
+	err = createOutputDir("/tmpl", dn, "")
+	if err != nil {
+		return err
+	}
+	err = createOutputDir("/src", dn, "")
+	if err != nil {
+		return err
+	}
+	log.Printf("\tCreating src directories for %s...\n", dn)
+	err = createOutputDir("/src/hndlr${DbName}", dn, "")
+	if err != nil {
+		return err
+	}
+	err = createOutputDir("/src/io${DbName}", dn, "")
+	if err != nil {
+		return err
+	}
+	for _, t := range Tables {
+		tn := t.TitledName()
+		log.Printf("\tCreating directories for Table: %s...\n", tn)
+		err = createOutputDir("/src/${DbName}${TblName}", dn, tn)
+		if err != nil {
+			log.Printf("FAILED on creating /src/%s/%s!\n", dn, tn)
+			return err
+		}
+		err = createOutputDir("/src/hndlr${DbName}${TblName}", dn, tn)
+		if err != nil {
+			log.Printf("FAILED on creating /src/hndlr%s%s!\n", dn, tn)
+			return err
+		}
+		err = createOutputDir("/src/io${DbName}${TblName}", dn, tn)
+		if err != nil {
+			log.Printf("FAILED on creating /src/io%s%s!\n", dn, tn)
+			return err
+		}
+	}
+
+	return err
 }
 
 //----------------------------------------------------------------------------
@@ -501,7 +632,7 @@ func createModelPath(fn string) (string, error) {
 // file name (fn), optional database name (dn) and optional table
 // name (tn). The dn and tn are only used if "$(DbName}" or "${TblName}"
 // are found in the file name.
-func createOutputPath(dir, dn, tn, fn string) (string, error) {
+func createOutputPath(dir, dn, tn, fn string) (util.Path, error) {
 	var outPath string
 	var err error
 
@@ -529,11 +660,13 @@ func createOutputPath(dir, dn, tn, fn string) (string, error) {
 	outPath, err = util.IsPathRegularFile(outPath)
 	if err == nil {
 		if !sharedData.Replace() {
-			return outPath, errors.New(fmt.Sprint("Over-write error of:", outPath))
+			err = fmt.Errorf("Over-write error of %s!\n", outPath)
 		}
+	} else {
+		err = nil
 	}
 
-	return outPath, nil
+	return util.NewPath(outPath), err
 }
 
 //----------------------------------------------------------------------------
@@ -558,7 +691,7 @@ func readJsonFiles() error {
 
 func GenSqlApp(inDefns map[string]interface{}) error {
 	var err 	error
-	var pathIn	string
+	var pathIn	util.Path
 	//var ok 		bool
 
 	if sharedData.Debug() {
@@ -575,62 +708,12 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	// Set up template data
 	tmplData.Main = mainData.MainStruct()
 	tmplData.Data = dbJson.DbStruct()
+	dn := tmplData.Data.TitledName()
 
 	// Set up the output directory structure
-    if !sharedData.Noop() {
-        tmpName := path.Clean(sharedData.OutDir())
-        // We only delete main directory if forced to. Otherwise, we
-        // will simply replace our files within it.
-        if sharedData.Force() {
-			if err = os.RemoveAll(tmpName); err != nil {
-				log.Fatalln("Error: Could not remove output directory:", tmpName, err)
-			}
-		}
-		tmpName = path.Clean(sharedData.OutDir() + "/html")
-		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-			log.Fatalln("Error: Could not create output directory:", tmpName, err)
-		}
-		tmpName = path.Clean(sharedData.OutDir() + "/static")
-		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-			log.Fatalln("Error: Could not create output directory:", tmpName, err)
-		}
-		tmpName = path.Clean(sharedData.OutDir() + "/style")
-		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-			log.Fatalln("Error: Could not create output directory:", tmpName, err)
-		}
-        tmpName = path.Clean(sharedData.OutDir() + "/tmpl")
-        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-            log.Fatalln("Error: Could not create output directory:", tmpName, err)
-        }
-        tmpName = path.Clean(sharedData.OutDir() + "/src/hndlr" + tmplData.Data.TitledName())
-        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-            log.Fatalln("Error: Could not create output directory:", tmpName, err)
-        }
-        for _, t := range tmplData.Data.Tables {
-			tmpName = path.Clean(sharedData.OutDir() + "/src/hndlr" + tmplData.Data.TitledName() + t.TitledName())
-			if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-				log.Fatalln("Error: Could not create output directory:", tmpName, err)
-			}
-			tmpName = path.Clean(sharedData.OutDir() + "/src/" + tmplData.Data.TitledName() + t.TitledName())
-			if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-				log.Fatalln("Error: Could not create output directory:", tmpName, err)
-			}
-		}
-        tmpName = path.Clean(sharedData.OutDir() + "/src/io" + tmplData.Data.TitledName())
-        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-            log.Fatalln("Error: Could not create output directory:", tmpName, err)
-        }
-		for _, t := range tmplData.Data.Tables {
-			tmpName = path.Clean(sharedData.OutDir() + "/src/io" + tmplData.Data.TitledName() + t.TitledName())
-			if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-				log.Fatalln("Error: Could not create output directory:", tmpName, err)
-			}
-		}
-		tmpName = path.Clean(sharedData.OutDir() + "/src/util")
-		if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-			log.Fatalln("Error: Could not create output directory:", tmpName, err)
-		}
-    }
+	if err = createOutputDirs(dn, tmplData.Data.Tables); err != nil {
+		return err
+	}
 
 	// Setup the worker queue.
 	done := make(chan bool)
@@ -645,6 +728,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 					},
 					5)
 
+	// Run the first phase of file generation.
 	for i, def := range FileDefns {
 
 		if !sharedData.Quiet() {
@@ -653,7 +737,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 
 		// Create the input model file path.
 		if pathIn, err = createModelPath(def.ModelName); err != nil {
-			return errors.New(fmt.Sprintln("Error:", pathIn, err))
+			return fmt.Errorf("Error: %s: %s\n", pathIn.String(), err.Error())
 		}
 		if sharedData.Debug() {
 			log.Println("\t\tmodelPath=", pathIn)
@@ -665,7 +749,8 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 			// Standard File
 			data := TaskData{FD:&FileDefns[i], TD:&tmplData, PathIn:pathIn}
 			// Create the output path
-			if data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, "", def.FileName); err != nil {
+			data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, "", def.FileName)
+			if err != nil {
 				log.Fatalln(err)
 			}
 			if sharedData.Debug() {
@@ -695,6 +780,56 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	close(inputQueue)
 
 	<-done
+
+	// Run the second phase of file generation
+	for i, def := range FileDefns2 {
+
+		if !sharedData.Quiet() {
+			log.Println("Process file:", def.ModelName, "generating:", def.FileName, "...")
+		}
+
+		// Create the input model file path.
+		if pathIn, err = createModelPath(def.ModelName); err != nil {
+			return errors.New(fmt.Sprintln("Error:", pathIn, err))
+		}
+		if sharedData.Debug() {
+			log.Println("\t\tmodelPath=", pathIn)
+		}
+
+		// Now generate the file.
+		switch def.PerGrp {
+		case 0:
+			// Standard File
+			data := TaskData{FD:&FileDefns2[i], TD:&tmplData, PathIn:pathIn}
+			// Create the output path
+			data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, "", def.FileName)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			if sharedData.Debug() {
+				log.Println("\t\t outPath=", data.PathOut)
+			}
+			// Generate the file.
+			data.genFile()
+		case 2:
+			// Output File is Titled Table Name in Titled Database Name directory
+			dbJson.DbStruct().ForTables(
+				func(v *dbJson.DbTable) {
+					data := TaskData{FD:&FileDefns2[i], TD:&tmplData, Table:v, PathIn:pathIn}
+					data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, v.Name, def.FileName)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					if sharedData.Debug() {
+						log.Println("\t\t outPath=", data.PathOut)
+					}
+					// Generate the file.
+					data.genFile()
+				})
+		default:
+			log.Printf("Skipped %s because of type!\n", def.FileName)
+		}
+	}
 
 	if dbJson.DbStruct().SqlType == "sqlite" && dbJson.DbStruct().HasDec() {
 		log.Printf("========================== WARNING ==========================\n")

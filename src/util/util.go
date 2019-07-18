@@ -11,7 +11,6 @@ package util
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/2kranki/jsonpreprocess"
 	"io"
@@ -21,6 +20,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 //----------------------------------------------------------------------------
@@ -96,30 +96,39 @@ func NewExecCmd(name string, args ...string) *ExecCmd {
 
 // CopyDir copies from the given directory (src) and all of its files to the
 // destination (dst).
-func CopyDir(src, dst string) error {
-	var err error
+func CopyDir(src, dst *Path) error {
+	var err 	error
 
-	src, err = IsPathRegularFile(src)
-	if err == nil {
+	//log.Printf("CopyDir: base: %s  last: %c\n", pathIn.Base(), dst[len(dst)-1])
+	if dst.String()[len(dst.String())-1] == os.PathSeparator {
+		dst = dst.Append(src.Base())
+	}
+	//log.Printf("CopyDir: %s -> %s\n", pathIn.String(), pathOut.String())
+
+	if src.IsPathRegularFile() {
 		return CopyFile(src, dst)
 	}
 
-	src, err = IsPathDir(src)
+	if !src.IsPathDir() {
+		return fmt.Errorf("Error: CopyDir: %s is not a file or directory!\n", src.String())
+	}
+
+	si, err := os.Stat(src.Absolute())
 	if err != nil {
 		return err
 	}
+	mode := si.Mode() & 03777
 
-	si, err := os.Stat(src)
+	log.Printf("CopyDir: MkdirAll %s %o\n", dst.Absolute(), mode)
+	err = os.MkdirAll(dst.Absolute(), mode)
 	if err != nil {
 		return err
 	}
-
-	err = os.MkdirAll(dst, si.Mode())
-	if err != nil {
-		return err
+	if !dst.IsPathDir() {
+		return fmt.Errorf("Error: %s could not be found!", dst.Absolute())
 	}
 
-	dir, err := os.Open(src)
+	dir, err := os.Open(src.Absolute())
 	if err != nil {
 		return err
 	}
@@ -132,16 +141,18 @@ func CopyDir(src, dst string) error {
 	dir.Close()
 
 	for _, fi := range entries {
-		srcpath := src + "/" + fi.Name()
-		dstpath := dst + "/" + fi.Name()
+		srcNew := src.Append(fi.Name())
+		dstNew := dst.Append(fi.Name())
 
-		if fi.IsDir() {
-			err = CopyDir(srcpath, dstpath)
+		if fi.Mode().IsDir() {
+			log.Printf("CopyDir: Dir: %s -> %s\n", srcNew.String(), dstNew.String())
+			err = CopyDir(srcNew, dstNew)
 			if err != nil {
 				return err
 			}
-		} else {
-			err = CopyFile(srcpath, dstpath)
+		} else if fi.Mode().IsRegular() {
+			log.Printf("CopyDir: File: %s -> %s\n", srcNew.String(), dstNew.String())
+			err = CopyFile(srcNew, dstNew)
 			if err != nil {
 				return err
 			}
@@ -157,25 +168,25 @@ func CopyDir(src, dst string) error {
 
 // CopyFile copies a file given by its path (src) creating
 // an output file given its path (dst)
-func CopyFile(src, dst string) error {
-	var err error
+func CopyFile(src, dst *Path) error {
+	var err 	error
+
+	log.Printf("CopyFile: %s -> %s\n", src.Absolute(), dst.Absolute())
 
 	// Clean up the input file path and check for its existence.
-	src, err = IsPathRegularFile(src)
-	if err != nil {
-		return err
+	if !src.IsPathRegularFile() {
+		return fmt.Errorf("Error: %s is not a file!\n", src.String())
 	}
 
 	// Open the input file.
-	fileIn, err := os.Open(src)
+	fileIn, err := os.Open(src.Absolute())
 	if err != nil {
 		return err
 	}
 	defer fileIn.Close()
 
 	// Create the output file.
-	dst, _ = IsPathRegularFile(dst)		// Clean up output file path
-	fileOut, err := os.Create(dst)
+	fileOut, err := os.Create(dst.Absolute())
 	if err != nil {
 		return err
 	}
@@ -185,9 +196,9 @@ func CopyFile(src, dst string) error {
 	// to same as input file.
 	_, err = io.Copy(fileOut, fileIn)
 	if err == nil {
-		si, err := os.Stat(src)
+		si, err := os.Stat(src.Absolute())
 		if err == nil {
-			err = os.Chmod(dst, si.Mode())
+			err = os.Chmod(dst.Absolute(), si.Mode())
 		}
 	}
 
@@ -210,43 +221,30 @@ func ErrorString(err error) string {
 //                             FileCompare
 //----------------------------------------------------------------------------
 
-// FileCompare compares two files returning true
+// FileCompareEqual compares two files returning true
 // if they are equal.
-func FileCompare(file1, file2 string) bool {
+func FileCompareEqual(file1, file2 *Path) bool {
 	var err 		error
-	var file1size	int64
-	var file2size	int64
 
-
-	file1, err = IsPathRegularFile(file1)
-	if err != nil {
-		return false
-	}
-	si, err := os.Stat(file1)
-	if err == nil {
-		file1size = si.Size()
-	}
-
-	file2, err = IsPathRegularFile(file2)
-	if err != nil {
-		return false
-	}
-	si, err = os.Stat(file2)
-	if err == nil {
-		file2size = si.Size()
-	}
-
-	if file1size != file2size {
+	if !file1.IsPathRegularFile() {
 		return false
 	}
 
-	f1, err := os.Open(file1)
+	if !file2.IsPathRegularFile() {
+		return false
+	}
+
+	if file1.Size() != file2.Size() {
+		return false
+	}
+
+	f1, err := os.Open(file1.Absolute())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f1.Close()
 
-	f2, err := os.Open(file2)
+	f2, err := os.Open(file2.Absolute())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -295,67 +293,6 @@ func FormatArgs(args ...interface{}) string {
 }
 
 //----------------------------------------------------------------------------
-//                             HomeDir
-//----------------------------------------------------------------------------
-
-// HomeDir returns $HOME diretory of the current user
-func HomeDir() string {
-
-	// user.Current() returns nil if cross-compiled e.g. on mac for linux
-	if usr, _ := user.Current(); usr != nil {
-		return usr.HomeDir
-	}
-
-	return os.Getenv("HOME")
-}
-
-//----------------------------------------------------------------------------
-//                             IsPathDir
-//----------------------------------------------------------------------------
-
-// IsPathDir cleans up the supplied file path
-// and then checks the cleaned file path to see
-// if it is an existing standard directory. Return the
-// cleaned up path and a potential error if it exists.
-func IsPathDir(fp string) (string, error) {
-	var err error
-	var path string
-
-	path = PathClean(fp)
-	fi, err := os.Lstat(path)
-	if err != nil {
-		return path, errors.New("path not found")
-	}
-	if fi.Mode().IsDir() {
-		return path, nil
-	}
-	return path, errors.New("path not regular file")
-}
-
-//----------------------------------------------------------------------------
-//                            IsPathRegularFile
-//----------------------------------------------------------------------------
-
-// IsPathRegularFile cleans up the supplied file path
-// and then checks the cleaned file path to see
-// if it is an existing standard file. Return the
-// cleaned up path and a potential error if it exists.
-func IsPathRegularFile(fp string) (string, error) {
-	var err error
-	var path string
-
-	path = PathClean(fp)
-	fi, err := os.Lstat(path)
-	if err != nil {
-		return path, errors.New("path not found")
-	}
-	if fi.Mode().IsRegular() {
-		return path, nil
-	}
-	return path, errors.New("path not regular file")
-}
-
-//----------------------------------------------------------------------------
 //                             PanicIf
 //----------------------------------------------------------------------------
 
@@ -397,15 +334,18 @@ type Path struct {
 // Absolute returns the absolute file path for
 // this path.
 func (p *Path) Absolute( ) string {
-	pth, _ := filepath.Abs(p.str)
-	return pth
+	path := p.Clean()
+	path, _ = filepath.Abs(path)
+	return path
 }
 
-func (p *Path) Append(s string) Path {
+// Append a subdirectory or file name[.file extension] to the path.
+// If the string is empty, then '/' will be appended.
+func (p *Path) Append(s string) *Path {
 	pth := Path{}
-	pth.str = p.str + "/" + s
+	pth.str = p.str + string(os.PathSeparator) + s
 	pth.str = filepath.Clean(pth.str)
-	return pth
+	return &pth
 }
 
 // Base returns the last component of the path. If the
@@ -415,13 +355,25 @@ func (p *Path) Base( ) string {
 	return b
 }
 
+// Chmod changes the mode of the named file to the given mode.
+func (p *Path) Chmod(mode os.FileMode) error {
+	var err error
+
+	b := p.Clean()
+	if len(b) > 0 {
+		err = os.Chmod(b, mode)
+	}
+
+	return err
+}
+
 // Clean cleans up the file path. It returns the absolute
 // file path if needed.
 func (p *Path) Clean( ) string {
 	var path string
 
 	if strings.HasPrefix(p.str, "~") {
-		p.str = HomeDir() + p.str[1:]
+		p.str = NewHomeDir().String() + string(os.PathSeparator) + p.str[1:]
 	}
 	p.str = os.ExpandEnv(p.str)
 	p.str = filepath.Clean(p.str)
@@ -438,7 +390,29 @@ func (p *Path) CreateDir( ) error {
 
 	b := p.Clean()
 	if len(b) > 0 {
-		err = os.MkdirAll(b, 0x777)
+		err = os.MkdirAll(b, 0777)
+	}
+
+	return err
+}
+
+// DeleteFile assumes that this path represents a
+// file and deletes it.
+func (p *Path) DeleteFile( ) error {
+	var err error
+
+	pth := p.Clean()
+	if len(pth) > 0 {
+		fi, err := os.Lstat(pth)
+		if err != nil {
+			err = fmt.Errorf("Error: DeleteFile(): %s is not a file!\n", pth)
+		} else {
+			if fi.Mode().IsRegular() {
+				err = os.Remove(pth)
+			} else {
+				err = fmt.Errorf("Error: DeleteFile(): %s is not a file!\n", pth)
+			}
+		}
 	}
 
 	return err
@@ -480,6 +454,26 @@ func (p *Path) IsPathRegularFile( ) bool {
 	return false
 }
 
+func (p *Path) Mode( ) os.FileMode {
+	var mode	os.FileMode
+
+	si, err := os.Stat(p.Absolute())
+	if err == nil {
+		mode = si.Mode()
+	}
+	return mode
+}
+
+func (p *Path) ModTime( ) time.Time {
+	var mod		time.Time
+
+	si, err := os.Stat(p.Absolute())
+	if err == nil {
+		mod = si.ModTime()
+	}
+	return mod
+}
+
 // RemoveDir assumes that this path represents a
 // directory and deletes it along with any parent
 // directories that it can as well.
@@ -498,39 +492,54 @@ func (p *Path) SetStr(s string) {
 	p.str = s
 }
 
+// Size returns length in bytes for regular files.
+func (p *Path) Size( ) int64 {
+	var size	int64
+
+	si, err := os.Stat(p.Absolute())
+	if err == nil {
+		size = si.Size()
+	}
+	return size
+}
+
 func (p *Path) String( ) string {
 	return p.str
 }
 
-func NewPath(s string) Path {
+// NewHomeDir returns the current working directory as a Path.
+func NewHomeDir() *Path {
+	p := Path{}
+
+	// user.Current() returns nil if cross-compiled e.g. on mac for linux.
+	// So, our backup is to get the home directory from the environment.
+	if usr, _ := user.Current(); usr != nil {
+		p.str = usr.HomeDir
+	} else {
+		p.str = os.Getenv("HOME")
+	}
+
+	return &p
+}
+
+func NewPath(s string) *Path {
 	p := Path{}
 	p.str = s
-	return p
+	return &p
 }
 
-// NewPWD returns the current working directory as a Path.
-func NewPWD() Path {
+// NewWorkDir returns the current working directory as a Path.
+func NewWorkDir() *Path {
 	p := Path{}
 	p.str, _ = os.Getwd()
-	return p
+	return &p
 }
 
-//----------------------------------------------------------------------------
-//                             PathClean
-//----------------------------------------------------------------------------
-
-// PathClean cleans up the supplied file path.
-func PathClean(fp string) string {
-	var path string
-
-	if strings.HasPrefix(fp, "~") {
-		fp = HomeDir() + fp[1:]
-	}
-	fp = os.ExpandEnv(fp)
-	fp = filepath.Clean(fp)
-	path, _ = filepath.Abs(fp)
-
-	return path
+// NewTempDir returns the temporary directory as a Path.
+func NewTempDir() *Path {
+	p := Path{}
+	p.str = os.TempDir()
+	return &p
 }
 
 //----------------------------------------------------------------------------

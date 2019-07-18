@@ -97,29 +97,43 @@ func NewExecCmd(name string, args ...string) *ExecCmd {
 // CopyDir copies from the given directory (src) and all of its files to the
 // destination (dst).
 func CopyDir(src, dst string) error {
-	var err error
+	var err 	error
+	var pathIn	Path
+	var pathOut	Path
 
-	src, err = IsPathRegularFile(src)
-	if err == nil {
+	pathIn = NewPath(src)
+	pathOut = NewPath(dst)
+	//log.Printf("CopyDir: base: %s  last: %c\n", pathIn.Base(), dst[len(dst)-1])
+	if dst[len(dst)-1] == os.PathSeparator {
+		pathOut = pathOut.Append(pathIn.Base())
+	}
+	//log.Printf("CopyDir: %s -> %s\n", pathIn.String(), pathOut.String())
+
+	if pathIn.IsPathRegularFile() {
 		return CopyFile(src, dst)
 	}
 
-	src, err = IsPathDir(src)
-	if err != nil {
-		return err
+	if !pathIn.IsPathDir() {
+		return fmt.Errorf("Error: CopyDir: %s is not a file or directory!\n", pathIn.String())
 	}
 
 	si, err := os.Stat(src)
 	if err != nil {
 		return err
 	}
+	mode := si.Mode() & 03777
 
-	err = os.MkdirAll(dst, si.Mode())
+	log.Printf("CopyDir: MkdirAll %s %o\n", pathOut.Absolute(), mode)
+	err = os.MkdirAll(pathOut.Absolute(), mode)
+	if err != nil {
+		return err
+	}
+	_, err = IsPathDir(pathOut.Absolute())
 	if err != nil {
 		return err
 	}
 
-	dir, err := os.Open(src)
+	dir, err := os.Open(pathIn.Absolute())
 	if err != nil {
 		return err
 	}
@@ -132,15 +146,17 @@ func CopyDir(src, dst string) error {
 	dir.Close()
 
 	for _, fi := range entries {
-		srcpath := src + "/" + fi.Name()
-		dstpath := dst + "/" + fi.Name()
+		srcpath := pathIn.Absolute() + string(os.PathSeparator) + fi.Name()
+		dstpath := pathOut.Absolute() + string(os.PathSeparator) + fi.Name()
 
-		if fi.IsDir() {
+		if fi.Mode().IsDir() {
+			log.Printf("CopyDir: Dir: %s -> %s\n", srcpath, dstpath)
 			err = CopyDir(srcpath, dstpath)
 			if err != nil {
 				return err
 			}
-		} else {
+		} else if fi.Mode().IsRegular() {
+			log.Printf("CopyDir: File: %s -> %s\n", srcpath, dstpath)
 			err = CopyFile(srcpath, dstpath)
 			if err != nil {
 				return err
@@ -158,24 +174,28 @@ func CopyDir(src, dst string) error {
 // CopyFile copies a file given by its path (src) creating
 // an output file given its path (dst)
 func CopyFile(src, dst string) error {
-	var err error
+	var err 	error
+	var pathIn	Path
+	var pathOut	Path
+
+	pathIn = NewPath(src)
+	pathOut = NewPath(dst)
+	log.Printf("CopyFile: %s -> %s\n", pathIn.Absolute(), pathOut.Absolute())
 
 	// Clean up the input file path and check for its existence.
-	src, err = IsPathRegularFile(src)
-	if err != nil {
-		return err
+	if !pathIn.IsPathRegularFile() {
+		return fmt.Errorf("Error: %s is not a file!\n", pathIn.String())
 	}
 
 	// Open the input file.
-	fileIn, err := os.Open(src)
+	fileIn, err := os.Open(pathIn.Absolute())
 	if err != nil {
 		return err
 	}
 	defer fileIn.Close()
 
 	// Create the output file.
-	dst, _ = IsPathRegularFile(dst)		// Clean up output file path
-	fileOut, err := os.Create(dst)
+	fileOut, err := os.Create(pathOut.Absolute())
 	if err != nil {
 		return err
 	}
@@ -187,7 +207,7 @@ func CopyFile(src, dst string) error {
 	if err == nil {
 		si, err := os.Stat(src)
 		if err == nil {
-			err = os.Chmod(dst, si.Mode())
+			err = os.Chmod(pathOut.Absolute(), si.Mode())
 		}
 	}
 
@@ -401,9 +421,11 @@ func (p *Path) Absolute( ) string {
 	return pth
 }
 
+// Append a subdirectory or file name[.file extension] to the path.
+// If the string is empty, then '/' will be appended.
 func (p *Path) Append(s string) Path {
 	pth := Path{}
-	pth.str = p.str + "/" + s
+	pth.str = p.str + string(os.PathSeparator) + s
 	pth.str = filepath.Clean(pth.str)
 	return pth
 }
@@ -413,6 +435,18 @@ func (p *Path) Append(s string) Path {
 func (p *Path) Base( ) string {
 	b := filepath.Base(p.str)
 	return b
+}
+
+// Chmod changes the mode of the named file to the given mode.
+func (p *Path) Chmod(mode os.FileMode) error {
+	var err error
+
+	b := p.Clean()
+	if len(b) > 0 {
+		err = os.Chmod(b, mode)
+	}
+
+	return err
 }
 
 // Clean cleans up the file path. It returns the absolute
@@ -428,6 +462,42 @@ func (p *Path) Clean( ) string {
 	path, _ = filepath.Abs(p.str)
 
 	return path
+}
+
+// CreateDir assumes that this path represents a
+// directory and creates it along with any parent
+// directories needed as well.
+func (p *Path) CreateDir( ) error {
+	var err error
+
+	b := p.Clean()
+	if len(b) > 0 {
+		err = os.MkdirAll(b, 0777)
+	}
+
+	return err
+}
+
+// DeleteFile assumes that this path represents a
+// file and deletes it.
+func (p *Path) DeleteFile( ) error {
+	var err error
+
+	pth := p.Clean()
+	if len(pth) > 0 {
+		fi, err := os.Lstat(pth)
+		if err != nil {
+			err = fmt.Errorf("Error: DeleteFile(): %s is not a file!\n", pth)
+		} else {
+			if fi.Mode().IsRegular() {
+				err = os.Remove(pth)
+			} else {
+				err = fmt.Errorf("Error: DeleteFile(): %s is not a file!\n", pth)
+			}
+		}
+	}
+
+	return err
 }
 
 // IsPathDir cleans up the supplied file path
@@ -464,6 +534,20 @@ func (p *Path) IsPathRegularFile( ) bool {
 		return true
 	}
 	return false
+}
+
+// RemoveDir assumes that this path represents a
+// directory and deletes it along with any parent
+// directories that it can as well.
+func (p *Path) RemoveDir( ) error {
+	var err error
+
+	b := p.Clean()
+	if len(b) > 0 {
+		err = os.RemoveAll(b)
+	}
+
+	return err
 }
 
 func (p *Path) SetStr(s string) {

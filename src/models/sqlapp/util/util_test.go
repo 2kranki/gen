@@ -92,16 +92,36 @@ func TestCopyDir(t *testing.T) {
 
 	src := "./test"
 	dst := "./test2"
+
+	err = os.RemoveAll("./test2")
+	err = os.RemoveAll("./test5")
+
 	t.Logf("\tcopying %s -> %s\n", src, dst)
 	err = CopyDir(src, dst)
 	if err != nil {
-		t.Errorf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
+		t.Fatalf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
 	}
 
 	cmd := exec.Command("diff", src, dst)
 	err = cmd.Run()
 	if err != nil {
-		t.Errorf("CopyDir(%s,%s) comparison failed: %s\n", src, dst, err)
+		t.Fatalf("CopyDir(%s,%s) comparison failed: %s\n", src, dst, err)
+	}
+
+	err = os.RemoveAll(dst)
+
+	dst = "./test5" + string(os.PathSeparator)
+	dst2 := dst + "test"
+	t.Logf("\tcopying %s -> %s\n", src, dst)
+	err = CopyDir(src, dst)
+	if err != nil {
+		t.Fatalf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
+	}
+
+	cmd = exec.Command("diff", src, dst2)
+	err = cmd.Run()
+	if err != nil {
+		t.Fatalf("CopyDir(%s,%s) comparison failed: %s\n", src, "./test3/test", err)
 	}
 
 	err = os.RemoveAll(dst)
@@ -251,6 +271,29 @@ func TestPath(t *testing.T) {
 	if pth != expected {
 		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
 	}
+
+	input = "./test3"
+	path = NewPath(input)
+	if err = path.CreateDir(); err != nil {
+		t.Fatalf("FATAL: create ./test3 failed: %s\n", err.Error())
+	}
+	if !path.IsPathDir() {
+		t.Fatalf("FATAL: create ./test3 failed!\n")
+	}
+	if err = path.RemoveDir(); err != nil {
+		t.Fatalf("FATAL: remove ./test3 failed: %s\n", err.Error())
+	}
+	if path.IsPathDir() {
+		t.Fatalf("FATAL: remove ./test3 failed!\n")
+	}
+
+	t.Logf("\t%s => %s\n", input, pth)
+	if pth != expected {
+		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
+	}
+
+	pwd := NewPWD()
+	t.Logf("PWD: %s\n", pwd.String())
 
 	t.Log("\tend: TestPathClean")
 }

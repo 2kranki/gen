@@ -8,17 +8,14 @@ package genSqlApp
 import (
 	"../shared"
 	"../util"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 )
 
-func GenTextFile(mdl string, outPath string, data interface{}) error {
+func GenTextFile(mdl util.Path, outPath util.Path, data interface{}) error {
 	var err	    error
 	var tmpl	*template.Template
 
@@ -27,8 +24,8 @@ func GenTextFile(mdl string, outPath string, data interface{}) error {
 	outData := strings.Builder{}
 
 	// Parse and execute the template.
-	name := filepath.Base(mdl)
-	tmpl, err = template.New(name).Delims("[[", "]]").Funcs(sharedData.Funcs()).ParseFiles(mdl)
+	name := mdl.Base()
+	tmpl, err = template.New(name).Delims("[[", "]]").Funcs(sharedData.Funcs()).ParseFiles(mdl.String())
 	if err != nil {
 		return err
 	}
@@ -44,24 +41,20 @@ func GenTextFile(mdl string, outPath string, data interface{}) error {
 	// Save the generated file to the output file path.
 	if !sharedData.Noop() {
 		// Delete existing file.
-		if outPath, err = util.IsPathRegularFile(outPath); err == nil {
-			if sharedData.Replace() {
-				if err = os.Remove(outPath); err != nil {
-					return errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
-				}
-			} else {
-				return errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+		if outPath.IsPathRegularFile( ) {
+			if !sharedData.Replace() {
+				return fmt.Errorf("Error - overwrite error of %s\n", outPath)
 			}
 		}
-		// Write the file to disk
-		err := ioutil.WriteFile(outPath, []byte(outData.String()), 0664)
+		// Write the file to disk replacing an existing file.
+		err := ioutil.WriteFile(outPath.String(), []byte(outData.String()), 0664)
 		if err != nil {
-			return errors.New(fmt.Sprint("Error:", outPath, err))
+			return fmt.Errorf("Error: I/O error for %s: %s\n", outPath.String(), err.Error())
 		}
 	} else {
-		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<", outPath, ">>>>>>>>>>>>>>>>>>>>>>>>>")
+		log.Println("<<<<<<<<<<<<<<<<<<<<<<<<", outPath.String(), ">>>>>>>>>>>>>>>>>>>>>>>>>")
 		log.Println(outData.String())
-		log.Println("<<<<<<<<<<<<<<<<<<<<<<<< End of", outPath, ">>>>>>>>>>>>>>>>>>>>>>>>>>")
+		log.Println("<<<<<<<<<<<<<<<<<<<<<<<< End of", outPath.String(), ">>>>>>>>>>>>>>>>>>>>>>>>>>")
 	}
 
 	return nil
