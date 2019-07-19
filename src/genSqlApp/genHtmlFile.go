@@ -17,7 +17,7 @@ import (
 
 var htmlTmpls template.Template
 
-func GenHtmlFile(mdl util.Path, outPath util.Path, data interface{}) error {
+func GenHtmlFile(mdl *util.Path, outPath *util.Path, data interface{}) error {
 	var err error
 	var tmpl *template.Template
 

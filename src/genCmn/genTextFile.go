@@ -1,9 +1,9 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // See License.txt in main repository directory
 
-// Generate SQL Application programs for GO
+// Generate Text Files
 
-package genSqlApp
+package genCmn
 
 import (
 	"../shared"

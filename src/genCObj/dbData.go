@@ -22,14 +22,6 @@ import (
 	"strings"
 )
 
-const (
-	DBTYPE_MARIABDB	= 1 << iota
-	DBTYPE_MSSQL
-	DBTYPE_MYSQL
-	DBTYPE_POSTGRES
-	DBTYPE_SQLITE
-)
-
 // StringsBuilder is a composition of strings.Builder so that
 // we can add supplemental functions.
 type StringBuilder struct {

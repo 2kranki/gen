@@ -66,22 +66,8 @@ import (
 )
 
 
-// FileDefn gives the parameters needed to generate a file.  The fields of
-// the struct have been simplified to allow for easy json encoding/decoding.
-type FileDefn struct {
-	ModelName		string 		`json:"ModelName,omitempty"`
-	FileDir			string		`json:"FileDir,omitempty"`		// Output File Directory
-	FileName  		string 		`json:"FileName,omitempty"`		// Output File Name
-	FileType  		string 		`json:"Type,omitempty"`  		// copy, text, sql, html
-	FilePerms		os.FileMode	`json:"FilePerms,omitempty"`	// Output File Permissions
-	Class     		string 		`json:"Class,omitempty"` 		// single, table
-	PerGrp  		int			`json:"PerGrp,omitempty"` 		// 0 == generate one file
-	//															// 1 == generate one file for a database
-	// 															// 2 == generate one file for a table
-}
-
 // FileDefns controls what files are generated.
-var FileDefns []FileDefn = []FileDefn{
+var FileDefns []genCmn.FileDefn = []genCmn.FileDefn{
 	{"bld.sh.txt",
 		"",
 		"b.sh",
@@ -292,7 +278,7 @@ var FileDefns []FileDefn = []FileDefn{
 	},
 }
 
-var FileDefns2 []FileDefn = []FileDefn{
+var FileDefns2 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"docker",
 		"/src/",
 		"",
@@ -329,8 +315,8 @@ type TaskData struct {
 	FD			*FileDefn
 	TD			*TmplData
 	Table		*dbJson.DbTable
-	PathIn	  	util.Path					// Input File Path
-	PathOut	  	util.Path					// Output File Path
+	PathIn	  	*util.Path					// Input File Path
+	PathOut	  	*util.Path					// Output File Path
 
 }
 
@@ -401,11 +387,11 @@ func (t *TaskData) genFile() {
 //								copyDir
 //----------------------------------------------------------------------------
 
-func copyDir(modelPath, outPath util.Path) error {
+func copyDir(modelPath, outPath *util.Path) error {
 	var err 	error
 	var base	string
-	var pathIn	util.Path
-	var pathOut	util.Path
+	var pathIn	*util.Path
+	var pathOut	*util.Path
 
 	if !modelPath.IsPathDir( ) {
 		return fmt.Errorf("Error - model directory, %s, does not exist!\n", pathIn.String())
@@ -429,7 +415,7 @@ func copyDir(modelPath, outPath util.Path) error {
 		}
 	}
 
-	err = util.CopyDir(pathIn.String(), pathOut.String())
+	err = util.CopyDir(pathIn, pathOut)
 
 	return err
 }
@@ -438,7 +424,7 @@ func copyDir(modelPath, outPath util.Path) error {
 //								copyFile
 //----------------------------------------------------------------------------
 
-func copyFile(modelPath, outPath util.Path) (int64, error) {
+func copyFile(modelPath, outPath *util.Path) (int64, error) {
 	var dst *os.File
 	var err error
 	var src *os.File
@@ -474,26 +460,17 @@ func copyFile(modelPath, outPath util.Path) (int64, error) {
 // createModelPath creates an input path from our models and verifies that it
 // exists.  Regular files and directories that are found in the "models"
 // directory are acceptable.
-func createModelPath(fn string) (util.Path, error) {
-	var modelPath   string
-	var err         error
+func createModelPath(fn string) (*util.Path, error) {
 
 	// Calculate the model path.
-	modelPath = sharedData.MdlDir()
-	modelPath += "/sqlapp"
-	modelPath += "/"
-	modelPath += fn
-	modelPath, err = util.IsPathRegularFile(modelPath)
-
-	if err != nil {
-		modelPath2, err2 := util.IsPathDir(modelPath)
-		if err2 == nil {
-			modelPath = modelPath2
-			err = nil
-		}
+	path := util.NewPath(sharedData.MdlDir())
+	path = path.Append("sqlapp")
+	path = path.Append(fn)
+	if !path.IsPathRegularFile() && !path.IsPathDir() {
+		return nil, fmt.Errorf("Error: %s is not a directory or a file!\n", path.String())
 	}
 
-	return util.NewPath(modelPath), err
+	return path, nil
 }
 
 //----------------------------------------------------------------------------
@@ -502,15 +479,17 @@ func createModelPath(fn string) (util.Path, error) {
 
 // createOutputDir creates the output directory on disk given a
 // subdirectory (dir).
-func createOutputDir(dir, dn, tn string) error {
+func createOutputDir(dir []string, dn string, tn string) error {
 	var err error
 	var outPath string
-	var pathOut util.Path
+	var pathOut *util.Path
 
 	outPath = sharedData.OutDir()
-	outPath += "/"
-	if len(dir) > 0 {
-		outPath += dir
+	for _, d := range dir {
+		outPath += string(os.PathSeparator)
+		if len(dir) > 0 {
+			outPath += d
+		}
 	}
 	mapper := func(placeholderName string) string {
 		switch placeholderName {
@@ -544,7 +523,7 @@ func createOutputDir(dir, dn, tn string) error {
 // subdirectory (dir).
 func createOutputDirs(dn string, Tables []dbJson.DbTable) error {
 	var err 	error
-	var outDir	util.Path
+	var outDir	*util.Path
 
 	if sharedData.Noop() {
 		log.Printf("NOOP -- Skipping Creating directories\n")
@@ -572,49 +551,49 @@ func createOutputDirs(dn string, Tables []dbJson.DbTable) error {
 	}
 
 	log.Printf("\tCreating general directories...\n")
-	err = createOutputDir("/html", dn, "")
+	err = createOutputDir([]string{"html"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = createOutputDir("/static", dn, "")
+	err = createOutputDir([]string{"static"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = createOutputDir("/style", dn, "")
+	err = createOutputDir([]string{"style"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = createOutputDir("/tmpl", dn, "")
+	err = createOutputDir([]string{"tmpl"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = createOutputDir("/src", dn, "")
+	err = createOutputDir([]string{"src"}, dn, "")
 	if err != nil {
 		return err
 	}
 	log.Printf("\tCreating src directories for %s...\n", dn)
-	err = createOutputDir("/src/hndlr${DbName}", dn, "")
+	err = createOutputDir([]string{"src","hndlr${DbName}"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = createOutputDir("/src/io${DbName}", dn, "")
+	err = createOutputDir([]string{"src","io${DbName}"}, dn, "")
 	if err != nil {
 		return err
 	}
 	for _, t := range Tables {
 		tn := t.TitledName()
 		log.Printf("\tCreating directories for Table: %s...\n", tn)
-		err = createOutputDir("/src/${DbName}${TblName}", dn, tn)
+		err = createOutputDir([]string{"src","${DbName}${TblName}"}, dn, tn)
 		if err != nil {
 			log.Printf("FAILED on creating /src/%s/%s!\n", dn, tn)
 			return err
 		}
-		err = createOutputDir("/src/hndlr${DbName}${TblName}", dn, tn)
+		err = createOutputDir([]string{"src","hndlr${DbName}${TblName}"}, dn, tn)
 		if err != nil {
 			log.Printf("FAILED on creating /src/hndlr%s%s!\n", dn, tn)
 			return err
 		}
-		err = createOutputDir("/src/io${DbName}${TblName}", dn, tn)
+		err = createOutputDir([]string{"src","io${DbName}${TblName}"}, dn, tn)
 		if err != nil {
 			log.Printf("FAILED on creating /src/io%s%s!\n", dn, tn)
 			return err
@@ -632,9 +611,10 @@ func createOutputDirs(dn string, Tables []dbJson.DbTable) error {
 // file name (fn), optional database name (dn) and optional table
 // name (tn). The dn and tn are only used if "$(DbName}" or "${TblName}"
 // are found in the file name.
-func createOutputPath(dir, dn, tn, fn string) (util.Path, error) {
-	var outPath string
+func createOutputPath(dir, dn, tn, fn string) (*util.Path, error) {
 	var err error
+	var outPath string
+	var path *util.Path
 
 	outPath = sharedData.OutDir()
 	outPath += "/"
@@ -657,16 +637,14 @@ func createOutputPath(dir, dn, tn, fn string) (util.Path, error) {
 		return ""
 	}
 	outPath = os.Expand(outPath, mapper)
-	outPath, err = util.IsPathRegularFile(outPath)
-	if err == nil {
+	path = util.NewPath(outPath)
+	if path.IsPathRegularFile() {
 		if !sharedData.Replace() {
 			err = fmt.Errorf("Over-write error of %s!\n", outPath)
 		}
-	} else {
-		err = nil
 	}
 
-	return util.NewPath(outPath), err
+	return path, err
 }
 
 //----------------------------------------------------------------------------
@@ -691,7 +669,7 @@ func readJsonFiles() error {
 
 func GenSqlApp(inDefns map[string]interface{}) error {
 	var err 	error
-	var pathIn	util.Path
+	var pathIn	*util.Path
 	//var ok 		bool
 
 	if sharedData.Debug() {

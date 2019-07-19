@@ -11,16 +11,18 @@ package util
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/2kranki/jsonpreprocess"
+	"golang.org/x/tools/go/gccgoexportdata"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"time"
 )
 
 //----------------------------------------------------------------------------
@@ -96,44 +98,39 @@ func NewExecCmd(name string, args ...string) *ExecCmd {
 
 // CopyDir copies from the given directory (src) and all of its files to the
 // destination (dst).
-func CopyDir(src, dst string) error {
+func CopyDir(src, dst *Path) error {
 	var err 	error
-	var pathIn	Path
-	var pathOut	Path
 
-	pathIn = NewPath(src)
-	pathOut = NewPath(dst)
 	//log.Printf("CopyDir: base: %s  last: %c\n", pathIn.Base(), dst[len(dst)-1])
-	if dst[len(dst)-1] == os.PathSeparator {
-		pathOut = pathOut.Append(pathIn.Base())
+	if dst.String()[len(dst.String())-1] == os.PathSeparator {
+		dst = dst.Append(src.Base())
 	}
 	//log.Printf("CopyDir: %s -> %s\n", pathIn.String(), pathOut.String())
 
-	if pathIn.IsPathRegularFile() {
+	if src.IsPathRegularFile() {
 		return CopyFile(src, dst)
 	}
 
-	if !pathIn.IsPathDir() {
-		return fmt.Errorf("Error: CopyDir: %s is not a file or directory!\n", pathIn.String())
+	if !src.IsPathDir() {
+		return fmt.Errorf("Error: CopyDir: %s is not a file or directory!\n", src.String())
 	}
 
-	si, err := os.Stat(src)
+	si, err := os.Stat(src.Absolute())
 	if err != nil {
 		return err
 	}
 	mode := si.Mode() & 03777
 
-	log.Printf("CopyDir: MkdirAll %s %o\n", pathOut.Absolute(), mode)
-	err = os.MkdirAll(pathOut.Absolute(), mode)
+	log.Printf("CopyDir: MkdirAll %s %o\n", dst.Absolute(), mode)
+	err = os.MkdirAll(dst.Absolute(), mode)
 	if err != nil {
 		return err
 	}
-	_, err = IsPathDir(pathOut.Absolute())
-	if err != nil {
-		return err
+	if !dst.IsPathDir() {
+		return fmt.Errorf("Error: %s could not be found!", dst.Absolute())
 	}
 
-	dir, err := os.Open(pathIn.Absolute())
+	dir, err := os.Open(src.Absolute())
 	if err != nil {
 		return err
 	}
@@ -146,18 +143,18 @@ func CopyDir(src, dst string) error {
 	dir.Close()
 
 	for _, fi := range entries {
-		srcpath := pathIn.Absolute() + string(os.PathSeparator) + fi.Name()
-		dstpath := pathOut.Absolute() + string(os.PathSeparator) + fi.Name()
+		srcNew := src.Append(fi.Name())
+		dstNew := dst.Append(fi.Name())
 
 		if fi.Mode().IsDir() {
-			log.Printf("CopyDir: Dir: %s -> %s\n", srcpath, dstpath)
-			err = CopyDir(srcpath, dstpath)
+			log.Printf("CopyDir: Dir: %s -> %s\n", srcNew.String(), dstNew.String())
+			err = CopyDir(srcNew, dstNew)
 			if err != nil {
 				return err
 			}
 		} else if fi.Mode().IsRegular() {
-			log.Printf("CopyDir: File: %s -> %s\n", srcpath, dstpath)
-			err = CopyFile(srcpath, dstpath)
+			log.Printf("CopyDir: File: %s -> %s\n", srcNew.String(), dstNew.String())
+			err = CopyFile(srcNew, dstNew)
 			if err != nil {
 				return err
 			}
@@ -173,29 +170,25 @@ func CopyDir(src, dst string) error {
 
 // CopyFile copies a file given by its path (src) creating
 // an output file given its path (dst)
-func CopyFile(src, dst string) error {
+func CopyFile(src, dst *Path) error {
 	var err 	error
-	var pathIn	Path
-	var pathOut	Path
 
-	pathIn = NewPath(src)
-	pathOut = NewPath(dst)
-	log.Printf("CopyFile: %s -> %s\n", pathIn.Absolute(), pathOut.Absolute())
+	log.Printf("CopyFile: %s -> %s\n", src.Absolute(), dst.Absolute())
 
 	// Clean up the input file path and check for its existence.
-	if !pathIn.IsPathRegularFile() {
-		return fmt.Errorf("Error: %s is not a file!\n", pathIn.String())
+	if !src.IsPathRegularFile() {
+		return fmt.Errorf("Error: %s is not a file!\n", src.String())
 	}
 
 	// Open the input file.
-	fileIn, err := os.Open(pathIn.Absolute())
+	fileIn, err := os.Open(src.Absolute())
 	if err != nil {
 		return err
 	}
 	defer fileIn.Close()
 
 	// Create the output file.
-	fileOut, err := os.Create(pathOut.Absolute())
+	fileOut, err := os.Create(dst.Absolute())
 	if err != nil {
 		return err
 	}
@@ -205,9 +198,9 @@ func CopyFile(src, dst string) error {
 	// to same as input file.
 	_, err = io.Copy(fileOut, fileIn)
 	if err == nil {
-		si, err := os.Stat(src)
+		si, err := os.Stat(src.Absolute())
 		if err == nil {
-			err = os.Chmod(pathOut.Absolute(), si.Mode())
+			err = os.Chmod(dst.Absolute(), si.Mode())
 		}
 	}
 
@@ -230,43 +223,30 @@ func ErrorString(err error) string {
 //                             FileCompare
 //----------------------------------------------------------------------------
 
-// FileCompare compares two files returning true
+// FileCompareEqual compares two files returning true
 // if they are equal.
-func FileCompare(file1, file2 string) bool {
+func FileCompareEqual(file1, file2 *Path) bool {
 	var err 		error
-	var file1size	int64
-	var file2size	int64
 
-
-	file1, err = IsPathRegularFile(file1)
-	if err != nil {
-		return false
-	}
-	si, err := os.Stat(file1)
-	if err == nil {
-		file1size = si.Size()
-	}
-
-	file2, err = IsPathRegularFile(file2)
-	if err != nil {
-		return false
-	}
-	si, err = os.Stat(file2)
-	if err == nil {
-		file2size = si.Size()
-	}
-
-	if file1size != file2size {
+	if !file1.IsPathRegularFile() {
 		return false
 	}
 
-	f1, err := os.Open(file1)
+	if !file2.IsPathRegularFile() {
+		return false
+	}
+
+	if file1.Size() != file2.Size() {
+		return false
+	}
+
+	f1, err := os.Open(file1.Absolute())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f1.Close()
 
-	f2, err := os.Open(file2)
+	f2, err := os.Open(file2.Absolute())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -315,67 +295,6 @@ func FormatArgs(args ...interface{}) string {
 }
 
 //----------------------------------------------------------------------------
-//                             HomeDir
-//----------------------------------------------------------------------------
-
-// HomeDir returns $HOME diretory of the current user
-func HomeDir() string {
-
-	// user.Current() returns nil if cross-compiled e.g. on mac for linux
-	if usr, _ := user.Current(); usr != nil {
-		return usr.HomeDir
-	}
-
-	return os.Getenv("HOME")
-}
-
-//----------------------------------------------------------------------------
-//                             IsPathDir
-//----------------------------------------------------------------------------
-
-// IsPathDir cleans up the supplied file path
-// and then checks the cleaned file path to see
-// if it is an existing standard directory. Return the
-// cleaned up path and a potential error if it exists.
-func IsPathDir(fp string) (string, error) {
-	var err error
-	var path string
-
-	path = PathClean(fp)
-	fi, err := os.Lstat(path)
-	if err != nil {
-		return path, errors.New("path not found")
-	}
-	if fi.Mode().IsDir() {
-		return path, nil
-	}
-	return path, errors.New("path not regular file")
-}
-
-//----------------------------------------------------------------------------
-//                            IsPathRegularFile
-//----------------------------------------------------------------------------
-
-// IsPathRegularFile cleans up the supplied file path
-// and then checks the cleaned file path to see
-// if it is an existing standard file. Return the
-// cleaned up path and a potential error if it exists.
-func IsPathRegularFile(fp string) (string, error) {
-	var err error
-	var path string
-
-	path = PathClean(fp)
-	fi, err := os.Lstat(path)
-	if err != nil {
-		return path, errors.New("path not found")
-	}
-	if fi.Mode().IsRegular() {
-		return path, nil
-	}
-	return path, errors.New("path not regular file")
-}
-
-//----------------------------------------------------------------------------
 //                             PanicIf
 //----------------------------------------------------------------------------
 
@@ -417,17 +336,18 @@ type Path struct {
 // Absolute returns the absolute file path for
 // this path.
 func (p *Path) Absolute( ) string {
-	pth, _ := filepath.Abs(p.str)
-	return pth
+	path := p.Clean()
+	path, _ = filepath.Abs(path)
+	return path
 }
 
 // Append a subdirectory or file name[.file extension] to the path.
 // If the string is empty, then '/' will be appended.
-func (p *Path) Append(s string) Path {
+func (p *Path) Append(s string) *Path {
 	pth := Path{}
 	pth.str = p.str + string(os.PathSeparator) + s
 	pth.str = filepath.Clean(pth.str)
-	return pth
+	return &pth
 }
 
 // Base returns the last component of the path. If the
@@ -455,7 +375,7 @@ func (p *Path) Clean( ) string {
 	var path string
 
 	if strings.HasPrefix(p.str, "~") {
-		p.str = HomeDir() + p.str[1:]
+		p.str = NewHomeDir().String() + string(os.PathSeparator) + p.str[1:]
 	}
 	p.str = os.ExpandEnv(p.str)
 	p.str = filepath.Clean(p.str)
@@ -536,6 +456,26 @@ func (p *Path) IsPathRegularFile( ) bool {
 	return false
 }
 
+func (p *Path) Mode( ) os.FileMode {
+	var mode	os.FileMode
+
+	si, err := os.Stat(p.Absolute())
+	if err == nil {
+		mode = si.Mode()
+	}
+	return mode
+}
+
+func (p *Path) ModTime( ) time.Time {
+	var mod		time.Time
+
+	si, err := os.Stat(p.Absolute())
+	if err == nil {
+		mod = si.ModTime()
+	}
+	return mod
+}
+
 // RemoveDir assumes that this path represents a
 // directory and deletes it along with any parent
 // directories that it can as well.
@@ -554,39 +494,54 @@ func (p *Path) SetStr(s string) {
 	p.str = s
 }
 
+// Size returns length in bytes for regular files.
+func (p *Path) Size( ) int64 {
+	var size	int64
+
+	si, err := os.Stat(p.Absolute())
+	if err == nil {
+		size = si.Size()
+	}
+	return size
+}
+
 func (p *Path) String( ) string {
 	return p.str
 }
 
-func NewPath(s string) Path {
+// NewHomeDir returns the current working directory as a Path.
+func NewHomeDir() *Path {
+	p := Path{}
+
+	// user.Current() returns nil if cross-compiled e.g. on mac for linux.
+	// So, our backup is to get the home directory from the environment.
+	if usr, _ := user.Current(); usr != nil {
+		p.str = usr.HomeDir
+	} else {
+		p.str = os.Getenv("HOME")
+	}
+
+	return &p
+}
+
+func NewPath(s string) *Path {
 	p := Path{}
 	p.str = s
-	return p
+	return &p
 }
 
-// NewPWD returns the current working directory as a Path.
-func NewPWD() Path {
+// NewWorkDir returns the current working directory as a Path.
+func NewWorkDir() *Path {
 	p := Path{}
 	p.str, _ = os.Getwd()
-	return p
+	return &p
 }
 
-//----------------------------------------------------------------------------
-//                             PathClean
-//----------------------------------------------------------------------------
-
-// PathClean cleans up the supplied file path.
-func PathClean(fp string) string {
-	var path string
-
-	if strings.HasPrefix(fp, "~") {
-		fp = HomeDir() + fp[1:]
-	}
-	fp = os.ExpandEnv(fp)
-	fp = filepath.Clean(fp)
-	path, _ = filepath.Abs(fp)
-
-	return path
+// NewTempDir returns the temporary directory as a Path.
+func NewTempDir() *Path {
+	p := Path{}
+	p.str = os.TempDir()
+	return &p
 }
 
 //----------------------------------------------------------------------------
@@ -648,9 +603,70 @@ func ReadJsonFileToData(jsonPath string, jsonOut interface{}) error {
 	return err
 }
 
-//----------------------------------------------------------------------------
+//============================================================================
 //                            		Workers
-//----------------------------------------------------------------------------
+//============================================================================
+
+type WorkQueue struct {
+	queue		chan interface{}
+	ack			chan bool
+	done		chan bool
+	doWork		func(interface{})
+	complete	func()
+	size		int
+}
+
+func (w *WorkQueue) CloseInput() {
+	close(w.queue)
+}
+
+func (w *WorkQueue) complete() {
+	w.done <- true
+}
+
+func (w *WorkQueue) PushWork(i interface{}) {
+	w.queue <- i
+}
+
+func (w *WorkQueue) WaitForCompletion() {
+	<-w.done
+	w.Completed()
+}
+
+func NewWorkQueue(task func(interface{}), s int) *WorkQueue {
+	// Set up the Work Queue.
+	wq := &WorkQueue{}
+	wq.doWork = task
+	if s > 0 {
+		wq.size = s
+	} else {
+		wq.size = runtime.NumCPU()
+	}
+	// Now set up the actual queues needed.
+	wq.queue = make(chan interface{})
+	wq.ack = make(chan bool)
+	wq.done = make(chan bool)
+	for i := 0; i < r; i++ {
+		go func() {
+			for {
+				v, ok := <-input
+				if ok {
+					task(v)
+				} else {
+					wq.ack <- true
+					return
+				}
+			}
+		}()
+	}
+	go func() {
+		for i := 0; i < r; i++ {
+			<-wq.ack
+		}
+		wq.complete()
+	}()
+
+}
 
 // Workers allows us to perform r number of task(s) at a time until
 // all tasks are completed.  The input channel to run the task is

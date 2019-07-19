@@ -19,6 +19,7 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -601,9 +602,74 @@ func ReadJsonFileToData(jsonPath string, jsonOut interface{}) error {
 	return err
 }
 
-//----------------------------------------------------------------------------
+//============================================================================
 //                            		Workers
-//----------------------------------------------------------------------------
+//============================================================================
+
+// WorkQueue represents a one use only structure to execute multiple
+// go routines easily.
+type WorkQueue struct {
+	queue		chan interface{}
+	ack			chan bool
+	done		chan bool
+	size		int
+}
+
+func (w *WorkQueue) CloseQueue() {
+	close(w.queue)
+}
+
+func (w *WorkQueue) CloseAndWaitForCompletion() {
+	close(w.queue)
+	<-w.done
+	close(w.ack)
+	close(w.done)
+}
+
+func (w *WorkQueue) Complete() {
+	w.done <- true
+}
+
+func (w *WorkQueue) PushWork(i interface{}) {
+	w.queue <- i
+}
+
+func NewWorkQueue(task func(interface{}), s int) *WorkQueue {
+
+	// Set up the Work Queue.
+	wq := &WorkQueue{}
+	if s > 0 {
+		wq.size = s
+	} else {
+		wq.size = runtime.NumCPU()
+	}
+
+	// Now set up the actual queues needed.
+	wq.queue = make(chan interface{})
+	wq.ack = make(chan bool)
+	wq.done = make(chan bool)
+	for i := 0; i < wq.size; i++ {
+		go func() {
+			for {
+				v, ok := <-wq.queue
+				if ok {
+					task(v)
+				} else {
+					wq.ack <- true
+					return
+				}
+			}
+		}()
+	}
+	go func() {
+		for i := 0; i < wq.size; i++ {
+			<-wq.ack
+		}
+		wq.Complete()
+	}()
+
+	return wq
+}
 
 // Workers allows us to perform r number of task(s) at a time until
 // all tasks are completed.  The input channel to run the task is

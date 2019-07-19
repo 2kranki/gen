@@ -6,6 +6,7 @@
 package util
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"testing"
@@ -302,4 +303,25 @@ func TestReadJsonFileToData(t *testing.T) {
 		t.Errorf("ReadJson(test.exec.json.txt) missing or invalid 'outdir'\n")
 	}
 	t.Log("\tend: TestReadJsonToData")
+}
+
+func TestWorkQueue(t *testing.T) {
+	var work 	*WorkQueue
+	var n		int
+
+	t.Log("TestWorkQueue()")
+
+	work = NewWorkQueue(
+			func(a interface{}) {
+				var t		int
+				t = a.(int)
+				fmt.Printf("\t work %d\n", t)
+			},
+			2)
+	for n = 1; n < 10; n++ {
+		work.PushWork(n)
+	}
+	work.CloseAndWaitForCompletion()
+
+	t.Log("\tend: TestWorkQueue")
 }

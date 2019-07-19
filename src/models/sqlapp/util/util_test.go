@@ -49,15 +49,15 @@ func TestFileCompare(t *testing.T) {
 
 	t.Log("TestFileCompare()")
 
-	src := "./util.go"
-	dst := "./util.go"
-	if !FileCompare(src,dst) {
+	src := NewPath("./util.go")
+	dst := NewPath("./util.go")
+	if !FileCompareEqual(src, dst) {
 		t.Errorf("FileCompare(%s,%s) failed comparison\n", src, dst)
 	}
 
-	src = "./test/test.exec.json.txt"
-	dst = "./util.go"
-	if FileCompare(src,dst) {
+	src = NewPath("./test/test.exec.json.txt")
+	dst = NewPath("./util.go")
+	if FileCompareEqual(src, dst) {
 		t.Errorf("FileCompare(%s,%s) failed comparison\n", src, dst)
 	}
 
@@ -65,22 +65,25 @@ func TestFileCompare(t *testing.T) {
 }
 
 func TestCopyFile(t *testing.T) {
-	var err error
+	var err 	error
 
 	t.Log("TestCopyFile()")
 
-	src := "./test/test.exec.json.txt"
-	dst := "./testout.txt"
+	src := NewPath("test").Append("test.exec.json.txt")
+	dst := NewTempDir().Append("testout.txt")
 	err = CopyFile(src, dst)
 	if err != nil {
-		t.Errorf("CopyFile(%s,%s) failed: %s\n", src, dst, err)
+		t.Errorf("CopyFile(%s,%s) failed: %s\n", src.String(), dst.String(), err.Error())
 	}
 
-	if !FileCompare(src,dst) {
-		t.Errorf("CopyFile(%s,%s) failed comparison\n", src, dst)
+	if !FileCompareEqual(src,dst) {
+		t.Errorf("CopyFile(%s,%s) failed comparison\n", src.String(), dst.String())
 	}
 
-	err = os.Remove(dst)
+	err = dst.DeleteFile()
+	if err != nil {
+		t.Errorf("DeleteFile(%s) failed: %s\n", dst.String(), err.Error())
+	}
 
 	t.Log("\tend: TestCopyFile")
 }
@@ -90,144 +93,100 @@ func TestCopyDir(t *testing.T) {
 
 	t.Log("TestCopyDir()")
 
-	src := "./test"
-	dst := "./test2"
+	src  := NewPath("test")
+	dst  := NewTempDir().Append("test2")
+	dst2 := NewTempDir().Append("test3")
 
-	err = os.RemoveAll("./test2")
-	err = os.RemoveAll("./test5")
+	err = dst.RemoveDir()
+	if err != nil {
+		t.Logf("\tError: Deleting %s: %s\n", dst.String(), err.Error())
+	}
+	err = dst2.RemoveDir()
+	if err != nil {
+		t.Logf("\tError: Deleting %s: %s\n", dst2.String(), err.Error())
+	}
 
 	t.Logf("\tcopying %s -> %s\n", src, dst)
 	err = CopyDir(src, dst)
 	if err != nil {
-		t.Fatalf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
+		t.Fatalf("CopyDir(%s,%s) failed: %s\n", src.String(), dst.String(), err.Error())
 	}
 
-	cmd := exec.Command("diff", src, dst)
+	cmd := exec.Command("diff", src.Absolute(), dst.Absolute())
 	err = cmd.Run()
 	if err != nil {
 		t.Fatalf("CopyDir(%s,%s) comparison failed: %s\n", src, dst, err)
 	}
 
-	err = os.RemoveAll(dst)
+	dst.RemoveDir()
 
-	dst = "./test5" + string(os.PathSeparator)
-	dst2 := dst + "test"
-	t.Logf("\tcopying %s -> %s\n", src, dst)
-	err = CopyDir(src, dst)
+	dst3 := dst2.Append("test")
+	dst2 =  dst2.Append("")
+	t.Logf("\tcopying %s -> %s\n", src.String(), dst2.String())
+	err = CopyDir(src, dst3)
 	if err != nil {
-		t.Fatalf("CopyDir(%s,%s) failed: %s\n", src, dst, err)
+		t.Fatalf("CopyDir(%s,%s) failed: %s\n", src.String(), dst3.String(), err.Error())
 	}
 
-	cmd = exec.Command("diff", src, dst2)
+	cmd = exec.Command("diff", src.Absolute(), dst3.Absolute())
 	err = cmd.Run()
 	if err != nil {
-		t.Fatalf("CopyDir(%s,%s) comparison failed: %s\n", src, "./test3/test", err)
+		t.Fatalf("CopyDir(%s,%s) comparison failed: %s\n", src.String(), dst3.String(), err)
 	}
 
-	err = os.RemoveAll(dst)
+	dst2.RemoveDir()
 
 	t.Log("\tend: TestCopyDir")
 }
 
 func TestIsPathDir(t *testing.T) {
-	var path string
-	var err error
+	var path	*Path
 
 	t.Log("TestIsPathDir()")
 
-	path, err = IsPathDir("./util.go")
-	if err == nil {
-		t.Errorf("IsPathDir(./files.go) failed: %s\n", err)
+	path = NewPath("./util.go")
+	if path.IsPathDir() {
+		t.Errorf("IsPathDir(%s) failed!\n", path.String())
 	}
-	t.Log("./files.go path:", path)
+	t.Logf("\t%s absolute: %s\n", path.String(), path.Absolute())
 
-	path, err = IsPathDir("./test")
-	if err != nil {
-		t.Errorf("IsPathRegularFile(./xyzzy.go) should have failed!\n")
+	path = NewPath("./test")
+	if !path.IsPathDir() {
+		t.Errorf("IsPathDir(%s) failed!\n", path.String())
 	}
-	t.Log("./test path:", path)
+	t.Logf("\t%s absolute: %s\n", path.String(), path.Absolute())
 
 	t.Log("\tend: TestIsPathDir")
 }
 
 func TestIsPathRegularFile(t *testing.T) {
-	var input	string
-	var path string
-	var err error
+	var path 	*Path
+	var err 	error
 
 	t.Log("TestIsPathRegularFile()")
 
-	path, err = IsPathRegularFile("./util.go")
-	if err != nil {
-		t.Errorf("IsPathRegularFile(./files.go) failed: %s\n", err)
+	path = NewPath("./util.go")
+	if !path.IsPathRegularFile() {
+		t.Errorf("IsPathRegularFile(%s) failed: %s\n", path.String(), err.Error())
 	}
-	t.Log("./files.go path:", path)
+	t.Logf("\t%s Absolute: %s\n", path.String(), path.Absolute())
 
-	input = "./xyzzy.go"
-	path, err = IsPathRegularFile(input)
-	if err == nil {
-		t.Errorf("IsPathRegularFile(%s) failed: %s\n", path, err)
+	path = NewPath("./xyzzy.go")
+	if path.IsPathRegularFile() {
+		t.Errorf("IsPathRegularFile(%s) failed: %s\n", path.String(), err.Error())
 	}
-	t.Logf("\t%s => %s\n", input, path)
+	t.Logf("\t%s Absolute: %s\n", path.String(), path.Absolute())
 
 	t.Log("\tend: TestIsPathRegularFile")
-}
-
-func TestPathClean(t *testing.T) {
-	var err			error
-	var expected	string
-	var input		string
-	var path 		string
-	homeDir := HomeDir()
-	curDir, err := os.Getwd()
-	if err != nil {
-		t.Errorf("Error: Getting Current Directory: %s\n", err)
-	}
-
-	t.Log("TestPathClean()")
-
-	input = "./util.go"
-	expected = curDir + "/util.go"
-	path = PathClean(input)
-	t.Logf("\t%s => %s\n", input, path)
-	if path != expected {
-		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
-	}
-
-	input = "./xyzzy.go"
-	expected = curDir + "/xyzzy.go"
-	path = PathClean(input)
-	t.Logf("\t%s => %s\n", input, path)
-	if path != expected {
-		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
-	}
-
-	input = "~"
-	expected = homeDir
-	path = PathClean(input)
-	t.Logf("\t%s => %s\n", input, path)
-	if path != expected {
-		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
-	}
-
-	input = "~/.ssh"
-	expected = homeDir + "/.ssh"
-	path = PathClean(input)
-	t.Logf("\t%s => %s\n", input, path)
-	if path != expected {
-		t.Errorf("PathClean Got: %s  Expected: %s\n", path, expected)
-	}
-
-	t.Log("\tend: TestPathClean")
 }
 
 func TestPath(t *testing.T) {
 	var err			error
 	var expected	string
 	var input		string
-	var path 		Path
+	var path 		*Path
 	var pth			string
-	homeDir := HomeDir()
+	homeDir := NewHomeDir()
 	curDir, err := os.Getwd()
 	if err != nil {
 		t.Errorf("Error: Getting Current Directory: %s\n", err)
@@ -254,7 +213,7 @@ func TestPath(t *testing.T) {
 	}
 
 	input = "~"
-	expected = homeDir
+	expected = homeDir.String()
 	path = NewPath(input)
 	path.Clean()
 	pth = path.Absolute()
@@ -264,7 +223,7 @@ func TestPath(t *testing.T) {
 	}
 
 	input = "~/.ssh"
-	expected = homeDir + "/.ssh"
+	expected = homeDir.String() + "/.ssh"
 	path = NewPath(input)
 	pth = path.Clean()
 	t.Logf("\t%s => %s\n", input, pth)
@@ -292,7 +251,7 @@ func TestPath(t *testing.T) {
 		t.Errorf("PathClean Got: %s  Expected: %s\n", pth, expected)
 	}
 
-	pwd := NewPWD()
+	pwd := NewWorkDir()
 	t.Logf("PWD: %s\n", pwd.String())
 
 	t.Log("\tend: TestPathClean")

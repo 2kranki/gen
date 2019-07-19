@@ -15,6 +15,7 @@
 package genCObj
 
 import (
+	"../genCmn"
 	"../shared"
 	"../util"
 	"errors"
@@ -35,18 +36,8 @@ const (
 	timeId    = "time"
 )
 
-// FileDefn gives the parameters needed to generate a file.  The fields of
-// the struct have been simplified to allow for easy json encoding/decoding.
-type FileDefn struct {
-	ModelName 	string 		`json:"ModelName,omitempty"`
-	FileDir		string		`json:"FileDir,omitempty"`		// Output File Directory
-	FileName  	string 		`json:"FileName,omitempty"`
-	FileType  	string 		`json:"Type,omitempty"`  // text, sql, html
-	FilePerms	os.FileMode	`json:"FilePerms,omitempty"`	// Output File Permissions
-}
-
 // FileDefns controls what files are generated.
-var FileDefns []FileDefn = []FileDefn{
+var FileDefns []genCmn.FileDefn = []genCmnFileDefn{
 	{"obj_int_h.txt",
 		"src",
 		"${Name}_internal.h",
