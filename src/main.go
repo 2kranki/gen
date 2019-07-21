@@ -16,24 +16,11 @@ import (
 	// genGo packages
 	"./genCObj"
 	"./genSqlApp"
-	"./mainData"
 	"./shared"
 	"./util"
 	// External Imports
 )
 
-// TmplData is used to centralize all the inputs
-// to the generators.  We maintain generic JSON
-// structures for the templating system which does
-// not support structs.  (Not certain why yet.)
-// We also maintain the data in structs for easier
-// access by the generation functions.
-type TmplData struct {
-	Data			*interface{}
-	Main			*mainData.MainData
-}
-
-var	tmplData		TmplData
 var (
 	debug    		bool
 	execPath 		string
@@ -66,19 +53,20 @@ func (t *defineFlags) Set(value string) error {
 var defnFlags defineFlags
 
 func ChkSetMdlDir(s string) {
-	var err		error
+	var path	*util.Path
 
 	if len(s) == 0 {
 		s = "./models"
 	}
-	if s, err = util.IsPathDir(s); err != nil {
-		s = os.ExpandEnv("${GENAPP_MODELS}")
-		if s, err = util.IsPathDir(s); err != nil {
+	path = util.NewPath(s)
+	if !path.IsPathDir() {
+		path = util.NewPath(os.ExpandEnv("${GENAPP_MODELS}"))
+		if !path.IsPathDir() {
 			panic("Error - Missing Model Directory! Set with Env(GENAPP_MODELS) or -mdldir flag.")
 		}
 	}
-	mdldir = s
-	sharedData.SetMdlDir(s)
+	mdldir = path.String()
+	sharedData.SetMdlDir(path.String())
 }
 
 // SetupShared combines several sources of program options into
@@ -172,11 +160,6 @@ func SetupShared(execPath string, cmd string) error {
 			sharedData.SetCmd(wrk.(string))
 		}
 	}
-
-	//wrkTime := time.Now().String()[:19]
-	//sharedData.SetTime(string(wrkTime))
-	//sharedData.SetFunc("Time", sharedData.Time)
-
 
 	return nil
 }

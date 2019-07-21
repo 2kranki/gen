@@ -22,34 +22,6 @@ import (
 	"strings"
 )
 
-// StringsBuilder is a composition of strings.Builder so that
-// we can add supplemental functions.
-type StringBuilder struct {
-	str		strings.Builder
-}
-
-func NewStringBuilder() *StringBuilder {
-	sb := StringBuilder{}
-	return &sb
-}
-
-func (s StringBuilder) String( ) string {
-	return s.str.String()
-}
-
-// WriteString allows us to write a string to the buffer.
-func (s StringBuilder) WriteString(format string) error {
-	_, err := s.str.WriteString(format)
-	return err
-}
-
-// WriteStringf allows us to write a formatted string.
-func (s StringBuilder) WriteStringf(format string, a ...interface{}) error {
-	str := fmt.Sprintf(format, a...)
-	err := s.WriteString(str)
-	return err
-}
-
 // DbProp defines an Objects Property.
 type DbProp struct {
 	Name		string		`json:"name,omitempty"`			// External Name

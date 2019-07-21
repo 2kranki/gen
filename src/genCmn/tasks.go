@@ -16,26 +16,21 @@
 package genCmn
 
 import (
-	"../mainData"
 	"../shared"
 	"../util"
-	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
-
-//----------------------------------------------------------------------------
+//============================================================================
 //								Task Data
-//----------------------------------------------------------------------------
+//============================================================================
 
 type TaskData struct {
 	FD			*FileDefn
-	TD			*TmplData
+	TD			interface{}
 	PathIn	  	*util.Path					// Input File Path
 	PathOut	  	*util.Path					// Output File Path
 	Data		interface{}
@@ -46,61 +41,79 @@ type TaskData struct {
 func (t *TaskData) genFile() {
 	var err         error
 
+	if t.PathOut == nil {
+		log.Fatalf("Error - Missing output path for %s!\n", t.PathIn.String())
+	}
+
+	if !sharedData.Quiet() {
+		log.Println("Processing file:", t.PathIn.String(), "generating:", t.PathOut.String(), "...")
+	}
+
 	// Now generate the file.
 	switch t.FD.FileType {
 	case "copy":
 		if sharedData.Noop() {
 			if !sharedData.Quiet() {
-				log.Printf("\tShould have copied from %s to %s\n", t.PathIn, t.PathOut)
+				log.Printf("\tShould have copied from %s to %s\n",
+					t.PathIn.String(), t.PathOut.String())
 			}
 		} else {
-			if amt, err := copyFile(t.PathIn, t.PathOut); err == nil {
+			if amt, err := t.copyFile(t.PathIn, t.PathOut); err == nil {
 				t.PathOut.Chmod(t.FD.FilePerms)
 				if !sharedData.Quiet() {
-					log.Printf("\tCopied %d bytes from %s to %s\n", amt, t.PathIn, t.PathOut)
+					log.Printf("\tCopied %d bytes from %s to %s\n",
+						amt, t.PathIn.String(), t.PathOut.String())
 				}
 			} else {
 				log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
-					amt, t.PathIn, t.PathOut, err)
+					amt, t.PathIn.String(), t.PathOut.String(), err.Error())
 			}
 		}
 	case "copyDir":
+		if !sharedData.Quiet() {
+			log.Println("\t CopyDir...")
+		}
 		if sharedData.Noop() {
 			if !sharedData.Quiet() {
-				log.Printf("\tShould have copied directory from %s to %s\n", t.PathIn, t.PathOut)
+				log.Printf("\tShould have copied directory from %s to %s\n",
+					t.PathIn.String(), t.PathOut.String())
 			}
 		} else {
-			if err := copyDir(t.PathIn, t.PathOut); err == nil {
+			if err := t.copyDir(t.PathIn, t.PathOut); err == nil {
 				if !sharedData.Quiet() {
-					log.Printf("\tCopied from %s to %s\n", t.PathIn, t.PathOut)
+					log.Printf("\tCopied from %s to %s\n",
+						t.PathIn.String(), t.PathOut.String())
 				}
 			} else {
 				log.Fatalf("Error - Copied from %s to %s with error %s\n",
-					t.PathIn, t.PathOut, err)
+					t.PathIn.String(), t.PathOut.String(), err.Error())
 			}
 		}
 	case "html":
 		if err = GenHtmlFile(t.PathIn, t.PathOut, t); err == nil {
 			t.PathOut.Chmod(t.FD.FilePerms)
 			if !sharedData.Quiet() {
-				log.Printf("\tGenerated HTML from %s to %s\n", t.PathIn, t.PathOut)
+				log.Printf("\tGenerated HTML from %s to %s\n",
+					t.PathIn.String(), t.PathOut.String())
 			}
 		} else {
 			log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
-				t.PathIn, t.PathOut, err)
+				t.PathIn.String(), t.PathOut.String(), err.Error())
 		}
 	case "text":
 		if err = GenTextFile(t.PathIn, t.PathOut, t); err == nil {
 			t.PathOut.Chmod(t.FD.FilePerms)
 			if !sharedData.Quiet() {
-				log.Printf("\tGenerated text from %s to %s\n", t.PathIn, t.PathOut)
+				log.Printf("\tGenerated text from %s to %s\n",
+					t.PathIn.String(), t.PathOut.String())
 			}
 		} else {
 			log.Fatalf("Error - Generated text from %s to %s with error %s\n",
-				t.PathIn, t.PathOut, err)
+				t.PathIn.String(), t.PathOut.String(), err.Error())
 		}
 	default:
-		log.Fatalln("Error: Invalid file type:", t.FD.FileType, "for", t.FD.ModelName, err)
+		log.Fatalln("Error: Invalid file type:", t.FD.FileType, "for",
+			t.FD.ModelName, err.Error())
 	}
 
 
@@ -113,19 +126,18 @@ func (t *TaskData) genFile() {
 func (t *TaskData) copyDir(modelPath, outPath *util.Path) error {
 	var err 	error
 	var base	string
-	var pathIn	*util.Path
 	var pathOut	*util.Path
 
 	if !modelPath.IsPathDir( ) {
-		return fmt.Errorf("Error - model directory, %s, does not exist!\n", pathIn.String())
+		return fmt.Errorf("Error - model directory, %s, does not exist!\n", modelPath.String())
 	}
 	base = modelPath.Base( )
 	if len(base) == 0 {
-		return fmt.Errorf("Error - model directory, %s, does not have base directory!\n", pathIn.String())
+		return fmt.Errorf("Error - model directory, %s, does not have base directory!\n", modelPath.String())
 	}
 
 	pathOut = outPath.Append(base)
-	log.Printf("\tcopyDir:  inPath: %s\n", pathIn.String())
+	log.Printf("\tcopyDir:  inPath: %s\n", modelPath.String())
 	log.Printf("\tcopyDir: outPath: %s base: %s\n", pathOut.String(), base)
 	if outPath.IsPathDir( ) {
 		if sharedData.Replace() {
@@ -137,8 +149,9 @@ func (t *TaskData) copyDir(modelPath, outPath *util.Path) error {
 			return fmt.Errorf("Error - overwrite error of %s\n", pathOut.String())
 		}
 	}
+	pathOut = pathOut.Append("")		// Add trailing path separator.
 
-	err = util.CopyDir(pathIn, pathOut)
+	err = util.CopyDir(modelPath, pathOut)
 
 	return err
 }

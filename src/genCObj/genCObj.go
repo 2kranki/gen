@@ -18,226 +18,258 @@ import (
 	"../genCmn"
 	"../shared"
 	"../util"
-	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"log"
-	"os"
-	"strings"
-)
-
-const (
-	jsonDirCon = "./"
-	// Merged from main.go
-	cmdId     = "cmd"
-	jsonDirId = "jsondir"
-	nameId    = "name"
-	timeId    = "time"
 )
 
 // FileDefns controls what files are generated.
-var FileDefns []genCmn.FileDefn = []genCmnFileDefn{
+var FileDefs1 	[]genCmn.FileDefn = []genCmn.FileDefn{
 	{"obj_int_h.txt",
-		"src",
+		[]string{"src"},
 		"${Name}_internal.h",
 		"text",
 		0644,
+		"",
+		0,
 	},
 	{"obj_obj_c.txt",
-		"src",
+		[]string{"src"},
 		"${Name}_object.c",
 		"text",
 		0644,
+		"",
+		0,
 	},
 	{"obj_c.txt",
-		"src",
+		[]string{"src"},
 		"${Name}.c",
 		"text",
 		0644,
+		"",
+		0,
 	},
 	{"obj_h.txt",
-		"src",
+		[]string{"src"},
 		"${Name}.h",
 		"text",
 		0644,
+		"",
+		0,
 	},
 	{"obj_test_c.txt",
-		"tests",
+		[]string{"tests"},
 		"test_${Name}.c",
 		"text",
 		0644,
+		"",
+		0,
 	},
 }
-
-// TmplData is used to centralize all the inputs
-// to the generators.  We maintain generic JSON
-// structures for the templating system which does
-// not support structs.  (Not certain why yet.)
-// We also maintain the data in structs for easier
-// access by the generation functions.
-type TmplData struct {
-	Data     *DbObject
-}
-
-var tmplData TmplData
 
 func init() {
 
 }
 
-func copyFile(modelPath, outPath string) (int64, error) {
-	var dst *os.File
-	var err error
-	var src *os.File
+//----------------------------------------------------------------------------
+//								createOutputDir
+//----------------------------------------------------------------------------
 
-	if _, err = util.IsPathRegularFile(modelPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
+// CreateOutputDir creates the output directory on disk given a
+// subdirectory (dir).
+func CreateOutputDir(g *genCmn.GenData, dir []string) error {
+	var err 	error
+	var outPath *util.Path
+
+	mapper := func(placeholderName string) string {
+		switch placeholderName {
+		case "Name":
+			if len(dbStruct.Name) > 0 {
+				return dbStruct.Name
+			}
+		}
+		return ""
 	}
 
-	if outPath, err = util.IsPathRegularFile(outPath); err == nil {
-		if sharedData.Force() {
-			if err = os.Remove(outPath); err != nil {
-				return 0, errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
-			}
-		} else {
-			return 0, errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+	outPath = util.NewPath(sharedData.OutDir())
+	for _, d := range dir {
+		if len(dir) > 0 {
+			outPath = outPath.Append(d)
 		}
 	}
-	if dst, err = os.Create(outPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - could not create:", outPath, err))
+	outPath = outPath.Expand(mapper)
+
+	if !outPath.IsPathDir() {
+		log.Printf("\t\tCreating directory: %s...\n", outPath.String())
+		err = outPath.CreateDir()
 	}
-	defer dst.Close()
 
-	if src, err = os.Open(modelPath); err != nil {
-		return 0, errors.New(fmt.Sprint("Error - could not open model file:", modelPath, err))
-	}
-	defer src.Close()
-
-	amt, err := io.Copy(dst, src)
-
-	return amt, err
+	return err
 }
 
-func createModelPath(fn string) (string, error) {
-	var modelPath   string
-	var err         error
+//----------------------------------------------------------------------------
+//								createOutputDirs
+//----------------------------------------------------------------------------
 
-	if modelPath, err = util.IsPathRegularFile(fn); err == nil {
-		return modelPath, err
+// createOutputDir creates the output directory on disk given a
+// subdirectory (dir).
+func CreateOutputDirs(g *genCmn.GenData) error {
+	var err 	error
+	var outDir	*util.Path
+
+	if sharedData.Noop() {
+		log.Printf("NOOP -- Skipping Creating directories\n")
+		return nil
+	}
+	outDir = util.NewPath(sharedData.OutDir())
+
+	// We only delete main directory if forced to. Otherwise, we
+	// will simply replace our files within it.
+	if sharedData.Force() {
+		log.Printf("\tRemoving directory: %s...\n", outDir.String())
+		if err = outDir.RemoveDir(); err != nil {
+			return fmt.Errorf("Error: Could not remove output directory: %s: %s\n",
+				outDir.String(), err.Error())
+		}
 	}
 
-	// Calculate the model path.
-	modelPath = sharedData.MdlDir()
-	modelPath += "/cobj/"
-	modelPath += fn
-	modelPath, err = util.IsPathRegularFile(modelPath)
+	// Create the main directory if needed.
+	if !outDir.IsPathDir() {
+		log.Printf("\tCreating directory: %s...\n", outDir.String())
+		if err = outDir.CreateDir(); err != nil {
+			return fmt.Errorf("Error: Could not crete output directory: %s: %s\n",
+				outDir.String(), err.Error())
+		}
+	}
 
-	return modelPath, err
+	log.Printf("\tCreating general directories...\n")
+	err = CreateOutputDir(g, []string{"src"})
+	if err != nil {
+		return err
+	}
+	err = CreateOutputDir(g, []string{"tests"})
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
-func createOutputPath(dn,fn string) (string, error) {
-	var outPath 	string
-	var err 		error
+//----------------------------------------------------------------------------
+//								CreateOutputFilePath
+//----------------------------------------------------------------------------
 
-	if len(fn) > 0 {
-		fn = strings.Replace(fn, "${Name}", tmplData.Data.Name, -1)
+func CreateOutputFilePath(name string, dir []string, fn string) (*util.Path, error) {
+	var outPath 	*util.Path
+
+	mapper := func(varSub string) string {
+		switch varSub {
+		case "Name":
+			return name
+		}
+		return ""
 	}
 
-	outPath = sharedData.OutDir()
-	outPath += "/"
-	outPath += dn
-	outPath += "/"
-	outPath += fn
-	outPath, err = util.IsPathRegularFile(outPath)
-	if err == nil {
+	outPath = util.NewPath(sharedData.OutDir())
+	for _, d := range dir {
+		outPath = outPath.Append(d)
+	}
+	outPath = outPath.Append(fn)
+	outPath = outPath.Expand(mapper)
+
+	if outPath.IsPathRegularFile() {
 		if !sharedData.Force() {
-			return outPath, errors.New(fmt.Sprint("Over-write error of:", outPath))
+			return outPath, fmt.Errorf("Over-write error of: %s\n", outPath)
 		}
 	}
 
 	return outPath, nil
 }
 
+//----------------------------------------------------------------------------
+//							readJsonFileData
+//----------------------------------------------------------------------------
+
+// ReadJsonFileData reads in the Data JSON file(s) that define the
+// application to be generated.
+func ReadJsonFileData(g *genCmn.GenData) error {
+	var err error
+
+	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
+		return fmt.Errorf("Error: Reading Data Json Input:%s %s\n",
+			sharedData.DataPath(), err.Error())
+	}
+	g.TmplData.Data = DbStruct()
+
+
+	return nil
+}
+
+//----------------------------------------------------------------------------
+//							SetupFile
+//----------------------------------------------------------------------------
+
+// SetupFile sets up the task data defining what is to be done and
+// pushes it on the work queue.
+func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error {
+	var err		error
+
+	data := &genCmn.TaskData{}
+	data.FD = &fd
+	data.TD = DbStruct()
+	data.Data = DbStruct()
+
+	// Create the input model file path.
+	data.PathIn, err = g.CreateModelPath(fd.ModelName)
+	if err != nil {
+		return fmt.Errorf("Error: %s: %s\n", data.PathIn.String(), err.Error())
+	}
+	if sharedData.Debug() {
+		log.Println("\t\tmodelPath=", data.PathIn.String())
+	}
+
+	// Create the output path
+	data.PathOut, err = CreateOutputFilePath(dbStruct.Name, fd.FileDir, fd.FileName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if sharedData.Debug() {
+		log.Println("\t\t outPath=", data.PathOut)
+	}
+
+	// Generate the file.
+	wrk.PushWork(data)
+
+	return nil
+}
+
+//============================================================================
+//								GenCObj
+//============================================================================
+
 func GenCObj(inDefns map[string]interface{}) error {
-	var err 	error
+	var genData		genCmn.GenData
+
+	genData.Name = "cobj"
+	genData.Mapper = func(varSub string) string {
+		switch varSub {
+		case "Name":
+			return dbStruct.Name
+		}
+		return ""
+	}
+	genData.FileDefs1 = &FileDefs1
+	genData.CreateOutputDirs = CreateOutputDirs
+	genData.ReadJsonData = ReadJsonFileData
+	genData.SetupFile = SetupFile
+	genData.TmplData.Data = DbStruct()
 
 	if sharedData.Debug() {
 		log.Println("GenCObj: In Debug Mode...")
 		log.Printf("\t  args: %q\n", flag.Args())
 	}
 
-	// Set up template data
-	tmplData.Data = DbStruct()
-
-	// Read the JSON file.
-	if sharedData.Debug() {
-		log.Println("\tDataPath:", sharedData.DataPath())
-	}
-	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
-		log.Fatalln(errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err)))
-	}
-
-	if sharedData.OutDir() == "" {
-		log.Fatalf("Error - 'libPath' cli argument is required!\n\n\n")
-	}
-
-	// Now handle each FileDefn creating a file for it.
-	for _, def := range (FileDefns) {
-		var modelPath string
-		var outPath string
-
-		if !sharedData.Quiet() {
-			log.Println("Process file:", def.ModelName, "generating:", def.FileName, "...")
-		}
-
-		// Create the input model file path.
-		if modelPath, err = createModelPath(def.ModelName); err != nil {
-			return errors.New(fmt.Sprintln("Error:", modelPath, err))
-		}
-		if sharedData.Debug() {
-			log.Println("\t\tmodelPath=", modelPath)
-		}
-
-		// Create the output path
-		if outPath, err = createOutputPath(def.FileDir, def.FileName); err != nil {
-			log.Fatalln(err)
-		}
-		if sharedData.Debug() {
-			log.Println("\t\t outPath=", outPath)
-		}
-
-		// Now generate the file.
-		switch def.FileType {
-		case "copy":
-			if sharedData.Noop() {
-				if !sharedData.Quiet() {
-					log.Printf("\tShould have copied from %s to %s\n", modelPath, outPath)
-				}
-			} else {
-				if amt, err := copyFile(modelPath, outPath); err == nil {
-					if !sharedData.Quiet() {
-						log.Printf("\tCopied %d bytes from %s to %s\n", amt, modelPath, outPath)
-					}
-				} else {
-					log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
-						amt, modelPath, outPath, err)
-				}
-			}
-		case "text":
-			if err = GenTextFile(modelPath, outPath, tmplData); err == nil {
-				if !sharedData.Quiet() {
-					log.Printf("\tGenerated HTML from %s to %s\n", modelPath, outPath)
-				}
-			} else {
-				log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
-					modelPath, outPath, err)
-			}
-		default:
-			return errors.New(fmt.Sprint("Error: Invalid file type:", def.FileType,
-				"for", def.ModelName, err))
-		}
-	}
+	genData.GenOutput()
 
 	return nil
 }

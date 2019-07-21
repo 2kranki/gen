@@ -171,6 +171,17 @@ func (i *ContainerInfos) RemoveImage(name, tag string) error {
 	return err
 }
 
+func (i *ContainerInfos) Run(imageName,imageTag,portIn,portOut string) {
+
+	if len(imageTag) > 0 {
+		imageName += ":" + imageTag
+	}
+
+	cmd := util.NewExecCmd("docker", "container","run", imageName)
+	s, err := cmd.RunWithOutput()
+	util.PanicIfErr(err, "Error - docker container run failed with %s", err)
+}
+
 func (i *ContainerInfos) Setup( ) {
 
 	cmd := util.NewExecCmd("docker", "container","ps", "-a", "--format", "{{.ID}}|{{.Names}}|{{.Image}}|{{.Labels}}|{{.Status}}")

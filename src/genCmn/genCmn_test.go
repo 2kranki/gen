@@ -8,47 +8,11 @@ package genCmn
 import (
 	"../shared"
 	"../util"
-	"./dbJson"
-	"fmt"
 	"log"
 	"os"
 	"testing"
 	"time"
 )
-
-func TestReadJsonFiles(t *testing.T) {
-	var data        *dbJson.Database
-    var err         error
-
-	t.Log("TestReadJsonFiles()")
-	sharedData.SetDebug(true)
-	sharedData.SetForce(false)
-	sharedData.SetNoop(true)
-	sharedData.SetQuiet(false)
-	sharedData.SetMdlDir("../models/")
-	sharedData.SetOutDir("/tmp/gen")
-	sharedData.SetTime(time.Now().Format("Mon Jan _2, 2006 15:04"))
-    sharedData.SetFunc("Time", sharedData.Time)
-    sharedData.SetDataPath("./test/db.json.txt")
-    sharedData.SetMainPath("./test/main.json.txt")
-
-	if err = readJsonFiles(); err != nil {
-		t.Errorf("ReadJsonFile() failed: %s\n", err)
-	}
-    data = dbJson.DbStruct()
-
-	if data.Name != "Finances" {
-		t.Errorf("ReadJsonFile() failed: Name should be 'Finances' but is '%s'\n", data.Name)
-	}
-	if len(data.Tables) != 2 {
-		t.Errorf("ReadJsonFile() failed: should be 1 tables but is %d\n", len(data.Tables))
-	}
-	if len(data.Tables[0].Fields) != 8 {
-		t.Errorf("ReadJsonFile() failed: should be 8 fields in table[0] but is %d\n", len(data.Tables[0].Fields))
-	}
-
-	t.Log("...End of TestReadJsonFiles")
-}
 
 func TestCreateModelPath(t *testing.T) {
 	var err         error

@@ -13,7 +13,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/2kranki/jsonpreprocess"
-	"golang.org/x/tools/go/gccgoexportdata"
 	"io"
 	"log"
 	"os"
@@ -25,9 +24,9 @@ import (
 	"time"
 )
 
-//----------------------------------------------------------------------------
+//============================================================================
 //                             Command Execution
-//----------------------------------------------------------------------------
+//============================================================================
 
 // os.Exec contains further details
 type ExecCmd struct {
@@ -324,9 +323,9 @@ func PanicIfErr(err error, args ...interface{}) {
 	panic(s)
 }
 
-//----------------------------------------------------------------------------
+//============================================================================
 //                             		Path
-//----------------------------------------------------------------------------
+//============================================================================
 
 // Path provides a centralized
 type Path struct {
@@ -384,6 +383,13 @@ func (p *Path) Clean( ) string {
 	return path
 }
 
+// Copy creates a new copy of the path.
+func (p *Path) Copy( ) *Path {
+	pth := Path{}
+	pth.str = p.str
+	return &pth
+}
+
 // CreateDir assumes that this path represents a
 // directory and creates it along with any parent
 // directories needed as well.
@@ -418,6 +424,15 @@ func (p *Path) DeleteFile( ) error {
 	}
 
 	return err
+}
+
+// Expand replaces ${var} or $var in the given path based on the
+// mapping function returning a new path.
+func (p *Path) Expand(mapping func(string) string) *Path {
+	pth := &Path{}
+	pth.str = os.Expand(p.str, mapping)
+	pth.str = filepath.Clean(pth.str)
+	return pth
 }
 
 // IsPathDir cleans up the supplied file path
@@ -604,23 +619,63 @@ func ReadJsonFileToData(jsonPath string, jsonOut interface{}) error {
 }
 
 //============================================================================
+//								String Builder
+//============================================================================
+
+// StringBuilder is a composition of strings.Builder so that
+// we can add supplemental functions such as formatted strings
+// easily.
+type StringBuilder struct {
+	str		strings.Builder
+}
+
+func NewStringBuilder() *StringBuilder {
+	sb := StringBuilder{}
+	return &sb
+}
+
+func (s StringBuilder) String( ) string {
+	return s.str.String()
+}
+
+// WriteString allows us to write a string to the buffer.
+func (s StringBuilder) WriteString(format string) error {
+	_, err := s.str.WriteString(format)
+	return err
+}
+
+// WriteStringf allows us to write a formatted string.
+func (s StringBuilder) WriteStringf(format string, a ...interface{}) error {
+	str := fmt.Sprintf(format, a...)
+	err := s.WriteString(str)
+	return err
+}
+
+//============================================================================
 //                            		Workers
 //============================================================================
 
+// WorkQueue represents a one use only structure to execute multiple
+// go routines easily.
 type WorkQueue struct {
 	queue		chan interface{}
 	ack			chan bool
 	done		chan bool
-	doWork		func(interface{})
-	complete	func()
 	size		int
 }
 
-func (w *WorkQueue) CloseInput() {
+func (w *WorkQueue) CloseQueue() {
 	close(w.queue)
 }
 
-func (w *WorkQueue) complete() {
+func (w *WorkQueue) CloseAndWaitForCompletion() {
+	close(w.queue)
+	<-w.done
+	close(w.ack)
+	close(w.done)
+}
+
+func (w *WorkQueue) Complete() {
 	w.done <- true
 }
 
@@ -628,30 +683,26 @@ func (w *WorkQueue) PushWork(i interface{}) {
 	w.queue <- i
 }
 
-func (w *WorkQueue) WaitForCompletion() {
-	<-w.done
-	w.Completed()
-}
+func NewWorkQueue(task func(a interface{}, cmn interface{}), cmn interface{}, s int) *WorkQueue {
 
-func NewWorkQueue(task func(interface{}), s int) *WorkQueue {
 	// Set up the Work Queue.
 	wq := &WorkQueue{}
-	wq.doWork = task
 	if s > 0 {
 		wq.size = s
 	} else {
 		wq.size = runtime.NumCPU()
 	}
+
 	// Now set up the actual queues needed.
 	wq.queue = make(chan interface{})
 	wq.ack = make(chan bool)
 	wq.done = make(chan bool)
-	for i := 0; i < r; i++ {
+	for i := 0; i < wq.size; i++ {
 		go func() {
 			for {
-				v, ok := <-input
+				v, ok := <-wq.queue
 				if ok {
-					task(v)
+					task(v, cmn)
 				} else {
 					wq.ack <- true
 					return
@@ -660,44 +711,12 @@ func NewWorkQueue(task func(interface{}), s int) *WorkQueue {
 		}()
 	}
 	go func() {
-		for i := 0; i < r; i++ {
+		for i := 0; i < wq.size; i++ {
 			<-wq.ack
 		}
-		wq.complete()
+		wq.Complete()
 	}()
 
-}
-
-// Workers allows us to perform r number of task(s) at a time until
-// all tasks are completed.  The input channel to run the task is
-// returned by this function. The caller of this function simply
-// puts to the returned input channel until all tasks have been inputted.
-// It then closes the channel indicating that there is no more data.
-// The function, completed, will be called when all of the input
-// has been processed.
-// Thanks to Vignesh Sk for his blog post on this.
-func Workers(task func(interface{}), completed func(), r int) chan interface{} {
-	input := make(chan interface{})
-	ack := make(chan bool)
-	for i := 0; i < r; i++ {
-		go func() {
-			for {
-				v, ok := <-input
-				if ok {
-					task(v)
-				} else {
-					ack <- true
-					return
-				}
-			}
-		}()
-	}
-	go func() {
-		for i := 0; i < r; i++ {
-			<-ack
-		}
-		completed()
-	}()
-	return input
+	return wq
 }
 
