@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 
-docker container rm -f postgres1
+name="postgres1"
+user="root"
+pw="Passw0rd!"
+server="localhost"
+port=5430
 
-docker container run --name postgres1 -e POSTGRES_PASSWORD='Passw0rd!' -p 5430:5432 -d postgres
+echo "Ignore message: Error: No such container: mssql1"
+docker container rm -f ${name}
 
+containerID=`docker container run --name ${name} -e "POSTGRES_PASSWORD=${pw}" -p ${port}:3306  -d postgres`
+
+#echo "Container ID: ${containerID: -10}"
+
+while ! `nc -z ${server} ${port}`; do sleep 3; done
+
+echo ..."Postgres SQL Server, ${name}:${containerID: -10}, has started with user:${user} pw:${pw} on ${server}:${port}!"
 

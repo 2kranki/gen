@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d2ab8454-5cac-44c2-8c87-7804cbe075e4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/testObj/test_obj01.json.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test_obj01.exec.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test_obj01.exec.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCObj/dbData.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCObj/dbData.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCObj/genCObj.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCObj/genCObj.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCObj/genTextFile.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/genCmn.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/genCmn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/genCmn_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/genCmn_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/tasks.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/tasks.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker/dockerContainer.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/docker/dockerContainer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/util/util.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/util/util_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/util/util_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/util.go" afterDir="false" />
-    </list>
+    <list default="true" id="d2ab8454-5cac-44c2-8c87-7804cbe075e4" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +13,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1541">
+            <state relative-caret-position="9900">
               <caret line="561" column="25" selection-start-line="561" selection-start-column="4" selection-end-line="561" selection-end-column="25" />
               <folding>
                 <element signature="e#137#266#0" expanded="true" />
@@ -43,9 +27,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="196">
               <caret line="510" column="94" selection-start-line="510" selection-start-column="94" selection-end-line="510" selection-end-column="94" />
-              <folding>
-                <element signature="e#1389#1702#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -53,7 +34,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2089">
+            <state relative-caret-position="2700">
               <caret line="163" selection-start-line="163" selection-end-line="163" />
             </state>
           </provider>
@@ -62,7 +43,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/genCmn/genCmn.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
+            <state relative-caret-position="2592">
               <caret line="153" selection-start-line="153" selection-end-line="153" />
             </state>
           </provider>
@@ -71,8 +52,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/genCmn/tasks.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="137" lean-forward="true" selection-start-line="137" selection-end-line="137" />
+            <state relative-caret-position="2340">
+              <caret line="137" selection-start-line="137" selection-end-line="137" />
               <folding>
                 <element signature="e#464#524#0" expanded="true" />
               </folding>
@@ -83,7 +64,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/util/util.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="339">
+            <state relative-caret-position="6750">
               <caret line="389" selection-start-line="389" selection-end-line="389" />
             </state>
           </provider>
@@ -279,7 +260,7 @@
     <frame x="64" y="63" width="1493" height="963" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5915751" visible="true" weight="0.31228313" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5915751" visible="true" weight="0.31783482" />
       <window_info id="Structure" order="1" sideWeight="0.4084249" side_tool="true" weight="0.29223433" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -559,23 +540,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genCObj/genCObjNew.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="67" column="5" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
-          <folding>
-            <element signature="e#467#569#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/genCObj/genTextFile.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="93">
-          <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genCObj/genCObjNew.go" />
+    <entry file="file://$PROJECT_DIR$/src/genCObj/genTextFile.go" />
     <entry file="file://$PROJECT_DIR$/src/mainData/mainData.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-438">
@@ -594,13 +560,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
           <caret line="27" column="19" selection-start-line="27" selection-start-column="19" selection-end-line="27" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2089">
-          <caret line="163" selection-start-line="163" selection-end-line="163" />
         </state>
       </provider>
     </entry>
@@ -624,16 +583,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1541">
-          <caret line="561" column="25" selection-start-line="561" selection-start-column="4" selection-end-line="561" selection-end-column="25" />
-          <folding>
-            <element signature="e#137#266#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/genCObj/genCObj.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
@@ -644,26 +593,43 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9900">
+          <caret line="561" column="25" selection-start-line="561" selection-start-column="4" selection-end-line="561" selection-end-column="25" />
+          <folding>
+            <element signature="e#137#266#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2700">
+          <caret line="163" selection-start-line="163" selection-end-line="163" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genCmn/genCmn.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2592">
+          <caret line="153" selection-start-line="153" selection-end-line="153" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/genCmn/tasks.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="137" lean-forward="true" selection-start-line="137" selection-end-line="137" />
+        <state relative-caret-position="2340">
+          <caret line="137" selection-start-line="137" selection-end-line="137" />
           <folding>
             <element signature="e#464#524#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genCmn/genCmn.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="153" selection-start-line="153" selection-end-line="153" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/util/util.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
+        <state relative-caret-position="6750">
           <caret line="389" selection-start-line="389" selection-end-line="389" />
         </state>
       </provider>

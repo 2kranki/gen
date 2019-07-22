@@ -1,0 +1,39 @@
+                            Microsoft SQL Docker Container (MSSQL)
+
+You can find the documentation on the MSSQL Docker container here:
+    https://hub.docker.com/_/mysql
+
+There are several commands that you will want to learn to use the container. First
+is:
+    pull mcr.microsoft.com/mssql/server:2017-latest
+
+This adds the MSSQL container image to your local Docker images. Once, you have it
+added to the images, you will want to run it. The following will do that with the
+defaults that the generated application will automatically use:
+    docker run --name mssql1 ’ACCEPT_EULA=Y’ -e ’SA_PASSWORD=Passw0rd!’ -p 1433:1433 -d microsoft/mssql-server-linux:2017-latest
+                            or
+    ./run.sh
+You may get a "missing mssql1" message and that is ok. Ignore it.  You can issue
+one run.sh after another, because it kills the one running and gives you a clean system
+to start over with.
+
+
+After you have it running, you can stop it with:
+    docker container stop mssql1
+
+And restart the stopped container with:
+    docker container start mssql1
+
+To delete the container that you created with the "run" command, you do
+    docker container rm -f mssql1
+                or
+    ./kill.sh
+
+This delete does get rid of the Docker container image. So, you will have to
+run.sh to create a fresh container.
+
+So, for testing, you issue the "run", then do your testing. If the database is
+no longer useable or you want to start from scratch, you simply do another "run".
+If you want to quit and get rid of the container, just do a "kill.sh"
+This is why testing using Docker is so great!
+

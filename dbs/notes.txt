@@ -12,16 +12,23 @@ use Docker.
 If you want to know about Docker internals and do things inside Docker containers,
 you should get a fundamental education on Linux and Bash that is what they are
 based on.  I run MacOS which is a Linux like operating system under the hood. So,
-I already understood Bash and the fundamentals.  I like MacOS a lot. I don't al-
-ways like Apple. lol  However, if you have an iphone, running an Apple computer
-works well.
-
-My experience so far is that Apple computers are more expensive, but they come
-with a lot of the software that you would have to buy for a Windows machine. So,
-it seems to be a wash.  Anyway, I have had good experiences with Apple so far.
+I already understood Bash and the fundamentals. 
 
 Back to Docker...
 
 Please look in the individual subdirectories to learn how I run the Docker
 containers for the various databases.
+
+To run an sql server, you will need the appropriate image.  Each subdirectory
+has a "pull.sh" which will get the image that I used for testing.
+
+When you have the image, you create containers to actually run the sql server.
+"run.sh" runs the appropriate server in a new container and "kill.sh" stops the
+container and deletes it. When you delete the container, you are also deleting
+any data within it. So, this works well for testing.
+
+If you just want to stop the container (ie not lose any data) and restart it
+later, you would use the "docker container stop" and "docker container start"
+commands. I will leave it up to you to figure out how to use them as a student
+exercise.
 

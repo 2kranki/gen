@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
-docker container rm -f mariadb1
+name="mariadb1"
+user="root"
+pw="Passw0rd!"
+server="localhost"
+port=4306
 
-docker container run --name mariadb1 -e MYSQL_ROOT_PASSWORD='Passw0rd!' -e MYSQL_DATABASE='Finances' -p 4306:3306  -d mariadb
+echo "Ignore message: Error: No such container: mssql1"
+docker container rm -f ${name}
 
+containerID=`docker container run --name ${name} -e "MYSQL_ROOT_PASSWORD=${pw}" -e "MYSQL_DATABASE='Finances'" -p ${port}:3306  -d mariadb`
 
+#echo "Container ID: ${containerID: -10}"
+
+while ! `nc -z ${server} ${port}`; do sleep 3; done
+
+echo ..."MariaDB SQL Server, ${name}:${containerID: -10}, has started with user:${user} pw:${pw} on ${server}:${port}!"
