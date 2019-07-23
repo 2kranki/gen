@@ -3,9 +3,23 @@
     * write any extra needed documentation
 
 * GenSqlApp:
+    * Add "docker image pull" to each of the "run.sh" so that it does not need
+        to be a separate step.
+        *   MariaDB
+        *   MSSQL
+        *   MySQL
+        *   Postgres
+    * MariaDB/MySQL support
+    * MSSQL support
+    * Postgres support
+    * Learn decimal library and start using it. Apply it accross all the SQL servers.
+    * Provide some form of data validation on the client and server side.
     * Clean up that all accesses to the generated struct must be with TitledName()
+    * Add server to client csv backup of a table.
     * Setup a Dockerfile and associated bash shells to run it so that we can
         containerize the generated application.
+    * Rewrite docker image/container stuff using the docker go SDK which I just
+        became aware of.
     * Main Menu Generation
         * Allow file path to be selected for Load and Save CSV
         * make it prettier lol
@@ -31,6 +45,8 @@
         * Add Foreign Key support into the JSON (needs table name and key name)
     * If we included the field/table tables in doPkg in the io package, we might be
         able to generate a more table-driven application that required less code generation.
+    * Several local developers have mentioned using javascript exclusively in the
+        client. Look into this.
 * possibly json to struct converter and vice versa
 * Add optional monitoring/statistics in the handler and io packages,
     need data extraction as well.

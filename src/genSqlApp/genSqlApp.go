@@ -278,6 +278,14 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 }
 
 var FileDefs2 []genCmn.FileDefn = []genCmn.FileDefn{
+	{"dbs",
+		[]string{""},
+		"",
+		"copyDir",
+		0644,
+		"single",
+		0,
+	},
 	{"docker",
 		[]string{"src"},
 		"",
