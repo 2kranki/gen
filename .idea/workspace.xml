@@ -2,28 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2ab8454-5cac-44c2-8c87-7804cbe075e4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Todo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mariadb/exec.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mariadb/kill.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mariadb/notes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mariadb/run.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mssql/docker-ip.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mssql/exec.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mssql/kill.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mssql/notes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mssql/pull.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mssql/run.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mysql/docker-ip.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mysql/exec.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mysql/kill.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mysql/notes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/mysql/run.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/notes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/postgres/exec.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/postgres/kill.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/postgres/notes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dbs/postgres/run.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/test01/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01/db.json.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/run.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -45,20 +26,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="186">
-              <caret line="281" column="18" lean-forward="true" selection-start-line="281" selection-start-column="18" selection-end-line="281" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Todo.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="10" column="20" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
+              <caret line="281" column="18" selection-start-line="281" selection-start-column="18" selection-end-line="281" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -149,7 +121,6 @@
         <option value="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/main.menu.html.tmpl.txt" />
-        <option value="$PROJECT_DIR$/misc/test01/db.json.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/tst.sh.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.test.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" />
@@ -176,6 +147,7 @@
         <option value="$PROJECT_DIR$/src/util/util.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" />
         <option value="$PROJECT_DIR$/Todo.txt" />
+        <option value="$PROJECT_DIR$/misc/test01/db.json.txt" />
       </list>
     </option>
   </component>
@@ -200,7 +172,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -208,10 +179,22 @@
               <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
               <item name="genapp" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="misc" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="misc" type="462c0819:PsiDirectoryNode" />
+              <item name="test01" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -274,7 +257,7 @@
     <frame x="64" y="63" width="1493" height="963" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5915751" visible="true" weight="0.32338655" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.5915751" visible="true" weight="0.32893825" />
       <window_info id="Structure" order="1" sideWeight="0.4084249" side_tool="true" weight="0.29223433" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -424,13 +407,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-3951">
           <caret line="158" column="55" selection-start-line="158" selection-start-column="55" selection-end-line="158" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/misc/test01/db.json.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="24" column="22" selection-start-line="24" selection-start-column="22" selection-end-line="24" selection-end-column="22" />
         </state>
       </provider>
     </entry>
@@ -641,17 +617,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="281" column="18" lean-forward="true" selection-start-line="281" selection-start-column="18" selection-end-line="281" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Todo.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="10" column="20" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/test01/db.json.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="13" column="32" selection-start-line="13" selection-start-column="32" selection-end-line="13" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="281" column="18" selection-start-line="281" selection-start-column="18" selection-end-line="281" selection-end-column="18" />
         </state>
       </provider>
     </entry>
