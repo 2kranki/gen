@@ -679,8 +679,16 @@ func ReadJsonFile(fn string) error {
 	}
 
 	// Set up Plugin Support for this database type.
+	if sharedData.Debug() {
+		log.Printf("\t\tSqtype: %s\n", dbStruct.SqlType)
+	}
 	if plg, err = dbPlugin.FindPlugin(dbStruct.SqlType); err != nil {
 		return fmt.Errorf("Error: Can't find plugin for %s!\n\n\n", dbStruct.SqlType)
+	}
+	if sharedData.Debug() {
+		log.Printf("\t\tPlugin Type: %T\n", plg)
+		log.Printf("\t\tPlugin: %+v\n", plg)
+		log.Printf("\t\tPlugin.Plugin: %+v\n", plg.Plugin)
 	}
 	err = SetupPlugin(plg)
 	if err != nil {
@@ -704,9 +712,6 @@ func SetupPlugin(plg dbPlugin.PluginData) error {
 	// Validate the Plugin if possible.
 	if plg.Types == nil {
 		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", dbStruct.SqlType)
-	}
-	if plg.Plugin == nil {
-		return fmt.Errorf("Error: Plugin missing support for %s!\n\n\n", dbStruct.SqlType)
 	}
 
 	// Save the plugin.

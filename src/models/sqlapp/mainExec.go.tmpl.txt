@@ -7,6 +7,8 @@
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
 
 package main
 
@@ -157,7 +159,7 @@ func exec() {
     // Set up the Table I/O.
 	[[range $t := $d.Tables -]]
         [[- $tn := $t.TitledName]]
-	    io[[$dn]][[$tn]] := io[[$dn]][[$tn]].[[$tn]]New(io[[$dn]].Sql())
+	    io[[$dn]][[$tn]] := io[[$dn]][[$tn]].[[$tn]]New(io[[$dn]])
         if io[[$dn]][[$tn]] == nil {
             log.Fatalf("ERROR - Failed to Connect to Table, [[$dn]][[$tn]]\n\n\n")
         }

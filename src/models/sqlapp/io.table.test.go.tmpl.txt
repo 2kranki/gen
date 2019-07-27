@@ -4,12 +4,15 @@
 // io[[.Table.TitledName]]_test tests various functions of
 // the Table SQL Maintenance methods.
 
-// Generated: [[Time]]
 [[- $dot := .]]
 [[- $d   := .TD.Data]]
 [[- $dn  := .TD.Data.TitledName]]
 [[- $t   := .Table]]
 [[- $tn  := .Table.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
 
 package io[[$dn]][[$tn]]
 

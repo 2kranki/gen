@@ -12,19 +12,22 @@
 //      immediately followed by "defer rows.Close()".  Queries that
 //      return a "row" need not be closed.
 
-// Generated: [[Time]]
 [[$td := .TD]]
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
 [[- $t  := .Table]]
 [[- $tn := .Table.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
 
 package io[[$dn]][[$tn]]
 
 import (
     "database/sql"
-	"errors"
+	"fmt"
     _ "github.com/shopspring/decimal"
     [[if GenDebugging]]
         "log"
@@ -32,9 +35,10 @@ import (
 	_ "strconv"
 	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
 	"../[[$dn]][[$tn]]"
+	"../io[[$dn]]"
 )
 
-
+[[$d.Plugin.Plugin.GenHeader]]
 
 //============================================================================
 //                              Miscellaneous
@@ -55,8 +59,33 @@ func ErrorString(err error) string {
 //============================================================================
 
 type IO_[[$tn]] struct {
-    dbSql       *sql.DB
+    io          *io[[$dn]].IO_[[$dn]]
 }
+
+func (io *IO_[[$tn]]) Sql() *sql.DB {
+    return io.io.Sql()
+}
+
+//----------------------------------------------------------------------------
+//                             Database Use
+//----------------------------------------------------------------------------
+
+// TableDelete deletes the table in the given database if present.
+func (io *IO_[[$tn]]) DatabaseUse() error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("io[[$tn]].DatabaseUse()\n")
+    [[end]]
+
+    err = io.io.DatabaseUse()
+
+    [[if GenDebugging]]
+        log.Printf("...end io[[$tn]].DatabaseUse(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
 
 //----------------------------------------------------------------------------
 //                             Row Delete
@@ -71,12 +100,12 @@ func (io *IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowDelete()\n")
     [[end]]
 
-	_, err = io.dbSql.Exec(sqlStmt, [[$t.KeysList "rcd." ""]])
+	err = io.io.Exec(sqlStmt, [[$t.KeysList "rcd." ""]])
 	if err != nil {
         [[if GenDebugging]]
             log.Printf("...end io[[$tn]].RowDelete(Error:500) - Internal Error\n")
         [[end]]
-		return errors.New("500. Internal Server Error")
+		return fmt.Errorf("500. Internal Server Error")
 	}
 
     [[if GenDebugging]]
@@ -99,7 +128,7 @@ func (io *IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowFind(%+v)\n", rcd)
     [[end]]
 
-	row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+	row := io.Sql().QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 
@@ -124,7 +153,7 @@ func (io *IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowFirst()\n")
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt)
+    row := io.Sql().QueryRow(sqlStmt)
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
@@ -156,12 +185,12 @@ func (io *IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    _, err = io.dbSql.Exec(sqlStmt, [[$t.InsertNameList "d."]])
+    err = io.io.Exec(sqlStmt, [[$t.InsertNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowInsert(Error:500) - Internal Error\n")
     [[end]]
-		err = errors.New("500. Internal Server Error." + err.Error())
+		err = fmt.Errorf("500. Internal Server Error. %s\n", err.Error())
 	}
 
     [[if GenDebugging]]
@@ -182,7 +211,7 @@ func (io *IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowLast(%+v)\n", rcd)
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt)
+    row := io.Sql().QueryRow(sqlStmt)
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
@@ -212,7 +241,7 @@ func (io *IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowNext(%+v)\n", rcd)
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+    row := io.Sql().QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err != nil {
@@ -242,7 +271,7 @@ func (io *IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], 
         log.Printf("io[[$tn]].RowPage(%d,%d)\n",offset,limit)
     [[end]]
 
-    rows, err := io.dbSql.Query(sqlStmt, limit, offset)
+    rows, err := io.Sql().Query(sqlStmt, limit, offset)
 	if err != nil {
 	    return data, err
 	}
@@ -276,7 +305,7 @@ func (io *IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowPrev(%+v)\n", rcd)
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+    row := io.Sql().QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err != nil {
@@ -304,12 +333,12 @@ func (io *IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    _, err = io.dbSql.Exec(sqlStmt, [[$t.FieldNameList "d."]])
+    err = io.io.Exec(sqlStmt, [[$t.FieldNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowUpdate(Error:500) - Internal Error\n")
     [[end]]
-		err = errors.New("500. Internal Server Error." + err.Error())
+		err = fmt.Errorf("500. Internal Server Error. %s\n", err.Error())
 	}
 
     [[if GenDebugging]]
@@ -332,7 +361,7 @@ func (io *IO_[[$tn]]) TableCount( ) (int, error) {
         log.Printf("io[[$tn]].TableCount()\n")
     [[end]]
 
-    row := io.dbSql.QueryRow(sqlStmt)
+    row := io.Sql().QueryRow(sqlStmt)
 
 	err = row.Scan(&count)
     if err != nil {
@@ -370,7 +399,7 @@ func (io *IO_[[$tn]]) TableCreate() error {
         [[end]]
         return err
     }
-    _, err = io.dbSql.Exec(sqlStmt)
+    err = io.io.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].TableCreate(%s)\n", ErrorString(err))
@@ -392,7 +421,7 @@ func (io *IO_[[$tn]]) TableDelete() error {
         log.Printf("\tSQL:\n%s\n", sqlStmt)
     [[end]]
 
-    _, err = io.dbSql.Exec(sqlStmt)
+    err = io.io.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].TableDelete(%s)\n", ErrorString(err))
@@ -400,14 +429,19 @@ func (io *IO_[[$tn]]) TableDelete() error {
     return err
 }
 
+
+[[$d.Plugin.Plugin.GenTrailer]]
+
+
+
 //----------------------------------------------------------------------------
 //                                  New
 //----------------------------------------------------------------------------
 
 // New creates a new io struct.
-func [[$tn]]New(dbSql *sql.DB) *IO_[[$tn]] {
+func [[$tn]]New(io *io[[$dn]].IO_[[$dn]]) *IO_[[$tn]] {
     db := &IO_[[$tn]]{}
-    db.dbSql = dbSql
+    db.io = io
     return db
 }
 

@@ -15,7 +15,9 @@ package dbGener
 
 import (
 	"../../shared"
+	"../../util"
 	"../dbJson"
+	"../dbPlugin"
 	"fmt"
 	"log"
 	"strings"
@@ -37,6 +39,19 @@ import (
 // if there is only one statement ever generated.  That is because some servers
 // such as Microsoft's SQL Server may not do anything until an additional statement
 // is issued such as "go".
+
+//----------------------------------------------------------------------------
+//               Exec/Query Error Processing Interface Support
+//----------------------------------------------------------------------------
+
+type GenExecErrorChecker interface {
+	GenExecErrorCheck(db *dbJson.Database) string
+}
+
+type GenQueryErrorChecker interface {
+	GenQueryErrorCheck(db *dbJson.Database) string
+}
+
 
 //----------------------------------------------------------------------------
 //                        	Database SQL Interface Support
@@ -152,6 +167,40 @@ type GenPlaceHolderer interface {
 
 
 //----------------------------------------------------------------------------
+//               Exec/Query Error Processing Interface Support
+//----------------------------------------------------------------------------
+
+func GenExecErrorCheck(db *dbJson.Database) string {
+	var str			util.StringBuilder
+	var intr		GenExecErrorChecker
+	var ok			bool
+
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenExecErrorChecker)
+	if ok {
+		return intr.GenExecErrorCheck(db)
+	}
+
+	return str.String()
+}
+
+func GenQueryErrorCheck(db *dbJson.Database) string {
+	var str			util.StringBuilder
+	var intr		GenQueryErrorChecker
+	var ok			bool
+
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenQueryErrorChecker)
+	if ok {
+		return intr.GenQueryErrorCheck(db)
+	}
+
+	return str.String()
+}
+
+//----------------------------------------------------------------------------
 //						Global Database Support Functions
 //----------------------------------------------------------------------------
 
@@ -160,7 +209,9 @@ func GenDatabaseCreateStmt(db *dbJson.Database) string {
 	var intr		GenDatabaseCreateStmter
 	var ok			bool
 
-	intr, ok = db.Plugin.(GenDatabaseCreateStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenDatabaseCreateStmter)
 	if ok {
 		return intr.GenDatabaseCreateStmt(db)
 	}
@@ -182,12 +233,14 @@ func GenDatabaseDeleteStmt(db *dbJson.Database) string {
 	var intr		GenDatabaseDeleteStmter
 	var ok			bool
 
-	intr, ok = db.Plugin.(GenDatabaseDeleteStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenDatabaseDeleteStmter)
 	if ok {
 		return intr.GenDatabaseDeleteStmt(db)
 	}
 
-	str.WriteString(fmt.Sprintf("DELETE DATABASE IF EXISTS %s;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", db.TitledName()))
 	if db.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -205,7 +258,9 @@ func GenTableCountStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenTableCountStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenTableCountStmter)
 	if ok {
 		return intr.GenTableCountStmt(t)
 	}
@@ -225,7 +280,9 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 	var hasKeys		bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenTableCreateStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenTableCreateStmter)
 	if ok {
 		return intr.GenTableCreateStmt(t)
 	}
@@ -305,7 +362,9 @@ func GenTableDeleteStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenTableDeleteStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenTableDeleteStmter)
 	if ok {
 		return intr.GenTableDeleteStmt(t)
 	}
@@ -328,7 +387,9 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowDeleteStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowDeleteStmter)
 	if ok {
 		return intr.GenRowDeleteStmt(t)
 	}
@@ -348,7 +409,9 @@ func GenRowFindStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowFindStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowFindStmter)
 	if ok {
 		return intr.GenRowFindStmt(t)
 	}
@@ -367,7 +430,9 @@ func GenRowFirstStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowFirstStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowFirstStmter)
 	if ok {
 		return intr.GenRowFirstStmt(t)
 	}
@@ -386,7 +451,9 @@ func GenRowInsertStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowInsertStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowInsertStmter)
 	if ok {
 		return intr.GenRowInsertStmt(t)
 	}
@@ -405,7 +472,9 @@ func GenRowLastStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowLastStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowLastStmter)
 	if ok {
 		return intr.GenRowLastStmt(t)
 	}
@@ -424,7 +493,9 @@ func GenRowNextStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowNextStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowNextStmter)
 	if ok {
 		return intr.GenRowNextStmt(t)
 	}
@@ -444,7 +515,9 @@ func GenRowPageStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowPageStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowPageStmter)
 	if ok {
 		return intr.GenRowPageStmt(t)
 	}
@@ -464,7 +537,9 @@ func GenRowPrevStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowPrevStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowPrevStmter)
 	if ok {
 		return intr.GenRowPrevStmt(t)
 	}
@@ -483,7 +558,9 @@ func GenRowUpdateStmt(t *dbJson.DbTable) string {
 	var ok			bool
 
 	db := t.DB
-	intr, ok = db.Plugin.(GenRowUpdateStmter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowUpdateStmter)
 	if ok {
 		return intr.GenRowUpdateStmt(t)
 	}
@@ -511,7 +588,9 @@ func GenFormDataDisplay(tb *dbJson.DbTable) string {
 	var err			error
 
 	db := tb.DB
-	intr, ok = db.Plugin.(GenFormDataDisplayer)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenFormDataDisplayer)
 	if ok {
 		return intr.GenFormDataDisplay(tb)
 	}
@@ -595,7 +674,9 @@ func GenFormDataKeyGet(tb *dbJson.DbTable) string {
 	var err			error
 
 	db := tb.DB
-	intr, ok = db.Plugin.(GenFormDataKeyGetter)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenFormDataKeyGetter)
 	if ok {
 		return intr.GenFormDataKeyGet(tb)
 	}
@@ -619,7 +700,9 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 	var keys  		[]string
 
 	db := tb.DB
-	intr, ok = db.Plugin.(GenFormDataKeyser)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenFormDataKeyser)
 	if ok {
 		return intr.GenFormDataKeys(tb)
 	}
@@ -653,7 +736,9 @@ func GenDataPlaceHolder(tb *dbJson.DbTable) string {
 	var ok			bool
 
 	db := tb.DB
-	intr, ok = db.Plugin.(GenPlaceHolderer)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenPlaceHolderer)
 	if ok {
 		return intr.GenDataPlaceHolder(tb)
 	}
@@ -678,7 +763,9 @@ func GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
 	var ok			bool
 
 	db := tb.DB
-	intr, ok = db.Plugin.(GenPlaceHolderer)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenPlaceHolderer)
 	if ok {
 		return intr.GenKeySearchPlaceHolder(tb, rel)
 	}
@@ -703,7 +790,9 @@ func GenKeysPlaceHolder(tb *dbJson.DbTable) string {
 	var ok			bool
 
 	db := tb.DB
-	intr, ok = db.Plugin.(GenPlaceHolderer)
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenPlaceHolderer)
 	if ok {
 		return intr.GenKeysPlaceHolder(tb)
 	}
@@ -730,6 +819,8 @@ func GenKeysPlaceHolder(tb *dbJson.DbTable) string {
 // init() is called before main(). Here we define the functions that will be
 // used in the templates.
 func init() {
+	sharedData.SetFunc("GenExecErrorCheck", GenExecErrorCheck)
+	sharedData.SetFunc("GenQueryErrorCheck", GenQueryErrorCheck)
 	sharedData.SetFunc("GenDatabaseCreateStmt", GenDatabaseCreateStmt)
 	sharedData.SetFunc("GenDatabaseDeleteStmt", GenDatabaseDeleteStmt)
 	sharedData.SetFunc("GenTableCountStmt", GenTableCountStmt)

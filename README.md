@@ -60,7 +60,7 @@ a little different on my system and it might be that way for you.  Remember that
 connection parameters from the command line.  To see the arguments, just run "/tmp/bin/app --help" and it
 will display them.
 
-I am running this on MacOSX for now with golang v1.12.1.  I will adapt the above for Windows at some point.
+I am running this on MacOSX for now with golang v1.12.7.  I will adapt the above for Windows at some point.
 My editor is Goland from Intellij.  It has worked well for me.
 
 I have added repository, app01. It contains the latest output of *genapp* for the Test01

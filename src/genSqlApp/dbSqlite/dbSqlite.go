@@ -13,6 +13,8 @@ package dbSqlite
 
 import (
 	"../../shared"
+	"../../util"
+	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
@@ -41,7 +43,7 @@ var tds	= dbType.TypeDefns {
 	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
 	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},
-	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
+	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"time.Time",	DftLen:0,},
 	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
 }
 
@@ -60,6 +62,36 @@ func (pd Plugin) CreateDatabase() bool {
 	return false
 }
 
+// DefaultDatabase returns default database name.
+func (pd *Plugin) DefaultDatabase(db *dbJson.Database) string {
+	return db.TitledName()+".db"
+}
+
+// DefaultPort returns default docker port.
+func (pd *Plugin) DefaultPort() string {
+	return ""
+}
+
+// DefaultPW returns default docker password.
+func (pd *Plugin) DefaultPW() string {
+	return ""
+}
+
+// DefaultServer returns default docker server name.
+func (pd *Plugin) DefaultServer() string {
+	return ""
+}
+
+// DefaultUser returns default docker user.
+func (pd *Plugin) DefaultUser() string {
+	return ""
+}
+
+// DriverName returns the name to be used on pkg database sql.Open calls
+func (pd *Plugin) DriverName() string {
+	return "sqlite3"
+}
+
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
@@ -68,6 +100,14 @@ func (pd Plugin) GenFlagArgDefns(name string) string {
 
 	wk = fmt.Sprintf("\tflag.StringVar(&db_name,\"dbName\",\"%s.db\",\"the database path\")\n", name)
 	str.WriteString(wk)
+	return str.String()
+}
+
+// GenHeader returns any header information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenHeader() string {
+	var str			util.StringBuilder
+
 	return str.String()
 }
 
@@ -80,7 +120,7 @@ func (pd Plugin) GenImportString() string {
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
 func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 
 	str.WriteString("\tconnStr := fmt.Sprintf(\"%s\", ")
 	str.WriteString(dbName)
@@ -88,9 +128,15 @@ func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) str
 	if sharedData.GenDebugging() {
 		str.WriteString("\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n")
 	}
-	str.WriteString("\t")
-	str.WriteString(dbSql)
-	str.WriteString(", err = sql.Open(\"sqlite3\", connStr)\n")
+	str.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+
+	return str.String()
+}
+
+// GenTrailer returns any trailer information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenTrailer() string {
+	var str			util.StringBuilder
 
 	return str.String()
 }

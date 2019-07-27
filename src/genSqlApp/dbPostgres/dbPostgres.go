@@ -1,5 +1,8 @@
 // See License.txt in main repository directory
 
+// https://github.com/lib/pq  			<== Driver being used
+// https://godoc.org/github.com/lib/pq
+
 // dbPostgres is the plugin for PostgreSQL and  contains the
 // data and functions specific for PostgreSQL to generate
 // table and field data for html forms, handlers and
@@ -9,6 +12,7 @@ package dbPostgres
 
 import (
 	"../../shared"
+	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
@@ -54,6 +58,31 @@ func (pd Plugin) CreateDatabase() bool {
 	return false
 }
 
+// DefaultDatabase returns default database name.
+func (pd *Plugin) DefaultDatabase(db *dbJson.Database) string {
+	return db.TitledName()
+}
+
+// DefaultPort returns default docker port.
+func (pd *Plugin) DefaultPort() string {
+	return "5430"
+}
+
+// DefaultPW returns default docker password.
+func (pd *Plugin) DefaultPW() string {
+	return "Passw0rd!"
+}
+
+// DefaultServer returns default docker server name.
+func (pd *Plugin) DefaultServer() string {
+	return "localhost"
+}
+
+// DefaultUser returns default docker user.
+func (pd *Plugin) DefaultUser() string {
+	return "postgres"
+}
+
 // DockerName returns docker name used to pull the image.
 func (pd Plugin) DockerName() string {
 	return "postgres"
@@ -62,6 +91,11 @@ func (pd Plugin) DockerName() string {
 // DockerTag returns docker tag used to pull the image.
 func (pd Plugin) DockerTag() string {
 	return "11.3"
+}
+
+// DriverName returns the name to be used on pkg database sql.Open calls
+func (pd *Plugin) DriverName() string {
+	return "postgres"
 }
 
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the

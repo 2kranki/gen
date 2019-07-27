@@ -634,18 +634,22 @@ func NewStringBuilder() *StringBuilder {
 	return &sb
 }
 
-func (s StringBuilder) String( ) string {
+func (s *StringBuilder) Len( ) int {
+	return s.str.Len()
+}
+
+func (s *StringBuilder) String( ) string {
 	return s.str.String()
 }
 
 // WriteString allows us to write a string to the buffer.
-func (s StringBuilder) WriteString(format string) error {
+func (s *StringBuilder) WriteString(format string) error {
 	_, err := s.str.WriteString(format)
 	return err
 }
 
 // WriteStringf allows us to write a formatted string.
-func (s StringBuilder) WriteStringf(format string, a ...interface{}) error {
+func (s *StringBuilder) WriteStringf(format string, a ...interface{}) error {
 	str := fmt.Sprintf(format, a...)
 	err := s.WriteString(str)
 	return err

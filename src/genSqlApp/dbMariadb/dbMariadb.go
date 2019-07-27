@@ -9,6 +9,7 @@ package dbMariadb
 
 import (
 	"../../shared"
+	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
@@ -55,6 +56,31 @@ func (pd Plugin) CreateDatabase() bool {
 	return false
 }
 
+// DefaultDatabase returns default database name.
+func (pd *Plugin) DefaultDatabase(db *dbJson.Database) string {
+	return db.TitledName()
+}
+
+// DefaultPort returns default docker port.
+func (pd *Plugin) DefaultPort() string {
+	return "4306"
+}
+
+// DefaultPW returns default docker password.
+func (pd *Plugin) DefaultPW() string {
+	return "Passw0rd!"
+}
+
+// DefaultServer returns default docker server name.
+func (pd *Plugin) DefaultServer() string {
+	return "localhost"
+}
+
+// DefaultUser returns default docker user.
+func (pd *Plugin) DefaultUser() string {
+	return "root"
+}
+
 // DockerName returns docker name used to pull the image.
 func (pd Plugin) DockerName() string {
 	return "mariadb"
@@ -63,6 +89,11 @@ func (pd Plugin) DockerName() string {
 // DockerTag returns docker tag used to pull the image.
 func (pd Plugin) DockerTag() string {
 	return "5.5"
+}
+
+// DriverName returns the name to be used on pkg database sql.Open calls
+func (pd *Plugin) DriverName() string {
+	return "mysql"
 }
 
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
@@ -98,7 +129,7 @@ func (pd Plugin) GenSqlOpen() []string {
 	if sharedData.GenDebugging() {
 		strs = append(strs, "\tlog.Printf(\"\\tConnecting to mariadb using %s\\n\", connStr)\n")
 	}
-	strs = append(strs, "\tdb, err = sql.Open(\"mysql\", connStr)\n")
+	//FIXME: strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
 
 	return strs
 }

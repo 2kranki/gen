@@ -5,7 +5,7 @@ name="mssql1"
 user="SA"
 pw="Passw0rd!"
 server="localhost"
-port=1433
+port=1401
 dockerName="mcr.microsoft.com/mssql/server"
 dockerTag="2017-latest-ubuntu"
 

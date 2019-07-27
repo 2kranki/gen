@@ -9,11 +9,11 @@ package dbMysql
 
 import (
 	"../../shared"
+	"../../util"
+	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
-	"fmt"
 	"log"
-	"strings"
 )
 
 const(
@@ -55,6 +55,31 @@ func (pd Plugin) CreateDatabase() bool {
 	return false
 }
 
+// DefaultDatabase returns default database name.
+func (pd *Plugin) DefaultDatabase(db *dbJson.Database) string {
+	return db.TitledName()
+}
+
+// DefaultPort returns default docker port.
+func (pd *Plugin) DefaultPort() string {
+	return "3306"
+}
+
+// DefaultPW returns default docker password.
+func (pd *Plugin) DefaultPW() string {
+	return "Passw0rd!"
+}
+
+// DefaultServer returns default docker server name.
+func (pd *Plugin) DefaultServer() string {
+	return "localhost"
+}
+
+// DefaultUser returns default docker user.
+func (pd *Plugin) DefaultUser() string {
+	return "root"
+}
+
 // DockerName returns docker name used to pull the image.
 func (pd Plugin) DockerName() string {
 	return "mysql"
@@ -65,18 +90,21 @@ func (pd Plugin) DockerTag() string {
 	return "5.7"
 }
 
+// DriverName returns the name to be used on pkg database sql.Open calls
+func (pd *Plugin) DriverName() string {
+	return "mysql"
+}
+
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
-	var str			strings.Builder
-	var wk			string
+	var str			util.StringBuilder
 
-	str.WriteString("\tflag.StringVar(&db_pw,\"dbPW\",\"Passw0rd!\",\"the database password\")\n")
-	str.WriteString("\tflag.StringVar(&db_port,\"dbPort\",\"3306\",\"the database port\")\n")
-	str.WriteString("\tflag.StringVar(&db_srvr,\"dbServer\",\"localhost\",\"the database server\")\n")
-	str.WriteString("\tflag.StringVar(&db_user,\"dbUser\",\"root\",\"the database user\")\n")
-	wk = fmt.Sprintf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
-	str.WriteString(wk)
+	str.WriteStringf("\tflag.StringVar(&db_pw,\"dbPW\",\"%s\",\"the database password\")\n", pd.DefaultPW())
+	str.WriteStringf("\tflag.StringVar(&db_port,\"dbPort\",\"%s\",\"the database port\")\n", pd.DefaultPort())
+	str.WriteStringf("\tflag.StringVar(&db_srvr,\"dbServer\",\"%s\",\"the database server\")\n", pd.DefaultServer())
+	str.WriteStringf("\tflag.StringVar(&db_user,\"dbUser\",\"%s\",\"the database user\")\n", pd.DefaultUser())
+	str.WriteStringf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
 	return str.String()
 }
 

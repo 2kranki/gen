@@ -45,6 +45,10 @@ func ErrorString(err error) string {
 //                             Database Interfaces
 //============================================================================
 
+type DbDatabaseUser interface {
+    DatabaseUse() error
+}
+
 type DbRowDeleter interface {
     // RowDelete deletes the row with keys from the provided record, rcd.
     RowDelete(rcd *[[$tn]]) error

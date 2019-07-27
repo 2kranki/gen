@@ -13,6 +13,8 @@
     * MSSQL support
     * Postgres support
     * Learn decimal library and start using it. Apply it accross all the SQL servers.
+    * Look into https://github.com/jmoiron/sqlx
+    * Look into https://gorm.io and https://xorm.io Both have a lot of stars.
     * Provide some form of data validation on the client and server side.
     * Clean up that all accesses to the generated struct must be with TitledName()
     * Add server to client csv backup of a table.

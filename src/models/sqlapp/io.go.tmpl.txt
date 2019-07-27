@@ -7,16 +7,18 @@
 // specific Table Maintenance Methods. Those are maintained
 // in separate packages.
 
-// Generated: [[Time]]
 [[- $dot := .]]
-[[- $d  := .TD.Data]]
-[[- $dn := .TD.Data.TitledName]]
+[[- $d   := .TD.Data]]
+[[- $dn  := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
 
 package io[[$dn]]
 
 import (
     "database/sql"
-	"errors"
     "fmt"
     [[if GenDebugging]]
         "log"
@@ -28,6 +30,7 @@ import (
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
+[[$d.Plugin.Plugin.GenHeader]]
 
 //============================================================================
 //                            IO_[[$dn]]
@@ -42,42 +45,42 @@ type IO_[[$dn]] struct {
     dbUser     	string
 }
 
-func (io *IO_[[$dn]]) Name () string {
+func (io *IO_[[$dn]]) Name() string {
     return io.dbName
 }
-func (io *IO_[[$dn]]) SetName (str string) {
+func (io *IO_[[$dn]]) SetName(str string) {
     io.dbName = str
 }
 
-func (io *IO_[[$dn]]) PW () string {
+func (io *IO_[[$dn]]) PW() string {
     return io.dbPW
 }
-func (io *IO_[[$dn]]) SetPW (str string) {
+func (io *IO_[[$dn]]) SetPW(str string) {
     io.dbPW = str
 }
 
-func (io *IO_[[$dn]]) Port () string {
+func (io *IO_[[$dn]]) Port() string {
     return io.dbPort
 }
-func (io *IO_[[$dn]]) SetPort (str string) {
+func (io *IO_[[$dn]]) SetPort(str string) {
     io.dbPort = str
 }
 
-func (io *IO_[[$dn]]) Server () string {
+func (io *IO_[[$dn]]) Server() string {
     return io.dbServer
 }
-func (io *IO_[[$dn]]) SetServer (str string) {
+func (io *IO_[[$dn]]) SetServer(str string) {
     io.dbServer = str
 }
 
-func (io *IO_[[$dn]]) Sql () *sql.DB {
+func (io *IO_[[$dn]]) Sql() *sql.DB {
     return io.dbSql
 }
 
-func (io *IO_[[$dn]]) User () string {
+func (io *IO_[[$dn]]) User() string {
     return io.dbUser
 }
-func (io *IO_[[$dn]]) SetUser (str string) {
+func (io *IO_[[$dn]]) SetUser(str string) {
     io.dbUser = str
 }
 
@@ -112,29 +115,11 @@ func (io *IO_[[$dn]]) SetUser (str string) {
 
 // Set up default parameters for the needed SQL Type.
 func (io *IO_[[$dn]]) DefaultParms() {
-	[[ if eq $d.SqlType "mariadb" ]]
-		io.SetPort("4306")
-		io.SetPW("Passw0rd!")
-		io.SetServer("127.0.0.1")
-		io.SetUser("root")
-	[[ else if eq $d.SqlType  "mssql" ]]
-		io.SetPort("1401")
-		io.SetPW("Passw0rd!")
-		io.SetServer("localhost")
-		io.SetUser("SA")
-	[[ else if eq $d.SqlType "mysql" ]]
-		io.SetPort("3306")
-		io.SetPW("Passw0rd!")
-		io.SetServer("127.0.0.1")
-		io.SetUser("root")
-	[[ else if eq $d.SqlType "postgres" ]]
-		io.SetPort("5432")
-		io.SetPW("Passw0rd!")
-		io.SetServer("localhost")
-		io.SetUser("postgres")
-	[[ else if eq $d.SqlType "sqlite" ]]
-		io.SetName("test.db")
-	[[ end ]]
+		io.SetPort("[[$d.Plugin.Plugin.DefaultPort]]")
+		io.SetPW("[[$d.Plugin.Plugin.DefaultPW]]")
+		io.SetServer("[[$d.Plugin.Plugin.DefaultServer]]")
+		io.SetUser("[[$d.Plugin.Plugin.DefaultUser]]")
+		io.SetName("[[$d.Plugin.Plugin.DefaultDatabase $d]]")
 }
 
 //============================================================================
@@ -147,10 +132,12 @@ func (io *IO_[[$dn]]) Connect() error {
     var err         error
 
 	[[$d.Plugin.Plugin.GenSqlOpen "io.dbSql" "io.dbServer" "io.dbPort" "io.dbUser" "io.dbPW" "io.dbName"]]
-
     if err != nil {
         log.Fatalln("Error: Cannot Connect: ", err)
     }
+    [[if GenDebugging]]
+        log.Printf("Pinging Server...\n")
+    [[end]]
     err = io.dbSql.Ping()
     if err != nil {
         io.Disconnect( )
@@ -158,18 +145,24 @@ func (io *IO_[[$dn]]) Connect() error {
     }
 
     [[if $d.Plugin.Plugin.CreateDatabase]]
+        [[if GenDebugging]]
+            log.Printf("Creating Database...\n")
+        [[end]]
         err = io.DatabaseCreate()
         if err != nil {
             io.Disconnect( )
-            log.Fatalln("Error: Cannot Ping: ", err)
+            log.Fatalln("Error: Cannot Create Database: ", err)
         }
     [[end]]
 
     [[if $d.Plugin.Plugin.NeedUse]]
-        err = io.DatabaseUse()
+        [[if GenDebugging]]
+            log.Printf("Issuing Database USE...\n")
+        [[end]]
+        err = io.DatabaseUse("")
         if err != nil {
             io.Disconnect( )
-            log.Fatalln("Error: Cannot Ping: ", err)
+            log.Fatalln("Error: Cannot USE: ", err)
         }
     [[end]]
     return nil
@@ -188,7 +181,7 @@ func (io *IO_[[$dn]]) Disconnect() error {
         err = io.dbSql.Close()
         io.dbSql = nil
     } else {
-        err = errors.New("Error: Database was not connected!")
+        err = fmt.Errorf("Error: Database was not connected!")
     }
 
     return err
@@ -211,6 +204,7 @@ func (io *IO_[[$dn]]) IsConnected() bool {
 func (io *IO_[[$dn]]) DatabaseCreate() error {
     var sqlStmt = "[[GenDatabaseCreateStmt $d]]"
     var err     error
+    var lineNo  int
 
     [[if GenDebugging]]
         log.Printf("DatabaseCreate()\n")
@@ -223,10 +217,20 @@ func (io *IO_[[$dn]]) DatabaseCreate() error {
         [[end]]
         return err
     }
-    _, err = io.dbSql.Exec(sqlStmt)
+
+    err = io.DatabaseUse("master")
+    if err != nil {
+        [[if GenDebugging]]
+            log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
+        [[end]]
+        return err
+    }
+
+    // Create the database.
+    err = io.Exec(sqlStmt)
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
+        log.Printf("...end DatabaseCreate(%s) Line:%d\n", ErrorString(err), lineNo)
     [[end]]
     return err
 }
@@ -236,35 +240,208 @@ func (io *IO_[[$dn]]) DatabaseCreate() error {
 func (io *IO_[[$dn]]) DatabaseDelete() error {
     var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
     var err     error
+    var lineNo  int
 
     [[if GenDebugging]]
         log.Printf("DatabaseDelete()\n")
     [[end]]
 
-    _, err = io.dbSql.Exec(sqlStmt)
+    err = io.DatabaseUse("master")
+    if err != nil {
+        [[if GenDebugging]]
+            log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
+        [[end]]
+        return err
+    }
+
+    err = io.Exec(sqlStmt)
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
+        log.Printf("...end DatabaseDelete(%s) Line:%d\n", ErrorString(err), lineNo)
     [[end]]
     return err
 }
 
+[[ if eq $typ "mssql" -]]
 // DatabaseUse issues the database USE command.
-func (io *IO_[[$dn]]) DatabaseUse() error {
-    var sql = "USE [[$dn]];"
+func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
     var err     error
 
     [[if GenDebugging]]
         log.Printf("DatabaseUse()\n")
     [[end]]
 
-    _, err = io.dbSql.Exec(sql)
+    name := io.Name()
+    if len(dbName) > 0 {
+        name = dbName
+    }
+    err = io.Exec(fmt.Sprintf("USE %s;\nGO", name))
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
+
+// Exec executes an sql statement which does not return any rows.
+func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("Exec(%s)\n", sqlStmt)
+    [[end]]
+
+    _, err = io.dbSql.Exec(sqlStmt, args...)
+	if err != nil {
+		extra, ok := err.(ErrorWithExtraInfo)
+		if ok {
+			errNo  := int(extra.SQLErrorNumber())
+			lineNo := int(extra.SQLErrorLineNo())
+			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
+		}
+	}
+
+    [[if GenDebugging]]
+        log.Printf("...end Exec(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+// Query executes an sql statement which does return row(s).
+func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
+    var sqlStmt = "SELECT name FROM sys.master_files WHERE name = N'[[$dn]]';GO"
+    var err     error
+    var row     *sql.Row
+    var name    string
+
+    [[if GenDebugging]]
+        log.Printf("IsDatabaseDefined()\n")
+    [[end]]
+
+    err = io.DatabaseUse("master")
+    if err != nil {
+        [[if GenDebugging]]
+            log.Printf("...end IsDatabaseDefined(false)\n")
+        [[end]]
+            return false;
+    }
+
+    row = io.dbSql.QueryRow(sqlStmt)
+    err = row.Scan(&name)
+	if err == nil {
+        if name == "[[$dn]]" {
+        [[if GenDebugging]]
+            log.Printf("...end IsDatabaseDefined(true)\n")
+        [[end]]
+            return true;
+        }
+	}
+
+    [[if GenDebugging]]
+        log.Printf("...end IsDatabaseDefined(false)\n")
+    [[end]]
+    return false
+}
+
+[[ else ]]
+
+// DatabaseUse issues the database USE command.
+func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
+    var sqlStmt = "USE [[$dn]];"
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("DatabaseUse()\n")
+    [[end]]
+
+    name := io.Name()
+    if len(dbName) > 0 {
+        name = dbName
+    }
+    err = io.Exec(fmt.Sprintf("USE %s;\n", name))
+
+    [[if GenDebugging]]
+        log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+// Exec executes an sql statement which does not return any rows.
+func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
+    var err     error
+
+    [[if GenDebugging]]
+        log.Printf("Exec(%s)\n", sqlStmt)
+    [[end]]
+
+    _, err = io.dbSql.Exec(sql, args...)
+
+    [[if GenDebugging]]
+        log.Printf("...end Exec(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+[[- end ]]
+
+// Query executes an sql statement which does return row(s).
+func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...interface{}) error {
+    var err     error
+    var rows    *sql.Rows
+
+    [[if GenDebugging]]
+        log.Printf("Query(%s)\n", sqlStmt)
+    [[end]]
+
+    rows, err = io.dbSql.Query(sqlStmt, args...)
+    [[ if eq $typ "mssql" -]]
+	if err != nil {
+		extra, ok := err.(ErrorWithExtraInfo)
+		if ok {
+			errNo  := int(extra.SQLErrorNumber())
+			lineNo := int(extra.SQLErrorLineNo())
+			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
+		}
+	}
+    [[- end ]]
+    if err == nil {
+        defer rows.Close()
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end Query(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+// Query executes an sql statement which does return row(s).
+func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) (*sql.Rows, error) {
+    var err     error
+    var rows    *sql.Rows
+
+    [[if GenDebugging]]
+        log.Printf("Query(%s)\n", sqlStmt)
+    [[end]]
+
+    rows, err = io.dbSql.Query(sqlStmt, args...)
+    [[ if eq $typ "mssql" -]]
+	if err != nil {
+		extra, ok := err.(ErrorWithExtraInfo)
+		if ok {
+			errNo  := int(extra.SQLErrorNumber())
+			lineNo := int(extra.SQLErrorLineNo())
+			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
+		}
+	}
+    [[- end ]]
+
+    [[if GenDebugging]]
+        log.Printf("...end Query(%s)\n", ErrorString(err))
+    [[end]]
+    return rows,err
+}
+
+[[$d.Plugin.Plugin.GenTrailer]]
+
 
 //----------------------------------------------------------------------------
 //                                  New

@@ -20,18 +20,9 @@
 package dbPlugin
 
 import (
-	//"../dbJson"
 	"../dbType"
 	"fmt"
 	"sync"
-)
-
-const (
-	DBTYPE_MARIABDB	= 1 << iota
-	DBTYPE_MSSQL
-	DBTYPE_MYSQL
-	DBTYPE_POSTGRES
-	DBTYPE_SQLITE
 )
 
 //============================================================================

@@ -1152,6 +1152,7 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var inserter    [[$dn]][[$tn]].DbRowInserter
     var creater     [[$dn]][[$tn]].DbTableCreater
+    var useStmter   [[$dn]][[$tn]].DbDatabaseUser
     var ok          bool
 
     [[if GenDebugging]]
@@ -1169,6 +1170,10 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
+    if useStmter, ok = h.db.([[$dn]][[$tn]].DbDatabaseUser); !ok {
+        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+        return
+    }
 
     // Create the table.
     err = creater.TableCreate()
@@ -1180,7 +1185,7 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
 
 [[- if $dot.TD.Data.Plugin.Plugin.NeedUse]]
     // Set USE;
-    err = io[[$dn]].DatabaseUse()
+    err = useStmter.DatabaseUse()
     if err == nil {
         w.Write([]byte("USE was issued\n"))
     } else {

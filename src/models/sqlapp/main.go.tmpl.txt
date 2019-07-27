@@ -3,10 +3,13 @@
 
 // SQL Application main program
 
-// Generated: [[Time]]
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
 
 package main
 

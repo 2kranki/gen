@@ -4,20 +4,74 @@
 // io[[.TD.Data.TitledName]] contains all the functions
 // and data to interact with the SQL Database.
 
-// Generated: [[Time]]
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
 
 package io[[$dn]]
 
 import (
 	"testing"
+	"../util"
 )
 
 
 var io      *IO_[[$dn]]
 
+
+[[ if eq $typ "mssql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    err = exec.Run()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "sqlite" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    //err = exec.Run()      // Not needed for sqlite!
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ end ]]
 
 //============================================================================
 //                              Tests
@@ -31,6 +85,8 @@ func TestConnect(t *testing.T) {
     var err         error
 
 	t.Logf("TestConnect()...\n")
+	DockerRun(t)
+
 	io = [[$dn]]New()
 	io.DefaultParms()
     err = io.Connect()
@@ -43,6 +99,7 @@ func TestConnect(t *testing.T) {
     } else {
             t.Fatalf("Error: %s\n\n", err)
     }
+
 	t.Logf("TestConnect() - End of Test\n\n\n")
 }
 
@@ -85,3 +142,42 @@ func TestDisconnect(t *testing.T) {
 	t.Logf("TestDisconnect() - End of Test\n\n\n")
 }
 
+[[ if eq $typ "mssql" -]]
+//----------------------------------------------------------------------------
+//                              IsDatabaseDefined
+//----------------------------------------------------------------------------
+
+func TestIsDatabaseDefined(t *testing.T) {
+    var err         error
+
+	t.Logf("TestIsDatabaseDefined()...\n")
+	DockerRun(t)
+
+	io = [[$dn]]New()
+	io.DefaultParms()
+    err = io.Connect()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+
+    if io.IsDatabaseDefined() {
+        err = io.DatabaseUse("")
+        if err != nil {
+            t.Errorf("\tError - Database Use failed: %s\n", err.Error())
+        }
+    } else {
+        err = io.DatabaseCreate()
+        if err != nil {
+            t.Errorf("\tError - Database Create failed: %s\n", err.Error())
+        }
+    }
+
+    err = io.Disconnect()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    io = nil
+
+	t.Logf("TestIsDatabaseDefined() - End of Test\n\n\n")
+}
+[[ end ]]
