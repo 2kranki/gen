@@ -9,12 +9,11 @@ package dbMariadb
 
 import (
 	"../../shared"
+	"../../util"
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
-	"fmt"
 	"log"
-	"strings"
 )
 
 const(
@@ -99,15 +98,21 @@ func (pd *Plugin) DriverName() string {
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
-	var str			strings.Builder
-	var wk			string
+	var str			util.StringBuilder
 
-	str.WriteString("\tflag.StringVar(&db_pw,\"dbPW\",\"Passw0rd!\",\"the database password\")\n")
-	str.WriteString("\tflag.StringVar(&db_port,\"dbPort\",\"4306\",\"the database port\")\n")
-	str.WriteString("\tflag.StringVar(&db_srvr,\"dbServer\",\"127.0.0.1\",\"the database server\")\n")
-	str.WriteString("\tflag.StringVar(&db_user,\"dbUser\",\"root\",\"the database user\")\n")
-	wk = fmt.Sprintf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
-	str.WriteString(wk)
+	str.WriteStringf("\tflag.StringVar(&db_pw,\"dbPW\",\"%s\",\"the database password\")\n", pd.DefaultPW())
+	str.WriteStringf("\tflag.StringVar(&db_port,\"dbPort\",\"%s\",\"the database port\")\n", pd.DefaultPort())
+	str.WriteStringf("\tflag.StringVar(&db_srvr,\"dbServer\",\"%s\",\"the database server\")\n", pd.DefaultServer())
+	str.WriteStringf("\tflag.StringVar(&db_user,\"dbUser\",\"%s\",\"the database user\")\n", pd.DefaultUser())
+	str.WriteStringf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
+	return str.String()
+}
+
+// GenHeader returns any header information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenHeader() string {
+	var str			util.StringBuilder
+
 	return str.String()
 }
 
@@ -119,19 +124,32 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
-func (pd Plugin) GenSqlOpen() []string {
-	var strs		[]string
+func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+	var strs		util.StringBuilder
 
-	strs = append(strs, "\tconnStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)\", dbUser, dbPW, dbServer, dbPort)\n")
-	strs = append(strs, "\tif len(dbName) > 0 {\n")
-	strs = append(strs, "\t\tconnStr += fmt.Sprintf(\"/%s\", dbName)\n")
-	strs = append(strs, "\t}\n")
+	strs.WriteString("connStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)/\",")
+	strs.WriteString(dbUser)
+	strs.WriteString(",")
+	strs.WriteString(dbPW)
+	strs.WriteString(",")
+	strs.WriteString(dbServer)
+	strs.WriteString(",")
+	strs.WriteString(dbPort)
+	strs.WriteString(")\n")
 	if sharedData.GenDebugging() {
-		strs = append(strs, "\tlog.Printf(\"\\tConnecting to mariadb using %s\\n\", connStr)\n")
+		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
 	}
-	//FIXME: strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
 
-	return strs
+	return strs.String()
+}
+
+// GenTrailer returns any trailer information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenTrailer() string {
+	var str			util.StringBuilder
+
+	return str.String()
 }
 
 // Name simply returns the external name that this plugin is known by

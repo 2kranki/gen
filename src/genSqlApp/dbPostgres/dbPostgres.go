@@ -12,10 +12,10 @@ package dbPostgres
 
 import (
 	"../../shared"
+	"../../util"
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
-	"fmt"
 	"log"
 	"strings"
 )
@@ -101,15 +101,21 @@ func (pd *Plugin) DriverName() string {
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
-	var str			strings.Builder
-	var wk			string
+	var str			util.StringBuilder
 
-	str.WriteString("\tflag.StringVar(&db_pw,\"dbPW\",\"Passw0rd!\",\"the database password\")\n")
-	str.WriteString("\tflag.StringVar(&db_port,\"dbPort\",\"5430\",\"the database port\")\n")
-	str.WriteString("\tflag.StringVar(&db_srvr,\"dbServer\",\"localhost\",\"the database server\")\n")
-	str.WriteString("\tflag.StringVar(&db_user,\"dbUser\",\"postgres\",\"the database user\")\n")
-	wk = fmt.Sprintf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
-	str.WriteString(wk)
+	str.WriteStringf("\tflag.StringVar(&db_pw,\"dbPW\",\"%s\",\"the database password\")\n", pd.DefaultPW())
+	str.WriteStringf("\tflag.StringVar(&db_port,\"dbPort\",\"%s\",\"the database port\")\n", pd.DefaultPort())
+	str.WriteStringf("\tflag.StringVar(&db_srvr,\"dbServer\",\"%s\",\"the database server\")\n", pd.DefaultServer())
+	str.WriteStringf("\tflag.StringVar(&db_user,\"dbUser\",\"%s\",\"the database user\")\n", pd.DefaultUser())
+	str.WriteStringf("\tflag.StringVar(&db_name,\"dbName\",\"%s\",\"the database name\")\n", name)
+	return str.String()
+}
+
+// GenHeader returns any header information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenHeader() string {
+	var str			util.StringBuilder
+
 	return str.String()
 }
 
@@ -147,6 +153,14 @@ func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) str
 	str.WriteString("\t")
 	str.WriteString(dbSql)
 	str.WriteString(", err = sql.Open(\"postgres\", connStr)\n")
+
+	return str.String()
+}
+
+// GenTrailer returns any trailer information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenTrailer() string {
+	var str			util.StringBuilder
 
 	return str.String()
 }

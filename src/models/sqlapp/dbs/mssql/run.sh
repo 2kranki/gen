@@ -2,7 +2,7 @@
 # add -xv above after bash to debug
 
 name="mssql1"
-user="SA"
+user="sa"
 pw="Passw0rd!"
 server="localhost"
 port=1401
@@ -24,7 +24,7 @@ else
     docker image pull "${imageName}"
 fi
 
-containerID=`docker container run --name ${name} -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=${pw}" -p ${port}:1433  -d "${imageName}"`
+containerID=`docker container run --name ${name} -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${pw}" -p ${port}:1433  -d "${imageName}"`
 #echo "Container ID: ${containerID: -10}"
 
 while ! `nc -z ${server} ${port}`; do sleep 3; done

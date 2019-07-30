@@ -97,7 +97,7 @@ func (pd *Plugin) DefaultServer() string {
 
 // DefaultUser returns default docker user.
 func (pd *Plugin) DefaultUser() string {
-	return "SA"
+	return "sa"
 }
 
 // DockerName returns docker name used to pull the image.
@@ -112,14 +112,14 @@ func (pd *Plugin) DockerTag() string {
 
 // DriverName returns the name to be used on pkg database sql.Open calls
 func (pd *Plugin) DriverName() string {
-	return "sqlserver"
+	return "mssql"
 }
 
 func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("CREATE DATABASE %s ;\\n", db.TitledName())
-	str.WriteString( "GO\\n")
+	str.WriteStringf("create database %s;\\n", db.TitledName())
+	//str.WriteString( "go")
 
 	return str.String()
 }
@@ -129,7 +129,7 @@ func (pd *Plugin) GenDatabaseDeleteStmt(db *dbJson.Database) string {
 
 	str.WriteStringf("IF DB_ID (N'%s') IS NOT NULL\\n", db.TitledName())
 	str.WriteStringf("DROP DATABASE %s ;\\n", db.TitledName())
-	str.WriteString("GO\\n")
+	//str.WriteString("GO")
 
 	return str.String()
 }
@@ -137,7 +137,7 @@ func (pd *Plugin) GenDatabaseDeleteStmt(db *dbJson.Database) string {
 func (pd *Plugin) GenDatabaseUseStmt(db *dbJson.Database) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("USE %s;\\nGO", db.TitledName())
+	str.WriteStringf("USE %s;\\n", db.TitledName())
 
 	return str.String()
 }
@@ -192,8 +192,8 @@ func (pd *Plugin) GenImportString() string {
 func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
-	// Note: We use https://github.com/denisenkom/go-mssqldb which specifies that the driver name should
-	//	be "sqlserver" not "mssql". This changes how variables are parsed in sql statements.
+	/**************
+	//strs.WriteString("connStr := fmt.Sprintf(\"sqlserver://%s:%s@%s:%s?database=master&connection+timeout=30\",")
 	strs.WriteString("connStr := fmt.Sprintf(\"sqlserver://%s:%s@%s:%s?connection+timeout=30\",")
 	strs.WriteString(dbUser)
 	strs.WriteString(",")
@@ -203,8 +203,28 @@ func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) st
 	strs.WriteString(",")
 	strs.WriteString(dbPort)
 	strs.WriteString(")\n")
+	 *************/
+
+	strs.WriteString("\tquery := url.Values{}\n")
+	strs.WriteString("\tquery.Add(\"connection+timeout\", \"30\")\n")
+	strs.WriteString("\tu := &url.URL{\n")
+	strs.WriteString("\t\tScheme:\t\t\"sqlserver\",\n")
+	strs.WriteString("\t\tUser:\t\turl.UserPassword(")
+	strs.WriteString(dbUser)
+	strs.WriteString(", ")
+	strs.WriteString(dbPW)
+	strs.WriteString("),\n")
+	strs.WriteString("\t\tHost:\t\tfmt.Sprintf(\"%s:%s\", ")
+	strs.WriteString(dbServer)
+	strs.WriteString(", ")
+	strs.WriteString(dbPort)
+	strs.WriteString("),\n")
+	strs.WriteString("\t\tRawQuery:\tquery.Encode(),\n")
+	strs.WriteString("\t}\n")
+	strs.WriteString("\tconnStr := u.String()\n")
+
 	if sharedData.GenDebugging() {
-		strs.WriteString("\tlog.Printf(\"\\tConnecting to mssql using %s\\n\", connStr)\n")
+		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
 	}
 	strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
 

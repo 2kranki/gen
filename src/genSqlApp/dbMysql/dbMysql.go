@@ -95,6 +95,14 @@ func (pd *Plugin) DriverName() string {
 	return "mysql"
 }
 
+func (pd *Plugin) GenDatabaseUseStmt(db *dbJson.Database) string {
+	var str			util.StringBuilder
+
+	str.WriteStringf("USE %s;", db.TitledName())
+
+	return str.String()
+}
+
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
@@ -108,6 +116,14 @@ func (pd Plugin) GenFlagArgDefns(name string) string {
 	return str.String()
 }
 
+// GenHeader returns any header information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenHeader() string {
+	var str			util.StringBuilder
+
+	return str.String()
+}
+
 // GenImportString returns the Database driver import string for this
 // plugin.
 func (pd Plugin) GenImportString() string {
@@ -116,19 +132,32 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
-func (pd Plugin) GenSqlOpen() []string {
-	var strs		[]string
+func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+	var strs		util.StringBuilder
 
-	strs = append(strs, "\tconnStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)\", dbUser, dbPW, dbServer, dbPort)\n")
-	strs = append(strs, "\tif len(dbName) > 0 {\n")
-	strs = append(strs, "\t\tconnStr += fmt.Sprintf(\"/%s\", dbName)\n")
-	strs = append(strs, "\t}\n")
+	strs.WriteString("connStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)/\",")
+	strs.WriteString(dbUser)
+	strs.WriteString(",")
+	strs.WriteString(dbPW)
+	strs.WriteString(",")
+	strs.WriteString(dbServer)
+	strs.WriteString(",")
+	strs.WriteString(dbPort)
+	strs.WriteString(")\n")
 	if sharedData.GenDebugging() {
-		strs = append(strs, "\tlog.Printf(\"\\tConnecting to mysql using %s\\n\", connStr)\n")
+		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
 	}
-	strs = append(strs, "\tdb, err = sql.Open(\"mysql\", connStr)\n")
+	strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
 
-	return strs
+	return strs.String()
+}
+
+// GenTrailer returns any trailer information needed for I/O.
+// This is included in both Database I/O and Table I/O.
+func (pd *Plugin) GenTrailer() string {
+	var str			util.StringBuilder
+
+	return str.String()
 }
 
 // Name simply returns the external name that this plugin is known by
@@ -141,7 +170,7 @@ func (pd Plugin) Name() string {
 // NeedUse indicates if the Database needs a USE
 // SQL Statement before it can be used.
 func (pd Plugin) NeedUse() bool {
-	return false
+	return true
 }
 
 // Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.

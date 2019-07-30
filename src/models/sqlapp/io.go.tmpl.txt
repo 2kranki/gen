@@ -23,6 +23,9 @@ import (
     [[if GenDebugging]]
         "log"
     [[end]]
+    [[ if eq $typ "mssql" -]]
+        "net/url"
+    [[end]]
      [[if $d.HasFloat]]
         "strconv"
         "strings"
@@ -126,6 +129,10 @@ func (io *IO_[[$dn]]) DefaultParms() {
 //                              Database Methods
 //============================================================================
 
+//----------------------------------------------------------------------------
+//								Connect
+//----------------------------------------------------------------------------
+
 // Connect connects the database/sql/driver to the appropriate
 //database using the given parameters.
 func (io *IO_[[$dn]]) Connect() error {
@@ -133,15 +140,16 @@ func (io *IO_[[$dn]]) Connect() error {
 
 	[[$d.Plugin.Plugin.GenSqlOpen "io.dbSql" "io.dbServer" "io.dbPort" "io.dbUser" "io.dbPW" "io.dbName"]]
     if err != nil {
-        log.Fatalln("Error: Cannot Connect: ", err)
+        return fmt.Errorf("Error: Cannot Connect: %s\n", err.Error())
     }
+
     [[if GenDebugging]]
         log.Printf("Pinging Server...\n")
     [[end]]
     err = io.dbSql.Ping()
     if err != nil {
         io.Disconnect( )
-        log.Fatalln("Error: Cannot Ping: ", err)
+        return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
     }
 
     [[if $d.Plugin.Plugin.CreateDatabase]]
@@ -151,7 +159,7 @@ func (io *IO_[[$dn]]) Connect() error {
         err = io.DatabaseCreate()
         if err != nil {
             io.Disconnect( )
-            log.Fatalln("Error: Cannot Create Database: ", err)
+            return fmt.Errorf("Error: Cannot Create Database: %s\n", err.Error())
         }
     [[end]]
 
@@ -162,11 +170,16 @@ func (io *IO_[[$dn]]) Connect() error {
         err = io.DatabaseUse("")
         if err != nil {
             io.Disconnect( )
-            log.Fatalln("Error: Cannot USE: ", err)
+            return fmt.Errorf("Error: Cannot USE: %s\n", err.Error())
         }
     [[end]]
+
     return nil
 }
+
+//----------------------------------------------------------------------------
+//								Disconnect
+//----------------------------------------------------------------------------
 
 // Disconnect() cleans up anything that needs to be
 // accomplished before the database is closed
@@ -187,6 +200,10 @@ func (io *IO_[[$dn]]) Disconnect() error {
     return err
 }
 
+//----------------------------------------------------------------------------
+//								IsConnected
+//----------------------------------------------------------------------------
+
 func (io *IO_[[$dn]]) IsConnected() bool {
     if io.dbSql != nil {
         return true
@@ -197,6 +214,10 @@ func (io *IO_[[$dn]]) IsConnected() bool {
 //============================================================================
 //                        Database Maintenance
 //============================================================================
+
+//----------------------------------------------------------------------------
+//								Create
+//----------------------------------------------------------------------------
 
 // DatabaseCreate creates the table in the
 // given database deleting the current table if
@@ -210,30 +231,20 @@ func (io *IO_[[$dn]]) DatabaseCreate() error {
         log.Printf("DatabaseCreate()\n")
     [[end]]
 
-    err = io.DatabaseDelete()
-    if err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
-        [[end]]
-        return err
-    }
-
-    err = io.DatabaseUse("master")
-    if err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
-        [[end]]
-        return err
-    }
-
     // Create the database.
-    err = io.Exec(sqlStmt)
+    if !io.IsDatabaseDefined() {
+        err = io.Exec(sqlStmt)
+    }
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseCreate(%s) Line:%d\n", ErrorString(err), lineNo)
     [[end]]
     return err
 }
+
+//----------------------------------------------------------------------------
+//								Delete
+//----------------------------------------------------------------------------
 
 // DatabaseDelete deletes the table in the
 // given database if present.
@@ -246,15 +257,9 @@ func (io *IO_[[$dn]]) DatabaseDelete() error {
         log.Printf("DatabaseDelete()\n")
     [[end]]
 
-    err = io.DatabaseUse("master")
-    if err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end DatabaseCreate(Error:%s)\n", err.Error())
-        [[end]]
-        return err
+    if !io.IsDatabaseDefined() {
+        err = io.Exec(sqlStmt)
     }
-
-    err = io.Exec(sqlStmt)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseDelete(%s) Line:%d\n", ErrorString(err), lineNo)
@@ -263,6 +268,10 @@ func (io *IO_[[$dn]]) DatabaseDelete() error {
 }
 
 [[ if eq $typ "mssql" -]]
+//----------------------------------------------------------------------------
+//								Use - mssql
+//----------------------------------------------------------------------------
+
 // DatabaseUse issues the database USE command.
 func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
     var err     error
@@ -275,13 +284,17 @@ func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
     if len(dbName) > 0 {
         name = dbName
     }
-    err = io.Exec(fmt.Sprintf("USE %s;\nGO", name))
+    err = io.Exec(fmt.Sprintf("USE %s;", name))
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
+
+//----------------------------------------------------------------------------
+//								Exec - mssql
+//----------------------------------------------------------------------------
 
 // Exec executes an sql statement which does not return any rows.
 func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
@@ -292,14 +305,7 @@ func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
     [[end]]
 
     _, err = io.dbSql.Exec(sqlStmt, args...)
-	if err != nil {
-		extra, ok := err.(ErrorWithExtraInfo)
-		if ok {
-			errNo  := int(extra.SQLErrorNumber())
-			lineNo := int(extra.SQLErrorLineNo())
-			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
-		}
-	}
+    err = io.ErrChk(err)
 
     [[if GenDebugging]]
         log.Printf("...end Exec(%s)\n", ErrorString(err))
@@ -307,9 +313,13 @@ func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
     return err
 }
 
+//----------------------------------------------------------------------------
+//						IsDatabaseDefined - mssql
+//----------------------------------------------------------------------------
+
 // Query executes an sql statement which does return row(s).
 func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
-    var sqlStmt = "SELECT name FROM sys.master_files WHERE name = N'[[$dn]]';GO"
+    var sqlStmt = "SELECT name FROM sys.databases WHERE name = N'[[$dn]]';"
     var err     error
     var row     *sql.Row
     var name    string
@@ -317,14 +327,6 @@ func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
     [[if GenDebugging]]
         log.Printf("IsDatabaseDefined()\n")
     [[end]]
-
-    err = io.DatabaseUse("master")
-    if err != nil {
-        [[if GenDebugging]]
-            log.Printf("...end IsDatabaseDefined(false)\n")
-        [[end]]
-            return false;
-    }
 
     row = io.dbSql.QueryRow(sqlStmt)
     err = row.Scan(&name)
@@ -335,6 +337,10 @@ func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
         [[end]]
             return true;
         }
+    [[if GenDebugging]]
+	} else {
+	        log.Printf("\tSELECT Error: %s  Name: %s\n", err.Error(), name)
+    [[end]]
 	}
 
     [[if GenDebugging]]
@@ -343,11 +349,40 @@ func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
     return false
 }
 
+//----------------------------------------------------------------------------
+//								ErrChk - mssql
+//----------------------------------------------------------------------------
+
+// ErrChk updates errors from mssql with other information provided.
+func (io *IO_[[$dn]]) ErrChk(err error) error {
+
+    [[if GenDebugging]]
+        log.Printf("ErrChk(%s)\n", ErrorString(err))
+    [[end]]
+
+    if err != nil {
+		extra, ok := err.(ErrorWithExtraInfo)
+		if ok {
+			errNo  := int(extra.SQLErrorNumber())
+			lineNo := int(extra.SQLErrorLineNo())
+			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
+		}
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end ErrChk(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
 [[ else ]]
+
+//----------------------------------------------------------------------------
+//								    Use
+//----------------------------------------------------------------------------
 
 // DatabaseUse issues the database USE command.
 func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
-    var sqlStmt = "USE [[$dn]];"
     var err     error
 
     [[if GenDebugging]]
@@ -366,6 +401,10 @@ func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
     return err
 }
 
+//----------------------------------------------------------------------------
+//								    Exec
+//----------------------------------------------------------------------------
+
 // Exec executes an sql statement which does not return any rows.
 func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
     var err     error
@@ -374,7 +413,7 @@ func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
         log.Printf("Exec(%s)\n", sqlStmt)
     [[end]]
 
-    _, err = io.dbSql.Exec(sql, args...)
+    _, err = io.dbSql.Exec(sqlStmt, args...)
 
     [[if GenDebugging]]
         log.Printf("...end Exec(%s)\n", ErrorString(err))
@@ -382,6 +421,10 @@ func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
     return err
 }
 [[- end ]]
+
+//----------------------------------------------------------------------------
+//								    Query
+//----------------------------------------------------------------------------
 
 // Query executes an sql statement which does return row(s).
 func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...interface{}) error {
@@ -394,14 +437,7 @@ func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...
 
     rows, err = io.dbSql.Query(sqlStmt, args...)
     [[ if eq $typ "mssql" -]]
-	if err != nil {
-		extra, ok := err.(ErrorWithExtraInfo)
-		if ok {
-			errNo  := int(extra.SQLErrorNumber())
-			lineNo := int(extra.SQLErrorLineNo())
-			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
-		}
-	}
+        err = io.ErrChk(err)
     [[- end ]]
     if err == nil {
         defer rows.Close()
@@ -413,38 +449,36 @@ func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...
     return err
 }
 
-// Query executes an sql statement which does return row(s).
-func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) (*sql.Rows, error) {
+//----------------------------------------------------------------------------
+//								    QueryRow
+//----------------------------------------------------------------------------
+
+// QueryRow executes an sql statement which does return row(s).
+func (io *IO_[[$dn]]) QueryRow(sqlStmt string, apply func(rows *sql.Rows), args ...interface{}) *sql.Row {
     var err     error
-    var rows    *sql.Rows
+    var row     *sql.Row
 
     [[if GenDebugging]]
-        log.Printf("Query(%s)\n", sqlStmt)
+        log.Printf("QueryRow(%s)\n", sqlStmt)
     [[end]]
 
-    rows, err = io.dbSql.Query(sqlStmt, args...)
+    row = io.dbSql.QueryRow(sqlStmt, args...)
+
     [[ if eq $typ "mssql" -]]
-	if err != nil {
-		extra, ok := err.(ErrorWithExtraInfo)
-		if ok {
-			errNo  := int(extra.SQLErrorNumber())
-			lineNo := int(extra.SQLErrorLineNo())
-			err = fmt.Errorf("Error: %d  Line: %d - %s\n", errNo, lineNo, err.Error())
-		}
-	}
+        err = io.ErrChk(err)
     [[- end ]]
 
     [[if GenDebugging]]
         log.Printf("...end Query(%s)\n", ErrorString(err))
     [[end]]
-    return rows,err
+    return row
 }
 
 [[$d.Plugin.Plugin.GenTrailer]]
 
 
 //----------------------------------------------------------------------------
-//                                  New
+//                                  [[$dn]]New
 //----------------------------------------------------------------------------
 
 // New creates a new struct.

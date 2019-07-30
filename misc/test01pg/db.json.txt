@@ -1,7 +1,7 @@
 # vi:nu:et:sts=4 ts=4 sw=4
 
 {
-    "Name":"Finances",
+    "Name":"app01pg",
     "SqlType":"postgres",       # mariadb | mssql | mysql | postgres | sqlite (required)
     #"dbServer":"test.db",      # sqlite
     "dbServer":"localhost",

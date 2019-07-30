@@ -16,6 +16,7 @@ package io[[$dn]]
 
 import (
 	"testing"
+	"time"
 	"../util"
 )
 
@@ -23,7 +24,7 @@ import (
 var io      *IO_[[$dn]]
 
 
-[[ if eq $typ "mssql" -]]
+[[ if eq $typ "mariadb" -]]
 //----------------------------------------------------------------------------
 //                              Docker Run
 //----------------------------------------------------------------------------
@@ -44,6 +45,85 @@ func DockerRun(t *testing.T) {
     if err != nil {
         t.Fatalf("Error: %s\n\n", err)
     }
+    time.Sleep(5000 * time.Millisecond)
+
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "mssql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+    var output      string
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    output, err = exec.RunWithOutput()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    t.Logf("%s\n", output)
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "mysql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    err = exec.Run()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "postgres" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    err = exec.Run()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    time.Sleep(5000 * time.Millisecond)
 
 	t.Logf("DockerRun() - End\n\n\n")
 }
@@ -160,16 +240,16 @@ func TestIsDatabaseDefined(t *testing.T) {
         t.Fatalf("Error: %s\n\n", err)
     }
 
-    if io.IsDatabaseDefined() {
-        err = io.DatabaseUse("")
-        if err != nil {
-            t.Errorf("\tError - Database Use failed: %s\n", err.Error())
-        }
-    } else {
+    if !io.IsDatabaseDefined() {
         err = io.DatabaseCreate()
         if err != nil {
             t.Errorf("\tError - Database Create failed: %s\n", err.Error())
         }
+    }
+
+    err = io.DatabaseUse("")
+    if err != nil {
+        t.Errorf("\tError - Database Use failed: %s\n", err.Error())
     }
 
     err = io.Disconnect()
