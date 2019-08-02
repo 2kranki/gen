@@ -556,6 +556,7 @@ type Database struct {
 	Name		string			`json:"Name,omitempty"`
 	SqlType		string			`json:"SqlType,omitempty"`
 	SQLParms	string			`json:"SQLParms,omitempty"`		// Extra SQL Parameters
+	Schema		string			`json:"Schema,omitempty"`		// Optional Schema Name
 	Server		string			`json:"Server,omitempty"`
 	Port		string			`json:"Port,omitempty"`
 	PW			string			`json:"PW,omitempty"`
@@ -605,35 +606,6 @@ func (d *Database) HasFloat() bool {
 		}
 	}
 	return false
-}
-
-// SetupPlugin sets up the plugin within the database.
-func (d *Database) SetupPlugin(plg dbPlugin.PluginData) error {
-
-	// Validate the Plugin if possible.
-	if plg.Types == nil {
-		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", d.SqlType)
-	}
-	if plg.Plugin == nil {
-		return fmt.Errorf("Error: Plugin missing support for %s!\n\n\n", d.SqlType)
-	}
-
-	// Save the plugin.
-	d.Plugin = plg
-
-	// Fix up the tables with back pointers that we do not store externally.
-	for i, t := range d.Tables {
-		for ii, _ := range t.Fields {
-			t.Fields[ii].Tbl = &t
-			t.Fields[ii].Typ = plg.Types.FindDefn(t.Fields[ii].TypeDefn)
-			if t.Fields[ii].Typ == nil {
-				return fmt.Errorf("Error: Invalid Field Type for %s:%s!\n\n\n", t.Name, t.Fields[ii].Name)
-			}
-		}
-		d.Tables[i].DB = d
-	}
-
-	return nil
 }
 
 func (d *Database) TitledName( ) string {
@@ -708,6 +680,8 @@ func ReadJsonFile(fn string) error {
 
 // SetupPlugin sets up the plugin within the database.
 func SetupPlugin(plg dbPlugin.PluginData) error {
+	var intr		dbPlugin.SchemaNamer
+	var ok			bool
 
 	// Validate the Plugin if possible.
 	if plg.Types == nil {
@@ -727,6 +701,13 @@ func SetupPlugin(plg dbPlugin.PluginData) error {
 			}
 		}
 		dbStruct.Tables[i].DB = &dbStruct
+	}
+
+	if len(dbStruct.Schema) == 0 {
+		intr, ok = plg.Plugin.(dbPlugin.SchemaNamer)
+		if ok {
+			dbStruct.Schema = intr.SchemaName()
+		}
 	}
 
 	return nil

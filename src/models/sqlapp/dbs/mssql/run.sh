@@ -16,7 +16,7 @@ fi
 #echo "Image Name: ${imageName}"
 
 #echo "Ignore message: Error: No such container: mssql1"
-s=`docker container rm -f ${name} 2>1`
+s=`docker container rm -f ${name} 2>&1`
 
 if docker image ls ${imageName} | tail -n 1 | grep "${dockerName}"; then
     :

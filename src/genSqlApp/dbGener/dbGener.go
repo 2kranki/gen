@@ -85,6 +85,18 @@ type GenTableDeleteStmter interface {
 //                        	Row SQL Interface Support
 //----------------------------------------------------------------------------
 
+// GenRowLimiter defines the interface for generating the LIMIT n option on
+// SELECT.  LIMIT is used in general SQL, but not supported by T-SQL (Microsoft).
+type GenRowLimiter interface {
+	GenRowLimit(tb *dbJson.DbTable, n string) string
+}
+
+// GenRowOffseter defines the interface for generating the OFFSET n option on
+// SELECT.  OFFSET has a different grammar on T-SQL (Microsoft).
+type GenRowOffseter interface {
+	GenRowOffset(tb *dbJson.DbTable, n string) string
+}
+
 type GenRowDeleteStmter interface {
 	GenRowDeleteStmt(tb *dbJson.DbTable) string
 }
@@ -217,13 +229,7 @@ func GenDatabaseCreateStmt(db *dbJson.Database) string {
 	}
 
 	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;\\n", db.TitledName()))
-	if db.SqlType == "mssql" {
-		str.WriteString( "GO\\n")
-	}
 	str.WriteString(fmt.Sprintf("USE %s;\\n", db.TitledName()))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
 
 	return str.String()
 }
@@ -241,9 +247,6 @@ func GenDatabaseDeleteStmt(db *dbJson.Database) string {
 	}
 
 	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", db.TitledName()))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
 
 	return str.String()
 }
@@ -265,10 +268,7 @@ func GenTableCountStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCountStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s;\\n", t.TitledName()))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s%s;\\n", db.Schema, t.TitledName()))
 
 	return str.String()
 }
@@ -287,7 +287,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCreateStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (\\n", t.TitledName()))
+	str.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s%s (\\n", db.Schema, t.TitledName()))
 	for i, _ := range t.Fields {
 		var cm  		string
 		var f			*dbJson.DbField
@@ -349,9 +349,6 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		}
 	}
 	str.WriteString(";\\n")
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
 
 	return str.String()
 }
@@ -369,10 +366,7 @@ func GenTableDeleteStmt(t *dbJson.DbTable) string {
 		return intr.GenTableDeleteStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s;\\n", t.TitledName()))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s%s;\\n", db.Schema, t.TitledName()))
 
 	return str.String()
 }
@@ -395,10 +389,7 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Delete SQL
-	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE %s;\\n", t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE %s%s;\\n", db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
 
 	return str.String()
 }
@@ -416,16 +407,13 @@ func GenRowFindStmt(t *dbJson.DbTable) string {
 		return intr.GenRowFindStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE %s;\\n", t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s%s WHERE %s;\\n", db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
 
 	return str.String()
 }
 
 func GenRowFirstStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowFirstStmter
 	var ok			bool
 
@@ -437,16 +425,15 @@ func GenRowFirstStmt(t *dbJson.DbTable) string {
 		return intr.GenRowFirstStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT 1;\\n", t.TitledName(), t.KeysList("", " ASC")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), t.KeysList("", " ASC"),
+		GenRowLimit(t, "1"))
 
 	return str.String()
 }
 
 func GenRowInsertStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowInsertStmter
 	var ok			bool
 
@@ -458,16 +445,14 @@ func GenRowInsertStmt(t *dbJson.DbTable) string {
 		return intr.GenRowInsertStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s);\\n", t.TitledName(), t.FieldNameList(""), GenDataPlaceHolder(t)))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteStringf("INSERT INTO %s%s (%s) VALUES (%s);\\n",
+		db.Schema, t.TitledName(), t.FieldNameList(""), GenDataPlaceHolder(t))
 
 	return str.String()
 }
 
 func GenRowLastStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowLastStmter
 	var ok			bool
 
@@ -479,16 +464,35 @@ func GenRowLastStmt(t *dbJson.DbTable) string {
 		return intr.GenRowLastStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT 1;\\n", t.TitledName(), t.KeysList("", " DESC")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), t.KeysList("", " DESC"),
+		GenRowLimit(t, "1"))
+
+	return str.String()
+}
+
+// GenRowLimit defines the interface for generating the LIMIT n option on
+// SELECT.  LIMIT is used in general SQL, but not supported by T-SQL (Microsoft).
+func GenRowLimit(t *dbJson.DbTable, n string) string {
+	var str			util.StringBuilder
+	var intr		GenRowLimiter
+	var ok			bool
+
+	db := t.DB
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowLimiter)
+	if ok {
+		return intr.GenRowLimit(t,  n)
 	}
+
+	str.WriteStringf("LIMIT %s", n)
 
 	return str.String()
 }
 
 func GenRowNextStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowNextStmter
 	var ok			bool
 
@@ -500,17 +504,35 @@ func GenRowNextStmt(t *dbJson.DbTable) string {
 		return intr.GenRowNextStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE %s ORDER BY %s LIMIT 1;\\n",
-					t.TitledName(), GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
+	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC"),
+		GenRowLimit(t, "1"))
+
+	return str.String()
+}
+
+// GenRowOffset defines the interface for generating the OFFSET n option on
+// SELECT.  OFFSET has a slightly different grammar on T-SQL (Microsoft).
+func GenRowOffset(t *dbJson.DbTable, n string) string {
+	var str			util.StringBuilder
+	var intr		GenRowOffseter
+	var ok			bool
+
+	db := t.DB
+	pluginData := db.Plugin.(dbPlugin.PluginData)
+	plugin := pluginData.Plugin
+	intr, ok = plugin.(GenRowOffseter)
+	if ok {
+		return intr.GenRowOffset(t,  n)
 	}
+
+	str.WriteStringf("OFFSET %s", n)
 
 	return str.String()
 }
 
 func GenRowPageStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowPageStmter
 	var ok			bool
 
@@ -522,17 +544,15 @@ func GenRowPageStmt(t *dbJson.DbTable) string {
 		return intr.GenRowPageStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s ORDER BY %s LIMIT ? OFFSET ? ;\\n",
-						t.TitledName(), t.KeysList("", " ASC")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s %s;\\n",
+		db.Schema, t.TitledName(), t.KeysList("", " ASC"),
+		GenRowLimit(t, "?"), GenRowOffset(t, "?"))
 
 	return str.String()
 }
 
 func GenRowPrevStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowPrevStmter
 	var ok			bool
 
@@ -544,16 +564,15 @@ func GenRowPrevStmt(t *dbJson.DbTable) string {
 		return intr.GenRowPrevStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s WHERE %s ORDER BY %s LIMIT 1;\\n", t.TitledName(), GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC")))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC"),
+		GenRowLimit(t, "1"))
 
 	return str.String()
 }
 
 func GenRowUpdateStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
+	var str			util.StringBuilder
 	var intr		GenRowUpdateStmter
 	var ok			bool
 
@@ -566,10 +585,8 @@ func GenRowUpdateStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Update SQL
-	str.WriteString(fmt.Sprintf("INSERT INTO %s ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]]);\\n", t.TitledName()))
-	if db.SqlType == "mssql" {
-		str.WriteString("GO\\n")
-	}
+	str.WriteStringf("INSERT INTO %s%s ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]]);\\n",
+		db.Schema, t.TitledName())
 
 	return str.String()
 }

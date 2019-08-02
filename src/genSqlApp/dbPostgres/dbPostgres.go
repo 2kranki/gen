@@ -178,6 +178,13 @@ func (pd Plugin) NeedUse() bool {
 	return false
 }
 
+// SchemaName simply returns the external name that this plugin is known by
+// or supports.
+// Required method
+func (pd *Plugin) SchemaName() string {
+	return ""
+}
+
 // Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
 // Required method
 func (pd Plugin) Types() *dbType.TypeDefns {

@@ -219,25 +219,26 @@ func (io *IO_[[$dn]]) IsConnected() bool {
 //								Create
 //----------------------------------------------------------------------------
 
-// DatabaseCreate creates the table in the
-// given database deleting the current table if
-// present.
+// DatabaseCreate creates the database within the SQL server.
 func (io *IO_[[$dn]]) DatabaseCreate() error {
-    var sqlStmt = "[[GenDatabaseCreateStmt $d]]"
     var err     error
-    var lineNo  int
+    [[ if ne $typ "sqlite" -]]
+        var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
+    [[- end ]]
 
     [[if GenDebugging]]
         log.Printf("DatabaseCreate()\n")
     [[end]]
 
     // Create the database.
-    if !io.IsDatabaseDefined() {
-        err = io.Exec(sqlStmt)
-    }
+    [[ if ne $typ "sqlite" -]]
+        if !io.IsDatabaseDefined() {
+            err = io.Exec(sqlStmt)
+        }
+    [[- end ]]
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseCreate(%s) Line:%d\n", ErrorString(err), lineNo)
+        log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
@@ -249,27 +250,29 @@ func (io *IO_[[$dn]]) DatabaseCreate() error {
 // DatabaseDelete deletes the table in the
 // given database if present.
 func (io *IO_[[$dn]]) DatabaseDelete() error {
-    var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
     var err     error
-    var lineNo  int
+    [[ if ne $typ "sqlite" -]]
+        var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
+    [[- end ]]
 
     [[if GenDebugging]]
         log.Printf("DatabaseDelete()\n")
     [[end]]
 
-    if !io.IsDatabaseDefined() {
-        err = io.Exec(sqlStmt)
-    }
+    [[ if ne $typ "sqlite" -]]
+        if !io.IsDatabaseDefined() {
+            err = io.Exec(sqlStmt)
+        }
+    [[- end ]]
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseDelete(%s) Line:%d\n", ErrorString(err), lineNo)
+        log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
 
-[[ if eq $typ "mssql" -]]
 //----------------------------------------------------------------------------
-//								Use - mssql
+//								    Use
 //----------------------------------------------------------------------------
 
 // DatabaseUse issues the database USE command.
@@ -280,11 +283,13 @@ func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
         log.Printf("DatabaseUse()\n")
     [[end]]
 
-    name := io.Name()
-    if len(dbName) > 0 {
-        name = dbName
-    }
-    err = io.Exec(fmt.Sprintf("USE %s;", name))
+    [[ if ne $typ "sqlite" -]]
+        name := io.Name()
+        if len(dbName) > 0 {
+            name = dbName
+        }
+        err = io.Exec(fmt.Sprintf("USE %s;\n", name))
+    [[- end ]]
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
@@ -292,32 +297,13 @@ func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
     return err
 }
 
-//----------------------------------------------------------------------------
-//								Exec - mssql
-//----------------------------------------------------------------------------
-
-// Exec executes an sql statement which does not return any rows.
-func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("Exec(%s)\n", sqlStmt)
-    [[end]]
-
-    _, err = io.dbSql.Exec(sqlStmt, args...)
-    err = io.ErrChk(err)
-
-    [[if GenDebugging]]
-        log.Printf("...end Exec(%s)\n", ErrorString(err))
-    [[end]]
-    return err
-}
-
+[[ if eq $typ "mssql" -]]
 //----------------------------------------------------------------------------
 //						IsDatabaseDefined - mssql
 //----------------------------------------------------------------------------
 
-// Query executes an sql statement which does return row(s).
+// IsDatabaseDefined checks to see if the Database is already defined to the
+// SQL server.
 func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
     var sqlStmt = "SELECT name FROM sys.databases WHERE name = N'[[$dn]]';"
     var err     error
@@ -375,31 +361,25 @@ func (io *IO_[[$dn]]) ErrChk(err error) error {
     return err
 }
 
-[[ else ]]
-
+[[ else if eq $typ "sqlite" -]]
 //----------------------------------------------------------------------------
-//								    Use
+//						IsDatabaseDefined - sqlite
 //----------------------------------------------------------------------------
 
-// DatabaseUse issues the database USE command.
-func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
-    var err     error
+// IsDatabaseDefined checks to see if the Database is already defined to the SQL server.
+// This is not needed in SQLite. So, we just return true.
+func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
 
     [[if GenDebugging]]
-        log.Printf("DatabaseUse()\n")
+        log.Printf("IsDatabaseDefined()\n")
     [[end]]
-
-    name := io.Name()
-    if len(dbName) > 0 {
-        name = dbName
-    }
-    err = io.Exec(fmt.Sprintf("USE %s;\n", name))
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseUse(%s)\n", ErrorString(err))
+        log.Printf("...end IsDatabaseDefined(false)\n")
     [[end]]
-    return err
+    return true
 }
+[[- end ]]
 
 //----------------------------------------------------------------------------
 //								    Exec
@@ -414,20 +394,22 @@ func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
     [[end]]
 
     _, err = io.dbSql.Exec(sqlStmt, args...)
+    [[ if eq $typ "mssql" -]]
+        err = io.ErrChk(err)
+    [[- end ]]
 
     [[if GenDebugging]]
         log.Printf("...end Exec(%s)\n", ErrorString(err))
     [[end]]
     return err
 }
-[[- end ]]
 
 //----------------------------------------------------------------------------
 //								    Query
 //----------------------------------------------------------------------------
 
 // Query executes an sql statement which does return row(s).
-func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...interface{}) error {
+func (io *IO_[[$dn]]) Query(sqlStmt string, process func(rows *sql.Rows), args ...interface{}) error {
     var err     error
     var rows    *sql.Rows
 
@@ -441,6 +423,11 @@ func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...
     [[- end ]]
     if err == nil {
         defer rows.Close()
+        // Process the rows
+        for rows.Next() {
+            process(rows)
+        }
+        err = rows.Close()
     }
 
     [[if GenDebugging]]
@@ -454,7 +441,7 @@ func (io *IO_[[$dn]]) Query(sqlStmt string, apply func(rows *sql.Rows), args ...
 //----------------------------------------------------------------------------
 
 // QueryRow executes an sql statement which does return row(s).
-func (io *IO_[[$dn]]) QueryRow(sqlStmt string, apply func(rows *sql.Rows), args ...interface{}) *sql.Row {
+func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) *sql.Row {
     var err     error
     var row     *sql.Row
 

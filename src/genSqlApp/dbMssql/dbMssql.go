@@ -38,7 +38,9 @@ import (
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
+	"fmt"
 	"log"
+	"strings"
 )
 
 // Notes:
@@ -48,11 +50,11 @@ var tds	= dbType.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"time.Time",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"time.Time",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
+	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
+	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
 	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
+	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
 	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
 	{Name:"text", 		Html:"text",		Sql:"NVARCHAR",		Go:"string",	DftLen:0,},
@@ -187,6 +189,109 @@ func (pd *Plugin) GenImportString() string {
 	return "\"github.com/denisenkom/go-mssqldb\""
 }
 
+// GenKeySearchPlaceHolder generates the string for multiple keys when an expression
+// is involved such as used in RowFind(). The expression will always be '=' and will
+// apply to all keys in the table. Example: "key1 = $1 AND key2 = $2"
+func (pd *Plugin) GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
+
+	insertStr := ""
+	keys, _ := tb.Keys()
+	for i, _ := range keys {
+		cm := " AND "
+		if i == len(keys) - 1 {
+			cm = ""
+		}
+		insertStr += fmt.Sprintf("%s %s ?%s", keys[i], rel, cm)
+	}
+
+	return insertStr
+}
+
+func (pd *Plugin) GenRowFirstStmt(t *dbJson.DbTable) string {
+	var str			util.StringBuilder
+
+	db := t.DB
+
+	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s %s;\\n",
+		db.Schema, t.TitledName(), t.KeysList("", " ASC"),
+		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
+
+	return str.String()
+}
+
+func (pd *Plugin) GenRowLastStmt(t *dbJson.DbTable) string {
+	var str			util.StringBuilder
+
+	db := t.DB
+
+	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), t.KeysList("", " DESC"),
+		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
+
+	return str.String()
+}
+
+// GenRowLimit defines the interface for generating the LIMIT n option on
+// SELECT.  LIMIT is used in general SQL, but not supported by T-SQL (Microsoft).
+func (pd *Plugin) GenRowLimit(t *dbJson.DbTable, n string) string {
+	var str			util.StringBuilder
+
+	str.WriteStringf("FETCH NEXT %s ROWS ONLY", n)
+
+	return str.String()
+}
+
+func (pd *Plugin) GenRowNextStmt(t *dbJson.DbTable) string {
+	var str			util.StringBuilder
+
+	db := t.DB
+
+	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
+	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), pd.GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC"),
+		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
+
+	return str.String()
+}
+
+// GenRowOffset defines the interface for generating the OFFSET n option on
+// SELECT.  OFFSET has a slightly different grammar on T-SQL (Microsoft).
+func (pd *Plugin) GenRowOffset(t *dbJson.DbTable, n string) string {
+	var str			util.StringBuilder
+
+	str.WriteStringf("OFFSET %s ROWS", n)
+
+	return str.String()
+}
+
+func (pd *Plugin) GenRowPageStmt(t *dbJson.DbTable) string {
+	var str			util.StringBuilder
+
+	db := t.DB
+
+	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s %s;\\n",
+		db.Schema, t.TitledName(), t.KeysList("", " ASC"),
+		pd.GenRowOffset(t, "?"), pd.GenRowLimit(t, "?"))
+
+	return str.String()
+}
+
+func (pd *Plugin) GenRowPrevStmt(t *dbJson.DbTable) string {
+	var str			util.StringBuilder
+
+	db := t.DB
+
+	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
+	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
+		db.Schema, t.TitledName(), pd.GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC"),
+		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
+
+	return str.String()
+}
+
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
 func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
@@ -231,6 +336,78 @@ func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) st
 	return strs.String()
 }
 
+func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
+	var str			strings.Builder
+	var hasKeys		bool
+
+	db := t.DB
+
+	str.WriteString(fmt.Sprintf("CREATE TABLE %s%s (\\n", db.Schema, t.TitledName()))
+	for i, _ := range t.Fields {
+		var cm  		string
+		var f			*dbJson.DbField
+		var ft			string
+		var nl			string
+		var pk			string
+		var sp			string
+
+		f = &t.Fields[i]
+		cm = ""
+		if i != (len(t.Fields) - 1) {
+			cm = ","
+		} else {
+			if hasKeys {
+				cm = ","
+			}
+		}
+
+		td := f.Typ
+		if td == nil {
+			log.Fatalln("Error - Could not find Type definition for field,",
+				f.Name,"type:",f.TypeDefn)
+		}
+		tdd := f.Typ.SqlType()
+
+		if f.Len > 0 {
+			if f.Dec > 0 {
+				ft = fmt.Sprintf("%s(%d,%d)", tdd, f.Len, f.Dec)
+			} else {
+				ft = fmt.Sprintf("%s(%d)", tdd, f.Len)
+			}
+		} else {
+			ft = tdd
+		}
+		nl = " NOT NULL"
+		if f.Nullable {
+			nl = ""
+		}
+		pk = ""
+		if f.KeyNum > 0 {
+			hasKeys = true
+		}
+		sp = ""
+		if len(f.SQLParms) > 0 {
+			sp = " " + f.SQLParms
+		}
+
+		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
+	}
+	if hasKeys {
+		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.TitledName(), t.KeysList("", ""))
+		str.WriteString(wrk)
+	}
+	str.WriteString(")")
+	if len(t.SQLParms) > 0 {
+		str.WriteString(",\\n")
+		for _, l := range t.SQLParms {
+			str.WriteString(fmt.Sprintf("%s\\n", l))
+		}
+	}
+	str.WriteString(";\\n")
+
+	return str.String()
+}
+
 // GenTrailer returns any trailer information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenTrailer() string {
@@ -250,6 +427,13 @@ func (pd *Plugin) Name() string {
 // SQL Statement before it can be used.
 func (pd *Plugin) NeedUse() bool {
 	return true
+}
+
+// SchemaName simply returns the external name that this plugin is known by
+// or supports.
+// Required method
+func (pd *Plugin) SchemaName() string {
+	return "dbo."
 }
 
 // Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.

@@ -6,12 +6,6 @@
 // table manipulation should be added to this package as
 // methods in IO_[[.Table.Name]]
 
-// Notes:
-//  1. Any Database Query that returns "rows" must have an associated
-//      rows.Close(). The best way to handle this is to do the query
-//      immediately followed by "defer rows.Close()".  Queries that
-//      return a "row" need not be closed.
-
 [[$td := .TD]]
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
@@ -21,6 +15,17 @@
 [[- $plg := $d.Plugin.Plugin]]
 [[- $typ := $plg.Name]]
 
+// Notes:
+//  1. Any Database Query that returns "rows" must have an associated
+//      rows.Close(). The best way to handle this is to do the query
+//      immediately followed by "defer rows.Close()".  Queries that
+//      return a "row" need not be closed.
+
+[[ if eq $typ "mssql" -]]
+// 2.   T-SQL does not seem to support LIMIT or OFFSET in SQL Server 2017. So, you
+//      have to use an ORDER BY clause followed by an OFFSET clause optionally
+//      followed by the FETCH clause (ie ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]).
+[[- end ]]
 // Generated: [[Time]] for [[$typ]] Database
 
 package io[[$dn]][[$tn]]
@@ -60,10 +65,6 @@ func ErrorString(err error) string {
 
 type IO_[[$tn]] struct {
     io          *io[[$dn]].IO_[[$dn]]
-}
-
-func (io *IO_[[$tn]]) Sql() *sql.DB {
-    return io.io.Sql()
 }
 
 //----------------------------------------------------------------------------
@@ -128,7 +129,7 @@ func (io *IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowFind(%+v)\n", rcd)
     [[end]]
 
-	row := io.Sql().QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+	row := io.io.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 
@@ -153,7 +154,7 @@ func (io *IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowFirst()\n")
     [[end]]
 
-    row := io.Sql().QueryRow(sqlStmt)
+    row := io.io.QueryRow(sqlStmt)
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
@@ -211,7 +212,7 @@ func (io *IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowLast(%+v)\n", rcd)
     [[end]]
 
-    row := io.Sql().QueryRow(sqlStmt)
+    row := io.io.QueryRow(sqlStmt)
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
@@ -241,7 +242,7 @@ func (io *IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowNext(%+v)\n", rcd)
     [[end]]
 
-    row := io.Sql().QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+    row := io.io.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err != nil {
@@ -271,21 +272,24 @@ func (io *IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], 
         log.Printf("io[[$tn]].RowPage(%d,%d)\n",offset,limit)
     [[end]]
 
-    rows, err := io.Sql().Query(sqlStmt, limit, offset)
-	if err != nil {
-	    return data, err
-	}
-
-	for rows.Next() {
-		var rcd     [[$dn]][[$tn]].[[$tn]]
-		if err = rows.Scan([[$t.FieldNameList "&rcd."]]); err != nil {
-			log.Fatal(err)
-		} else {
-		    data = append(data, rcd)
-		}
-	}
-
-	err = rows.Close()
+    err = io.io.Query(
+                    sqlStmt,
+                    func(r *sql.Rows) {
+                        var rcd     [[$dn]][[$tn]].[[$tn]]
+                        err = r.Scan([[$t.FieldNameList "&rcd."]])
+                        if err != nil {
+                            log.Fatal(err)
+                        } else {
+                            data = append(data, rcd)
+                        }
+                    },
+    [[ if eq $typ "mssql" -]]
+                    offset,
+                    limit)
+    [[ else -]]
+                    limit,
+                    offset)
+    [[- end ]]
 
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowPage(%s)\n", ErrorString(err))
@@ -305,7 +309,7 @@ func (io *IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowPrev(%+v)\n", rcd)
     [[end]]
 
-    row := io.Sql().QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+    row := io.io.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
 
 	err = row.Scan([[$t.FieldNameList "&rcd."]])
 	if err != nil {
@@ -361,7 +365,7 @@ func (io *IO_[[$tn]]) TableCount( ) (int, error) {
         log.Printf("io[[$tn]].TableCount()\n")
     [[end]]
 
-    row := io.Sql().QueryRow(sqlStmt)
+    row := io.io.QueryRow(sqlStmt)
 
 	err = row.Scan(&count)
     if err != nil {

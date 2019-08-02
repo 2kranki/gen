@@ -18,11 +18,144 @@ package io[[$dn]][[$tn]]
 
 import (
 	"testing"
+    [[ if ne $typ "sqlite" -]]
+	"time"
+	[[- end ]]
 	"../[[$dn]][[$tn]]"
 	"../io[[$dn]]"
+	"../util"
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
+
+[[ if eq $typ "mariadb" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    err = exec.Run()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    time.Sleep(5000 * time.Millisecond)
+
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "mssql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+    var output      string
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    output, err = exec.RunWithOutput()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    t.Logf("%s\n", output)
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "mysql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    err = exec.Run()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "postgres" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    err = exec.Run()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "sqlite" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    //err = exec.Run()      // Not needed for sqlite!
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ end ]]
 
 //============================================================================
 //                              Test Data
@@ -126,9 +259,10 @@ func TestCreateDeleteTable(t *testing.T) {
     var io          *IO_[[$tn]]
 
 	t.Logf("TestCreateTable()...\n")
+	DockerRun(t)
 	td = NewTest()
 	td.Setup(t)
-	io = [[$tn]]New(td.io.Sql())
+	io = [[$tn]]New(td.io)
 
     err = io.TableDelete()
     if err != nil {
@@ -160,9 +294,10 @@ func Test[[$tn]]RowInsert(t *testing.T) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
 
     t.Logf("Test[[$tn]].RowInsert()...\n")
+	DockerRun(t)
 	td = NewTest()
 	td.Setup(t)
-	io = [[$tn]]New(td.io.Sql())
+	io = [[$tn]]New(td.io)
 
     // Start clean with new empty tables.
     err = io.TableCreate()
@@ -244,9 +379,10 @@ func Test[[$tn]]RowPage(t *testing.T) {
     var rcds        [][[$dn]][[$tn]].[[$tn]]
 
     t.Logf("Test[[$tn]]RowPage()...\n")
+	DockerRun(t)
 	td = NewTest()
 	td.Setup(t)
-	io = [[$tn]]New(td.io.Sql())
+	io = [[$tn]]New(td.io)
 
     // Start clean with new empty tables.
     err = io.TableCreate()

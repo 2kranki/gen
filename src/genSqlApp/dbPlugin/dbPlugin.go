@@ -43,6 +43,10 @@ type GenTableCreateStringer	interface {
 	GenDeleteTableSQL(table interface{}) string
 }
 
+type SchemaNamer interface {
+	SchemaName()	string
+}
+
 //============================================================================
 //                        		Plugin Support
 //============================================================================
