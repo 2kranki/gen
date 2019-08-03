@@ -52,7 +52,7 @@ type	Plugin struct {}
 // CreateDatabase indicatess if the Database needs to be
 // created before it can be used.
 func (pd Plugin) CreateDatabase() bool {
-	return false
+	return true
 }
 
 // DefaultDatabase returns default database name.
@@ -132,18 +132,16 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
-func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
-	strs.WriteString("connStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)/\",")
-	strs.WriteString(dbUser)
-	strs.WriteString(",")
-	strs.WriteString(dbPW)
-	strs.WriteString(",")
-	strs.WriteString(dbServer)
-	strs.WriteString(",")
-	strs.WriteString(dbPort)
-	strs.WriteString(")\n")
+	strs.WriteString("\tcfg := mysql.NewConfig()\n")
+	strs.WriteString("\tcfg.User = io.dbUser\n")
+	strs.WriteString("\tcfg.Passwd = io.dbPW\n")
+	strs.WriteString("\tcfg.Net = \"tcp\"\n")
+	strs.WriteString("\tcfg.Addr = fmt.Sprintf(\"%s:%s\", io.dbServer, io.dbPort)\n")
+	strs.WriteString("\tconnStr := cfg.FormatDSN()\n")
+
 	if sharedData.GenDebugging() {
 		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
 	}

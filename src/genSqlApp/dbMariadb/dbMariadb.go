@@ -27,11 +27,11 @@ var tds	= dbType.TypeDefns {
 	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
 	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
 	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
+	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
+	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
 	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"string",	DftLen:0,},
+	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
 	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
 	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},
@@ -52,7 +52,7 @@ type	Plugin struct {
 // CreateDatabase indicates that the Database needs to be
 // created before it can be used.
 func (pd Plugin) CreateDatabase() bool {
-	return false
+	return true
 }
 
 // DefaultDatabase returns default database name.
@@ -124,22 +124,30 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
-func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
-	strs.WriteString("connStr := fmt.Sprintf(\"%s:%s@tcp(%s:%s)/\",")
-	strs.WriteString(dbUser)
-	strs.WriteString(",")
-	strs.WriteString(dbPW)
-	strs.WriteString(",")
-	strs.WriteString(dbServer)
-	strs.WriteString(",")
-	strs.WriteString(dbPort)
-	strs.WriteString(")\n")
+	strs.WriteString("cfg := mysql.NewConfig()\n")
+	strs.WriteString("\tcfg.User = io.dbUser\n")
+	strs.WriteString("\tcfg.Passwd = io.dbPW\n")
+	strs.WriteString("\tcfg.Net = \"tcp\"\n")
+	strs.WriteString("\tcfg.Addr = fmt.Sprintf(\"%s:%s\", io.dbServer, io.dbPort)\n")
+	strs.WriteString("\tconnStr := cfg.FormatDSN()\n")
+
+	strs.WriteString("\tfor i:=0; i<7; i++ {\n")
 	if sharedData.GenDebugging() {
-		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
+		strs.WriteStringf("\t\tlog.Printf(\"\\tConnecting %%d to %s using %%s\\n\", i, connStr)\n", pd.DriverName())
 	}
-	strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteStringf("\t\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteString("\t\tif err == nil {\n")
+	strs.WriteString("\t\t\terr = io.dbSql.Ping()\n")
+	strs.WriteString("\t\t\tif err == nil {\n")
+	strs.WriteString("\t\t\t\tbreak\n")
+	strs.WriteString("\t\t\t}\n")
+	strs.WriteString("\t\t\tio.Disconnect()\n")
+	strs.WriteString("\t\t}\n")
+	strs.WriteString("\t\ttime.Sleep(2 * time.Second)\n")
+	strs.WriteString("\t}\n")
 
 	return strs.String()
 }
@@ -162,7 +170,7 @@ func (pd Plugin) Name() string {
 // NeedUse indicates if the Database needs a USE
 // SQL Statement before it can be used.
 func (pd Plugin) NeedUse() bool {
-	return false
+	return true
 }
 
 // SchemaName simply returns the external name that this plugin is known by

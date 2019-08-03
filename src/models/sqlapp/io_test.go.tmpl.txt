@@ -28,13 +28,14 @@ var io      *IO_[[$dn]]
 
 [[ if eq $typ "mariadb" -]]
 //----------------------------------------------------------------------------
-//                              Docker Run
+//                              Docker Run - mariadb
 //----------------------------------------------------------------------------
 
 // DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
 func DockerRun(t *testing.T) {
     var err         error
     var exec        *util.ExecCmd
+    var output      string
 
 	t.Logf("DockerRun()...\n")
 
@@ -43,10 +44,11 @@ func DockerRun(t *testing.T) {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
 
-    err = exec.Run()
+    output, err = exec.RunWithOutput()
     if err != nil {
         t.Fatalf("Error: %s\n\n", err)
     }
+    t.Logf("%s\n", output)
     time.Sleep(5000 * time.Millisecond)
 
 
@@ -54,7 +56,7 @@ func DockerRun(t *testing.T) {
 }
 [[ else if eq $typ "mssql" -]]
 //----------------------------------------------------------------------------
-//                              Docker Run
+//                              Docker Run - mssql
 //----------------------------------------------------------------------------
 
 // DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
@@ -81,13 +83,14 @@ func DockerRun(t *testing.T) {
 }
 [[ else if eq $typ "mysql" -]]
 //----------------------------------------------------------------------------
-//                              Docker Run
+//                              Docker Run - mysql
 //----------------------------------------------------------------------------
 
 // DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
 func DockerRun(t *testing.T) {
     var err         error
     var exec        *util.ExecCmd
+    var output      string
 
 	t.Logf("DockerRun()...\n")
 
@@ -96,23 +99,25 @@ func DockerRun(t *testing.T) {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
 
-    err = exec.Run()
+    output, err = exec.RunWithOutput()
     if err != nil {
         t.Fatalf("Error: %s\n\n", err)
     }
+    t.Logf("%s\n", output)
     time.Sleep(5000 * time.Millisecond)
 
 	t.Logf("DockerRun() - End\n\n\n")
 }
 [[ else if eq $typ "postgres" -]]
 //----------------------------------------------------------------------------
-//                              Docker Run
+//                              Docker Run - postgres
 //----------------------------------------------------------------------------
 
 // DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
 func DockerRun(t *testing.T) {
     var err         error
     var exec        *util.ExecCmd
+    var output      string
 
 	t.Logf("DockerRun()...\n")
 
@@ -121,17 +126,18 @@ func DockerRun(t *testing.T) {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
 
-    err = exec.Run()
+    output, err = exec.RunWithOutput()
     if err != nil {
         t.Fatalf("Error: %s\n\n", err)
     }
+    t.Logf("%s\n", output)
     time.Sleep(5000 * time.Millisecond)
 
 	t.Logf("DockerRun() - End\n\n\n")
 }
 [[ else if eq $typ "sqlite" -]]
 //----------------------------------------------------------------------------
-//                              Docker Run
+//                              Docker Run - sqlite
 //----------------------------------------------------------------------------
 
 // DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.

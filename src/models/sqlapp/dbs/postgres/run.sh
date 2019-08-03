@@ -6,7 +6,7 @@ pw="Passw0rd!"
 server="localhost"
 port=5430
 
-echo "Ignore message: Error: No such container: mssql1"
+echo "Ignore message: Error: No such container: ${name}"
 docker container rm -f ${name}
 
 containerID=`docker container run --name ${name} -e "POSTGRES_PASSWORD=${pw}" -p ${port}:5432  -d postgres`

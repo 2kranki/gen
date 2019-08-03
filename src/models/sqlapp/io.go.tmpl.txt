@@ -26,11 +26,18 @@ import (
     [[ if eq $typ "mssql" -]]
         "net/url"
     [[end]]
-     [[if $d.HasFloat]]
+     [[ if $d.HasFloat -]]
         "strconv"
         "strings"
-    [[end]]
-	_ [[$d.Plugin.Plugin.GenImportString]]
+    [[- end ]]
+    "time"
+    [[ if eq $typ "mariadb" -]]
+	    [[$d.Plugin.Plugin.GenImportString]]
+    [[ else if eq $typ "mysql" -]]
+	    [[$d.Plugin.Plugin.GenImportString]]
+	[[- else ]]
+	    _ [[$d.Plugin.Plugin.GenImportString]]
+	[[- end ]]
 )
 
 [[$d.Plugin.Plugin.GenHeader]]
@@ -223,7 +230,7 @@ func (io *IO_[[$dn]]) IsConnected() bool {
 func (io *IO_[[$dn]]) DatabaseCreate() error {
     var err     error
     [[ if ne $typ "sqlite" -]]
-        var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
+        var sqlStmt = "[[GenDatabaseCreateStmt $d]]"
     [[- end ]]
 
     [[if GenDebugging]]
@@ -288,7 +295,7 @@ func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
         if len(dbName) > 0 {
             name = dbName
         }
-        err = io.Exec(fmt.Sprintf("USE %s;\n", name))
+        err = io.Exec(fmt.Sprintf("USE %s;", name))
     [[- end ]]
 
     [[if GenDebugging]]
@@ -297,7 +304,45 @@ func (io *IO_[[$dn]]) DatabaseUse(dbName string) error {
     return err
 }
 
-[[ if eq $typ "mssql" -]]
+[[ if eq $typ "mariadb" -]]
+//----------------------------------------------------------------------------
+//						IsDatabaseDefined - mariadb
+//----------------------------------------------------------------------------
+
+// IsDatabaseDefined checks to see if the Database is already defined to the SQL server.
+// This is not needed in SQLite. So, we just return true.
+func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
+    var sqlStmt = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = '[[$dn]]';"
+    var err         error
+    var row         *sql.Row
+    var Database    string
+
+    [[if GenDebugging]]
+        log.Printf("IsDatabaseDefined()\n")
+    [[end]]
+
+    row = io.dbSql.QueryRow(sqlStmt)
+    err = row.Scan(&Database)
+	if err == nil {
+        if Database == "[[$dn]]" {
+        [[if GenDebugging]]
+            log.Printf("...end IsDatabaseDefined(true)\n")
+        [[end]]
+            return true;
+        }
+    [[if GenDebugging]]
+	} else {
+	        log.Printf("\tSELECT schema_name Error: %s  Name: %s\n", err.Error(), Database)
+    [[end]]
+	}
+
+    [[if GenDebugging]]
+        log.Printf("...end IsDatabaseDefined(false)\n")
+    [[end]]
+    return false
+}
+
+[[ else if eq $typ "mssql" -]]
 //----------------------------------------------------------------------------
 //						IsDatabaseDefined - mssql
 //----------------------------------------------------------------------------
@@ -359,6 +404,44 @@ func (io *IO_[[$dn]]) ErrChk(err error) error {
         log.Printf("...end ErrChk(%s)\n", ErrorString(err))
     [[end]]
     return err
+}
+
+[[ else if eq $typ "mysql" -]]
+//----------------------------------------------------------------------------
+//						IsDatabaseDefined - mysql
+//----------------------------------------------------------------------------
+
+// IsDatabaseDefined checks to see if the Database is already defined to the SQL server.
+// This is not needed in SQLite. So, we just return true.
+func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
+    var sqlStmt = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = ''[[$dn]]';"
+    var err         error
+    var row         *sql.Row
+    var Database    string
+
+    [[if GenDebugging]]
+        log.Printf("IsDatabaseDefined()\n")
+    [[end]]
+
+    row = io.dbSql.QueryRow(sqlStmt)
+    err = row.Scan(&Database)
+	if err == nil {
+        if Database == "[[$dn]]" {
+        [[if GenDebugging]]
+            log.Printf("...end IsDatabaseDefined(true)\n")
+        [[end]]
+            return true;
+        }
+    [[if GenDebugging]]
+	} else {
+	        log.Printf("\tSELECT schema_name Error: %s  Name: %s\n", err.Error(), Database)
+    [[end]]
+	}
+
+    [[if GenDebugging]]
+        log.Printf("...end IsDatabaseDefined(false)\n")
+    [[end]]
+    return false
 }
 
 [[ else if eq $typ "sqlite" -]]

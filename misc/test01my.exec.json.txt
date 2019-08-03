@@ -5,7 +5,7 @@
     "force":false,
     "main":"./misc/test01my/main.json.txt",
     "noop":false,
-    "outdir":"/tmp/app01my",
+    "outdir":"/tmp/app01/app01my",
     "quiet":false,
     "replace":true
 }

@@ -297,19 +297,6 @@ func (pd *Plugin) GenRowPrevStmt(t *dbJson.DbTable) string {
 func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
-	/**************
-	//strs.WriteString("connStr := fmt.Sprintf(\"sqlserver://%s:%s@%s:%s?database=master&connection+timeout=30\",")
-	strs.WriteString("connStr := fmt.Sprintf(\"sqlserver://%s:%s@%s:%s?connection+timeout=30\",")
-	strs.WriteString(dbUser)
-	strs.WriteString(",")
-	strs.WriteString(dbPW)
-	strs.WriteString(",")
-	strs.WriteString(dbServer)
-	strs.WriteString(",")
-	strs.WriteString(dbPort)
-	strs.WriteString(")\n")
-	 *************/
-
 	strs.WriteString("\tquery := url.Values{}\n")
 	strs.WriteString("\tquery.Add(\"connection+timeout\", \"30\")\n")
 	strs.WriteString("\tu := &url.URL{\n")

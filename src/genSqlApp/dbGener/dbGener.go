@@ -228,8 +228,8 @@ func GenDatabaseCreateStmt(db *dbJson.Database) string {
 		return intr.GenDatabaseCreateStmt(db)
 	}
 
-	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;\\n", db.TitledName()))
-	str.WriteString(fmt.Sprintf("USE %s;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s;", db.TitledName()))
+	//str.WriteString(fmt.Sprintf("USE %s;", db.TitledName()))
 
 	return str.String()
 }
@@ -246,7 +246,7 @@ func GenDatabaseDeleteStmt(db *dbJson.Database) string {
 		return intr.GenDatabaseDeleteStmt(db)
 	}
 
-	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;\\n", db.TitledName()))
+	str.WriteString(fmt.Sprintf("DROP DATABASE IF EXISTS %s;", db.TitledName()))
 
 	return str.String()
 }

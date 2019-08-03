@@ -6,10 +6,11 @@ pw="Passw0rd!"
 server="localhost"
 port=3306
 
-echo "Ignore message: Error: No such container: mssql1"
+echo "Ignore message(s): Error: No such container: ${name}"
 docker container rm -f ${name}
 
-containerID=`docker container run --name ${name} -e "MYSQL_ROOT_PASSWORD=${pw}" -e "MYSQL_DATABASE='Finances'" -p ${port}:3306  -d mysql:5.7`
+#containerID=`docker container run --name ${name} -e "MYSQL_ROOT_PASSWORD=${pw}" -e "MYSQL_DATABASE='Finances'" -p ${port}:3306  -d mysql:5.7`
+containerID=`docker container run --name ${name} -e "MYSQL_ROOT_PASSWORD=${pw}" -p ${port}:3306  -d mysql:5.7`
 
 #echo "Container ID: ${containerID: -10}"
 
