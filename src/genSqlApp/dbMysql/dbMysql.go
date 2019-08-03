@@ -29,10 +29,10 @@ var tds	= dbType.TypeDefns {
 	{Name:"email", 		Html:"email", 		Sql:"NVARCHAR", 	Go:"string",	DftLen:50,},
 	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
 	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
+	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
+	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
+	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
 	{Name:"tel", 		Html:"tel",			Sql:"NVARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
 	{Name:"text", 		Html:"text",		Sql:"NVARCHAR",		Go:"string",	DftLen:0,},
 	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
@@ -135,17 +135,27 @@ func (pd Plugin) GenImportString() string {
 func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
-	strs.WriteString("\tcfg := mysql.NewConfig()\n")
+	strs.WriteString("cfg := mysql.NewConfig()\n")
 	strs.WriteString("\tcfg.User = io.dbUser\n")
 	strs.WriteString("\tcfg.Passwd = io.dbPW\n")
 	strs.WriteString("\tcfg.Net = \"tcp\"\n")
 	strs.WriteString("\tcfg.Addr = fmt.Sprintf(\"%s:%s\", io.dbServer, io.dbPort)\n")
 	strs.WriteString("\tconnStr := cfg.FormatDSN()\n")
 
+	strs.WriteString("\tfor i:=0; i<7; i++ {\n")
 	if sharedData.GenDebugging() {
-		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
+		strs.WriteStringf("\t\tlog.Printf(\"\\tConnecting %%d to %s using %%s\\n\", i, connStr)\n", pd.DriverName())
 	}
-	strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteStringf("\t\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteString("\t\tif err == nil {\n")
+	strs.WriteString("\t\t\terr = io.dbSql.Ping()\n")
+	strs.WriteString("\t\t\tif err == nil {\n")
+	strs.WriteString("\t\t\t\tbreak\n")
+	strs.WriteString("\t\t\t}\n")
+	strs.WriteString("\t\t\tio.Disconnect()\n")
+	strs.WriteString("\t\t}\n")
+	strs.WriteString("\t\ttime.Sleep(2 * time.Second)\n")
+	strs.WriteString("\t}\n")
 
 	return strs.String()
 }

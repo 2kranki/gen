@@ -27,8 +27,8 @@ definition and having them control the generation process.
 - [x] Finish Database I/O Testing for SQLite
 - [x] Finish Table I/O Testing for SQLite
 - [x] Finish Database Handler Testing
-- [ ] Finish MS-SQL Support
-- [ ] Finish MySQL/MariaDB Support
+- [x] Finish MS-SQL Support
+- [x] Finish MySQL/MariaDB Support
 - [ ] Finish Postgres Support
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
