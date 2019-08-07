@@ -120,7 +120,7 @@ func (pd *Plugin) DriverName() string {
 func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("create database %s;\\n", db.TitledName())
+	str.WriteStringf("CREATE DATABASE %s;\\n", db.TitledName())
 	//str.WriteString( "go")
 
 	return str.String()
@@ -292,9 +292,9 @@ func (pd *Plugin) GenRowPrevStmt(t *dbJson.DbTable) string {
 	return str.String()
 }
 
-// GenSqlOpen generates the code to issue sql.Open() which is unique
-// for each database server.
-func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+// GenSqlBuildConn generates the code to build the connection string that would be
+// issued to sql.Open() which is unique for each database server.
+func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
 	strs.WriteString("\tquery := url.Values{}\n")
@@ -315,10 +315,19 @@ func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) st
 	strs.WriteString("\t}\n")
 	strs.WriteString("\tconnStr := u.String()\n")
 
+	return strs.String()
+}
+
+// GenSqlOpen generates the code to issue sql.Open() which is unique
+// for each database server.
+func (pd *Plugin) GenSqlOpen(dbSql string) string {
+	var strs		util.StringBuilder
+
+
 	if sharedData.GenDebugging() {
-		strs.WriteStringf("\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
+		strs.WriteStringf("\t\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
 	}
-	strs.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteStringf("\t\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
 
 	return strs.String()
 }
@@ -408,12 +417,6 @@ func (pd *Plugin) GenTrailer() string {
 // Required method
 func (pd *Plugin) Name() string {
 	return "mssql"
-}
-
-// NeedUse indicates if the Database needs a USE
-// SQL Statement before it can be used.
-func (pd *Plugin) NeedUse() bool {
-	return true
 }
 
 // SchemaName simply returns the external name that this plugin is known by

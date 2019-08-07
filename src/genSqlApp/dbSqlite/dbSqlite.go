@@ -12,7 +12,6 @@
 package dbSqlite
 
 import (
-	"../../shared"
 	"../../util"
 	"../dbJson"
 	"../dbPlugin"
@@ -117,20 +116,16 @@ func (pd Plugin) GenImportString() string {
 	return "\"github.com/mattn/go-sqlite3\""
 }
 
-// GenSqlOpen generates the code to issue sql.Open() which is unique
-// for each database server.
-func (pd Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
-	var str			util.StringBuilder
+// GenSqlBuildConn generates the code to build the connection string that would be
+// issued to sql.Open() which is unique for each database server.
+func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
+	var strs		util.StringBuilder
 
-	str.WriteString("\tconnStr := fmt.Sprintf(\"%s\", ")
-	str.WriteString(dbName)
-	str.WriteString(")\n")
-	if sharedData.GenDebugging() {
-		str.WriteString("\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n")
-	}
-	str.WriteStringf("\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
+	strs.WriteString("\tconnStr := fmt.Sprintf(\"%s\", ")
+	strs.WriteString(dbName)
+	strs.WriteString(")\n")
 
-	return str.String()
+	return strs.String()
 }
 
 // GenTrailer returns any trailer information needed for I/O.
@@ -146,12 +141,6 @@ func (pd *Plugin) GenTrailer() string {
 // Required method
 func (pd Plugin) Name() string {
 	return extName
-}
-
-// NeedUse indicates if the Database needs a USE
-// SQL Statement before it can be used.
-func (pd Plugin) NeedUse() bool {
-	return false
 }
 
 // SchemaName simply returns the external name that this plugin is known by

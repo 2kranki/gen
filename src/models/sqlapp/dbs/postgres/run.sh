@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 name="postgres1"
-user="root"
+user="postgres"
 pw="Passw0rd!"
 server="localhost"
 port=5430

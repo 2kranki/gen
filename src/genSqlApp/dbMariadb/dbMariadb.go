@@ -8,7 +8,6 @@
 package dbMariadb
 
 import (
-	"../../shared"
 	"../../util"
 	"../dbJson"
 	"../dbPlugin"
@@ -122,9 +121,9 @@ func (pd Plugin) GenImportString() string {
 	return "\"github.com/go-sql-driver/mysql\""
 }
 
-// GenSqlOpen generates the code to issue sql.Open() which is unique
-// for each database server.
-func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) string {
+// GenSqlBuildConn generates the code to build the connection string that would be
+// issued to sql.Open() which is unique for each database server.
+func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
 	var strs		util.StringBuilder
 
 	strs.WriteString("cfg := mysql.NewConfig()\n")
@@ -133,21 +132,6 @@ func (pd *Plugin) GenSqlOpen(dbSql,dbServer,dbPort,dbUser,dbPW,dbName string) st
 	strs.WriteString("\tcfg.Net = \"tcp\"\n")
 	strs.WriteString("\tcfg.Addr = fmt.Sprintf(\"%s:%s\", io.dbServer, io.dbPort)\n")
 	strs.WriteString("\tconnStr := cfg.FormatDSN()\n")
-
-	strs.WriteString("\tfor i:=0; i<7; i++ {\n")
-	if sharedData.GenDebugging() {
-		strs.WriteStringf("\t\tlog.Printf(\"\\tConnecting %%d to %s using %%s\\n\", i, connStr)\n", pd.DriverName())
-	}
-	strs.WriteStringf("\t\t%s, err = sql.Open(\"%s\", connStr)\n", dbSql, pd.DriverName())
-	strs.WriteString("\t\tif err == nil {\n")
-	strs.WriteString("\t\t\terr = io.dbSql.Ping()\n")
-	strs.WriteString("\t\t\tif err == nil {\n")
-	strs.WriteString("\t\t\t\tbreak\n")
-	strs.WriteString("\t\t\t}\n")
-	strs.WriteString("\t\t\tio.Disconnect()\n")
-	strs.WriteString("\t\t}\n")
-	strs.WriteString("\t\ttime.Sleep(2 * time.Second)\n")
-	strs.WriteString("\t}\n")
 
 	return strs.String()
 }
@@ -165,12 +149,6 @@ func (pd *Plugin) GenTrailer() string {
 // Required method
 func (pd Plugin) Name() string {
 	return extName
-}
-
-// NeedUse indicates if the Database needs a USE
-// SQL Statement before it can be used.
-func (pd Plugin) NeedUse() bool {
-	return true
 }
 
 // SchemaName simply returns the external name that this plugin is known by
