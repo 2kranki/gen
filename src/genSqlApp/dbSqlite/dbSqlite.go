@@ -6,8 +6,13 @@
 // table sql i/o for a specific database.
 
 // SQLite is a fairly simple interface and easy to work
-// with.  The database name becomes also the file name
+// with.  The database name becomes also the file path
 // suffixed with ".db".
+
+// Remarks:
+//	*	The Create Database statement is irrelevant for
+//		this server since the database name is used as
+//		part of the SQLite file path.
 
 package dbSqlite
 

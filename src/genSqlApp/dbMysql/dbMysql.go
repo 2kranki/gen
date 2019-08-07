@@ -95,14 +95,6 @@ func (pd *Plugin) DriverName() string {
 	return "mysql"
 }
 
-func (pd *Plugin) GenDatabaseUseStmt(db *dbJson.Database) string {
-	var str			util.StringBuilder
-
-	str.WriteStringf("USE %s;", db.TitledName())
-
-	return str.String()
-}
-
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {

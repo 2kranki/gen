@@ -8,6 +8,11 @@
 // table and field data for html forms, handlers and
 // table sql i/o for a specific database.
 
+// Remarks:
+//	*	Unquoted names are converted to lowercase. Quoted names are case-sensitive
+//		(ie "MyTable" is not equal to "MYTABLE") and should be surrounded with
+//		double-quotes.
+
 package dbPostgres
 
 import (
@@ -99,8 +104,7 @@ func (pd *Plugin) DriverName() string {
 func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("CREATE DATABASE %s;\\n", db.TitledName())
-	//str.WriteString( "go")
+	str.WriteString("\tstr.WriteStringf(\"CREATE DATABASE %s;\", dbName)\n")
 
 	return str.String()
 }

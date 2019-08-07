@@ -15,6 +15,14 @@
 //  *   A Golang Database driver may or may not support multiple statements per
 //      request. So, it is safest to only assume that it will perform 1 statement
 //      at a time.
+//  *   We recommend certain naming conventions. First all supplied names should
+//      be lower-case. You should separate words with an '_' if you use full words
+//      in the name.
+[[ if eq .TD.Data.Plugin.Plugin.Name "postgres" -]]
+//	*	Unquoted names are converted to lowercase. Quoted names are case-sensitive
+//		(ie "MyTable" is not equal to "MYTABLE") and should be surrounded with
+//		double-quotes.
+[[- end ]]
 
 [[- $dot := .]]
 [[- $d   := .TD.Data]]
@@ -42,6 +50,7 @@ import (
     [[ if ne $typ "sqlite" -]]
         "time"
     [[end]]
+    "../util"
     [[ if eq $typ "mariadb" -]]
 	    [[$d.Plugin.Plugin.GenImportString]]
     [[ else if eq $typ "mysql" -]]
@@ -140,73 +149,12 @@ func (io *IO_[[$dn]]) DefaultParms() {
 		io.SetPW("[[$d.Plugin.Plugin.DefaultPW]]")
 		io.SetServer("[[$d.Plugin.Plugin.DefaultServer]]")
 		io.SetUser("[[$d.Plugin.Plugin.DefaultUser]]")
-		io.SetName("[[$d.Plugin.Plugin.DefaultDatabase $d]]")
+		//io.SetName("[[$d.Plugin.Plugin.DefaultDatabase $d]]")
 }
 
 //============================================================================
 //                              Database Methods
 //============================================================================
-
-//----------------------------------------------------------------------------
-//								Connect
-//----------------------------------------------------------------------------
-
-// Connect connects the database/sql/driver to the appropriate
-// database using the given parameters. If the database name
-// is not used.
-func (io *IO_[[$dn]]) Connect() error {
-    var err         error
-
-	[[$d.Plugin.Plugin.GenSqlBuildConn "io.dbServer" "io.dbPort" "io.dbUser" "io.dbPW" ""]]
-
-    [[ if eq $typ "sqlite" -]]
-        [[ if GenDebugging -]]
-            log.Printf("\tConnecting to [[$typ]] with %s...\n", connStr)
-        [[- end ]]
-	    io.dbSql, err = sql.Open("[[$typ]]", connStr)
-    [[- else ]]
-        // Allow for the Docker Container to get operational.
-	    for i:=0; i<7; i++ {
-            [[ if GenDebugging -]]
-                log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
-            [[- end ]]
-            io.dbSql, err = sql.Open("[[$typ]]", connStr)
-            if err == nil {
-                err = io.dbSql.Ping()
-                if err == nil {
-                    break
-                }
-                io.Disconnect()
-            }
-            time.Sleep(2 * time.Second)
-        }
-    [[- end ]]
-    if err != nil {
-        return fmt.Errorf("Error: Cannot Connect: %s\n", err.Error())
-    }
-
-    [[if GenDebugging]]
-        log.Printf("Pinging Server...\n")
-    [[end]]
-    err = io.dbSql.Ping()
-    if err != nil {
-        io.Disconnect( )
-        return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
-    }
-
-    [[if $d.Plugin.Plugin.CreateDatabase]]
-        [[if GenDebugging]]
-            log.Printf("Creating Database...\n")
-        [[end]]
-        err = io.DatabaseCreate()
-        if err != nil {
-            io.Disconnect( )
-            return fmt.Errorf("Error: Cannot Create Database: %s\n", err.Error())
-        }
-    [[end]]
-
-    return nil
-}
 
 [[ if eq $typ "mariadb" -]]
 //----------------------------------------------------------------------------
@@ -215,8 +163,10 @@ func (io *IO_[[$dn]]) Connect() error {
 
 // Connect connects the database/sql/driver to the appropriate
 // database server using the given parameters.
-func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
+func (io *IO_[[$dn]]) Connect(dbName string) error {
     var err         error
+
+    dbName = strings.ToLower(dbName)
 
     // Set up connection string, connStr.
 	cfg := mysql.NewConfig()
@@ -224,6 +174,9 @@ func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
 	cfg.Passwd = io.dbPW
 	cfg.Net = "tcp"
 	cfg.Addr = fmt.Sprintf("%s:%s", io.dbServer, io.dbPort)
+	if len(dbName) > 0 {
+	    cfg.DBName = dbName
+	}
 	connStr := cfg.FormatDSN()
 
     // Allow for the Docker Container to get operational.
@@ -231,7 +184,7 @@ func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
-        io.dbSql, err = sql.Open("[[$typ]]", connStr)
+        io.dbSql, err = sql.Open("[[$plg.DriverName]]", connStr)
         if err == nil {
             err = io.dbSql.Ping()
             if err == nil {
@@ -253,6 +206,7 @@ func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
         io.Disconnect( )
         return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
     }
+    io.SetName(dbName)
 
     return nil
 }
@@ -266,8 +220,11 @@ func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
 func (io *IO_[[$dn]]) Connect(dbName string) error {
     var err         error
 
+    dbName = strings.ToLower(dbName)
+
     // Set up connection string, connStr.
 	query := url.Values{}
+	query.Add("database", dbName)
 	query.Add("connection+timeout", "30")
 	u := &url.URL{
 		Scheme:		"sqlserver",
@@ -282,7 +239,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
-        io.dbSql, err = sql.Open("[[$typ]]", connStr)
+        io.dbSql, err = sql.Open("[[$plg.DriverName]]", connStr)
         if err == nil {
             err = io.dbSql.Ping()
             if err == nil {
@@ -304,6 +261,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
         io.Disconnect( )
         return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
     }
+    io.SetName(dbName)
 
     return nil
 }
@@ -317,12 +275,17 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 func (io *IO_[[$dn]]) Connect(dbName string) error {
     var err         error
 
+    dbName = strings.ToLower(dbName)
+
     // Set up connection string, connStr.
 	cfg := mysql.NewConfig()
 	cfg.User = io.dbUser
 	cfg.Passwd = io.dbPW
 	cfg.Net = "tcp"
 	cfg.Addr = fmt.Sprintf("%s:%s", io.dbServer, io.dbPort)
+	if len(dbName) > 0 {
+	    cfg.DBName = dbName
+	}
 	connStr := cfg.FormatDSN()
 
     // Allow for the Docker Container to get operational.
@@ -330,7 +293,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
-        io.dbSql, err = sql.Open("[[$typ]]", connStr)
+        io.dbSql, err = sql.Open("[[$plg.DriverName]]", connStr)
         if err == nil {
             err = io.dbSql.Ping()
             if err == nil {
@@ -352,6 +315,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
         io.Disconnect( )
         return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
     }
+    io.SetName(dbName)
 
     return nil
 }
@@ -365,10 +329,12 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 func (io *IO_[[$dn]]) Connect(dbName string) error {
     var err         error
 
+    dbName = strings.ToLower(dbName)
+
     // Set up connection string, connStr.
 	connStr := fmt.Sprintf("user=%s password='%s' host=%s port=%s ", io.dbUser, io.dbPW, io.dbServer, io.dbPort)
 	if len(dbName) > 0 {
-	    connStr += fmt.Sprintf("database='%s' ", dbName)
+	    connStr += fmt.Sprintf("dbname='%s' ", dbName)
 	}
 	connStr += "sslmode=disable"
 
@@ -377,7 +343,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
-        io.dbSql, err = sql.Open("[[$typ]]", connStr)
+        io.dbSql, err = sql.Open("[[$plg.DriverName]]", connStr)
         if err == nil {
             err = io.dbSql.Ping()
             if err == nil {
@@ -399,6 +365,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
         io.Disconnect( )
         return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
     }
+    io.SetName(dbName)
 
     return nil
 }
@@ -409,15 +376,20 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 
 // Connect connects the database/sql/driver to the appropriate
 // database server using the given parameters.
-func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
+func (io *IO_[[$dn]]) Connect(dbName string) error {
     var err         error
 
-	[[$d.Plugin.Plugin.GenSqlBuildConn "io.dbServer" "io.dbPort" "io.dbUser" "io.dbPW" "io.dbName"]]
+    // Set up connection string, connStr.
+    if len(dbName) > 0 {
+	    connStr := fmt.Sprintf("%s", io.dbName)
+    } else {
+        return fmt.Errorf("Error: Missing required database name\n")
+    }
 
     [[ if GenDebugging -]]
         log.Printf("\tConnecting to [[$typ]] with %s...\n", connStr)
     [[- end ]]
-    io.dbSql, err = sql.Open("[[$typ]]", connStr)
+    io.dbSql, err = sql.Open("[[$plg.DriverName]]", connStr)
     if err != nil {
         return fmt.Errorf("Error: Cannot Connect: %s\n", err.Error())
     }
@@ -430,6 +402,7 @@ func (io *IO_[[$dn]]) ConnectDB(dbName string) error {
         io.Disconnect( )
         return fmt.Errorf("Ping Error: Cannot Ping: %s\n", err.Error())
     }
+    io.SetName(dbName)
 
     return nil
 }
@@ -478,22 +451,58 @@ func (io *IO_[[$dn]]) IsConnected() bool {
 //----------------------------------------------------------------------------
 
 // DatabaseCreate creates the database within the SQL server.
-func (io *IO_[[$dn]]) DatabaseCreate() error {
+func (io *IO_[[$dn]]) DatabaseCreate(dbName string) error {
     var err     error
-    [[ if ne $typ "sqlite" -]]
-        var sqlStmt = "[[GenDatabaseCreateStmt $d]]"
-    [[- end ]]
+	var str		util.StringBuilder
 
     [[if GenDebugging]]
         log.Printf("DatabaseCreate()\n")
     [[end]]
+    dbName = strings.ToLower(dbName)
+
+    [[ if eq $typ "sqlite" -]]
+        return nil
+    [[- end ]]
+    if io.IsDatabaseDefined(dbName) {
+        err = io.Connect(dbName)
+        return err
+    }
+
+	// Build the Create Database SQL Statement.
+    [[ if ne $typ "sqlite" -]]
+        [[GenDatabaseCreateStmt $d]]
+    [[- end ]]
+
+    // Connect without a database specified if needed.
+    if len(io.dbName) > 0 {
+        if io.IsConnected() {
+            io.Disconnect()
+        }
+        err = io.Connect("")
+        if err != nil {
+            return err
+        }
+    }
 
     // Create the database.
-    [[ if ne $typ "sqlite" -]]
-        if !io.IsDatabaseDefined() {
-            err = io.Exec(sqlStmt)
-        }
-    [[- end ]]
+    err = io.Exec(str.String())
+    if err != nil {
+        io.Disconnect()
+        return err
+    }
+    time.Sleep(5 * time.Second)         // Give it time to get done.
+    if !io.IsDatabaseDefined(dbName) {
+        io.Disconnect()
+        return fmt.Errorf("Error - Could not verify database, %s, exists!", dbName)
+    }
+
+    // Now disconnect from the connection without a database.
+    if io.IsConnected() {
+        io.Disconnect()
+    }
+
+    // Reconnect using the newly created database.
+    err = io.Connect(dbName)
 
     [[if GenDebugging]]
         log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
@@ -507,19 +516,23 @@ func (io *IO_[[$dn]]) DatabaseCreate() error {
 
 // DatabaseDelete deletes the table in the
 // given database if present.
-func (io *IO_[[$dn]]) DatabaseDelete() error {
+func (io *IO_[[$dn]]) DatabaseDelete(dbName string) error {
     var err     error
-    [[ if ne $typ "sqlite" -]]
-        var sqlStmt = "[[GenDatabaseDeleteStmt $d]]"
-    [[- end ]]
+	var str		util.StringBuilder
 
     [[if GenDebugging]]
         log.Printf("DatabaseDelete()\n")
     [[end]]
+    dbName = strings.ToLower(dbName)
+
+	// Build the Create Database SQL Statement.
+    [[ if eq $typ "sqlite" -]]
+        [[GenDatabaseDeleteStmt $d]]
+    [[- end ]]
 
     [[ if ne $typ "sqlite" -]]
-        if !io.IsDatabaseDefined() {
-            err = io.Exec(sqlStmt)
+        if !io.IsDatabaseDefined(dbName) {
+            err = io.Exec(str.String())
         }
     [[- end ]]
 
@@ -536,20 +549,24 @@ func (io *IO_[[$dn]]) DatabaseDelete() error {
 
 // IsDatabaseDefined checks to see if the Database is already defined to the SQL server.
 // This is not needed in SQLite. So, we just return true.
-func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
-    var sqlStmt = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = '[[$dn]]';"
+func (io *IO_[[$dn]]) IsDatabaseDefined(dbName string) bool {
+	var str		    util.StringBuilder
     var err         error
     var row         *sql.Row
     var Database    string
 
     [[if GenDebugging]]
-        log.Printf("IsDatabaseDefined()\n")
+        log.Printf("IsDatabaseDefined(%s)\n", dbName)
     [[end]]
+    dbName = strings.ToLower(dbName)
 
-    row = io.dbSql.QueryRow(sqlStmt)
+    // Build the SQL Statement.
+    str.WriteStringf("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '%s';", dbName)
+
+    row = io.dbSql.QueryRow(str.String())
     err = row.Scan(&Database)
 	if err == nil {
-        if Database == "[[$dn]]" {
+        if Database == dbName {
         [[if GenDebugging]]
             log.Printf("...end IsDatabaseDefined(true)\n")
         [[end]]
@@ -574,20 +591,24 @@ func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
 
 // IsDatabaseDefined checks to see if the Database is already defined to the
 // SQL server.
-func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
-    var sqlStmt = "SELECT name FROM sys.databases WHERE name = N'[[$dn]]';"
+func (io *IO_[[$dn]]) IsDatabaseDefined(dbName string) bool {
+	var str	    util.StringBuilder
     var err     error
     var row     *sql.Row
     var name    string
 
     [[if GenDebugging]]
-        log.Printf("IsDatabaseDefined()\n")
+        log.Printf("IsDatabaseDefined(%s)\n", dbName)
     [[end]]
+    dbName = strings.ToLower(dbName)
 
-    row = io.dbSql.QueryRow(sqlStmt)
+    // Build the SQL Statement.
+    str.WriteStringf("SELECT name FROM sys.databases WHERE name = N'%s';", dbName)
+
+    row = io.dbSql.QueryRow(str.String())
     err = row.Scan(&name)
 	if err == nil {
-        if name == "[[$dn]]" {
+        if name == dbName {
         [[if GenDebugging]]
             log.Printf("...end IsDatabaseDefined(true)\n")
         [[end]]
@@ -638,20 +659,24 @@ func (io *IO_[[$dn]]) ErrChk(err error) error {
 
 // IsDatabaseDefined checks to see if the Database is already defined to the SQL server.
 // This is not needed in SQLite. So, we just return true.
-func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
-    var sqlStmt = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = ''[[$dn]]';"
+func (io *IO_[[$dn]]) IsDatabaseDefined(dbName string) bool {
+	var str	    util.StringBuilder
     var err         error
     var row         *sql.Row
     var Database    string
 
     [[if GenDebugging]]
-        log.Printf("IsDatabaseDefined()\n")
+        log.Printf("IsDatabaseDefined(%s)\n", dbName)
     [[end]]
+    dbName = strings.ToLower(dbName)
 
-    row = io.dbSql.QueryRow(sqlStmt)
+    // Build the SQL Statement.
+    str.WriteStringf("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '%s';", dbName)
+
+    row = io.dbSql.QueryRow(str.String())
     err = row.Scan(&Database)
 	if err == nil {
-        if Database == "[[$dn]]" {
+        if Database == dbName {
         [[if GenDebugging]]
             log.Printf("...end IsDatabaseDefined(true)\n")
         [[end]]
@@ -676,20 +701,24 @@ func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
 
 // IsDatabaseDefined checks to see if the Database is already defined to the SQL server.
 // This is not needed in SQLite. So, we just return true.
-func (io *IO_[[$dn]]) IsDatabaseDefined() bool {
-    var sqlStmt = "SELECT datname FROM pg_database WHERE datname = '[[$dn]]';"
+func (io *IO_[[$dn]]) IsDatabaseDefined(dbName string) bool {
+	var str	        util.StringBuilder
     var err         error
     var row         *sql.Row
     var Database    string
 
     [[if GenDebugging]]
-        log.Printf("IsDatabaseDefined()\n")
+        log.Printf("IsDatabaseDefined(%s)\n", dbName)
     [[end]]
+    dbName = strings.ToLower(dbName)
 
-    row = io.dbSql.QueryRow(sqlStmt)
+    // Build the SQL Statement.
+    str.WriteStringf("SELECT datname FROM pg_database WHERE datname = '%s';", dbName)
+
+    row = io.dbSql.QueryRow(str.String())
     err = row.Scan(&Database)
 	if err == nil {
-        if Database == "[[$dn]]" {
+        if Database == dbName {
         [[if GenDebugging]]
             log.Printf("...end IsDatabaseDefined(true)\n")
         [[end]]
@@ -857,7 +886,7 @@ func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) *sql.Row {
 //----------------------------------------------------------------------------
 
 // New creates a new struct.
-func [[$dn]]New() *IO_[[$dn]] {
+func New() *IO_[[$dn]] {
     db := &IO_[[$dn]]{}
     return db
 }

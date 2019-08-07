@@ -175,9 +175,9 @@ func TestConnect(t *testing.T) {
 	t.Logf("TestConnect()...\n")
 	DockerRun(t)
 
-	io = [[$dn]]New()
+	io = New()
 	io.DefaultParms()
-    err = io.Connect()
+    err = io.Connect("")
     if err == nil {
 	    err = io.Disconnect()
         if err != nil {
@@ -199,7 +199,7 @@ func TestDisconnect(t *testing.T) {
     var err         error
 
 	t.Logf("TestDisconnect()...\n")
-	io = [[$dn]]New()
+	io = New()
 	io.DefaultParms()
 
 	// Disconnect before a connection has been made.
@@ -213,7 +213,7 @@ func TestDisconnect(t *testing.T) {
     }
 
     // Now connect then disconnect.
-    err = io.Connect()
+    err = io.Connect("")
     if err != nil {
         t.Fatal("Error: Cannot connect: ", err)
     }
@@ -241,23 +241,18 @@ func TestIsDatabaseDefined(t *testing.T) {
 	t.Logf("TestIsDatabaseDefined()...\n")
 	DockerRun(t)
 
-	io = [[$dn]]New()
+	io = New()
 	io.DefaultParms()
-    err = io.Connect()
+    err = io.Connect("")
     if err != nil {
         t.Fatalf("Error: %s\n\n", err)
     }
 
-    if !io.IsDatabaseDefined() {
-        err = io.DatabaseCreate()
+    if !io.IsDatabaseDefined("[[$dn]]") {
+        err = io.DatabaseCreate("[[$dn]]")
         if err != nil {
-            t.Errorf("\tError - Database Create failed: %s\n", err.Error())
+            t.Fatalf("\tError - Database Create failed: %s\n", err.Error())
         }
-    }
-
-    err = io.DatabaseUse("")
-    if err != nil {
-        t.Errorf("\tError - Database Use failed: %s\n", err.Error())
     }
 
     err = io.Disconnect()
@@ -277,27 +272,22 @@ func TestIsDatabaseDefined(t *testing.T) {
 func TestQueryRow(t *testing.T) {
     var err         error
 
-	t.Logf("TestIsDatabaseDefined()...\n")
-	DockerRun(t)
+	t.Logf("TestQueryRow()...\n")
+	//DockerRun(t)
 
-	io = [[$dn]]New()
+	io = New()
 	io.DefaultParms()
-    err = io.Connect()
+    err = io.Connect("")
     if err != nil {
         t.Fatalf("Error: %s\n\n", err)
     }
 
     [[ if ne $typ "sqlite" -]]
-    if !io.IsDatabaseDefined() {
-        err = io.DatabaseCreate()
+    if !io.IsDatabaseDefined("[[$dn]]") {
+        err = io.DatabaseCreate("[[$dn]]")
         if err != nil {
             t.Errorf("\tError - Database Create failed: %s\n", err.Error())
         }
-    }
-
-    err = io.DatabaseUse("")
-    if err != nil {
-        t.Errorf("\tError - Database Use failed: %s\n", err.Error())
     }
     [[- end ]]
 
@@ -307,5 +297,5 @@ func TestQueryRow(t *testing.T) {
     }
     io = nil
 
-	t.Logf("TestIsDatabaseDefined() - End of Test\n\n\n")
+	t.Logf("TestQueryRow() - End of Test\n\n\n")
 }

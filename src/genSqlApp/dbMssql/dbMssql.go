@@ -120,8 +120,7 @@ func (pd *Plugin) DriverName() string {
 func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("CREATE DATABASE %s;\\n", db.TitledName())
-	//str.WriteString( "go")
+	str.WriteString("\tstr.WriteStringf(\"CREATE DATABASE %s;\", dbName)\n")
 
 	return str.String()
 }
@@ -129,17 +128,8 @@ func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 func (pd *Plugin) GenDatabaseDeleteStmt(db *dbJson.Database) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("IF DB_ID (N'%s') IS NOT NULL\\n", db.TitledName())
-	str.WriteStringf("DROP DATABASE %s ;\\n", db.TitledName())
-	//str.WriteString("GO")
-
-	return str.String()
-}
-
-func (pd *Plugin) GenDatabaseUseStmt(db *dbJson.Database) string {
-	var str			util.StringBuilder
-
-	str.WriteStringf("USE %s;\\n", db.TitledName())
+	str.WriteString("\tstr.WriteStringf(\"IF DB_ID (N'%s') IS NOT NULL\\n\", dbName)")
+	str.WriteString("str.WriteStringf(\"DROP DATABASE %s ;\", dbName)")
 
 	return str.String()
 }

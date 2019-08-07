@@ -1183,16 +1183,6 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
         w.Write([]byte("Table creation had an error of:" + ErrorString(err)))
     }
 
-[[- if $dot.TD.Data.Plugin.Plugin.NeedUse]]
-    // Set USE;
-    err = useStmter.DatabaseUse()
-    if err == nil {
-        w.Write([]byte("USE was issued\n"))
-    } else {
-        w.Write([]byte("USE had an error of:" + ErrorString(err)))
-    }
-[[end -]]
-
     // Load the test rows.
     // Now add some records.
     for i := 0; i < 26; i++ {
