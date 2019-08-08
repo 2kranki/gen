@@ -82,7 +82,7 @@ func (io *IO_[[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowDelete()\n")
     [[end]]
 
-	err = io.io.Exec(sqlStmt, [[$t.KeysList "rcd." ""]])
+	err = io.io.Exec(sqlStmt, [[$t.TitledKeysList "rcd." ""]])
 	if err != nil {
         [[if GenDebugging]]
             log.Printf("...end io[[$tn]].RowDelete(Error:500) - Internal Error\n")
@@ -110,9 +110,9 @@ func (io *IO_[[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowFind(%+v)\n", rcd)
     [[end]]
 
-	row := io.io.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+	row := io.io.QueryRow(sqlStmt, [[$t.TitledKeysList "rcd." ""]])
 
-	err = row.Scan([[$t.FieldNameList "&rcd."]])
+	err = row.Scan([[$t.TitledFieldNameList "&rcd."]])
 
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowFind(%s)\n", ErrorString(err))
@@ -137,7 +137,7 @@ func (io *IO_[[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
     row := io.io.QueryRow(sqlStmt)
 
-	err = row.Scan([[$t.FieldNameList "&rcd."]])
+	err = row.Scan([[$t.TitledFieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
         [[if GenDebugging]]
             log.Printf("\tNo Rows found!\n")
@@ -195,7 +195,7 @@ func (io *IO_[[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
     row := io.io.QueryRow(sqlStmt)
 
-	err = row.Scan([[$t.FieldNameList "&rcd."]])
+	err = row.Scan([[$t.TitledFieldNameList "&rcd."]])
 	if err == sql.ErrNoRows {
         [[if GenDebugging]]
             log.Printf("\tNo Rows found!\n")
@@ -223,9 +223,9 @@ func (io *IO_[[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowNext(%+v)\n", rcd)
     [[end]]
 
-    row := io.io.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+    row := io.io.QueryRow(sqlStmt, [[$t.TitledKeysList "rcd." ""]])
 
-	err = row.Scan([[$t.FieldNameList "&rcd."]])
+	err = row.Scan([[$t.TitledFieldNameList "&rcd."]])
 	if err != nil {
 	    err = io.RowFirst(rcd)
 	}
@@ -257,7 +257,7 @@ func (io *IO_[[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], 
                     sqlStmt,
                     func(r *sql.Rows) {
                         var rcd     [[$dn]][[$tn]].[[$tn]]
-                        err = r.Scan([[$t.FieldNameList "&rcd."]])
+                        err = r.Scan([[$t.TitledFieldNameList "&rcd."]])
                         if err != nil {
                             log.Fatal(err)
                         } else {
@@ -290,9 +290,9 @@ func (io *IO_[[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
         log.Printf("io[[$tn]].RowPrev(%+v)\n", rcd)
     [[end]]
 
-    row := io.io.QueryRow(sqlStmt, [[$t.KeysList "rcd." ""]])
+    row := io.io.QueryRow(sqlStmt, [[$t.TitledKeysList "rcd." ""]])
 
-	err = row.Scan([[$t.FieldNameList "&rcd."]])
+	err = row.Scan([[$t.TitledFieldNameList "&rcd."]])
 	if err != nil {
 	    err = io.RowLast(rcd)
 	}
@@ -318,7 +318,7 @@ func (io *IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    err = io.io.Exec(sqlStmt, [[$t.FieldNameList "d."]])
+    err = io.io.Exec(sqlStmt, [[$t.TitledFieldNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowUpdate(Error:500) - Internal Error\n")

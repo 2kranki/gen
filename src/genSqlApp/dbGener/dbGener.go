@@ -267,7 +267,7 @@ func GenTableCountStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCountStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s%s;\\n", db.Schema, t.TitledName()))
+	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s%s;\\n", db.Schema, t.Name))
 
 	return str.String()
 }
@@ -286,7 +286,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCreateStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s%s (\\n", db.Schema, t.TitledName()))
+	str.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s%s (\\n", db.Schema, t.Name))
 	for i, _ := range t.Fields {
 		var cm  		string
 		var f			*dbJson.DbField
@@ -337,7 +337,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
 	}
 	if hasKeys {
-		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.TitledName(), t.KeysList("", ""))
+		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.Name, t.KeysList("", ""))
 		str.WriteString(wrk)
 	}
 	str.WriteString(")")
@@ -365,7 +365,7 @@ func GenTableDeleteStmt(t *dbJson.DbTable) string {
 		return intr.GenTableDeleteStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s%s;\\n", db.Schema, t.TitledName()))
+	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s%s;\\n", db.Schema, t.Name))
 
 	return str.String()
 }
@@ -388,7 +388,7 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Delete SQL
-	str.WriteString(fmt.Sprintf("DELETE FROM %s WHERE %s%s;\\n", db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
+	str.WriteString(fmt.Sprintf("DELETE FROM %s%s WHERE %s;\\n", db.Schema, t.Name, GenKeySearchPlaceHolder(t, "=")))
 
 	return str.String()
 }
@@ -406,7 +406,7 @@ func GenRowFindStmt(t *dbJson.DbTable) string {
 		return intr.GenRowFindStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s%s WHERE %s;\\n", db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, "=")))
+	str.WriteString(fmt.Sprintf("SELECT * FROM %s%s WHERE %s;\\n", db.Schema, t.Name, GenKeySearchPlaceHolder(t, "=")))
 
 	return str.String()
 }
@@ -425,7 +425,7 @@ func GenRowFirstStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s;\\n",
-		db.Schema, t.TitledName(), t.KeysList("", " ASC"),
+		db.Schema, t.Name, t.KeysList("", " ASC"),
 		GenRowLimit(t, "1"))
 
 	return str.String()
@@ -445,7 +445,7 @@ func GenRowInsertStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("INSERT INTO %s%s (%s) VALUES (%s);\\n",
-		db.Schema, t.TitledName(), t.FieldNameList(""), GenDataPlaceHolder(t))
+		db.Schema, t.Name, t.FieldNameList(""), GenDataPlaceHolder(t))
 
 	return str.String()
 }
@@ -464,7 +464,7 @@ func GenRowLastStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s;\\n",
-		db.Schema, t.TitledName(), t.KeysList("", " DESC"),
+		db.Schema, t.Name, t.KeysList("", " DESC"),
 		GenRowLimit(t, "1"))
 
 	return str.String()
@@ -504,7 +504,7 @@ func GenRowNextStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
-		db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC"),
+		db.Schema, t.Name, GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC"),
 		GenRowLimit(t, "1"))
 
 	return str.String()
@@ -544,7 +544,7 @@ func GenRowPageStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s %s;\\n",
-		db.Schema, t.TitledName(), t.KeysList("", " ASC"),
+		db.Schema, t.Name, t.KeysList("", " ASC"),
 		GenRowLimit(t, "?"), GenRowOffset(t, "?"))
 
 	return str.String()
@@ -564,7 +564,7 @@ func GenRowPrevStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
-		db.Schema, t.TitledName(), GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC"),
+		db.Schema, t.Name, GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC"),
 		GenRowLimit(t, "1"))
 
 	return str.String()
@@ -585,7 +585,7 @@ func GenRowUpdateStmt(t *dbJson.DbTable) string {
 
 	//TODO: Finish Row Update SQL
 	str.WriteStringf("INSERT INTO %s%s ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]]);\\n",
-		db.Schema, t.TitledName())
+		db.Schema, t.Name)
 
 	return str.String()
 }
@@ -742,7 +742,7 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 }
 
 //----------------------------------------------------------------------------
-//                        	Miscellaneous Interface Support
+//                        Miscellaneous Interface Support
 //----------------------------------------------------------------------------
 
 // GenDataPlaceHolder generates the string for table columns when a list of them

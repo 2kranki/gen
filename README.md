@@ -15,9 +15,10 @@ definition and having them control the generation process.
 
 
 * Version is 0.1
-* Supports only SQLite
-* Still a work in progress
-* WARNING - genapp should generate an app, but the app will only work with SQLite! I will fix this in the near future.
+* Supports MariaDB, MS SQL Server, MySQL, PostGres and SQLite.
+* PostGres support is only working for connections, no table maintenance support yet.
+* In testing app01, Customer table works, Vendor table doesn't, because it needs an
+    adjusted insert (in all, but PostGres).
 
 
 **Project Futures**:
@@ -29,7 +30,7 @@ definition and having them control the generation process.
 - [x] Finish Database Handler Testing
 - [x] Finish MS-SQL Support
 - [x] Finish MySQL/MariaDB Support
-- [ ] Finish Postgres Support
+- [x] Finish Postgres Support, partially working
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
 - [ ] Add **csv** save/restore per table

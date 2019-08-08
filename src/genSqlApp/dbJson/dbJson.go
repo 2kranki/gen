@@ -331,9 +331,9 @@ func (t *DbTable) FieldNameList(prefix string) string {
 			cm = ""
 		}
 		if len(prefix) > 0 {
-			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.TitledName(), cm))
+			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
 		} else {
-			str.WriteString(fmt.Sprintf("%s%s", f.TitledName(), cm))
+			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
 		}
 	}
 	return str.String()
@@ -522,7 +522,7 @@ func (t *DbTable) KeysList(prefix, suffix string) string {
 		if len(suffix) > 0 {
 			suf = suffix
 		}
-		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, strings.Title(fn), suf, cm))
+		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, fn, suf, cm))
 	}
 	return str.String()
 }
@@ -540,6 +540,50 @@ func (t *DbTable) KeysListStr() string {
 			cm = ""
 		}
 		str.WriteString(fmt.Sprintf("\"%s\"%s", fn, cm))
+	}
+	return str.String()
+}
+
+// TitledFieldNameList returns struct fields separated by
+// commas with an optional per field prefix.
+func (t *DbTable) TitledFieldNameList(prefix string) string {
+	var str			strings.Builder
+
+	for i,f := range t.Fields {
+		cm := ", "
+		if i == len(t.Fields) - 1 {
+			cm = ""
+		}
+		if len(prefix) > 0 {
+			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.TitledName(), cm))
+		} else {
+			str.WriteString(fmt.Sprintf("%s%s", f.TitledName(), cm))
+		}
+	}
+	return str.String()
+}
+
+// TitledKeysList returns the table's keys in number order as
+// a comma separated list.
+func (t *DbTable) TitledKeysList(prefix, suffix string) string {
+	var str			strings.Builder
+	var strs		[]string
+
+	strs, _ = t.Keys()
+	for i, fn := range strs {
+		cm := ", "
+		if i == len(strs) - 1 {
+			cm = ""
+		}
+		pref := ""
+		if len(prefix) > 0 {
+			pref = prefix
+		}
+		suf := ""
+		if len(suffix) > 0 {
+			suf = suffix
+		}
+		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, strings.Title(fn), suf, cm))
 	}
 	return str.String()
 }

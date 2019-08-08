@@ -20,6 +20,7 @@ import (
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
+	"fmt"
 	"log"
 )
 
@@ -177,13 +178,68 @@ func (pd Plugin) Name() string {
 // or supports.
 // Required method
 func (pd *Plugin) SchemaName() string {
-	return "public"
+	return "public."
 }
 
 // Types returns the TypeDefn table for this plugin to the caller as defined in dbPlugin.
 // Required method
 func (pd Plugin) Types() *dbType.TypeDefns {
 	return &tds
+}
+
+//----------------------------------------------------------------------------
+//                        Miscellaneous Support
+//----------------------------------------------------------------------------
+
+// GenDataPlaceHolder generates the string for table columns when a list of them
+// is involved such as used in RowInsert().  Example: "$1, $2, $3"
+func (pd Plugin) GenDataPlaceHolder(tb *dbJson.DbTable) string {
+
+	insertStr := ""
+	for i, _ := range tb.Fields {
+		cm := ", "
+		if i == len(tb.Fields) - 1 {
+			cm = ""
+		}
+		//insertStr += fmt.Sprintf("?%s", cm)
+		insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+	}
+	return insertStr
+}
+
+// GenKeySearchPlaceHolder generates the string for multiple keys when an expression
+// is involved such as used in RowFind(). The expression will always be '=' and will
+// apply to all keys in the table. Example: "key1 = $1 AND key2 = $2"
+func (pd Plugin) GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
+
+	insertStr := ""
+	keys, _ := tb.Keys()
+	for i, _ := range keys {
+		cm := " AND "
+		if i == len(keys) - 1 {
+			cm = ""
+		}
+		insertStr += fmt.Sprintf("%s %s $%d%s", keys[i], rel, i+1, cm)
+	}
+
+	return insertStr
+}
+
+// GenKeysPlaceHolder generates the string for multiple keys when a list of key
+// is involved such as used in RowFind().  Example: "?, ?, ?"
+func (pd Plugin) GenKeysPlaceHolder(tb *dbJson.DbTable) string {
+
+	insertStr := ""
+	keys, _ := tb.Keys()
+	for i:=0; i < len(keys); i++ {
+		cm := ", "
+		if i == len(tb.Fields) - 1 {
+			cm = ""
+		}
+		//insertStr += fmt.Sprintf("?%s", cm)
+		insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+	}
+	return insertStr
 }
 
 //----------------------------------------------------------------------------
