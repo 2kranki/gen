@@ -27,6 +27,7 @@ var (
 	force    		bool
 	genDebugging	bool
 	genLogging		bool
+	genMuxWrapper	bool
 	jsonPath 		string
 	mainPath 		string
 	mdldir   		string
@@ -85,6 +86,7 @@ func SetupShared(execPath string, cmd string) error {
 	sharedData.SetForce(force)
 	sharedData.SetDefn("GenDebugging", genDebugging)
 	sharedData.SetDefn("GenLogging", genLogging)
+	sharedData.SetDefn("GenMuxWrapper", genMuxWrapper)
 	ChkSetMdlDir(mdldir)
 	sharedData.SetNoop(noop)
 	if len(outdir) > 0 {
@@ -175,6 +177,7 @@ func main() {
 	flag.BoolVar(&force, "f", false, "enable over-writes and deletions")
 	flag.BoolVar(&genDebugging, "genDebugging", true, "generate debugging output")
 	flag.BoolVar(&genLogging, "genLogging", true, "generate logging")
+	flag.BoolVar(&genMuxWrapper, "genMuxWrapper", true, "generate a wrapper around the mux")
 	flag.StringVar(&mainPath, "main", "", "set json main input path")
 	flag.StringVar(&jsonPath, "json", "", "set json main input path")
 	flag.StringVar(&mdldir, "mdldir", "./src/models", "set model input directory")

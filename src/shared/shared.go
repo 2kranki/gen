@@ -32,6 +32,8 @@ func init() {
 	funcs["GenDebugging"] = GenDebugging
 	defns["GenLogging"] = false
 	funcs["GenLogging"] = GenLogging
+	defns["GenMuxWrapper"] = false
+	funcs["GenMuxWrapper"] = GenMuxWrapper
 	defns["Noop"] = false
 	defns["Quiet"] = false
 	defns["Replace"] = true
@@ -176,6 +178,10 @@ func GenDebugging() bool {
 
 func GenLogging() bool {
 	return defns["GenLogging"].(bool)
+}
+
+func GenMuxWrapper() bool {
+	return defns["GenMuxWrapper"].(bool)
 }
 
 // MainPath is the path to the main json file.

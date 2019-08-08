@@ -129,6 +129,51 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
     }
 [[end]]
 
+[[ if GenMuxWrapper -]]
+// To understand the following, review packages net/http and net/url and review:
+// https://stackoverflow.com/questions/25456390/how-to-log-http-server-errors-in-golang
+
+// MuxResponseWriterWrap provides a wrapper around the Response
+// Writer so that we can intercept data being written out if
+// needed.
+type MuxResponseWriterWrap struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *MuxResponseWriterWrap) Write(p []byte) (int, error) {
+	return r.ResponseWriter.Write(p)
+}
+
+func (r *MuxResponseWriterWrap) WriteHeader(status int) {
+	r.status = status
+	r.ResponseWriter.WriteHeader(status)
+}
+
+// MuxHandlerWrapper will intercept each mux request and give
+// us access both, before and after, the request is handled.
+func MuxHandlerWrapper(f http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		record := &MuxResponseWriterWrap{
+			ResponseWriter: w,
+		}
+
+        // Intercept before the request is handled.
+		log.Println("mux input: (", r.Method, ") ", r.URL.String())
+
+		f.ServeHTTP(record, r)
+
+        // Intercept after the request is handled.
+		log.Println("Bad Request ", record.status)
+
+		if record.status == http.StatusBadRequest {
+			log.Println("Bad Request ", r)
+		}
+	}
+}
+
+[[- end ]]
+
 func exec() {
 
     // Connect the databases.
@@ -209,7 +254,15 @@ func exec() {
         log.Printf("\tStarting Server at %s:%s...\n", http_srvr, http_port)
     [[end]]
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
-	log.Fatal(http.ListenAndServe(srvrStr, mux))
+    [[ if GenMuxWrapper -]]
+        s := &http.Server{
+            Addr:    srvrStr,
+            Handler: MuxHandlerWrapper(mux),
+        }
+        log.Fatal(s.ListenAndServe())
+    [[ else -]]
+	    log.Fatal(http.ListenAndServe(srvrStr, mux))
+	[[- end ]]
 
 }
 

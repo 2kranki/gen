@@ -41,7 +41,7 @@
     </style>
 </head>
 <body>
-    <form id="listForm" method="get" action="/[[.Table.Name]]">
+    <form id="listForm" method="get" action="/[[.Table.TitledName]]">
     <table>
         <tbody>
             {{range $r := .Rcds}}
@@ -64,11 +64,11 @@
     <p/>
     <script>
         function onListFirst() {
-            document.getElementById("listForm").action = "/[[.Table.Name]]/list/first";
+            document.getElementById("listForm").action = "/[[.Table.TitledName]]/list/first";
             document.getElementById("listForm").method = "get";
         }
         function onListLast() {
-            document.getElementById("listForm").action = "/[[.Table.Name]]/list/last";
+            document.getElementById("listForm").action = "/[[.Table.TitledName]]/list/last";
             document.getElementById("listForm").method = "get";
         }
         function onListMenu() {
@@ -77,12 +77,12 @@
         }
         function onListNext() {
             key = document.getElementById("offset").value
-            document.getElementById("listForm").action = "/[[.Table.Name]]/list/next?key="+key;
+            document.getElementById("listForm").action = "/[[.Table.TitledName]]/list/next?key="+key;
             document.getElementById("listForm").method = "get";
         }
         function onListPrev() {
             key = document.getElementById("offset").value
-            document.getElementById("listForm").action = "/[[.Table.Name]]/list/prev?key="+key;
+            document.getElementById("listForm").action = "/[[.Table.TitledName]]/list/prev?key="+key;
             document.getElementById("listForm").method = "get";
         }
     </script>
