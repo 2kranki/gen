@@ -266,6 +266,32 @@ func TestIsDatabaseDefined(t *testing.T) {
 [[ end ]]
 
 //----------------------------------------------------------------------------
+//                              DatabaseCreate
+//----------------------------------------------------------------------------
+
+func TestDatabaseCreate(t *testing.T) {
+    var err         error
+
+	t.Logf("TestDatabaseCreate()...\n")
+	DockerRun(t)
+
+	io = New()
+	io.DefaultParms()
+
+    err = io.DatabaseCreate("[[$dn]]")
+    if err != nil {
+        t.Errorf("\tError - Database Create failed: %s\n", err.Error())
+    }
+
+    err = io.Disconnect()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    io = nil
+
+	t.Logf("TestQueryRow() - End of Test\n\n\n")
+}
+//----------------------------------------------------------------------------
 //                              QueryRow
 //----------------------------------------------------------------------------
 
@@ -277,19 +303,11 @@ func TestQueryRow(t *testing.T) {
 
 	io = New()
 	io.DefaultParms()
-    err = io.Connect("")
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
 
-    [[ if ne $typ "sqlite" -]]
-    if !io.IsDatabaseDefined("[[$dn]]") {
-        err = io.DatabaseCreate("[[$dn]]")
-        if err != nil {
-            t.Errorf("\tError - Database Create failed: %s\n", err.Error())
-        }
+    err = io.DatabaseCreate("[[$dn]]")
+    if err != nil {
+        t.Errorf("\tError - Database Create failed: %s\n", err.Error())
     }
-    [[- end ]]
 
     err = io.Disconnect()
     if err != nil {

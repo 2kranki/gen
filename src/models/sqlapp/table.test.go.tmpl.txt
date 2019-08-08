@@ -8,6 +8,8 @@
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
 [[- $t  := .Table]]
 [[- $tn := .Table.TitledName]]
 
@@ -25,10 +27,16 @@ func TestTestData(t *testing.T) {
     var chr         rune
     var str         string
     var i64         int64
+    [[ if $t.HasFloat -]]
+        var f64         float64
+    [[- end ]]
 
     t.Logf("Test.TestData()...\n")
-    i64 = 65 + 1
-    chr = rune(i64)
+    i64 = 1
+    [[ if $t.HasFloat -]]
+        f64 = float64(i64)
+    [[- end ]]
+    chr = rune(i64 + 65)
     str = string(chr)
     t.Logf("\t i64 = %d\n", i64)
     t.Logf("\t chr = %c\n", chr)
@@ -46,9 +54,19 @@ func TestTestData(t *testing.T) {
                 t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of (%d)%s!\n\n\n",
                                     len(rcd.[[$f.TitledName]]), rcd.[[$f.TitledName]])
             }
-        [[else if $f.IsDec]]
-            if rcd.[[$f.TitledName]] != i64 {
-                t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of %d!\n\n\n", rcd.[[$f.TitledName]])
+        [[else if $f.IsInteger]]
+            [[ if $f.Incr ]]
+                if rcd.[[$f.TitledName]] != i64+1 {
+                    t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of %d!\n\n\n", rcd.[[$f.TitledName]])
+                }
+            [[ else ]]
+                if rcd.[[$f.TitledName]] != i64 {
+                    t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of %d!\n\n\n", rcd.[[$f.TitledName]])
+                }
+            [[ end ]]
+        [[else if $f.IsFloat]]
+            if rcd.[[$f.TitledName]] != f64 {
+                t.Fatalf("Error: Invalid data for rcd.[[$f.TitledName]] of %f!\n\n\n", rcd.[[$f.TitledName]])
             }
         [[end]]
     [[end]]

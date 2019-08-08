@@ -366,7 +366,7 @@ func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
             }{rcds, offset}
 
     [[if GenDebugging]]
-        log.Printf("\tData: %q\n", data)
+        log.Printf("\tData: %+v\n", data)
     [[end]]
 
     [[if GenDebugging -]]
@@ -1152,7 +1152,6 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var rcd         [[$dn]][[$tn]].[[$tn]]
     var inserter    [[$dn]][[$tn]].DbRowInserter
     var creater     [[$dn]][[$tn]].DbTableCreater
-    var useStmter   [[$dn]][[$tn]].DbDatabaseUser
     var ok          bool
 
     [[if GenDebugging]]
@@ -1167,10 +1166,6 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
         return
     }
     if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if useStmter, ok = h.db.([[$dn]][[$tn]].DbDatabaseUser); !ok {
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }

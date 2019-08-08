@@ -247,7 +247,7 @@ func Test[[$tn]]FakeDB(t *testing.T) {
     }
     rcd.TestData(0)
     if 0 != rcd.CompareKeys(&rcd2) {
-        t.Fatalf("Error - First did not work, need A, got %q\n", rcd2)
+        t.Fatalf("Error - First did not work, need A, got %+v\n", rcd2)
     }
 
     t.Logf("Test[[$tn]].FakeDB() - End of Test\n\n\n")

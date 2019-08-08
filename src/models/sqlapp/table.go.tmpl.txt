@@ -7,6 +7,8 @@
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
 [[- $t  := .Table]]
 [[- $tn := .Table.TitledName]]
 
@@ -44,10 +46,6 @@ func ErrorString(err error) string {
 //============================================================================
 //                             Database Interfaces
 //============================================================================
-
-type DbDatabaseUser interface {
-    DatabaseUse() error
-}
 
 type DbRowDeleter interface {
     // RowDelete deletes the row with keys from the provided record, rcd.

@@ -45,8 +45,8 @@ import (
     [[end]]
      [[ if $d.HasFloat -]]
         "strconv"
-        "strings"
     [[- end ]]
+    "strings"
     [[ if ne $typ "sqlite" -]]
         "time"
     [[end]]
@@ -379,17 +379,10 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 func (io *IO_[[$dn]]) Connect(dbName string) error {
     var err         error
 
-    // Set up connection string, connStr.
-    if len(dbName) > 0 {
-	    connStr := fmt.Sprintf("%s", io.dbName)
-    } else {
-        return fmt.Errorf("Error: Missing required database name\n")
-    }
-
     [[ if GenDebugging -]]
-        log.Printf("\tConnecting to [[$typ]] with %s...\n", connStr)
+        log.Printf("\tConnecting to [[$typ]] with %s...\n", dbName)
     [[- end ]]
-    io.dbSql, err = sql.Open("[[$plg.DriverName]]", connStr)
+    io.dbSql, err = sql.Open("[[$plg.DriverName]]", dbName)
     if err != nil {
         return fmt.Errorf("Error: Cannot Connect: %s\n", err.Error())
     }
@@ -450,56 +443,59 @@ func (io *IO_[[$dn]]) IsConnected() bool {
 //								Create
 //----------------------------------------------------------------------------
 
-// DatabaseCreate creates the database within the SQL server.
+// DatabaseCreate creates the database within the SQL server if needed and
+// opens a connection to it.
 func (io *IO_[[$dn]]) DatabaseCreate(dbName string) error {
     var err     error
-	var str		util.StringBuilder
-
-    [[if GenDebugging]]
-        log.Printf("DatabaseCreate()\n")
-    [[end]]
-    dbName = strings.ToLower(dbName)
-
-    [[ if eq $typ "sqlite" -]]
-        return nil
+    [[ if ne $typ "sqlite" -]]
+	    var str		util.StringBuilder
     [[- end ]]
-    if io.IsDatabaseDefined(dbName) {
-        err = io.Connect(dbName)
-        return err
+
+    [[ if GenDebugging -]]
+        log.Printf("DatabaseCreate(%s)\n", dbName)
+    [[- end ]]
+    if len(dbName) == 0 {
+        return fmt.Errorf("Error: Missing database name for DatabaseCreate()!")
     }
 
-	// Build the Create Database SQL Statement.
     [[ if ne $typ "sqlite" -]]
-        [[GenDatabaseCreateStmt $d]]
-    [[- end ]]
+        dbName = strings.ToLower(dbName)
 
-    // Connect without a database specified if needed.
-    if len(io.dbName) > 0 {
+        // Connect without a database specified if needed.
+        if len(io.dbName) > 0 || io.dbSql == nil {
+            io.Disconnect()
+            err = io.Connect("")
+            if err != nil {
+                return err
+            }
+        }
+
+        if io.IsDatabaseDefined(dbName) {
+            io.Disconnect()
+            err = io.Connect(dbName)
+            return err
+        }
+
+        // Build the Create Database SQL Statement.
+        [[GenDatabaseCreateStmt $d]]
+
+        // Create the database.
+        err = io.Exec(str.String())
+        if err != nil {
+            io.Disconnect()
+            return err
+        }
+        time.Sleep(5 * time.Second)         // Give it time to get done.
+        if !io.IsDatabaseDefined(dbName) {
+            io.Disconnect()
+            return fmt.Errorf("Error - Could not verify database, %s, exists!", dbName)
+        }
+
+        // Now disconnect from the connection without a database.
         if io.IsConnected() {
             io.Disconnect()
         }
-        err = io.Connect("")
-        if err != nil {
-            return err
-        }
-    }
-
-    // Create the database.
-    err = io.Exec(str.String())
-    if err != nil {
-        io.Disconnect()
-        return err
-    }
-    time.Sleep(5 * time.Second)         // Give it time to get done.
-    if !io.IsDatabaseDefined(dbName) {
-        io.Disconnect()
-        return fmt.Errorf("Error - Could not verify database, %s, exists!", dbName)
-    }
-
-    // Now disconnect from the connection without a database.
-    if io.IsConnected() {
-        io.Disconnect()
-    }
+    [[- end ]]
 
     // Reconnect using the newly created database.
     err = io.Connect(dbName)

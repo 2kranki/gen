@@ -70,27 +70,6 @@ type IO_[[$tn]] struct {
 }
 
 //----------------------------------------------------------------------------
-//                             Database Use
-//----------------------------------------------------------------------------
-
-// TableDelete deletes the table in the given database if present.
-func (io *IO_[[$tn]]) DatabaseUse() error {
-    var err     error
-
-    [[if GenDebugging]]
-        log.Printf("io[[$tn]].DatabaseUse()\n")
-    [[end]]
-
-    err = io.io.DatabaseUse("")
-
-    [[if GenDebugging]]
-        log.Printf("...end io[[$tn]].DatabaseUse(%s)\n", ErrorString(err))
-    [[end]]
-    return err
-}
-
-
-//----------------------------------------------------------------------------
 //                             Row Delete
 //----------------------------------------------------------------------------
 

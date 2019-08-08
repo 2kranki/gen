@@ -312,11 +312,12 @@ func TestWorkQueue(t *testing.T) {
 	t.Log("TestWorkQueue()")
 
 	work = NewWorkQueue(
-			func(a interface{}) {
+			func(a interface{}, cmn interface{}) {
 				var t		int
 				t = a.(int)
 				fmt.Printf("\t work %d\n", t)
 			},
+			nil,
 			2)
 	for n = 1; n < 10; n++ {
 		work.PushWork(n)

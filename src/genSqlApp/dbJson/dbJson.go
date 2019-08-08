@@ -331,9 +331,9 @@ func (t *DbTable) FieldNameList(prefix string) string {
 			cm = ""
 		}
 		if len(prefix) > 0 {
-			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
+			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.TitledName(), cm))
 		} else {
-			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+			str.WriteString(fmt.Sprintf("%s%s", f.TitledName(), cm))
 		}
 	}
 	return str.String()
@@ -451,9 +451,9 @@ func (t *DbTable) InsertNameList(prefix string) string {
 			}
 		} else {
 			if len(prefix) > 0 {
-				str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
+				str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.TitledName(), cm))
 			} else {
-				str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+				str.WriteString(fmt.Sprintf("%s%s", f.TitledName(), cm))
 			}
 		}
 	}
@@ -522,7 +522,7 @@ func (t *DbTable) KeysList(prefix, suffix string) string {
 		if len(suffix) > 0 {
 			suf = suffix
 		}
-		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, fn, suf, cm))
+		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, strings.Title(fn), suf, cm))
 	}
 	return str.String()
 }

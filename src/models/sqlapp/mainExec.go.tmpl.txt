@@ -135,14 +135,14 @@ func exec() {
     [[if GenDebugging]]
         log.Printf("\tConnecting to the Database...\n")
     [[end]]
-    io[[$dn]] := io[[$dn]].[[$dn]]New()
-    io[[$dn]].SetName(db_name)
+    io[[$dn]] := io[[$dn]].New()
+    //io[[$dn]].SetName(db_name)
     io[[$dn]].SetPort(db_port)
     io[[$dn]].SetPW(db_pw)
     io[[$dn]].SetPort(db_port)
     io[[$dn]].SetServer(db_srvr)
     io[[$dn]].SetUser(db_user)
-    err := io[[$dn]].Connect()
+    err := io[[$dn]].DatabaseCreate(db_name)
     if err != nil {
         log.Fatalf("ERROR - Failed to Connect Database\n\n\n")
     }

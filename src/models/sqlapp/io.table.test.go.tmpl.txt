@@ -226,11 +226,11 @@ func (td *TestData) SetupDB( ) {
     var err         error
 
     // Set connection parameters based on database SQL type.
-    td.io = io[[$dn]].[[$dn]]New()
+    td.io = io[[$dn]].New()
     td.io.DefaultParms()
-    err = td.io.Connect()
+    err = td.io.DatabaseCreate("[[$dn]]")
     if err != nil {
-        td.T.Fatalf("Error: Connection Failure: %s\n", err.Error())
+        td.T.Fatalf("Error: Creation Failure: %s\n", err.Error())
     }
 
 }

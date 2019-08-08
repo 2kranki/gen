@@ -17,54 +17,54 @@
     "GenLogging":true,
     "Tables":[
         {
-            "Name":"Customer",
+            "Name":"customer",
             "Fields":[
                 {
-                    "Name":"Num",
+                    "Name":"num",
                     "TypeDef":"int",
                     "KeyNum":1,
                     //"Incr":true,
                     "List":true
                 },
                 {
-                    "Name":"Name",
+                    "Name":"name",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30,
                     "List":true
                 },
                 {
-                    "Name":"Addr1",
+                    "Name":"addr1",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30
                 },
                 {
-                    "Name":"Addr2",
+                    "Name":"addr2",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30
                 },
                 {
-                    "Name":"City",
+                    "Name":"city",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":20
                 },
                 {
-                    "Name":"State",
+                    "Name":"state",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":10
                 },
                 {
-                    "Name":"Zip",
+                    "Name":"zip",
                     "Null":true,
                     "TypeDef":"text",
                     "Len": 15
                 },
                 {
-                    "Name":"CurBal",
+                    "Name":"curbal",
                     "Null":true,
                     "TypeDef":"money",
                     "Len":15,
@@ -73,54 +73,54 @@
             ]
         },
         {
-            "Name":"Vendor",
+            "Name":"vendor",
             "Fields":[
                 {
-                    "Name":"Num",
+                    "Name":"num",
                     "TypeDef":"int",
                     "KeyNum":1,
                     "Incr":true,
                     "List":true
                 },
                 {
-                    "Name":"Name",
+                    "Name":"name",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30,
                     "List":true
                 },
                 {
-                    "Name":"Addr1",
+                    "Name":"addr1",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30
                 },
                 {
-                    "Name":"Addr2",
+                    "Name":"addr2",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30
                 },
                 {
-                    "Name":"City",
+                    "Name":"city",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":20
                 },
                 {
-                    "Name":"State",
+                    "Name":"state",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":10
                 },
                 {
-                    "Name":"Zip",
+                    "Name":"zip",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":15
                 },
                 {
-                    "Name":"CurBal",
+                    "Name":"curbal",
                     "Null":true,
                     "TypeDef":"money",
                     "Len":15,
