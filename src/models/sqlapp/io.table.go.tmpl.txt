@@ -167,7 +167,7 @@ func (io *IO_[[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    err = io.io.Exec(sqlStmt, [[$t.InsertNameList "d."]])
+    err = io.io.Exec(sqlStmt, [[$t.TitledInsertNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowInsert(Error:500) - Internal Error\n")
@@ -318,7 +318,7 @@ func (io *IO_[[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
     // Validate the input record.
 
     // Add it to the table.
-    err = io.io.Exec(sqlStmt, [[$t.TitledFieldNameList "d."]])
+    err = io.io.Exec(sqlStmt, [[$t.TitledInsertNameList "d."]])
 	if err != nil {
     [[if GenDebugging]]
         log.Printf("...end io[[$tn]].RowUpdate(Error:500) - Internal Error\n")

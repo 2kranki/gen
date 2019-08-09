@@ -137,6 +137,17 @@ func (pd Plugin) GenImportString() string {
 	return "\"github.com/lib/pq\""
 }
 
+func (pd Plugin) GenRowPageStmt(t *dbJson.DbTable) string {
+	var str			util.StringBuilder
+
+	db := t.DB
+
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s LIMIT $1 OFFSET $2;\\n",
+		db.Schema, t.Name, t.KeysList("", " ASC"))
+
+	return str.String()
+}
+
 // GenSqlBuildConn generates the code to build the connection string that would be
 // issued to sql.Open() which is unique for each database server.
 func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
@@ -194,17 +205,26 @@ func (pd Plugin) Types() *dbType.TypeDefns {
 // GenDataPlaceHolder generates the string for table columns when a list of them
 // is involved such as used in RowInsert().  Example: "$1, $2, $3"
 func (pd Plugin) GenDataPlaceHolder(tb *dbJson.DbTable) string {
+	var str			util.StringBuilder
+	var cnt			int
 
-	insertStr := ""
-	for i, _ := range tb.Fields {
+	// Accumulate field name count.
+	for _, f := range tb.Fields {
+		if !f.Incr {
+			cnt++
+		}
+	}
+
+	for i := 0; i<cnt; i++ {
 		cm := ", "
-		if i == len(tb.Fields) - 1 {
+		if i == cnt - 1 {
 			cm = ""
 		}
-		//insertStr += fmt.Sprintf("?%s", cm)
-		insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+		//str.WriteStringf("?%s", cm)
+		str.WriteStringf("$%d%s", i+1, cm)
 	}
-	return insertStr
+
+	return str.String()
 }
 
 // GenKeySearchPlaceHolder generates the string for multiple keys when an expression

@@ -216,7 +216,7 @@ func (pd *Plugin) GenRowLastStmt(t *dbJson.DbTable) string {
 	db := t.DB
 
 	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
-	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s;\\n",
+	str.WriteStringf("SELECT * FROM %s%s ORDER BY %s %s %s;\\n",
 		db.Schema, t.TitledName(), t.KeysList("", " DESC"),
 		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
 
@@ -333,6 +333,7 @@ func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
 		var cm  		string
 		var f			*dbJson.DbField
 		var ft			string
+		var incr		string
 		var nl			string
 		var pk			string
 		var sp			string
@@ -367,6 +368,10 @@ func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
 		if f.Nullable {
 			nl = ""
 		}
+		incr = ""
+		if f.Incr {
+			incr = " IDENTITY(1,1)"
+		}
 		pk = ""
 		if f.KeyNum > 0 {
 			hasKeys = true
@@ -376,7 +381,7 @@ func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
 			sp = " " + f.SQLParms
 		}
 
-		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
+		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s%s\\n", f.Name, ft, nl, incr, pk, cm, sp))
 	}
 	if hasKeys {
 		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.TitledName(), t.KeysList("", ""))

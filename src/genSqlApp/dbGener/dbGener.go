@@ -291,6 +291,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		var cm  		string
 		var f			*dbJson.DbField
 		var ft			string
+		var incr		string
 		var nl			string
 		var pk			string
 		var sp			string
@@ -325,6 +326,16 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		if f.Nullable {
 			nl = ""
 		}
+		incr = ""
+		if f.Incr {
+			if db.SqlType == "postgres" {
+				ft = "SERIAL"
+			} else if db.SqlType == "sqlite"{
+				incr = " AUTOINCREMENT"
+			} else {
+				incr = " AUTO_INCREMENT"
+			}
+		}
 		pk = ""
 		if f.KeyNum > 0 {
 			hasKeys = true
@@ -334,7 +345,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 			sp = " " + f.SQLParms
 		}
 
-		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
+		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s%s\\n", f.Name, ft, nl, incr, pk, cm, sp))
 	}
 	if hasKeys {
 		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.Name, t.KeysList("", ""))
@@ -445,7 +456,7 @@ func GenRowInsertStmt(t *dbJson.DbTable) string {
 	}
 
 	str.WriteStringf("INSERT INTO %s%s (%s) VALUES (%s);\\n",
-		db.Schema, t.Name, t.FieldNameList(""), GenDataPlaceHolder(t))
+		db.Schema, t.Name, t.InsertNameList(""), GenDataPlaceHolder(t))
 
 	return str.String()
 }
@@ -748,6 +759,8 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 // GenDataPlaceHolder generates the string for table columns when a list of them
 // is involved such as used in RowInsert().  Example: "?, ?, ?"
 func GenDataPlaceHolder(tb *dbJson.DbTable) string {
+	var str			util.StringBuilder
+	var cnt			int
 	var intr		GenPlaceHolderer
 	var ok			bool
 
@@ -759,16 +772,23 @@ func GenDataPlaceHolder(tb *dbJson.DbTable) string {
 		return intr.GenDataPlaceHolder(tb)
 	}
 
-	insertStr := ""
-	for i, _ := range tb.Fields {
+	// Accumulate field name count.
+	for _, f := range tb.Fields {
+		if !f.Incr {
+			cnt++
+		}
+	}
+
+	for i := 0; i<cnt; i++ {
 		cm := ", "
-		if i == len(tb.Fields) - 1 {
+		if i == cnt - 1 {
 			cm = ""
 		}
-		insertStr += fmt.Sprintf("?%s", cm)
-		//insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+		str.WriteStringf("?%s", cm)
+		//str.WriteStringf("$%d%s", i+1, cm)
 	}
-	return insertStr
+
+	return str.String()
 }
 
 // GenKeySearchPlaceHolder generates the string for multiple keys when an expression
