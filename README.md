@@ -16,9 +16,8 @@ definition and having them control the generation process.
 
 * Version is 0.1
 * Supports MariaDB, MS SQL Server, MySQL, PostGres and SQLite.
-* PostGres support is only working for connections, no table maintenance support yet.
-* In testing app01, Customer table works, Vendor table doesn't, because it needs an
-    adjusted insert (in all, but PostGres).
+* In testing app01, Customer table works in all sql servers, Vendor table works
+    in all but SQLite for now.
 
 
 **Project Futures**:
@@ -30,11 +29,14 @@ definition and having them control the generation process.
 - [x] Finish Database Handler Testing
 - [x] Finish MS-SQL Support
 - [x] Finish MySQL/MariaDB Support
-- [x] Finish Postgres Support, partially working
+- [x] Finish Postgres Support
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
 - [ ] Add **csv** save/restore per table
+- [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
+        code generation such as SQLite rowid analysis.
 - [ ] Declare version 0.2
+- [ ] Add HTTP support for JSON data to/from client
 
 
 **Usage**:
@@ -45,10 +47,10 @@ To use this as I do, try the following:
 2. `git clone github.com/2kranki/genapp.git`
 3. `cd genapp`
 4. `./b.sh`     <- builds /tmp/bin/genapp
-5. `/tmp/genapp -x misc/test01.exec.json.txt` <- Creates "/tmp/app01"
-6. `cd /tmp/app01`
+5. `./gen01.sh` will generate /tmp/app01 for all the sql servers.
+6. `cd /tmp/app01/app01xx` where xx stands for ma (MariaDB), ms (MS SQL), my (MySQL), pg (PostGres), or sq (SQLite)
 7. `./b.sh`     <- builds app01 as app
-8. `/tmp/bin/app`      <- SQLite Application on localhost:8080
+8. `/tmp/bin/app01xx` <- (See Step 6 for xx) SQLite Application on localhost:8080
 9. `localhost:8080` in your browser
 10. Select "Load test data" for Customer Table
 11. Back to main menu
