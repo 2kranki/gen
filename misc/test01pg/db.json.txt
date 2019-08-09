@@ -76,7 +76,7 @@
             "Name":"vendor",
             "Fields":[
                 {
-                    "Name":"num",
+                    "Name":"id",
                     "TypeDef":"int",
                     "KeyNum":1,
                     "Incr":true,

@@ -338,14 +338,18 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		}
 		pk = ""
 		if f.KeyNum > 0 {
-			hasKeys = true
+			if t.KeyCount() == 1 && i == 0 && db.SqlType == "sqlite" {
+				pk = " PRIMARY KEY"
+			} else {
+				hasKeys = true
+			}
 		}
 		sp = ""
 		if len(f.SQLParms) > 0 {
 			sp = " " + f.SQLParms
 		}
 
-		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s%s\\n", f.Name, ft, nl, incr, pk, cm, sp))
+		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s%s\\n", f.Name, ft, nl, pk, incr, cm, sp))
 	}
 	if hasKeys {
 		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.Name, t.KeysList("", ""))
