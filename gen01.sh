@@ -40,4 +40,7 @@ else
     exit 1
 fi
 
+cd /tmp/app01
+go fmt ./...
+cd -
 

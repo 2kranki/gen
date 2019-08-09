@@ -9,9 +9,6 @@
         *   MSSQL
         *   MySQL
         *   Postgres
-    * MariaDB/MySQL support
-    * MSSQL support
-    * Postgres support
     * Learn decimal library and start using it. Apply it accross all the SQL servers.
     * Look into https://github.com/jmoiron/sqlx
     * Look into https://gorm.io and https://xorm.io Both have a lot of stars.
