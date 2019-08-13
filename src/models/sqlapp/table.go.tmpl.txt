@@ -110,6 +110,12 @@ type DbTableDeleter interface {
     TableDelete() error
 }
 
+type DbTableScanner interface {
+    // TableScan reads all the rows in the table applying a function to each of
+    // them.
+    TableScan(apply func (rcd [[$tn]])) error
+}
+
 //============================================================================
 //                              Table Struct
 //============================================================================

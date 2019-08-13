@@ -66,7 +66,7 @@ type TmplData struct {
 //							Generate Data
 //============================================================================
 
-// TmplData is used to centralize all the inputs
+// GenData is used to centralize all the inputs
 // to the generators.  We maintain generic JSON
 // structures for the templating system which does
 // not support structs.  (Not certain why yet.)
@@ -74,7 +74,12 @@ type TmplData struct {
 // access by the generation functions.
 type GenData struct {
 	Name				string
+	// Mapper is an optional function which translates a string to another
+	// string.  It can be used for translating external names to structs
+	// or fields within this system.
 	Mapper	 			func(string) string
+	// TmplData contains the primary data which is passed to the templating
+	// system, to various plugins and generally used for generation.
 	TmplData   			TmplData
 	// fileDefs1 define the files that will make up the application
 	// fill the various sub-directories of that application

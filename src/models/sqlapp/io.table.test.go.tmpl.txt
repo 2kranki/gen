@@ -459,3 +459,54 @@ func Test[[$tn]]RowPage(t *testing.T) {
     t.Logf("Test[[$tn]]RowInsert() - End of Test\n\n\n")
 }
 
+//----------------------------------------------------------------------------
+//                              Table Scanner
+//----------------------------------------------------------------------------
+
+func TestTableScan(t *testing.T) {
+    var err         error
+    var td          *TestData
+    var io          *IO_[[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var cnt         int
+
+	t.Logf("TestTableScan()...\n")
+	DockerRun(t)
+	td = NewTest()
+	td.Setup(t)
+	io = [[$tn]]New(td.io)
+
+    // Start clean with new empty tables.
+    err = io.TableCreate()
+    if err != nil {
+        t.Fatal("Error: Cannot create tables: ", err)
+    }
+
+    // Now add some records.
+    for i := 0; i < 10; i++ {
+        chr := 'A' + i
+        t.Logf("\tInserting Row %d - %c\n", i, chr)
+        rcd.TestData(i)
+        err = io.RowInsert(&rcd)
+        if err != nil {
+            t.Fatalf("Error: : Row Insertion Failed: %s\n\n\n", err)
+        }
+    }
+
+    apply := func (rcd [[$dn]][[$tn]].[[$tn]]) {
+                t.Logf("\tScan Row %d\n", cnt)
+                cnt++
+             }
+    err = io.TableScan(apply)
+    if err != nil {
+        t.Fatal("Error: Scanner: ", err)
+    }
+    if cnt != 10 {
+        t.Fatalf("Error: Scanner Count: %d - should be 10", cnt)
+    }
+
+
+    td.Disconnect()
+	t.Logf("TestCreateTable() - End of Test\n\n\n")
+}
+

@@ -415,6 +415,55 @@ func (io *IO_[[$tn]]) TableDelete() error {
 }
 
 
+//----------------------------------------------------------------------------
+//                             Table Scan
+//----------------------------------------------------------------------------
+
+// TableScan reads all the rows in the table applying a function to each of
+// them.
+func (io *IO_[[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$tn]])) error {
+    var sqlStmt = "[[GenTableDeleteStmt .Table]]"
+    var err     error
+    var rcd     [[$dn]][[$tn]].[[$tn]]
+    var sqlFirstStmt = "[[GenRowFirstStmt .Table]]"
+    var sqlNextStmt = "[[GenRowNextStmt .Table]]"
+    var row     *sql.Row
+
+    [[if GenDebugging]]
+        log.Printf("io[[$tn]].TableScanner()\n")
+        log.Printf("\tSQL:\n%s\n", sqlStmt)
+    [[end]]
+
+
+    [[if GenDebugging]]
+        log.Printf("io[[$tn]].RowFirst()\n")
+    [[end]]
+
+    row = io.io.QueryRow(sqlFirstStmt)
+    for ;; {
+        err = row.Scan([[$t.TitledFieldNameList "&rcd."]])
+        if err != nil {
+            if err == sql.ErrNoRows {
+                [[if GenDebugging]]
+                    log.Printf("\tNo Rows found!\n")
+                [[end]]
+                err = nil
+            }
+            break
+        }
+        // Warning: Next relies on the current record giving the key(s)
+        // to find its position in the table. So, we pass a copy to apply().
+        apply(rcd)
+        row = io.io.QueryRow(sqlNextStmt, [[$t.TitledKeysList "rcd." ""]])
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end io[[$tn]].TableDelete(%s)\n", ErrorString(err))
+    [[end]]
+    return err
+}
+
+
 [[$d.Plugin.Plugin.GenTrailer]]
 
 

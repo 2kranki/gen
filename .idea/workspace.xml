@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2ab8454-5cac-44c2-8c87-7804cbe075e4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/misc/test01ma/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01ma/db.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01ms/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01ms/db.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01my/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01my/db.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01pg/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01pg/db.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01sq/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01sq/db.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/genCmn.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/genCmn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,7 +20,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10242">
+            <state relative-caret-position="10044">
               <caret line="569" column="19" selection-start-line="569" selection-start-column="19" selection-end-line="569" selection-end-column="19" />
               <folding>
                 <element signature="e#137#266#0" expanded="true" />
@@ -29,23 +29,50 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="351" column="82" selection-start-line="351" selection-start-column="82" selection-end-line="351" selection-end-column="82" />
+            <state relative-caret-position="4716">
+              <caret line="575" column="23" selection-start-line="575" selection-start-column="23" selection-end-line="575" selection-end-column="23" />
               <folding>
-                <element signature="e#586#679#0" expanded="true" />
+                <element signature="e#1389#1694#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go">
+        <entry file="file://$PROJECT_DIR$/src/genCObj/genCObj.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1547">
-              <caret line="15" selection-start-line="11" selection-end-line="15" />
+            <state relative-caret-position="1962">
+              <caret line="116" selection-start-line="115" selection-end-line="116" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="149">
+              <caret line="859" selection-start-line="858" selection-end-line="859" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="316">
+              <caret line="456" column="73" selection-start-line="456" selection-start-column="73" selection-end-line="456" selection-end-column="73" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="206">
+              <caret line="497" column="16" lean-forward="true" selection-start-line="497" selection-start-column="16" selection-end-line="497" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -79,12 +106,10 @@
         <option value="$PROJECT_DIR$/src/genCObj/genCObjNew.go" />
         <option value="$PROJECT_DIR$/src/genCObj/genTextFile.go" />
         <option value="$PROJECT_DIR$/src/genCObj/dbData.go" />
-        <option value="$PROJECT_DIR$/src/genCmn/genCmn.go" />
         <option value="$PROJECT_DIR$/src/genCObj/genCObj.go" />
         <option value="$PROJECT_DIR$/src/genCmn/tasks.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" />
         <option value="$PROJECT_DIR$/src/util/util.go" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/Todo.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/mssql_io.go.tmp.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" />
@@ -103,7 +128,6 @@
         <option value="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" />
-        <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/util/util_test.go" />
@@ -114,17 +138,20 @@
         <option value="$PROJECT_DIR$/misc/test01sq/db.json.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt" />
-        <option value="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/table.test.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/list.html.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/main.go" />
         <option value="$PROJECT_DIR$/src/shared/shared.go" />
         <option value="$PROJECT_DIR$/src/models/sqlapp/mainExec.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" />
-        <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" />
         <option value="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go" />
+        <option value="$PROJECT_DIR$/src/genCmn/genCmn.go" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" />
       </list>
     </option>
   </component>
@@ -149,7 +176,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -202,6 +228,12 @@
               <item name="genapp" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="genCmn" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="genCObj" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
@@ -326,6 +358,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -388,7 +421,7 @@
     <frame x="27" y="78" width="1568" height="963" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5915751" visible="true" weight="0.32364598" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5915751" visible="true" weight="0.34478202" />
       <window_info id="Structure" order="1" sideWeight="0.4084249" side_tool="true" weight="0.29223433" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -438,16 +471,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/genCObj/genCObj.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="116" selection-start-line="115" selection-end-line="116" />
-          <folding>
-            <element signature="e#467#557#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/genCmn/tasks.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2466">
@@ -460,16 +483,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/misc/test01ms/main.json.txt">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="460">
-            <caret line="62" column="55" selection-start-line="62" selection-start-column="55" selection-end-line="62" selection-end-column="55" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Todo.txt">
       <provider selected="true" editor-type-id="text-editor">
@@ -568,13 +581,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1440">
-          <caret line="232" column="36" selection-start-line="232" selection-start-column="36" selection-end-line="232" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.go.tmpl.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-565" />
@@ -587,33 +593,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="368" column="31" selection-start-line="368" selection-start-column="31" selection-end-line="368" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbType/dbType.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2948" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="575" column="23" lean-forward="true" selection-start-line="575" selection-start-column="23" selection-end-line="575" selection-end-column="23" />
-          <folding>
-            <element signature="e#1389#1694#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/genCmn/genCmn.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="147" column="43" selection-start-line="147" selection-start-column="26" selection-end-line="147" selection-end-column="43" />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/util/util_test.go">
@@ -686,20 +668,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2358">
-          <caret line="131" selection-start-line="130" selection-end-line="131" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="11" selection-start-line="11" selection-end-line="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.test.go.tmpl.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="284">
@@ -747,16 +715,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10242">
-          <caret line="569" column="19" selection-start-line="569" selection-start-column="19" selection-end-line="569" selection-end-column="19" />
-          <folding>
-            <element signature="e#137#266#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3762">
@@ -764,27 +722,99 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt">
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3042">
-          <caret line="169" column="55" selection-start-line="169" selection-start-column="55" selection-end-line="169" selection-end-column="55" />
+        <state relative-caret-position="6318">
+          <caret line="351" column="82" selection-start-line="351" selection-start-column="82" selection-end-line="351" selection-end-column="82" />
+          <folding>
+            <element signature="e#586#679#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1547">
+        <state relative-caret-position="270">
           <caret line="15" selection-start-line="11" selection-end-line="15" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go">
+    <entry file="file://$PROJECT_DIR$/src/genCmn/genCmn.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="351" column="82" selection-start-line="351" selection-start-column="82" selection-end-line="351" selection-end-column="82" />
+        <state relative-caret-position="380">
+          <caret line="81" column="56" selection-start-line="81" selection-start-column="56" selection-end-line="81" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="542">
+            <caret line="70" column="27" selection-start-line="70" selection-start-column="27" selection-end-line="70" selection-end-column="27" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10044">
+          <caret line="569" column="19" selection-start-line="569" selection-start-column="19" selection-end-line="569" selection-end-column="19" />
           <folding>
-            <element signature="e#586#679#0" expanded="true" />
+            <element signature="e#137#266#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genCObj/genCObj.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1962">
+          <caret line="116" selection-start-line="115" selection-end-line="116" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="368" column="31" selection-start-line="368" selection-start-column="31" selection-end-line="368" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="115" column="30" selection-start-line="115" selection-start-column="30" selection-end-line="115" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4716">
+          <caret line="575" column="23" selection-start-line="575" selection-start-column="23" selection-end-line="575" selection-end-column="23" />
+          <folding>
+            <element signature="e#1389#1694#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="497" column="16" lean-forward="true" selection-start-line="497" selection-start-column="16" selection-end-line="497" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="859" selection-start-line="858" selection-end-line="859" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="456" column="73" selection-start-line="456" selection-start-column="73" selection-end-line="456" selection-end-column="73" />
         </state>
       </provider>
     </entry>
