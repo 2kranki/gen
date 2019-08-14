@@ -113,6 +113,7 @@ func (h *Handlers) SetupHandlers(mux *http.ServeMux) {
 	    mux.HandleFunc("/[[$tn]]/table/create",       h.TableCreate)
 	    mux.HandleFunc("/[[$tn]]/table/load/csv",     h.TableLoadCSV)
 	    mux.HandleFunc("/[[$tn]]/table/load/test",    h.TableLoadTestData)
+	    mux.HandleFunc("/[[$tn]]/table/save/csv",     h.TableSaveCSV)
 
     [[if GenDebugging]]
         log.Printf("\tend of hndlr[[$tn]].SetupHandlers()\n")
@@ -1195,6 +1196,59 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
         log.Printf("...end hndlr[[$tn]].TableLoadTestData(%s)\n", ErrorString(err))
+    [[end]]
+}
+
+//----------------------------------------------------------------------------
+//                            Table Save CSV
+//----------------------------------------------------------------------------
+
+// TableSaveCSV creates the table deleting any current ones and loads in
+// data from a CSV file.
+func (h *Handlers) TableSaveCSV(w http.ResponseWriter, r *http.Request) {
+    var err         error
+    var scanner     [[$dn]][[$tn]].DbTableScanner
+    var ok          bool
+    var cntGood     int
+    var cntTotal    int
+
+    [[if GenDebugging]]
+        log.Printf("hndlr[[$tn]].TableSaveCSV(%s)\n", r.Method)
+    [[end]]
+    if r.Method != "GET" {
+        http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+        return
+    }
+    if scanner, ok = h.db.([[$dn]][[$tn]].DbTableScanner); !ok {
+        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+        return
+    }
+
+    // Set up to write the CSV file.
+    fileName := "[[$tn]].csv"
+    w.Header().Set("Content-Type", "text/csv")
+    w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s", fileName))
+    wtr := csv.NewWriter(w)
+
+    // Write the CSV file.
+    if wtr != nil {
+        apply := func (rcd [[$dn]][[$tn]].[[$tn]]) error {
+                    log.Printf("\tRow: %v\n", rcd.ToStrings())
+                    err2 := wtr.Write(rcd.ToStrings())
+                    cntTotal++
+                    if err2 == nil {
+                        cntGood++
+                    }
+                    return err2
+                 }
+        err = scanner.TableScan(apply)
+        wtr.Flush()
+    } else {
+        err = fmt.Errorf("Error: Could not create CSV Writer!\n")
+    }
+
+    [[if GenDebugging]]
+        log.Printf("...end hndlr[[$tn]].TableSaveCSV(%s)\n", ErrorString(err))
     [[end]]
 }
 

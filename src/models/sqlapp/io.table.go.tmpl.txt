@@ -421,7 +421,7 @@ func (io *IO_[[$tn]]) TableDelete() error {
 
 // TableScan reads all the rows in the table applying a function to each of
 // them.
-func (io *IO_[[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$tn]])) error {
+func (io *IO_[[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$tn]]) error) error {
     var sqlStmt = "[[GenTableDeleteStmt .Table]]"
     var err     error
     var rcd     [[$dn]][[$tn]].[[$tn]]
@@ -453,7 +453,10 @@ func (io *IO_[[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$tn]])) error {
         }
         // Warning: Next relies on the current record giving the key(s)
         // to find its position in the table. So, we pass a copy to apply().
-        apply(rcd)
+        err = apply(rcd)
+        if err != nil {
+            break
+        }
         row = io.io.QueryRow(sqlNextStmt, [[$t.TitledKeysList "rcd." ""]])
     }
 

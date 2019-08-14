@@ -493,9 +493,10 @@ func TestTableScan(t *testing.T) {
         }
     }
 
-    apply := func (rcd [[$dn]][[$tn]].[[$tn]]) {
+    apply := func (rcd [[$dn]][[$tn]].[[$tn]]) error {
                 t.Logf("\tScan Row %d\n", cnt)
                 cnt++
+                return nil
              }
     err = io.TableScan(apply)
     if err != nil {

@@ -167,6 +167,12 @@ func (f *DbField) GenFromString(dn,sn string) string {
 // GenToString generates code to convert the struct st.f field to string in variable, v.
 func (f *DbField) GenToString(v string, st string) string {
 	var str			string
+	var fldName		string
+
+	fldName = st + "." + f.TitledName()
+	if st == "" {
+		fldName = f.TitledName()
+	}
 
 	switch f.Typ.GoType() {
 	case "int":
@@ -174,22 +180,22 @@ func (f *DbField) GenToString(v string, st string) string {
 	case "int32":
 		fallthrough
 	case "int64":
-		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%%d\", %s.%s)\n", v, st, f.TitledName())
+		str = fmt.Sprintf("\t%s = fmt.Sprintf(\"%%d\", %s)\n", v, fldName)
 	case "float32":
 		fallthrough
 	case "float64":
 		str = "\t{\n"
-		str += fmt.Sprintf("\t\ts := fmt.Sprintf(\"%s.4f\", %s.%s)\n", "%", st, f.TitledName())
+		str += fmt.Sprintf("\t\ts := fmt.Sprintf(\"%s.4f\", %s)\n", "%", fldName)
 		str += fmt.Sprintf("\t\t%s = strings.TrimRight(strings.TrimRight(s, \"0\"), \".\")\n", v)
 		str += "\t}\n"
 	case "time.Time":
 		{
-			wrk := "\t{\n\t\twrk, _ := %s.%s.MarshalText()\n" +
+			wrk := "\t{\n\t\twrk, _ := %s.MarshalText()\n" +
 				"\t\t%s = wrk\n\t}\n"
-			str = fmt.Sprintf(wrk, st, f.TitledName(), v)
+			str = fmt.Sprintf(wrk, fldName, v)
 		}
 	default:
-		str = fmt.Sprintf("\t%s = %s.%s\n", v, st, f.TitledName())
+		str = fmt.Sprintf("\t%s = %s\n", v, fldName)
 	}
 
 	return str

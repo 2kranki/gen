@@ -113,7 +113,7 @@ type DbTableDeleter interface {
 type DbTableScanner interface {
     // TableScan reads all the rows in the table applying a function to each of
     // them.
-    TableScan(apply func (rcd [[$tn]])) error
+    TableScan(apply func (rcd [[$tn]]) error) error
 }
 
 //============================================================================
@@ -366,6 +366,24 @@ func (s *[[$tn]]) TestData(i int) {
             s.[[$f.TitledName]] = f64
         [[end -]]
 	[[end]]
+}
+
+//----------------------------------------------------------------------------
+//                             To Strings
+//----------------------------------------------------------------------------
+
+// ToStrings converts a record to an array of strings acceptable to CSV and
+// other conversion packages.
+func (s *[[$tn]]) ToStrings() []string {
+    var strs    []string
+    var str     string
+
+    [[ range $f := $t.Fields ]]
+        [[ $f.GenToString "str" "s" ]]
+        strs = append(strs, str)
+	[[- end ]]
+
+	return strs
 }
 
 //----------------------------------------------------------------------------

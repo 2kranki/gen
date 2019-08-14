@@ -16,6 +16,7 @@
 package [[$dn]][[$tn]]
 
 import (
+    "fmt"
 	"testing"
 )
 
@@ -73,5 +74,32 @@ func TestTestData(t *testing.T) {
 
 
     t.Logf("Test.TestData() - End of Test\n\n\n")
+}
+
+func TestToStrings(t *testing.T) {
+    var strs        []string
+    var str         string
+    var offset      int
+
+    t.Logf("Test.ToStrings()...\n")
+
+    rcd := [[$tn]]New()
+    if rcd == nil {
+        t.Fatalf("Error: Could not create rcd!\n\n\n")
+    }
+    rcd.TestData(1)
+
+    strs = rcd.ToStrings()
+    [[range $f := $t.Fields]]
+        offset = [[$t.FieldIndex $f.Name]]
+        [[ $f.GenToString "str" "rcd" ]]
+        if str != strs[offset] {
+            t.Fatalf("Error: Invalid data for %s of %s!\n\n\n",
+                                    "[[$f.TitledName]]", strs[offset])
+        }
+    [[end]]
+
+
+    t.Logf("Test.ToStrings() - End of Test\n\n\n")
 }
 

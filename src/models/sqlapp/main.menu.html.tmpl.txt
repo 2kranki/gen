@@ -44,6 +44,7 @@
                     <input type=file onclick='onCsvFile[[$tn]]()' name=csvFile value="">
                     <input type=submit onclick='onCsvLoad[[$tn]]()' value="Create Table and load CSV File">
                 </li>
+                <li><input type=submit onclick='onSaveCSV[[$tn]]()' value="Save CSV file"></li>
                 <li><input type=submit onclick='onLoadTest[[$tn]]()' value="Create Table and load test data"></li>
             </ul>
     </form>
@@ -75,6 +76,10 @@
         }
         function onRow[[$tn]]() {
             document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/show";
+            document.getElementById("menuForm[[$tn]]").method = "get";
+        }
+        function onSaveCSV[[$tn]]() {
+            document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/table/save/csv";
             document.getElementById("menuForm[[$tn]]").method = "get";
         }
     </script>
