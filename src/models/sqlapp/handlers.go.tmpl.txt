@@ -16,12 +16,12 @@ import (
 	_ "net/http"
 	_ "io"
 	_ "io/ioutil"
+    "html/template"
     [[if GenDebugging]]
         "log"
     [[end]]
     _ "os"
     "sort"
-    "text/template"
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 

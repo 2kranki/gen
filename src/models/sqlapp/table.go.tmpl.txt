@@ -369,6 +369,26 @@ func (s *[[$tn]]) TestData(i int) {
 }
 
 //----------------------------------------------------------------------------
+//                             To String
+//----------------------------------------------------------------------------
+
+// ToString converts a record's field to a string.
+func (s *[[$tn]]) ToString(TitledName string) string {
+    var str     string
+
+    switch TitledName {
+    [[ range $f := $t.Fields ]]
+    case "[[$f.TitledName]]":
+        [[ $f.GenToString "str" "s" ]]
+	[[- end ]]
+	default:
+	    str = ""
+	}
+
+	return str
+}
+
+//----------------------------------------------------------------------------
 //                             To Strings
 //----------------------------------------------------------------------------
 

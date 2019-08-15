@@ -32,7 +32,7 @@ definition and having them control the generation process.
 - [x] Finish Postgres Support
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
-- [ ] Add **csv** save/restore per table
+- [x] Add **csv** save/restore per table
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
 - [ ] Declare version 0.2

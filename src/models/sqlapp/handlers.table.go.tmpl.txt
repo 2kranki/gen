@@ -19,6 +19,7 @@ import (
 	"encoding/csv"
     "fmt"
     "io"
+    "html/template"
     [[if GenDebugging]]
         "log"
     [[end]]
@@ -29,7 +30,6 @@ import (
 	    "strings"
     [[end]]
 	"sync"
-    "text/template"
     [[if $t.HasDate]]
 	    "time"
 	[[end]]

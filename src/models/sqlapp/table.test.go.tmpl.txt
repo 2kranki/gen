@@ -76,6 +76,30 @@ func TestTestData(t *testing.T) {
     t.Logf("Test.TestData() - End of Test\n\n\n")
 }
 
+func TestToString(t *testing.T) {
+    var str         string
+    var strRcd      string
+
+    t.Logf("Test.ToStrings()...\n")
+
+    rcd := [[$tn]]New()
+    if rcd == nil {
+        t.Fatalf("Error: Could not create rcd!\n\n\n")
+    }
+    rcd.TestData(1)
+
+    [[ range $f := $t.Fields -]]
+        strRcd = rcd.ToString("[[$f.TitledName]]")
+        [[ $f.GenToString "str" "rcd" ]]
+        if str != strRcd {
+            t.Fatalf("Error: Invalid data for %s!\n\n\n", "[[$f.TitledName]]")
+        }
+    [[ end ]]
+
+
+    t.Logf("Test.ToStrings() - End of Test\n\n\n")
+}
+
 func TestToStrings(t *testing.T) {
     var strs        []string
     var str         string
