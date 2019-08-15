@@ -33,6 +33,9 @@ definition and having them control the generation process.
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
 - [x] Add **csv** save/restore per table
+- [ ] Convert golang compile and testing to use Docker so that it is the same for linux, 
+        macOS and windows if possible. Right now, the scripts are for bash and only
+        support linux and macOS
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
 - [ ] Declare version 0.2
