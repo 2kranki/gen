@@ -7,7 +7,6 @@ package dbJson
 
 import (
 	"../../shared"
-	"../../util"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
@@ -16,6 +15,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/2kranki/go_util"
 )
 
 //============================================================================
@@ -290,7 +291,7 @@ type DbTable struct {
 func (t *DbTable) CreateStruct( ) string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName()))
+	str.WriteString(fmt.Sprintf("type %s%s struct {\n", t.DB.TitledName(),t.TitledName()))
 	for i,_ := range t.Fields {
 		str.WriteString(t.Fields[i].CreateStruct())
 	}

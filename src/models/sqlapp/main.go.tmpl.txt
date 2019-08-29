@@ -75,7 +75,7 @@ func main() {
     [[ GenFlagSetup ]]
 [[ end -]]
     [[$d.Plugin.Plugin.GenFlagArgDefns $dn]]
-	flag.StringVar(&http_port, "httpPort", "8080", "server port")
+	flag.StringVar(&http_port, "httpPort", "8090", "server port")
 	flag.StringVar(&http_srvr, "httpServer", "localhost", "server site")
 	flag.StringVar(&baseDir, "basedir", ".", "Base Directory for Templates, HTML and CSS")
 

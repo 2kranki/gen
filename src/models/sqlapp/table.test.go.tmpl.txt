@@ -13,10 +13,13 @@
 [[- $t  := .Table]]
 [[- $tn := .Table.TitledName]]
 
-package [[$dn]][[$tn]]
+package main
 
 import (
     "fmt"
+    [[ if $d.HasFloat -]]
+        "strings"
+    [[- end ]]
 	"testing"
 )
 
@@ -24,7 +27,7 @@ import (
 //                              Tests
 //============================================================================
 
-func TestTestData(t *testing.T) {
+func TestTestData[[$dn]][[$tn]](t *testing.T) {
     var chr         rune
     var str         string
     var i64         int64
@@ -43,7 +46,7 @@ func TestTestData(t *testing.T) {
     t.Logf("\t chr = %c\n", chr)
     t.Logf("\t str = (%d)%s\n", len(str), str)
 
-    rcd := [[$tn]]New()
+    rcd := New[[$dn]][[$tn]]()
     if rcd == nil {
         t.Fatalf("Error: Could not create rcd!\n\n\n")
     }
@@ -76,13 +79,13 @@ func TestTestData(t *testing.T) {
     t.Logf("Test.TestData() - End of Test\n\n\n")
 }
 
-func TestToString(t *testing.T) {
+func TestToString[[$dn]][[$tn]](t *testing.T) {
     var str         string
     var strRcd      string
 
     t.Logf("Test.ToStrings()...\n")
 
-    rcd := [[$tn]]New()
+    rcd := New[[$dn]][[$tn]]()
     if rcd == nil {
         t.Fatalf("Error: Could not create rcd!\n\n\n")
     }
@@ -100,14 +103,14 @@ func TestToString(t *testing.T) {
     t.Logf("Test.ToStrings() - End of Test\n\n\n")
 }
 
-func TestToStrings(t *testing.T) {
+func TestToStrings[[$dn]][[$tn]](t *testing.T) {
     var strs        []string
     var str         string
     var offset      int
 
     t.Logf("Test.ToStrings()...\n")
 
-    rcd := [[$tn]]New()
+    rcd := New[[$dn]][[$tn]]()
     if rcd == nil {
         t.Fatalf("Error: Could not create rcd!\n\n\n")
     }

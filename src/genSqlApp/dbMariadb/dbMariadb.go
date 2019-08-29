@@ -8,11 +8,12 @@
 package dbMariadb
 
 import (
-	"../../util"
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
 	"log"
+
+	"github.com/2kranki/go_util"
 )
 
 const(
@@ -66,7 +67,7 @@ func (pd *Plugin) DefaultPort() string {
 
 // DefaultPW returns default docker password.
 func (pd *Plugin) DefaultPW() string {
-	return "Passw0rd!"
+	return "Passw0rd"
 }
 
 // DefaultServer returns default docker server name.

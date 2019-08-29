@@ -7,14 +7,14 @@
 package mainData
 
 import (
+	"../shared"
 	"errors"
 	"fmt"
+	"github.com/2kranki/go_util"
 	"log"
 	"path/filepath"
 	"reflect"
 	"strings"
-	"../shared"
-	"../util"
 )
 
 type MainFlag struct {

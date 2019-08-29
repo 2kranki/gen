@@ -11,25 +11,26 @@
 [[- $t := .Table]]
 [[- $tn := .Table.TitledName]]
 
-package hndlr[[$dn]][[$tn]]
+package main
 
 import (
-	"../[[$dn]][[$tn]]"
     "fmt"
     "log"
     "sort"
+
+	"github.com/2kranki/go_util"
 )
 
 //============================================================================
 //                              Fake DB
 //============================================================================
 
-type FakeDB struct {
-    rcds        map[string][[$dn]][[$tn]].[[$tn]]
+type FakeDB_[[$dn]][[$tn]] struct {
+    rcds        map[string][[$dn]][[$tn]]
     errorOut    bool
 }
 
-func (db *FakeDB) SetErrorOut(f bool) {
+func (db *FakeDB_[[$dn]][[$tn]]) SetErrorOut(f bool) {
     db.errorOut = f
 }
 
@@ -38,7 +39,7 @@ func (db *FakeDB) SetErrorOut(f bool) {
 //----------------------------------------------------------------------------
 
 // RowDelete deletes the row with keys from the provided record, rcd.
-func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowDelete(rcd *[[$dn]][[$tn]]) error {
     var err         error
     var ok          bool
 
@@ -58,7 +59,7 @@ func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowDelete(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowDelete(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -69,7 +70,7 @@ func (db *FakeDB) RowDelete(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
 // RowFind searches the Database for a matching row for the keys found in
 // the given record and returns the output in that same record.
-func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowFind(rcd *[[$dn]][[$tn]]) error {
     var err         error
     var ok          bool
 
@@ -88,7 +89,7 @@ func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowFind(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowFind(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -100,7 +101,7 @@ func (db *FakeDB) RowFind(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 // RowFirst returns the first row in the table, [[$tn]].
 // If there are no rows in the table, then a blank/null record is returned
 // without error.
-func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowFirst(rcd *[[$dn]][[$tn]]) error {
     var err         error
     var keys        []string
 
@@ -123,7 +124,7 @@ func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowFirst(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowFirst(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -132,7 +133,7 @@ func (db *FakeDB) RowFirst(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Insert
 //----------------------------------------------------------------------------
 
-func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowInsert(rcd *[[$dn]][[$tn]]) error {
     var err         error
 
     [[if GenDebugging]]
@@ -154,7 +155,7 @@ func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowInsert(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowInsert(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -163,7 +164,7 @@ func (db *FakeDB) RowInsert(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Last
 //----------------------------------------------------------------------------
 
-func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowLast(rcd *[[$dn]][[$tn]]) error {
     var err         error
     var keys        []string
 
@@ -184,7 +185,7 @@ func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowLast(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowLast(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -195,7 +196,7 @@ func (db *FakeDB) RowLast(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 
 // RowNext returns the next row from the row given. If row after the current
 // one does not exist, then the first row is returned.
-func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowNext(rcd *[[$dn]][[$tn]]) error {
     var err         error
     var keys        []string
     var i           int
@@ -207,7 +208,7 @@ func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     if db.errorOut {
         err = fmt.Errorf("Error - Error Out!\n")
     } else {
-        var wrkRcd  [[$dn]][[$tn]].[[$tn]]
+        var wrkRcd  [[$dn]][[$tn]]
         for key := range db.rcds {
             keys = append(keys, key)
         }
@@ -231,7 +232,7 @@ func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowNext(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowNext(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -244,7 +245,7 @@ func (db *FakeDB) RowNext(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 // 'offset' is the offset into the result set ordered by the main index. Both
 // 'limit' and 'offset' are relative to 1. We return an address to the array
 // rows (structs) so that we don't have the overhead of copying them everwhere.
-func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], error) {
+func (db *FakeDB_[[$dn]][[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]], error) {
     var err         error
 
     [[if GenDebugging]]
@@ -258,7 +259,7 @@ func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], erro
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowPage(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowPage(%s)\n", util.ErrorString(err))
     [[end]]
     return nil, err
 }
@@ -267,7 +268,7 @@ func (db *FakeDB) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$tn]], erro
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowPrev(rcd *[[$dn]][[$tn]]) error {
     var err         error
 
     [[if GenDebugging]]
@@ -281,7 +282,7 @@ func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowPrev(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowPrev(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -290,7 +291,7 @@ func (db *FakeDB) RowPrev(rcd *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Row Update
 //----------------------------------------------------------------------------
 
-func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
+func (db *FakeDB_[[$dn]][[$tn]]) RowUpdate(d *[[$dn]][[$tn]]) error {
     var err     error
 
     [[if GenDebugging]]
@@ -305,7 +306,7 @@ func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
 
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBRowUpdate(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBRowUpdate(%s)\n", util.ErrorString(err))
     [[end]]
 	return err
 }
@@ -315,7 +316,7 @@ func (db *FakeDB) RowUpdate(d *[[$dn]][[$tn]].[[$tn]]) error {
 //                             Table Count
 //----------------------------------------------------------------------------
 
-func (db FakeDB) TableCount( ) (int, error) {
+func (db FakeDB_[[$dn]][[$tn]]) TableCount( ) (int, error) {
     var err         error
     var count       int
 
@@ -330,7 +331,7 @@ func (db FakeDB) TableCount( ) (int, error) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBTableCount(%s) %d\n", ErrorString(err), count)
+        log.Printf("...end [[$tn]].DBTableCount(%s) %d\n", util.ErrorString(err), count)
     [[end]]
     return count, err
 }
@@ -341,7 +342,7 @@ func (db FakeDB) TableCount( ) (int, error) {
 
 // TableCreate creates the table in the given database deleting the current
 // table if present.
-func (db FakeDB) TableCreate() error {
+func (db FakeDB_[[$dn]][[$tn]]) TableCreate() error {
     var err     error
 
     [[if GenDebugging]]
@@ -355,7 +356,7 @@ func (db FakeDB) TableCreate() error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBTableCreate(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBTableCreate(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -365,7 +366,7 @@ func (db FakeDB) TableCreate() error {
 //----------------------------------------------------------------------------
 
 // TableDelete deletes the table in the given database if present.
-func (db FakeDB) TableDelete() error {
+func (db FakeDB_[[$dn]][[$tn]]) TableDelete() error {
     var err     error
 
     [[if GenDebugging]]
@@ -379,7 +380,7 @@ func (db FakeDB) TableDelete() error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]].DBTableDelete(%s)\n", ErrorString(err))
+        log.Printf("...end [[$tn]].DBTableDelete(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }

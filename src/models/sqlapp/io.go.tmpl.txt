@@ -32,7 +32,7 @@
 
 // Generated: [[Time]] for [[$typ]] Database
 
-package io[[$dn]]
+package main
 
 import (
     "database/sql"
@@ -47,10 +47,13 @@ import (
         "strconv"
     [[- end ]]
     "strings"
+	// "time" is only needed for Docker support and "sqlite" is the only
+	//  database server not using it.
     [[ if ne $typ "sqlite" -]]
         "time"
     [[end]]
-    "../util"
+
+    "github.com/2kranki/go_util"
     [[ if eq $typ "mariadb" -]]
 	    [[$d.Plugin.Plugin.GenImportString]]
     [[ else if eq $typ "mysql" -]]
@@ -118,24 +121,14 @@ func (io *IO_[[$dn]]) SetUser(str string) {
 //                              Miscellaneous
 //============================================================================
 
-[[if GenDebugging]]
-    func ErrorString(err error) string {
-        if err == nil {
-            return "ok"
-        } else {
-            return err.Error()
-        }
-    }
-[[end]]
-
 [[if $d.HasFloat]]
 
-    func FloatToString(num float64) string {
+    func (io *IO_[[$dn]]) FloatToString(num float64) string {
         s := fmt.Sprintf("%.4f", num)
         return strings.TrimRight(strings.TrimRight(s, "0"), ".")
     }
 
-    func StringToFloat(str string) float64 {
+    func (io *IO_[[$dn]]) StringToFloat(str string) float64 {
         var num float64
         num, _ = strconv.ParseFloat(str, 64)
         return num
@@ -501,7 +494,7 @@ func (io *IO_[[$dn]]) DatabaseCreate(dbName string) error {
     err = io.Connect(dbName)
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseCreate(%s)\n", ErrorString(err))
+        log.Printf("...end DatabaseCreate(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -533,7 +526,7 @@ func (io *IO_[[$dn]]) DatabaseDelete(dbName string) error {
     [[- end ]]
 
     [[if GenDebugging]]
-        log.Printf("...end DatabaseDelete(%s)\n", ErrorString(err))
+        log.Printf("...end DatabaseDelete(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -630,7 +623,7 @@ func (io *IO_[[$dn]]) IsDatabaseDefined(dbName string) bool {
 func (io *IO_[[$dn]]) ErrChk(err error) error {
 
     [[if GenDebugging]]
-        log.Printf("ErrChk(%s)\n", ErrorString(err))
+        log.Printf("ErrChk(%s)\n", util.ErrorString(err))
     [[end]]
 
     if err != nil {
@@ -643,7 +636,7 @@ func (io *IO_[[$dn]]) ErrChk(err error) error {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end ErrChk(%s)\n", ErrorString(err))
+        log.Printf("...end ErrChk(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -812,7 +805,7 @@ func (io *IO_[[$dn]]) Exec(sqlStmt string, args ...interface{}) error {
     [[- end ]]
 
     [[if GenDebugging]]
-        log.Printf("...end Exec(%s)\n", ErrorString(err))
+        log.Printf("...end Exec(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -844,7 +837,7 @@ func (io *IO_[[$dn]]) Query(sqlStmt string, process func(rows *sql.Rows), args .
     }
 
     [[if GenDebugging]]
-        log.Printf("...end Query(%s)\n", ErrorString(err))
+        log.Printf("...end Query(%s)\n", util.ErrorString(err))
     [[end]]
     return err
 }
@@ -869,7 +862,7 @@ func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) *sql.Row {
     [[- end ]]
 
     [[if GenDebugging]]
-        log.Printf("...end Query(%s)\n", ErrorString(err))
+        log.Printf("...end Query(%s)\n", util.ErrorString(err))
     [[end]]
     return row
 }
@@ -878,11 +871,11 @@ func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) *sql.Row {
 
 
 //----------------------------------------------------------------------------
-//                                  [[$dn]]New
+//                                  NewIo[[$dn]]
 //----------------------------------------------------------------------------
 
 // New creates a new struct.
-func New() *IO_[[$dn]] {
+func NewIo[[$dn]]() *IO_[[$dn]] {
     db := &IO_[[$dn]]{}
     return db
 }

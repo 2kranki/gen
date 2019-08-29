@@ -34,13 +34,14 @@ package dbMssql
 
 import (
 	"../../shared"
-	"../../util"
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/2kranki/go_util"
 )
 
 // Notes:
@@ -89,7 +90,7 @@ func (pd *Plugin) DefaultPort() string {
 
 // DefaultPW returns default docker password.
 func (pd *Plugin) DefaultPW() string {
-	return "Passw0rd!"
+	return "Passw0rd"
 }
 
 // DefaultServer returns default docker server name.
@@ -228,7 +229,11 @@ func (pd *Plugin) GenRowLastStmt(t *dbJson.DbTable) string {
 func (pd *Plugin) GenRowLimit(t *dbJson.DbTable, n string) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("FETCH NEXT %s ROWS ONLY", n)
+	if n == "1" {
+		str.WriteStringf("FETCH NEXT 1 ROW ONLY")
+	} else {
+		str.WriteStringf("FETCH NEXT %s ROWS ONLY", n)
+	}
 
 	return str.String()
 }
@@ -239,7 +244,7 @@ func (pd *Plugin) GenRowNextStmt(t *dbJson.DbTable) string {
 	db := t.DB
 
 	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
-	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
+	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s %s;\\n",
 		db.Schema, t.TitledName(), pd.GenKeySearchPlaceHolder(t, ">"), t.KeysList("", " ASC"),
 		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
 

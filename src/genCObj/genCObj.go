@@ -17,10 +17,11 @@ package genCObj
 import (
 	"../genCmn"
 	"../shared"
-	"../util"
 	"flag"
 	"fmt"
 	"log"
+
+	"github.com/2kranki/go_util"
 )
 
 // FileDefns controls what files are generated.

@@ -14,12 +14,13 @@ package genCObj
 
 import (
 	"../shared"
-	"../util"
 	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
 	"strings"
+
+	"github.com/2kranki/go_util"
 )
 
 // DbProp defines an Objects Property.

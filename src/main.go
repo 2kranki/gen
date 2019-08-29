@@ -13,12 +13,12 @@ import (
 	"log"
 	"os"
 	"strings"
-	// genGo packages
+
 	"./genCObj"
 	"./genSqlApp"
 	"./shared"
-	"./util"
-	// External Imports
+
+	"github.com/2kranki/go_util"
 )
 
 var (

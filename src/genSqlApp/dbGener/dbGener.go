@@ -15,12 +15,13 @@ package dbGener
 
 import (
 	"../../shared"
-	"../../util"
 	"../dbJson"
 	"../dbPlugin"
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/2kranki/go_util"
 )
 
 //============================================================================

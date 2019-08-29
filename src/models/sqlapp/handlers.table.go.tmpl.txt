@@ -11,11 +11,9 @@
 [[- $tn := .Table.TitledName]]
 
 
-package hndlr[[$dn]][[$t.TitledName]]
+package main
 
 import (
-	_ [[$d.Plugin.Plugin.GenImportString]]
-	"../[[$dn]][[$tn]]"
 	"encoding/csv"
     "fmt"
     "io"
@@ -33,52 +31,45 @@ import (
     [[if $t.HasDate]]
 	    "time"
 	[[end]]
+
+	"github.com/2kranki/go_util"
+	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
-var Tmpls           *template.Template
 
 
 //============================================================================
 //                              Miscellaneous
 //============================================================================
 
-[[if GenDebugging]]
-func ErrorString(err error) string {
-    if err == nil {
-        return "ok"
-    } else {
-        return err.Error()
-    }
-}
-[[end]]
-
 //============================================================================
 //                        Handlers for [[$dn]].[[$tn]]
 //============================================================================
 
-type Handlers struct {
+type Handlers[[$dn]][[$tn]] struct {
     mu          sync.Mutex
-    db          interface{}
+    db          *IO_[[$dn]][[$tn]]
     rowsPerPage int
+    Tmpls       *template.Template
 }
 
 //----------------------------------------------------------------------------
 //                             Accessors
 //----------------------------------------------------------------------------
 
-func (h *Handlers) DB() interface{} {
+func (h *Handlers[[$dn]][[$tn]]) DB() *IO_[[$dn]][[$tn]] {
     return h.db
 }
 
-func (h *Handlers) SetDB(db interface{}) {
+func (h *Handlers[[$dn]][[$tn]]) SetDB(db *IO_[[$dn]][[$tn]]) {
     h.db = db
 }
 
-func (h *Handlers) RowsPerPage() int {
+func (h *Handlers[[$dn]][[$tn]]) RowsPerPage() int {
     return h.rowsPerPage
 }
 
-func (h *Handlers) SetRowsPerPage(r int) {
+func (h *Handlers[[$dn]][[$tn]]) SetRowsPerPage(r int) {
     h.rowsPerPage = r
 }
 
@@ -88,7 +79,7 @@ func (h *Handlers) SetRowsPerPage(r int) {
 
 // SetupHandlers creates a Handler object and sets up each of the handlers
 // with it given a mux.
-func (h *Handlers) SetupHandlers(mux *http.ServeMux) {
+func (h *Handlers[[$dn]][[$tn]]) SetupHandlers(mux *http.ServeMux) {
 
     [[if GenDebugging]]
         log.Printf("\thndlr[[$tn]].SetupHandlers()\n")
@@ -127,10 +118,10 @@ func (h *Handlers) SetupHandlers(mux *http.ServeMux) {
 // New creates a new Handlers object given the parameters needed by the handlers
 // and returns it to the caller if successful.  If it fails to properly create
 // the handlers then it must fail rather than return an error indicator.
-func New(db interface{}, rowsPerPage int, mux *http.ServeMux) *Handlers {
-    var h       *Handlers
+func NewHandlers[[$dn]][[$tn]](db *IO_[[$dn]][[$tn]], rowsPerPage int, mux *http.ServeMux) *Handlers[[$dn]][[$tn]] {
+    var h       *Handlers[[$dn]][[$tn]]
 
- 	h = &Handlers{db:db, rowsPerPage:rowsPerPage}
+ 	h = &Handlers[[$dn]][[$tn]]{db:db, rowsPerPage:rowsPerPage}
     if h == nil {
         log.Fatalf("Error: Unable to allocate Handlers for hndlr[[$dn]][[$tn]]!\n")
     }
@@ -148,7 +139,7 @@ func New(db interface{}, rowsPerPage int, mux *http.ServeMux) *Handlers {
 //----------------------------------------------------------------------------
 
 // ListFirst displays the first page of rows.
-func (h *Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) ListFirst(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].ListFirst(%s)\n", r.Method)
@@ -175,11 +166,9 @@ func (h *Handlers) ListFirst(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListLast displays the last page of rows.
-func (h *Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) ListLast(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
-    var counter [[$dn]][[$tn]].DbTableCounter
-    var ok      bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].ListLast(%s)\n", r.Method)
@@ -192,16 +181,12 @@ func (h *Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if counter, ok = h.db.([[$dn]][[$tn]].DbTableCounter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Calculate the offset.
-    offset, err = counter.TableCount()
+    offset, err = h.db.TableCount()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
     }
@@ -223,12 +208,10 @@ func (h *Handlers) ListLast(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListNext displays the next page of rows.
-func (h *Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) ListNext(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
     var cTable  int
-    var counter [[$dn]][[$tn]].DbTableCounter
-    var ok      bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].ListNext(%s)\n", r.Method)
@@ -241,16 +224,12 @@ func (h *Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if counter, ok = h.db.([[$dn]][[$tn]].DbTableCounter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Calculate the offset.
-    cTable, err = counter.TableCount()
+    cTable, err = h.db.TableCount()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
     }
@@ -273,13 +252,11 @@ func (h *Handlers) ListNext(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListPrev displays the next page of rows.
-func (h *Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) ListPrev(w http.ResponseWriter, r *http.Request) {
     var err     error
     var offset  int
     var begin   int
     var cTable  int
-    var counter [[$dn]][[$tn]].DbTableCounter
-    var ok      bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].ListPrev(%s, %s)\n", r.Method, r.FormValue("offset"))
@@ -292,16 +269,12 @@ func (h *Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if counter, ok = h.db.([[$dn]][[$tn]].DbTableCounter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Calculate the offset.
-    cTable, err = counter.TableCount()
+    cTable, err = h.db.TableCount()
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].ListLast(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
     }
@@ -331,12 +304,10 @@ func (h *Handlers) ListPrev(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // ListShow displays a list page given a starting offset.
-func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
+func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int) {
     var err     error
-    var ok      bool
-    var rcds    [][[$dn]][[$tn]].[[$tn]]
+    var rcds    [][[$dn]][[$tn]]
     var name    = "[[$dn]].[[$tn]].list.gohtml"
-    var pager   [[$dn]][[$tn]].DbRowPager
     [[if GenDebugging]]
         var str     strings.Builder
     [[end]]
@@ -346,13 +317,9 @@ func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
         log.Printf("\tname: %s\n", name)
         w2 := io.MultiWriter(w, &str)
     [[end]]
-    if pager, ok = h.db.([[$dn]][[$tn]].DbRowPager); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Get the records to display
-    rcds, err = pager.RowPage(offset, h.rowsPerPage)
+    rcds, err = h.db.RowPage(offset, h.rowsPerPage)
     if err != nil {
         [[if GenDebugging]]
             log.Printf("...end hndlr[[$tn]].ListShow(Error:400) - No Key\n")
@@ -362,7 +329,7 @@ func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
     }
 
     data := struct {
-                Rcds        [][[$dn]][[$tn]].[[$tn]]
+                Rcds        [][[$dn]][[$tn]]
                 Offset      int
             }{rcds, offset}
 
@@ -372,9 +339,9 @@ func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
 
     [[if GenDebugging -]]
         log.Printf("\tExecuting template: %s\n", name)
-        err = Tmpls.ExecuteTemplate(w2, name, data)
+        err = h.Tmpls.ExecuteTemplate(w2, name, data)
     [[else]]
-        err = Tmpls.ExecuteTemplate(w, name, data)
+        err = h.Tmpls.ExecuteTemplate(w, name, data)
     [[end -]]
     if err != nil {
         fmt.Fprintf(w, err.Error())
@@ -382,7 +349,7 @@ func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
 
     [[if GenDebugging]]
         log.Printf("\t output: %s\n", str.String())
-        log.Printf("...end hndlr[[$tn]].ListShow(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].ListShow(%s)\n", util.ErrorString(err))
     [[end]]
 }
 
@@ -395,12 +362,9 @@ func (h *Handlers) ListShow(w http.ResponseWriter, offset int) {
 //----------------------------------------------------------------------------
 
 // RowDelete handles an delete request which comes from the row display form.
-func (h *Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) RowDelete(w http.ResponseWriter, r *http.Request) {
     var err     error
-    var rcd     [[$dn]][[$tn]].[[$tn]]
-    var deleter [[$dn]][[$tn]].DbRowDeleter
-    var nexter  [[$dn]][[$tn]].DbRowNexter
-    var ok      bool
+    var rcd     [[$dn]][[$tn]]
     var i       int
     var key     string
 
@@ -412,14 +376,6 @@ func (h *Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
             log.Printf("...end hndlr[[$tn]].RowDelete(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if deleter, ok = h.db.([[$dn]][[$tn]].DbRowDeleter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if nexter, ok = h.db.([[$dn]][[$tn]].DbRowNexter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -436,20 +392,20 @@ func (h *Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     [[end]]
 
     // Delete the row with data given.
-    err = deleter.RowDelete(&rcd)
+    err = h.db.RowDelete(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
     }
 
     // Get the next row in the form with status message and display it.
-    err = nexter.RowNext(&rcd)
+    err = h.db.RowNext(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowDelete(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -457,7 +413,7 @@ func (h *Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
     h.RowDisplay(w, &rcd, "Row deleted!")
 
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].RowDelete(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].RowDelete(%s)\n", util.ErrorString(err))
     [[end]]
 }
 
@@ -466,16 +422,16 @@ func (h *Handlers) RowDelete(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowDisplay displays the given record.
-func (h *Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]], msg string) {
+func (h *Handlers[[$dn]][[$tn]]) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]], msg string) {
     var err     error
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowDisplay(%+v, %s)\n", rcd, msg)
     [[end]]
 
-    if Tmpls != nil {
+    if h.Tmpls != nil {
         data := struct {
-                    Rcd         *[[$dn]][[$tn]].[[$tn]]
+                    Rcd         *[[$dn]][[$tn]]
                     Msg         string
                 }{rcd, msg}
         name := "[[$dn]].[[$tn]].form.gohtml"
@@ -484,14 +440,14 @@ func (h *Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]
             log.Printf("\tMsg: %s\n", data.Msg)
             log.Printf("\tname: %s\n", name)
         [[end]]
-        err = Tmpls.ExecuteTemplate(w, name, data)
+        err = h.Tmpls.ExecuteTemplate(w, name, data)
         if err != nil {
             fmt.Fprintf(w, err.Error())
         }
     }
 
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].RowDisplay(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].RowDisplay(%s)\n", util.ErrorString(err))
     [[end]]
 }
 
@@ -500,8 +456,8 @@ func (h *Handlers) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$tn]
 //----------------------------------------------------------------------------
 
 // RowEmpty displays the table row form with an empty row.
-func (h *Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
-    var rcd     [[$dn]][[$tn]].[[$tn]]
+func (h *Handlers[[$dn]][[$tn]]) RowEmpty(w http.ResponseWriter, r *http.Request) {
+    var rcd     [[$dn]][[$tn]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowEmpty(%s)\n", r.Method)
@@ -527,12 +483,9 @@ func (h *Handlers) RowEmpty(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowFind handles displaying of the table row form display.
-func (h *Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) RowFind(w http.ResponseWriter, r *http.Request) {
     var err     error
-    var rcd     [[$dn]][[$tn]].[[$tn]]
-    var finder  [[$dn]][[$tn]].DbRowFinder
-    var firster [[$dn]][[$tn]].DbRowFirster
-    var ok      bool
+    var rcd     [[$dn]][[$tn]]
     var msg     string
     var i       int
     var key     string
@@ -547,14 +500,6 @@ func (h *Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if finder, ok = h.db.([[$dn]][[$tn]].DbRowFinder); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if firster, ok = h.db.([[$dn]][[$tn]].DbRowFirster); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Get the key(s).
     i = 0
@@ -566,14 +511,14 @@ func (h *Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
     [[- end]]
 
     // Get the row and display it.
-    err = finder.RowFind(&rcd)
+    err = h.db.RowFind(&rcd)
     if err != nil {
         msg = "Row NOT Found!"
-        err = firster.RowFirst(&rcd)
+        err = h.db.RowFirst(&rcd)
     }
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowFind(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowFind(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -590,11 +535,9 @@ func (h *Handlers) RowFind(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowFirst displays the first row.
-func (h *Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
-    var rcd     [[$dn]][[$tn]].[[$tn]]
+func (h *Handlers[[$dn]][[$tn]]) RowFirst(w http.ResponseWriter, r *http.Request) {
+    var rcd     [[$dn]][[$tn]]
     var err     error
-    var firster [[$dn]][[$tn]].DbRowFirster
-    var ok      bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowFirst(%s)\n", r.Method)
@@ -607,13 +550,9 @@ func (h *Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if firster, ok = h.db.([[$dn]][[$tn]].DbRowFirster); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Get the next row and display it.
-    err = firster.RowFirst(&rcd)
+    err = h.db.RowFirst(&rcd)
     if err != nil {
         [[if GenDebugging]]
             log.Printf("...end hndlr[[$tn]].RowFirst(Error:400) - No Key\n")
@@ -634,7 +573,7 @@ func (h *Handlers) RowFirst(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowForm displays the raw table row form without data.
-func (h *Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) RowForm(w http.ResponseWriter, r *http.Request) {
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowForm(%s)\n", r.Method)
@@ -664,26 +603,15 @@ func (h *Handlers) RowForm(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowInsert handles an add row request which comes from the row display form.
-func (h *Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func (h *Handlers[[$dn]][[$tn]]) RowInsert(w http.ResponseWriter, r *http.Request) {
+    var rcd         [[$dn]][[$tn]]
     var err         error
-    var inserter    [[$dn]][[$tn]].DbRowInserter
-    var laster      [[$dn]][[$tn]].DbRowLaster
-    var ok          bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowInsert(%s)\n", r.Method)
     [[end]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if laster, ok = h.db.([[$dn]][[$tn]].DbRowLaster); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -697,18 +625,18 @@ func (h *Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
     // Verify any fields that need it.
 
     // Add the row.
-    err = inserter.RowInsert(&rcd)
+    err = h.db.RowInsert(&rcd)
     if err != nil {
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
     }
 
     // Get the last row as a guess of where the inserted row went and display it.
-    _ = laster.RowLast(&rcd)
+    _ = h.db.RowLast(&rcd)
     h.RowDisplay(w, &rcd, "Row added!")
 
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].RowInsert(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].RowInsert(%s)\n", util.ErrorString(err))
     [[end]]
 }
 
@@ -717,11 +645,9 @@ func (h *Handlers) RowInsert(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowLast displays the first row.
-func (h *Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func (h *Handlers[[$dn]][[$tn]]) RowLast(w http.ResponseWriter, r *http.Request) {
+    var rcd         [[$dn]][[$tn]]
     var err         error
-    var laster      [[$dn]][[$tn]].DbRowLaster
-    var ok          bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowLast(%s)\n", r.Method)
@@ -733,13 +659,9 @@ func (h *Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if laster, ok = h.db.([[$dn]][[$tn]].DbRowLaster); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Get the next row to display.
-    err = laster.RowLast(&rcd)
+    err = h.db.RowLast(&rcd)
     if err != nil {
         [[if GenDebugging]]
             log.Printf("...end hndlr[[$tn]].RowLast(Error:400) - No Key\n")
@@ -762,11 +684,9 @@ func (h *Handlers) RowLast(w http.ResponseWriter, r *http.Request) {
 
 // RowNext handles an next request which comes from the row display form and
 // should display the next row from the current one.
-func (h *Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func (h *Handlers[[$dn]][[$tn]]) RowNext(w http.ResponseWriter, r *http.Request) {
+    var rcd         [[$dn]][[$tn]]
     var err         error
-    var nexter      [[$dn]][[$tn]].DbRowNexter
-    var ok          bool
     var i           int
     var key         string
 
@@ -776,10 +696,6 @@ func (h *Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if nexter, ok = h.db.([[$dn]][[$tn]].DbRowNexter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -793,7 +709,7 @@ func (h *Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
     [[- end]]
 
     // Get the next row and display it.
-    err = nexter.RowNext(&rcd)
+    err = h.db.RowNext(&rcd)
     if err != nil {
         [[if GenDebugging]]
             log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - No Key\n")
@@ -814,11 +730,9 @@ func (h *Handlers) RowNext(w http.ResponseWriter, r *http.Request) {
 
 // RowPrev handles an previous request which comes from the row display form
 // and should display the previous row from the current one.
-func (h *Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func (h *Handlers[[$dn]][[$tn]]) RowPrev(w http.ResponseWriter, r *http.Request) {
+    var rcd         [[$dn]][[$tn]]
     var err         error
-    var prever      [[$dn]][[$tn]].DbRowPrever
-    var ok          bool
     var i           int
     var key         string
 
@@ -827,10 +741,6 @@ func (h *Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if prever, ok = h.db.([[$dn]][[$tn]].DbRowPrever); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -844,7 +754,7 @@ func (h *Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
     [[- end]]
 
     // Get the next row and display it.
-    err = prever.RowPrev(&rcd)
+    err = h.db.RowPrev(&rcd)
     if err != nil {
         [[if GenDebugging]]
             log.Printf("...end [[$tn]].RowNext(Error:400) - No Key\n")
@@ -864,13 +774,10 @@ func (h *Handlers) RowPrev(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowShow handles displaying of the table row form display.
-func (h *Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) RowShow(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
-    var rcd         [[$dn]][[$tn]].[[$tn]]
-    var finder      [[$dn]][[$tn]].DbRowFinder
-    var firster     [[$dn]][[$tn]].DbRowFirster
-    var ok          bool
+    var rcd         [[$dn]][[$tn]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowShow(%s)\n", r.Method)
@@ -880,14 +787,6 @@ func (h *Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
             log.Printf("...end hndlr[[$tn]]HndlrShow(Error:405) - Not GET\n")
         [[end]]
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if finder, ok = h.db.([[$dn]][[$tn]].DbRowFinder); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if firster, ok = h.db.([[$dn]][[$tn]].DbRowFirster); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -900,13 +799,13 @@ func (h *Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
 
     // Get the row to display.
     if key == "" {
-        err = firster.RowFirst(&rcd)
+        err = h.db.RowFirst(&rcd)
     } else {
-        err = finder.RowFind(&rcd)
+        err = h.db.RowFind(&rcd)
     }
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowShow(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowShow(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -925,13 +824,10 @@ func (h *Handlers) RowShow(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // RowUpdate handles an update request which comes from the row display form.
-func (h *Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) RowUpdate(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
-    var rcd         [[$dn]][[$tn]].[[$tn]]
-    var deleter     [[$dn]][[$tn]].DbRowDeleter
-    var inserter    [[$dn]][[$tn]].DbRowInserter
-    var ok          bool
+    var rcd         [[$dn]][[$tn]]
     var i           int
 
     [[if GenDebugging]]
@@ -939,14 +835,6 @@ func (h *Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if deleter, ok = h.db.([[$dn]][[$tn]].DbRowDeleter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -964,10 +852,10 @@ func (h *Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     [[- end]]
 
     // Delete the row.
-    err = deleter.RowDelete(&rcd)
+    err = h.db.RowDelete(&rcd)
     if err != nil {
         [[if GenDebugging]]
-            log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - %s\n", ErrorString(err))
+            log.Printf("...end hndlr[[$tn]].RowNext(Error:400) - %s\n", util.ErrorString(err))
         [[end]]
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -981,7 +869,7 @@ func (h *Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
     }
 
     // Add the row.
-    err = inserter.RowInsert(&rcd)
+    err = h.db.RowInsert(&rcd)
     if err != nil {
         http.Error(w, http.StatusText(400), http.StatusBadRequest)
         return
@@ -1004,10 +892,8 @@ func (h *Handlers) RowUpdate(w http.ResponseWriter, r *http.Request) {
 //----------------------------------------------------------------------------
 
 // TableCreate creates the table deleting any current ones.
-func (h *Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) TableCreate(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var creater     [[$dn]][[$tn]].DbTableCreater
-    var ok          bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].TableCreate(%s)\n", r.Method)
@@ -1016,13 +902,9 @@ func (h *Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Create the table.
-    err = creater.TableCreate()
+    err = h.db.TableCreate()
     if err == nil {
         w.Write([]byte("Table was created"))
     } else {
@@ -1030,7 +912,7 @@ func (h *Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].TableCreate(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableCreate(%s)\n", util.ErrorString(err))
     [[end]]
 }
 
@@ -1040,29 +922,18 @@ func (h *Handlers) TableCreate(w http.ResponseWriter, r *http.Request) {
 
 // TableLoadCSV creates the table deleting any current ones and loads in
 // data from a CSV file.
-func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var rcd         [[$dn]][[$tn]]
     var fileIn      multipart.File
     var cnt         int
     var maxMem      int64
-    var inserter    [[$dn]][[$tn]].DbRowInserter
-    var creater     [[$dn]][[$tn]].DbTableCreater
-    var ok          bool
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].TableLoadCSV(%s)\n", r.Method)
     [[end]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -1083,7 +954,7 @@ func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     fileIn, handler, err := r.FormFile(name)
     if err != nil {
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].TableLoadCSV(Error:500) - %s\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableLoadCSV(Error:500) - %s\n", util.ErrorString(err))
     [[end]]
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
@@ -1097,9 +968,9 @@ func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     rdr := csv.NewReader(fileIn)
 
     // Create the table.
-    err = creater.TableCreate()
+    err = h.db.TableCreate()
     if err != nil {
-        w.Write([]byte("Table creation had an error of:" + ErrorString(err)))
+        w.Write([]byte("Table creation had an error of:" + util.ErrorString(err)))
     }
 
     [[if GenDebugging]]
@@ -1111,7 +982,7 @@ func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
             break
         }
         if err != nil {
-            str := fmt.Sprintf("ERROR: Reading row %d from csv - %s\n", cnt, ErrorString(err))
+            str := fmt.Sprintf("ERROR: Reading row %d from csv - %s\n", cnt, util.ErrorString(err))
             w.Write([]byte(str))
             return
         }
@@ -1121,9 +992,9 @@ func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
             [[ $f.GenFromStringArray "rcd" "record" $i ]]
         [[end]]
 
-        err = inserter.RowInsert(&rcd)
+        err = h.db.RowInsert(&rcd)
         if err != nil {
-            str := fmt.Sprintf("ERROR: Table creation had an error of: %s\n", ErrorString(err))
+            str := fmt.Sprintf("ERROR: Table creation had an error of: %s\n", util.ErrorString(err))
             w.Write([]byte(str))
             return
         }
@@ -1148,12 +1019,9 @@ func (h *Handlers) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
 
 // TableLoadTestData creates the table deleting any current ones and loads
 // in some test rows.
-func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var rcd         [[$dn]][[$tn]].[[$tn]]
-    var inserter    [[$dn]][[$tn]].DbRowInserter
-    var creater     [[$dn]][[$tn]].DbTableCreater
-    var ok          bool
+    var rcd         [[$dn]][[$tn]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].TableLoadTestData(%s)\n", r.Method)
@@ -1162,21 +1030,13 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
     }
-    if inserter, ok = h.db.([[$dn]][[$tn]].DbRowInserter); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
-    if creater, ok = h.db.([[$dn]][[$tn]].DbTableCreater); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-        return
-    }
 
     // Create the table.
-    err = creater.TableCreate()
+    err = h.db.TableCreate()
     if err == nil {
         w.Write([]byte("Table was created\n"))
     } else {
-        w.Write([]byte("Table creation had an error of:" + ErrorString(err)))
+        w.Write([]byte("Table creation had an error of:" + util.ErrorString(err)))
     }
 
     // Load the test rows.
@@ -1184,7 +1044,7 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     for i := 0; i < 26; i++ {
         chr := 'A' + i
         rcd.TestData(i)
-        err = inserter.RowInsert(&rcd)
+        err = h.db.RowInsert(&rcd)
         if err == nil {
             str := fmt.Sprintf("Added row: %c\n", chr)
             w.Write([]byte(str))
@@ -1195,7 +1055,7 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     }
 
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].TableLoadTestData(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableLoadTestData(%s)\n", util.ErrorString(err))
     [[end]]
 }
 
@@ -1205,10 +1065,8 @@ func (h *Handlers) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
 
 // TableSaveCSV creates the table deleting any current ones and loads in
 // data from a CSV file.
-func (h *Handlers) TableSaveCSV(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers[[$dn]][[$tn]]) TableSaveCSV(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var scanner     [[$dn]][[$tn]].DbTableScanner
-    var ok          bool
     var cntGood     int
     var cntTotal    int
 
@@ -1217,10 +1075,6 @@ func (h *Handlers) TableSaveCSV(w http.ResponseWriter, r *http.Request) {
     [[end]]
     if r.Method != "GET" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-        return
-    }
-    if scanner, ok = h.db.([[$dn]][[$tn]].DbTableScanner); !ok {
-        http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
 
@@ -1232,7 +1086,7 @@ func (h *Handlers) TableSaveCSV(w http.ResponseWriter, r *http.Request) {
 
     // Write the CSV file.
     if wtr != nil {
-        apply := func (rcd [[$dn]][[$tn]].[[$tn]]) error {
+        apply := func (rcd [[$dn]][[$tn]]) error {
                     log.Printf("\tRow: %v\n", rcd.ToStrings())
                     err2 := wtr.Write(rcd.ToStrings())
                     cntTotal++
@@ -1241,14 +1095,14 @@ func (h *Handlers) TableSaveCSV(w http.ResponseWriter, r *http.Request) {
                     }
                     return err2
                  }
-        err = scanner.TableScan(apply)
+        err = h.db.TableScan(apply)
         wtr.Flush()
     } else {
         err = fmt.Errorf("Error: Could not create CSV Writer!\n")
     }
 
     [[if GenDebugging]]
-        log.Printf("...end hndlr[[$tn]].TableSaveCSV(%s)\n", ErrorString(err))
+        log.Printf("...end hndlr[[$tn]].TableSaveCSV(%s)\n", util.ErrorString(err))
     [[end]]
 }
 

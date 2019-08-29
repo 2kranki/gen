@@ -11,27 +11,28 @@
 [[- $t := .Table]]
 [[- $tn := .Table.TitledName]]
 
-package hndlr[[$dn]][[$tn]]
+package main
 
 import (
-	"../[[$dn]][[$tn]]"
-	"../hndlr[[$dn]]"
     "fmt"
     "io/ioutil"
     "net/http"
     "net/http/httptest"
     "strings"
 	"testing"
+
+    "github.com/2kranki/go_util"
 )
 
 //============================================================================
 //                              Test Data
 //============================================================================
 
-type TestData struct {
+type TestData_[[$dn]][[$tn]] struct {
     T           *testing.T
-    Fdb         *FakeDB
-    H           *Handlers
+    bt          *[[$dn]][[$tn]]TestData
+    db          *IO_[[$dn]][[$tn]]
+    H           *Handlers[[$dn]][[$tn]]
     Mux         *http.ServeMux
     w           *httptest.ResponseRecorder
     Req         *http.Request
@@ -44,7 +45,7 @@ type TestData struct {
 
 // CheckStatus checks the request status code for a specific status.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) CheckStatus(status int) {
+func (td *TestData_[[$dn]][[$tn]]) CheckStatus(status int) {
 
     [[if GenDebugging]]
         td.T.Logf("[[$tn]].CheckStatus()\n")
@@ -68,7 +69,7 @@ func (td *TestData) CheckStatus(status int) {
 
 // GetReq initializes the http.Request for a GET.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) GetReq(target string, body string) {
+func (td *TestData_[[$dn]][[$tn]]) GetReq(target string, body string) {
 
     [[if GenDebugging]]
         td.T.Logf("[[$tn]].Setup()\n")
@@ -91,7 +92,7 @@ func (td *TestData) GetReq(target string, body string) {
 
 // SetupPostReq initializes the http.Request for a POST.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) PostReq(target string, body string) {
+func (td *TestData_[[$dn]][[$tn]]) PostReq(target string, body string) {
 
     [[if GenDebugging]]
         td.T.Logf("[[$tn]].Setup()\n")
@@ -112,7 +113,7 @@ func (td *TestData) PostReq(target string, body string) {
 
 // ResponseBody returns the response body converted to a string.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) ResponseBody() string {
+func (td *TestData_[[$dn]][[$tn]]) ResponseBody() string {
     var str     string
 
     [[if GenDebugging]]
@@ -141,7 +142,7 @@ func (td *TestData) ResponseBody() string {
 
 // ServeHttp executes the handler through the mux.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) ServeHttp( ) {
+func (td *TestData_[[$dn]][[$tn]]) ServeHttp( ) {
 
     [[if GenDebugging]]
         td.T.Logf("[[$tn]].ServeHttp()\n")
@@ -162,34 +163,51 @@ func (td *TestData) ServeHttp( ) {
 
 // Setup initializes the Test Data.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) Setup(t *testing.T) {
+func (td *TestData_[[$dn]][[$tn]]) Setup(t *testing.T) {
 
     td.T = t
-    td.SetupFakeDB()
+    td.SetupIO()
     td.SetupHandlers()
 
 }
 
 //----------------------------------------------------------------------------
-//                             Set up FakeDB
+//                             Set up I/O
 //----------------------------------------------------------------------------
 
-// SetupFakeDB initializes the FakeDB with 2 records.
+// SetupFakeDB initializes the DB with 2 records.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) SetupFakeDB( ) {
+func (td *TestData_[[$dn]][[$tn]]) SetupIO( ) {
     var err         error
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var rcd         [[$dn]][[$tn]]
 
-    td.Fdb = &FakeDB{rcds:map[string][[$dn]][[$tn]].[[$tn]]{}, errorOut:false,}
-    if td.Fdb == nil {
-        td.T.Fatalf("Error: Unable to allocate FakeDB!\n")
+    td.bt = NewTest[[$dn]][[$tn]]()
+    if td.bt == nil {
+        td.T.Fatalf("Error: Unable to allocate io[[$dn]] Test!\n")
     } else {
-        for i:=0; i<2; i++ {
-            rcd.TestData(i)
-            err = td.Fdb.RowInsert(&rcd)
-            if err != nil {
-                td.T.Fatalf("Error: Insert %d Failed: %s \n", i, ErrorString(err))
-            }
+        td.bt.Setup(td.T)
+    }
+
+    td.db = NewIo[[$dn]][[$tn]](td.bt.io)
+    if td.db == nil {
+        td.T.Fatalf("Error: Unable to allocate FakeDB!\n")
+    }
+
+    err = td.db.TableDelete()
+    if err != nil {
+        td.T.Fatalf("Error: Table Deletion Failure: %s\n\n\n", err.Error())
+    }
+
+    err = td.db.TableCreate()
+    if err != nil {
+        td.T.Fatalf("Error: Cannot create table: %s\n\n\n", err)
+    }
+
+    for i:=0; i<2; i++ {
+        rcd.TestData(i)
+        err = td.db.RowInsert(&rcd)
+        if err != nil {
+            td.T.Fatalf("Error: Insert %d Failed: %s \n", i, util.ErrorString(err))
         }
     }
 
@@ -201,15 +219,15 @@ func (td *TestData) SetupFakeDB( ) {
 
 // SetupHandlers initializes HTTP Test Handlers.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) SetupHandlers( ) {
+func (td *TestData_[[$dn]][[$tn]]) SetupHandlers( ) {
 
 	// Set up main Handler which parses the templates.
-	hndlr[[$dn]].SetTmplsDir("../../tmpl")
-	hndlr[[$dn]].SetupTmpls()
-	Tmpls = hndlr[[$dn]].Tmpls
+    hndlrs[[$dn]] = NewTmpls[[$dn]]()
+    hndlrs[[$dn]].SetTmplsDir("../tmpl")
+    hndlrs[[$dn]].SetupTmpls()
 
     // Set up the Handler object.
-    td.H = &Handlers{db:td.Fdb, rowsPerPage:2}
+    td.H = &Handlers[[$dn]][[$tn]]{db:td.db, rowsPerPage:2}
     if td.H == nil {
         td.T.Fatalf("Error: Unable to allocate Handlers\n")
     }
@@ -228,21 +246,21 @@ func (td *TestData) SetupHandlers( ) {
 //============================================================================
 
 //----------------------------------------------------------------------------
-//                          FakeDB
+//                          DB
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]FakeDB(t *testing.T) {
+func Test[[$dn]][[$tn]]HndlrDB(t *testing.T) {
     var err         error
-    var td          *TestData
-    var rcd         [[$dn]][[$tn]].[[$tn]]
-    var rcd2        [[$dn]][[$tn]].[[$tn]]
+    var td          *TestData_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
+    var rcd2        [[$dn]][[$tn]]
 
-    t.Logf("Test[[$tn]].FakeDB()...\n")
-    td = &TestData{}
+    t.Logf("Test[[$tn]].DB()...\n")
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     t.Logf("\tChecking First()...\n")
-    if err = td.Fdb.RowFirst(&rcd2); err != nil {
+    if err = td.db.RowFirst(&rcd2); err != nil {
         t.Fatalf("Error - Read First failed: %s\n", err.Error())
     }
     rcd.TestData(0)
@@ -250,19 +268,19 @@ func Test[[$tn]]FakeDB(t *testing.T) {
         t.Fatalf("Error - First did not work, need A, got %+v\n", rcd2)
     }
 
-    t.Logf("Test[[$tn]].FakeDB() - End of Test\n\n\n")
+    t.Logf("Test[[$tn]].DB() - End of Test\n\n\n")
 }
 
 //----------------------------------------------------------------------------
 //                             List Index
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]ListIndex(t *testing.T) {
+func Test[[$dn]][[$tn]]HndlrListIndex(t *testing.T) {
     var err         error
-    var td          *TestData
+    var td          *TestData_[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].HndlrListIndex()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     //TODO: err = db.Ping()
@@ -277,11 +295,11 @@ func Test[[$tn]]ListIndex(t *testing.T) {
 //                             List Show
 //----------------------------------------------------------------------------
 
-func TestListShow(t *testing.T) {
-    var td          *TestData
+func Test[[$dn]][[$tn]]HndlrListShow(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
 
     t.Logf("TestListShow()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     // First try a blank record.
@@ -293,14 +311,14 @@ func TestListShow(t *testing.T) {
 //                             Row Delete
 //----------------------------------------------------------------------------
 
-func TestRowDelete(t *testing.T) {
+func Test[[$dn]][[$tn]]HndlrRowDelete(t *testing.T) {
     var err         error
-    var td          *TestData
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var td          *TestData_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
     //expectedBody    := ""
 
     t.Logf("TestRowDelete()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     // Delete a record.
@@ -321,7 +339,7 @@ func TestRowDelete(t *testing.T) {
     //}
 
     rcd.TestData(1)             // "B"
-    err = td.Fdb.RowFind(&rcd)
+    err = td.db.RowFind(&rcd)
     if err == nil {
         t.Fatalf("Expected Not Found error from RowFind, got ok\n")
     }
@@ -333,14 +351,14 @@ func TestRowDelete(t *testing.T) {
 //                             Row Empty
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowEmpty(t *testing.T) {
-    var td          *TestData
+func Test[[$dn]][[$tn]]HndlrRowEmpty(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
 /*****
     expectedBody    := ""
  *****/
 
     t.Logf("Test[[$tn]].RowEmpty()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     // Display empty record.
@@ -366,15 +384,15 @@ func Test[[$tn]]RowEmpty(t *testing.T) {
 //                             Row First
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowFirst(t *testing.T) {
-    var td          *TestData
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func Test[[$dn]][[$tn]]HndlrRowFirst(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
 /*****
     expectedBody    := ""
  *****/
 
     t.Logf("Test[[$tn]].RowFirst()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     // Delete a record.
@@ -402,17 +420,16 @@ func Test[[$tn]]RowFirst(t *testing.T) {
 //                             Row Insert
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowInsert(t *testing.T) {
-    var err         error
-    var td          *TestData
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func Test[[$dn]][[$tn]]HndlrRowInsert(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
     //expectedBody    := ""
 
     t.Logf("Test[[$tn]]RowInsert()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
-    // Insert a record.
+    // Insert a "Z" record.
     rcd.TestData(25)        // "Z"
     keys := rcd.KeysToValue()
     data := rcd.FieldsToValue()
@@ -430,12 +447,6 @@ func Test[[$tn]]RowInsert(t *testing.T) {
         //t.Errorf("Expected the message '%s'\n", expectedBody)
     //}
 
-    rcd.TestData(25)        // "Z"
-    err = td.Fdb.RowFind(&rcd)
-    if err != nil {
-        t.Errorf("Expected Found error from RowFind, got ok\n")
-    }
-
     t.Logf("Test[[$tn]]RowInsert() - End of Test\n\n\n")
 }
 
@@ -443,12 +454,12 @@ func Test[[$tn]]RowInsert(t *testing.T) {
 //                             Row Next
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowNext(t *testing.T) {
-    var td          *TestData
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+func Test[[$dn]][[$tn]]HndlrRowNext(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowNext()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     // Build and execute a URL.
@@ -465,11 +476,11 @@ func Test[[$tn]]RowNext(t *testing.T) {
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowLastPrev(t *testing.T) {
-    var td          *TestData
+func Test[[$dn]][[$tn]]HndlrRowLastPrev(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowPrev()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     t.Logf("Test[[$tn]].RowPrev() - End of Test\n\n\n")
@@ -479,11 +490,11 @@ func Test[[$tn]]RowLastPrev(t *testing.T) {
 //                             Row Display
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowDisplay(t *testing.T) {
-    var td          *TestData
+func Test[[$dn]][[$tn]]HndlrRowDisplay(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowDisplay()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     t.Logf("Test[[$tn]]RowShow() - End of Test\n\n\n")
@@ -493,11 +504,11 @@ func Test[[$tn]]RowDisplay(t *testing.T) {
 //                             Row Update
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowUpdate(t *testing.T) {
-    var td          *TestData
+func Test[[$dn]][[$tn]]HndlrRowUpdate(t *testing.T) {
+    var td          *TestData_[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowUpdate()...\n")
-    td = &TestData{}
+    td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
     t.Logf("Test[[$tn]].RowUpdate() - End of Test\n\n\n")

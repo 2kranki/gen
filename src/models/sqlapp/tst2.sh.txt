@@ -5,6 +5,8 @@
 [[- $plg := $d.Plugin.Plugin]]
 [[- $typ := $plg.Name]]
 
+cd src
+
 [[ if ne $typ "sqlite" -]]
 echo "Running container..."
 if ../dbs/[[$plg.Name]]/run.sh ; then
@@ -27,4 +29,5 @@ do
         rm $file
     fi
 done
+
 

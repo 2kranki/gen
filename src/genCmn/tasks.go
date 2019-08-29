@@ -17,11 +17,12 @@ package genCmn
 
 import (
 	"../shared"
-	"../util"
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/2kranki/go_util"
 )
 
 //============================================================================

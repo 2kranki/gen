@@ -12,7 +12,7 @@ is:
 This adds the MariaDB container image to your local Docker images. Once, you have it
 added to the images, you will want to run it. The following will do that with the
 defaults that the generated application will automatically use:
-    docker run --name mariadb1 -e MYSQL_ROOT_PASSWORD="Passw0rd!" -d mariadb:latest
+    docker run --name mariadb1 -e MYSQL_ROOT_PASSWORD="Passw0rd" -d mariadb:latest
                             or
     ./run.sh
 You may get a "missing mariadb1" message and that is ok. Ignore it.  You can issue

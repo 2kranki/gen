@@ -30,6 +30,7 @@ definition and having them control the generation process.
 - [x] Finish MS-SQL Support
 - [x] Finish MySQL/MariaDB Support
 - [x] Finish Postgres Support
+- [ ] Change structure of genapp and the application generated to conform to Go's package requirements. In our case, that means that everything will be package "main" instead of how it is currently structured.  Currently, everything compiles and runs properly, but it is not according to Go's GOPATH standard.
 - [ ] Clean up form templating
 - [ ] Add more testing to xx_test.go files in both genapp and the generated code
 - [x] Add **csv** save/restore per table

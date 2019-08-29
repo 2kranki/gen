@@ -18,18 +18,17 @@ import (
 	"net/http"
 	"os"
     "os/signal"
-	"./hndlr[[$dn]]"
-	"./io[[$dn]]"
-	[[range $t := $d.Tables -]]
-        [[- $tn := $t.TitledName]]
-        "./hndlr[[$dn]][[$tn]]"
-	    "./io[[$dn]][[$tn]]"
-	[[end]]
 )
 
 const (
     RowsPerPage = 15
 )
+
+var     hndlrs[[$dn]]    *Tmpls[[$dn]]
+	[[ range $t := $d.Tables -]]
+        [[- $tn := $t.TitledName ]]
+	    var hndlrs[[$dn]][[$tn]]     *Handlers[[$dn]][[$tn]]
+	[[- end ]]
 
 // HndlrFavIcon is the default Favorite Icon Handler.  It defaults to
 // returning a 405 status to indicate that no Icon is available.
@@ -74,60 +73,6 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
         fmt.Printf("...end HndlrHome()\n")
     [[end]]
 }
-
-[[if GenDebugging]]
-    func HndlrDebug(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebug(%s)\n", r.Method)
-        http.ServeFile(w, r, baseDir+"/html/form.html")
-        fmt.Printf("...end HndlrDebug()\n")
-    }
-
-    func HndlrDebugAdd(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebugAdd(%s)\n", r.Method)
-        if r.Method != "POST" {
-            http.NotFound(w, r)
-        }
-        fmt.Fprintf(w, "Good Addition!")
-    }
-
-    func HndlrDebugDelete(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebugDelete(%s)\n", r.Method)
-        if r.Method != "POST" {
-            http.NotFound(w, r)
-        }
-        fmt.Fprintf(w, "Good Deletion!")
-    }
-
-    func HndlrDebugNext(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebugNext(%s)\n", r.Method)
-        if r.Method != "GET" {
-            http.NotFound(w, r)
-        }
-        fmt.Fprintf(w, "Going to Next!")
-    }
-
-    func HndlrDebugPrev(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebugPrev(%s)\n", r.Method)
-        if r.Method != "GET" {
-            http.NotFound(w, r)
-        }
-        fmt.Fprintf(w, "Going to Prev!")
-    }
-
-    func HndlrDebugReset(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebugReset(%s)\n", r.Method)
-
-        fmt.Fprintf(w, "Doing a Reset!")
-    }
-
-    func HndlrDebugUpdate(w http.ResponseWriter, r *http.Request) {
-        fmt.Printf("HndlrDebugUpdate(%s)\n", r.Method)
-        if r.Method != "POST" {
-            http.NotFound(w, r)
-        }
-        fmt.Fprintf(w, "Good Update!")
-    }
-[[end]]
 
 [[ if GenMuxWrapper -]]
 // To understand the following, review packages net/http and net/url and review:
@@ -180,7 +125,7 @@ func exec() {
     [[if GenDebugging]]
         log.Printf("\tConnecting to the Database...\n")
     [[end]]
-    io[[$dn]] := io[[$dn]].New()
+    io[[$dn]] := NewIo[[$dn]]()
     //io[[$dn]].SetName(db_name)
     io[[$dn]].SetPort(db_port)
     io[[$dn]].SetPW(db_pw)
@@ -204,7 +149,7 @@ func exec() {
     // Set up the Table I/O.
 	[[range $t := $d.Tables -]]
         [[- $tn := $t.TitledName]]
-	    io[[$dn]][[$tn]] := io[[$dn]][[$tn]].[[$tn]]New(io[[$dn]])
+	    io[[$dn]][[$tn]] := NewIo[[$dn]][[$tn]](io[[$dn]])
         if io[[$dn]][[$tn]] == nil {
             log.Fatalf("ERROR - Failed to Connect to Table, [[$dn]][[$tn]]\n\n\n")
         }
@@ -214,15 +159,9 @@ func exec() {
     [[if GenDebugging]]
         log.Printf("\tSetting up the Templates...\n")
     [[end]]
-    hndlr[[$dn]].SetTmplsDir(baseDir + "/tmpl")
-    hndlr[[$dn]].SetupTmpls()
-	[[range $t := $d.Tables -]]
-        [[- $tn := $t.TitledName]]
-	    hndlr[[$dn]][[$tn]].Tmpls = hndlr[[$dn]].Tmpls
-        if hndlr[[$dn]][[$tn]].Tmpls == nil {
-            log.Fatalf("ERROR - Failed to load templates from hndlr[[$dn]]\n\n\n")
-        }
-	[[end]]
+    hndlrs[[$dn]] = NewTmpls[[$dn]]()
+    hndlrs[[$dn]].SetTmplsDir(baseDir + "/tmpl")
+    hndlrs[[$dn]].SetupTmpls()
 
     // Set up default URL handlers
     [[if GenDebugging]]
@@ -232,21 +171,14 @@ func exec() {
 	mux.HandleFunc("/", HndlrHome)
 	mux.HandleFunc("/favicon.ico", HndlrFavIcon)
 
-	// Set up Debug URL handlers to practice on simple form
-    [[if GenDebugging]]
-        mux.HandleFunc("/debug", HndlrDebug)
-        mux.HandleFunc("/debugAdd", HndlrDebugAdd)
-        mux.HandleFunc("/debugDelete", HndlrDebugDelete)
-        mux.HandleFunc("/debugNext", HndlrDebugNext)
-        mux.HandleFunc("/debugPrev", HndlrDebugPrev)
-        mux.HandleFunc("/debugReset", HndlrDebugReset)
-        mux.HandleFunc("/debugUpdate", HndlrDebugUpdate)
-    [[end]]
-
 	[[range $t := $d.Tables -]]
 	    [[ $tn := $t.TitledName -]]
 	    // [[$dn]].[[$tn]] URL handlers for table maintenance
-	    _ = hndlr[[$dn]][[$tn]].New(io[[$dn]][[$tn]], RowsPerPage, mux)
+	    hndlrs[[$dn]][[$tn]] = NewHandlers[[$dn]][[$tn]](io[[$dn]][[$tn]], RowsPerPage, mux)
+	    hndlrs[[$dn]][[$tn]].Tmpls = hndlrs[[$dn]].Tmpls
+        if hndlrs[[$dn]][[$tn]].Tmpls == nil {
+            log.Fatalf("ERROR - Failed to load templates from hndlrs[[$dn]]\n\n\n")
+        }
 	[[ end -]]
 
 	// Start the HTTP Server.

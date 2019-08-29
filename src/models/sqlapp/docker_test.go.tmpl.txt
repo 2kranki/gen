@@ -1,0 +1,160 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
+
+package main
+
+import (
+	"testing"
+    [[ if ne $typ "sqlite" -]]
+	"time"
+	[[- end ]]
+	"github.com/2kranki/go_util"
+)
+
+
+[[ if eq $typ "mariadb" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run - mariadb
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+    var output      string
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    output, err = exec.RunWithOutput()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    t.Logf("%s\n", output)
+    time.Sleep(5000 * time.Millisecond)
+
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "mssql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run - mssql
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+    var output      string
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    output, err = exec.RunWithOutput()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    t.Logf("%s\n", output)
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "mysql" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run - mysql
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+    var output      string
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    output, err = exec.RunWithOutput()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    t.Logf("%s\n", output)
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "postgres" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run - postgres
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+    var output      string
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    output, err = exec.RunWithOutput()
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+    t.Logf("%s\n", output)
+    time.Sleep(5000 * time.Millisecond)
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[ else if eq $typ "sqlite" -]]
+//----------------------------------------------------------------------------
+//                              Docker Run - sqlite
+//----------------------------------------------------------------------------
+
+// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
+func DockerRun(t *testing.T) {
+    var err         error
+    var exec        *util.ExecCmd
+
+	t.Logf("DockerRun()...\n")
+
+	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	if exec == nil {
+        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
+	}
+
+    //err = exec.Run()      // Not needed for sqlite!
+    if err != nil {
+        t.Fatalf("Error: %s\n\n", err)
+    }
+
+	t.Logf("DockerRun() - End\n\n\n")
+}
+[[- end ]]
+

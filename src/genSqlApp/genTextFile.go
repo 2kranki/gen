@@ -7,12 +7,13 @@ package genSqlApp
 
 import (
 	"../shared"
-	"../util"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"strings"
 	"text/template"
+
+	"github.com/2kranki/go_util"
 )
 
 func GenTextFile(mdl *util.Path, outPath *util.Path, data interface{}) error {

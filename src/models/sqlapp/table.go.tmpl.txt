@@ -13,7 +13,7 @@
 [[- $tn := .Table.TitledName]]
 
 
-package [[$dn]][[$tn]]
+package main
 
 import (
     "fmt"
@@ -27,93 +27,81 @@ import (
         "time"
     [[end]]
 	"net/url"
+
+	"github.com/2kranki/go_util"
 )
-
-//============================================================================
-//                              Miscellaneous
-//============================================================================
-
-[[if GenDebugging]]
-func ErrorString(err error) string {
-    if err == nil {
-        return "ok"
-    } else {
-        return err.Error()
-    }
-}
-[[end]]
 
 //============================================================================
 //                             Database Interfaces
 //============================================================================
 
-type DbRowDeleter interface {
+type [[$dn]][[$tn]]DbRowDeleter interface {
     // RowDelete deletes the row with keys from the provided record, rcd.
-    RowDelete(rcd *[[$tn]]) error
+    RowDelete(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowFinder interface {
+type [[$dn]][[$tn]]DbRowFinder interface {
     // RowFind searches the Database for a matching row for the keys found in
     // the given record and returns the output in that same record.
-    RowFind(rcd *[[$tn]]) error
+    RowFind(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowFirster interface {
+type [[$dn]][[$tn]]DbRowFirster interface {
     // RowFirst returns the first row in the table, [[$tn]].
     // If there are no rows in the table, then a blank/null record is returned
     // without error.
-    RowFirst(rcd *[[$tn]]) error
+    RowFirst(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowInserter interface {
-    RowInsert(rcd *[[$tn]]) error
+type [[$dn]][[$tn]]DbRowInserter interface {
+    RowInsert(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowLaster interface {
+type [[$dn]][[$tn]]DbRowLaster interface {
     // RowLast returns the last row in the table, [[$tn]].
     // If there are no rows in the table, then a blank/null record is returned
     // without error.
-    RowLast(rcd *[[$tn]]) error
+    RowLast(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowNexter interface {
+type [[$dn]][[$tn]]DbRowNexter interface {
     // RowNext returns the next row from the row given. If row after the current
     // one does not exist, then the first row is returned.
-    RowNext(rcd *[[$tn]]) error
+    RowNext(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowPager interface {
+type [[$dn]][[$tn]]DbRowPager interface {
     // RowPage returns a page of rows where a page size is the 'limit' parameter and
     // 'offset' is the offset into the result set ordered by the main index. Both
     // 'limit' and 'offset' are relative to 1. We return an address to the array
     // rows (structs) so that we don't have the overhead of copying them everwhere.
-    RowPage(offset int, limit int) ([][[$tn]], error)
+    RowPage(offset int, limit int) ([][[$dn]][[$tn]], error)
 }
 
-type DbRowPrever interface {
-    RowPrev(rcd *[[$tn]]) error
+type [[$dn]][[$tn]]DbRowPrever interface {
+    RowPrev(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbRowUpdater interface {
-    RowUpdate(rcd *[[$tn]]) error
+type [[$dn]][[$tn]]DbRowUpdater interface {
+    RowUpdate(rcd *[[$dn]][[$tn]]) error
 }
 
-type DbTableCounter interface {
+type [[$dn]][[$tn]]DbTableCounter interface {
     TableCount() (int, error)
 }
 
-type DbTableCreater interface {
+type [[$dn]][[$tn]]DbTableCreater interface {
     TableCreate() error
 }
 
-type DbTableDeleter interface {
+type [[$dn]][[$tn]]DbTableDeleter interface {
     TableDelete() error
 }
 
-type DbTableScanner interface {
+type [[$dn]][[$tn]]DbTableScanner interface {
     // TableScan reads all the rows in the table applying a function to each of
     // them.
-    TableScan(apply func (rcd [[$tn]]) error) error
+    TableScan(apply func (rcd [[$dn]][[$tn]]) error) error
 }
 
 //============================================================================
@@ -128,7 +116,7 @@ type DbTableScanner interface {
 
 // Compare compares our struct to another returning
 // 0, 1 for equal and not equal.
-func (s *[[$tn]]) Compare(r *[[$tn]]) int {
+func (s *[[$dn]][[$tn]]) Compare(r *[[$dn]][[$tn]]) int {
     // Accumulate the key value(s) in KeyNum order.
     [[range $f := $t.Fields -]]
         if s.[[$f.TitledName]] != r.[[$f.TitledName]] {
@@ -141,7 +129,7 @@ func (s *[[$tn]]) Compare(r *[[$tn]]) int {
 
 // CompareKeys compares our struct to another using keys returning the normal
 // -1, 0, 1 for less than, equal and greater than.
-func (s *[[$tn]]) CompareKeys(r *[[$tn]]) int {
+func (s *[[$dn]][[$tn]]) CompareKeys(r *[[$dn]][[$tn]]) int {
     // Accumulate the key value(s) in KeyNum order.
     [[range $fn := $t.Keys -]]
         [[ $f := $t.FindField $fn -]]
@@ -163,7 +151,7 @@ func (s *[[$tn]]) CompareKeys(r *[[$tn]]) int {
 //----------------------------------------------------------------------------
 
 // Empty resets the struct values to their null values.
-func (s *[[$tn]]) Empty() {
+func (s *[[$dn]][[$tn]]) Empty() {
 [[if $t.HasDate -]]
     var date    time.Time
 [[end -]]
@@ -195,7 +183,7 @@ func (s *[[$tn]]) Empty() {
 //----------------------------------------------------------------------------
 
 // FieldsToValue creates a URL Value map from the the table's field(s).
-func (s *[[$tn]]) FieldsToValue() string {
+func (s *[[$dn]][[$tn]]) FieldsToValue() string {
     var wrk string
 
     v := url.Values{}
@@ -214,7 +202,7 @@ func (s *[[$tn]]) FieldsToValue() string {
 //----------------------------------------------------------------------------
 
 // KeysToValue creates a URL Value map from the table's key(s).
-func (s *[[$tn]]) KeysToValue() string {
+func (s *[[$dn]][[$tn]]) KeysToValue() string {
     var wrk string
     var i   int
 
@@ -236,7 +224,7 @@ func (s *[[$tn]]) KeysToValue() string {
 //                             List Output
 //----------------------------------------------------------------------------
 
-func (s *[[$tn]]) ListOutput() string {
+func (s *[[$dn]][[$tn]]) ListOutput() string {
 	var str strings.Builder
     var wrk string
 
@@ -272,7 +260,7 @@ func (s *[[$tn]]) ListOutput() string {
 // [[.Table.TitledName]]Request2Struct converts the form values to a struct. FormValue(s) are available
 // for both, GET and POST.  It is just that all your parameters are present in the URL if you use
 // GET.  In general, you should use POST with this function for security reasons.
-func (s *[[$tn]]) Request2Struct(r *http.Request) error {
+func (s *[[$dn]][[$tn]]) Request2Struct(r *http.Request) error {
     var err         error
     var str         string
 
@@ -288,7 +276,7 @@ func (s *[[$tn]]) Request2Struct(r *http.Request) error {
     [[end]]
 
     [[if GenDebugging]]
-        log.Printf("...end [[$tn]]Request2Struct(%+v, %s)\n", s, ErrorString(err))
+        log.Printf("...end [[$tn]]Request2Struct(%+v, %s)\n", s, util.ErrorString(err))
     [[end]]
     return err
 }
@@ -299,7 +287,7 @@ func (s *[[$tn]]) Request2Struct(r *http.Request) error {
 
 // SetKeysFromStrings creates a URL Value map from the table's key(s). The slice
 // is in field order within the struct, not sorted by field name.
-func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
+func (s *[[$dn]][[$tn]]) SetKeysFromStrings(strs []string) error {
     var i   int
 
     if len(strs) != [[$t.KeyCount]] {
@@ -321,7 +309,7 @@ func (s *[[$tn]]) SetKeysFromStrings(strs []string) error {
 
 // TestData takes the given integer and uses it to fill most of the fields in
 // with data derived from it. 'i' is relative to zero.
-func (s *[[$tn]]) TestData(i int) {
+func (s *[[$dn]][[$tn]]) TestData(i int) {
     var chr     rune
 [[if $t.HasDate -]]
     var date    time.Time
@@ -373,7 +361,7 @@ func (s *[[$tn]]) TestData(i int) {
 //----------------------------------------------------------------------------
 
 // ToString converts a record's field to a string.
-func (s *[[$tn]]) ToString(TitledName string) string {
+func (s *[[$dn]][[$tn]]) ToString(TitledName string) string {
     var str     string
 
     switch TitledName {
@@ -394,7 +382,7 @@ func (s *[[$tn]]) ToString(TitledName string) string {
 
 // ToStrings converts a record to an array of strings acceptable to CSV and
 // other conversion packages.
-func (s *[[$tn]]) ToStrings() []string {
+func (s *[[$dn]][[$tn]]) ToStrings() []string {
     var strs    []string
     var str     string
 
@@ -411,8 +399,8 @@ func (s *[[$tn]]) ToStrings() []string {
 //----------------------------------------------------------------------------
 
 // [[$tn]]New creates a new empty struct.
-func [[$tn]]New() *[[$tn]] {
-    return &[[$tn]]{}
+func New[[$dn]][[$tn]]() *[[$dn]][[$tn]] {
+    return &[[$dn]][[$tn]]{}
 }
 
 

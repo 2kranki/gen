@@ -45,7 +45,6 @@ package genSqlApp
 import (
 	"../genCmn"
 	"../shared"
-	"../util"
 	_ "./dbForm"
 	_ "./dbGener"
 	"./dbJson"
@@ -62,6 +61,8 @@ import (
 	_ "./dbMysql"
 	_ "./dbPostgres"
 	_ "./dbSqlite"
+
+	"github.com/2kranki/go_util"
 )
 
 
@@ -75,10 +76,10 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		"one",
 		0,
 	},
-	{"tst.sh.txt",
+	{"tst2.sh.txt",
 		[]string{},
 		"t.sh",
-		"copy",
+		"text",
 		0755,
 		"one",
 		0,
@@ -94,23 +95,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"tst.sh.txt",
 		[]string{"src"},
 		"t.sh",
-		"copy",
-		0755,
-		"one",
-		0,
-	},
-	{"tst.sh.txt",
-		[]string{"src","hndlr${DbName}"},
-		"t.sh",
-		"copy",
-		0755,
-		"one",
-		0,
-	},
-	{"tst.sh.txt",
-		[]string{"src","io${DbName}"},
-		"t.sh",
-		"copy",
+		"text",
 		0755,
 		"one",
 		0,
@@ -164,23 +149,15 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"handlers.go.tmpl.txt",
-		[]string{"src","hndlr${DbName}"},
+		[]string{"src"},
 		"hndlr${DbName}.go",
 		"text",
 		0644,
 		"single",
 		0,
 	},
-	{"handlers.test.go.tmpl.txt",
-		[]string{"src","hndlr${DbName}"},
-		"hndlr${DbName}_test.go",
-		"text",
-		0644,
-		"single",
-		0,
-	},
 	{"table.go.tmpl.txt",
-		[]string{"src","${DbName}${TblName}"},
+		[]string{"src"},
 		"${DbName}${TblName}.go",
 		"text",
 		0644,
@@ -188,63 +165,47 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"table.test.go.tmpl.txt",
-		[]string{"src","${DbName}${TblName}"},
+		[]string{"src"},
 		"${DbName}${TblName}_test.go",
 		"text",
 		0644,
 		"single",
 		2,
 	},
-	{"tst.sh.txt",
-		[]string{"src","${DbName}${TblName}"},
-		"t.sh",
-		"copy",
-		0755,
-		"single",
-		2,
-	},
 	{"handlers.table.go.tmpl.txt",
-		[]string{"src","hndlr${DbName}${TblName}"},
-		"${DbName}${TblName}.go",
+		[]string{"src"},
+		"hndlr${DbName}${TblName}.go",
 		"text",
 		0644,
 		"single",
 		2,
 	},
 	{"handlers.table.test.go.tmpl.txt",
-		[]string{"src","hndlr${DbName}${TblName}"},
-		"${DbName}${TblName}_test.go",
+		[]string{"src"},
+		"hndlr${DbName}${TblName}_test.go",
 		"text",
 		0644,
-		"single",
-		2,
-	},
-	{"handlers.table.test.fakedb.go.tmpl.txt",
-		[]string{"src","hndlr${DbName}${TblName}"},
-		"${DbName}${TblName}FakeDB.go",
-		"text",
-		0644,
-		"single",
-		2,
-	},
-	{"tst.sh.txt",
-		[]string{"src","hndlr${DbName}${TblName}"},
-		"t.sh",
-		"copy",
-		0755,
 		"single",
 		2,
 	},
 	{"io.go.tmpl.txt",
-		[]string{"src","io${DbName}"},
+		[]string{"src"},
 		"io${DbName}.go",
 		"text",
 		0644,
 		"single",
 		0,
 	},
+	{"docker_test.go.tmpl.txt",
+		[]string{"src"},
+		"docker_test.go",
+		"text",
+		0644,
+		"single",
+		2,
+	},
 	{"io_test.go.tmpl.txt",
-		[]string{"src","io${DbName}"},
+		[]string{"src"},
 		"io${DbName}_test.go",
 		"text",
 		0644,
@@ -252,26 +213,18 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"io.table.go.tmpl.txt",
-		[]string{"src","io${DbName}${TblName}"},
-		"${TblName}.go",
+		[]string{"src"},
+		"io${DbName}${TblName}.go",
 		"text",
 		0644,
 		"single",
 		2,
 	},
 	{"io.table.test.go.tmpl.txt",
-		[]string{"src","io${DbName}${TblName}"},
-		"${TblName}_test.go",
+		[]string{"src"},
+		"io${DbName}${TblName}_test.go",
 		"text",
 		0644,
-		"single",
-		2,
-	},
-	{"tst.sh.txt",
-		[]string{"src","io${DbName}${TblName}"},
-		"t.sh",
-		"copy",
-		0755,
 		"single",
 		2,
 	},
@@ -280,22 +233,6 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 var FileDefs2 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"dbs",
 		[]string{""},
-		"",
-		"copyDir",
-		0644,
-		"single",
-		0,
-	},
-	{"docker",
-		[]string{"src"},
-		"",
-		"copyDir",
-		0644,
-		"single",
-		0,
-	},
-	{"util",
-		[]string{"src"},
 		"",
 		"copyDir",
 		0644,
@@ -355,7 +292,6 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 	var outDir	*util.Path
 
 	dn := dbJson.DbStruct().Name
-	Tables := dbJson.DbStruct().Tables
 	if sharedData.Noop() {
 		log.Printf("NOOP -- Skipping Creating directories\n")
 		return nil
@@ -401,34 +337,6 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 	err = CreateOutputDir([]string{"src"}, dn, "")
 	if err != nil {
 		return err
-	}
-	log.Printf("\tCreating src directories for %s...\n", dn)
-	err = CreateOutputDir([]string{"src","hndlr${DbName}"}, dn, "")
-	if err != nil {
-		return err
-	}
-	err = CreateOutputDir([]string{"src","io${DbName}"}, dn, "")
-	if err != nil {
-		return err
-	}
-	for _, t := range Tables {
-		tn := t.TitledName()
-		log.Printf("\tCreating directories for Table: %s...\n", tn)
-		err = CreateOutputDir([]string{"src","${DbName}${TblName}"}, dn, tn)
-		if err != nil {
-			log.Printf("FAILED on creating /src/%s/%s!\n", dn, tn)
-			return err
-		}
-		err = CreateOutputDir([]string{"src","hndlr${DbName}${TblName}"}, dn, tn)
-		if err != nil {
-			log.Printf("FAILED on creating /src/hndlr%s%s!\n", dn, tn)
-			return err
-		}
-		err = CreateOutputDir([]string{"src","io${DbName}${TblName}"}, dn, tn)
-		if err != nil {
-			log.Printf("FAILED on creating /src/io%s%s!\n", dn, tn)
-			return err
-		}
 	}
 
 	return err

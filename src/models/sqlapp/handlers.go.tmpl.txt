@@ -9,7 +9,7 @@
 [[- $dn  := .TD.Data.TitledName]]
 
 
-package hndlr[[$dn]]
+package main
 
 import (
 	_ "fmt"
@@ -22,37 +22,36 @@ import (
     [[end]]
     _ "os"
     "sort"
+
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
-var tmplsDir        string
-var Tmpls           *template.Template
+type Tmpls[[$dn]]  struct {
+    tmplsDir        string
+    Tmpls           *template.Template
+}
 
 
-func Title(i interface{}) string {
+func (Tmpls[[$dn]]) Title(i interface{}) string {
     return "Title() - NOT Implemented"
 }
 
-func Body(i interface{}) string {
+func (Tmpls[[$dn]]) Body(i interface{}) string {
     return "Body() - NOT Implemented"
 }
 
-[[if GenDebugging]]
-    func ErrorString(err error) string {
-        if err == nil {
-            return "ok"
-        } else {
-            return err.Error()
-        }
-    }
-[[end]]
-
 func init() {
-    tmplsDir = "./tmpl"
+
 }
 
-func SetTmplsDir(d string) {
-    tmplsDir = d
+func (t *Tmpls[[$dn]]) SetTmplsDir(d string) {
+    t.tmplsDir = d
+}
+
+func NewTmpls[[$dn]]() *Tmpls[[$dn]] {
+    t := &Tmpls[[$dn]]{}
+    t.tmplsDir = "./tmpl"
+    return t
 }
 
 //----------------------------------------------------------------------------
@@ -61,26 +60,26 @@ func SetTmplsDir(d string) {
 
 // SetupTmpls initializes the functions used in the templates
 // and loads them.
-func SetupTmpls() {
+func (t *Tmpls[[$dn]]) SetupTmpls() {
     [[if GenDebugging]]
         var templates   []*template.Template
-        var t           *template.Template
+        var tt          *template.Template
         var names       []string
         var name        string
     [[end]]
 
     [[if GenDebugging]]
-        log.Printf("\tSetupTmpls(%s/*.gohtml)\n", tmplsDir)
+        log.Printf("\tSetupTmpls(%s/*.gohtml)\n", t.tmplsDir)
     [[end]]
 
-    funcs := map[string]interface{}{"Title":Title, "Body":Body,}
-    path := tmplsDir + "/*.gohtml"
-	Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
+    funcs := map[string]interface{}{"Title":t.Title, "Body":t.Body,}
+    path := t.tmplsDir + "/*.gohtml"
+	t.Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
 
     [[if GenDebugging]]
-        templates = Tmpls.Templates()
-        for _, t = range templates {
-            names = append(names, t.Name())
+        templates = t.Tmpls.Templates()
+        for _, tt = range templates {
+            names = append(names, tt.Name())
         }
         sort.Strings(names)
         for _, name = range names {

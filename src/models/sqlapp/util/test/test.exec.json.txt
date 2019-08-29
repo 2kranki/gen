@@ -1,9 +1,0 @@
-{
-    "debug":true,
-    "force":false,
-    "noop":true,
-    "quiet":false,
-    "defines":"a=A,b=B",
-    "outdir":"./test",
-    "cmd":"sqlapp"
-}

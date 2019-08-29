@@ -10,7 +10,7 @@ is:
 This adds the MSSQL container image to your local Docker images. Once, you have it
 added to the images, you will want to run it. The following will do that with the
 defaults that the generated application will automatically use:
-    docker run --name mssql1 ’ACCEPT_EULA=Y’ -e ’SA_PASSWORD=Passw0rd!’ -p 1433:1433 -d microsoft/mssql-server-linux:2017-latest
+    docker run --name mssql1 ’ACCEPT_EULA=Y’ -e ’SA_PASSWORD=Passw0rd’ -p 1433:1433 -d microsoft/mssql-server-linux:2017-latest
                             or
     ./run.sh
 You may get a "missing mssql1" message and that is ok. Ignore it.  You can issue

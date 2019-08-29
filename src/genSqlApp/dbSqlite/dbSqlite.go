@@ -17,13 +17,14 @@
 package dbSqlite
 
 import (
-	"../../util"
 	"../dbJson"
 	"../dbPlugin"
 	"../dbType"
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/2kranki/go_util"
 )
 
 const(

@@ -14,161 +14,30 @@
 
 // Generated: [[Time]] for [[$typ]] Database
 
-package io[[$dn]][[$tn]]
+package main
 
 import (
 	"testing"
-    [[ if ne $typ "sqlite" -]]
-	"time"
+    [[ if $d.HasDate -]]
+	    "time"
 	[[- end ]]
-	"../[[$dn]][[$tn]]"
-	"../io[[$dn]]"
-	"../util"
+
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
-
-[[ if eq $typ "mariadb" -]]
-//----------------------------------------------------------------------------
-//                              Docker Run
-//----------------------------------------------------------------------------
-
-// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
-func DockerRun(t *testing.T) {
-    var err         error
-    var exec        *util.ExecCmd
-
-	t.Logf("DockerRun()...\n")
-
-	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
-	if exec == nil {
-        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
-	}
-
-    err = exec.Run()
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
-    time.Sleep(5000 * time.Millisecond)
-
-
-	t.Logf("DockerRun() - End\n\n\n")
-}
-[[ else if eq $typ "mssql" -]]
-//----------------------------------------------------------------------------
-//                              Docker Run
-//----------------------------------------------------------------------------
-
-// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
-func DockerRun(t *testing.T) {
-    var err         error
-    var exec        *util.ExecCmd
-    var output      string
-
-	t.Logf("DockerRun()...\n")
-
-	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
-	if exec == nil {
-        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
-	}
-
-    output, err = exec.RunWithOutput()
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
-    t.Logf("%s\n", output)
-    time.Sleep(5000 * time.Millisecond)
-
-	t.Logf("DockerRun() - End\n\n\n")
-}
-[[ else if eq $typ "mysql" -]]
-//----------------------------------------------------------------------------
-//                              Docker Run
-//----------------------------------------------------------------------------
-
-// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
-func DockerRun(t *testing.T) {
-    var err         error
-    var exec        *util.ExecCmd
-
-	t.Logf("DockerRun()...\n")
-
-	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
-	if exec == nil {
-        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
-	}
-
-    err = exec.Run()
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
-    time.Sleep(5000 * time.Millisecond)
-
-	t.Logf("DockerRun() - End\n\n\n")
-}
-[[ else if eq $typ "postgres" -]]
-//----------------------------------------------------------------------------
-//                              Docker Run
-//----------------------------------------------------------------------------
-
-// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
-func DockerRun(t *testing.T) {
-    var err         error
-    var exec        *util.ExecCmd
-
-	t.Logf("DockerRun()...\n")
-
-	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
-	if exec == nil {
-        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
-	}
-
-    err = exec.Run()
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
-    time.Sleep(5000 * time.Millisecond)
-
-	t.Logf("DockerRun() - End\n\n\n")
-}
-[[ else if eq $typ "sqlite" -]]
-//----------------------------------------------------------------------------
-//                              Docker Run
-//----------------------------------------------------------------------------
-
-// DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
-func DockerRun(t *testing.T) {
-    var err         error
-    var exec        *util.ExecCmd
-
-	t.Logf("DockerRun()...\n")
-
-	exec = util.NewExecCmd("../../dbs/[[$typ]]/run.sh")
-	if exec == nil {
-        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
-	}
-
-    //err = exec.Run()      // Not needed for sqlite!
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
-
-	t.Logf("DockerRun() - End\n\n\n")
-}
-[[ end ]]
 
 //============================================================================
 //                              Test Data
 //============================================================================
 
-type TestData struct {
+type [[$dn]][[$tn]]TestData struct {
     T           *testing.T
     Port        string
     PW          string
     Server      string
     User        string
     NameDB      string
-    io          *io[[$dn]].IO_[[$dn]]
+    io          *IO_[[$dn]]
 }
 
 //----------------------------------------------------------------------------
@@ -177,8 +46,8 @@ type TestData struct {
 
 // CheckRcd compares the given record to the needed one and issues an error if
 // they do not match.
-func (td *TestData) CheckRcd(need int, rcd *[[$dn]][[$tn]].[[$tn]]) {
-    var rcd2        [[$dn]][[$tn]].[[$tn]]
+func (td *[[$dn]][[$tn]]TestData) CheckRcd(need int, rcd *[[$dn]][[$tn]]) {
+    var rcd2        [[$dn]][[$tn]]
 
     rcd2.TestData(need)
 
@@ -193,7 +62,7 @@ func (td *TestData) CheckRcd(need int, rcd *[[$dn]][[$tn]].[[$tn]]) {
 //----------------------------------------------------------------------------
 
 // Disconnect disconnects the io[[$dn]] server.
-func (td *TestData) Disconnect() {
+func (td *[[$dn]][[$tn]]TestData) Disconnect() {
     var err         error
 
     err = td.io.Disconnect()
@@ -209,7 +78,7 @@ func (td *TestData) Disconnect() {
 
 // Setup initializes the Test Data.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) Setup(t *testing.T) {
+func (td *[[$dn]][[$tn]]TestData) Setup(t *testing.T) {
 
     td.T = t
     td.SetupDB()
@@ -222,11 +91,11 @@ func (td *TestData) Setup(t *testing.T) {
 
 // SetupDB initializes the DB with test records.
 // If it fails at something, it must issue a t.Fatalf().
-func (td *TestData) SetupDB( ) {
+func (td *[[$dn]][[$tn]]TestData) SetupDB( ) {
     var err         error
 
     // Set connection parameters based on database SQL type.
-    td.io = io[[$dn]].New()
+    td.io = NewIo[[$dn]]()
     td.io.DefaultParms()
     err = td.io.DatabaseCreate("[[$dn]]")
     if err != nil {
@@ -240,8 +109,8 @@ func (td *TestData) SetupDB( ) {
 //----------------------------------------------------------------------------
 
 // New creates a new io struct.
-func NewTest() *TestData {
-    td := TestData{}
+func NewTest[[$dn]][[$tn]]() *[[$dn]][[$tn]]TestData {
+    td := [[$dn]][[$tn]]TestData{}
     return &td
 }
 
@@ -253,16 +122,16 @@ func NewTest() *TestData {
 //                              Create Table
 //----------------------------------------------------------------------------
 
-func TestCreateDeleteTable(t *testing.T) {
+func Test[[$dn]][[$tn]]CreateDeleteTable(t *testing.T) {
     var err         error
-    var td          *TestData
-    var io          *IO_[[$tn]]
+    var td          *[[$dn]][[$tn]]TestData
+    var io          *IO_[[$dn]][[$tn]]
 
 	t.Logf("TestCreateTable()...\n")
 	DockerRun(t)
-	td = NewTest()
+	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
-	io = [[$tn]]New(td.io)
+	io = NewIo[[$dn]][[$tn]](td.io)
 
     err = io.TableDelete()
     if err != nil {
@@ -287,17 +156,17 @@ func TestCreateDeleteTable(t *testing.T) {
 //                              Row Insert
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowInsert(t *testing.T) {
+func Test[[$dn]][[$tn]]RowInsert(t *testing.T) {
     var err         error
-    var td          *TestData
-    var io          *IO_[[$tn]]
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var td          *[[$dn]][[$tn]]TestData
+    var io          *IO_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowInsert()...\n")
 	DockerRun(t)
-	td = NewTest()
+	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
-	io = [[$tn]]New(td.io)
+	io = NewIo[[$dn]][[$tn]](td.io)
 
     // Start clean with new empty tables.
     err = io.TableCreate()
@@ -371,18 +240,18 @@ func Test[[$tn]]RowInsert(t *testing.T) {
 //                              Row Page
 //----------------------------------------------------------------------------
 
-func Test[[$tn]]RowPage(t *testing.T) {
+func Test[[$dn]][[$tn]]RowPage(t *testing.T) {
     var err         error
-    var td          *TestData
-    var io          *IO_[[$tn]]
-    var rcd         [[$dn]][[$tn]].[[$tn]]
-    var rcds        [][[$dn]][[$tn]].[[$tn]]
+    var td          *[[$dn]][[$tn]]TestData
+    var io          *IO_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
+    var rcds        [][[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]]RowPage()...\n")
 	DockerRun(t)
-	td = NewTest()
+	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
-	io = [[$tn]]New(td.io)
+	io = NewIo[[$dn]][[$tn]](td.io)
 
     // Start clean with new empty tables.
     err = io.TableCreate()
@@ -463,18 +332,18 @@ func Test[[$tn]]RowPage(t *testing.T) {
 //                              Table Scanner
 //----------------------------------------------------------------------------
 
-func TestTableScan(t *testing.T) {
+func Test[[$dn]][[$tn]]TableScan(t *testing.T) {
     var err         error
-    var td          *TestData
-    var io          *IO_[[$tn]]
-    var rcd         [[$dn]][[$tn]].[[$tn]]
+    var td          *[[$dn]][[$tn]]TestData
+    var io          *IO_[[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]]
     var cnt         int
 
 	t.Logf("TestTableScan()...\n")
 	DockerRun(t)
-	td = NewTest()
+	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
-	io = [[$tn]]New(td.io)
+	io = NewIo[[$dn]][[$tn]](td.io)
 
     // Start clean with new empty tables.
     err = io.TableCreate()
@@ -493,7 +362,7 @@ func TestTableScan(t *testing.T) {
         }
     }
 
-    apply := func (rcd [[$dn]][[$tn]].[[$tn]]) error {
+    apply := func (rcd [[$dn]][[$tn]]) error {
                 t.Logf("\tScan Row %d\n", cnt)
                 cnt++
                 return nil

@@ -18,12 +18,13 @@ package genCmn
 import (
 	"../mainData"
 	"../shared"
-	"../util"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/2kranki/go_util"
 )
 
 

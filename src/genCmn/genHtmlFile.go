@@ -7,12 +7,13 @@ package genCmn
 
 import (
 	"../shared"
-	"../util"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"strings"
+
+	"github.com/2kranki/go_util"
 )
 
 var htmlTmpls template.Template
