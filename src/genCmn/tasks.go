@@ -16,7 +16,7 @@
 package genCmn
 
 import (
-	"../shared"
+	"genapp/shared"
 	"fmt"
 	"io"
 	"log"

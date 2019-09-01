@@ -8,7 +8,7 @@ package dbType
 import (
 	"testing"
 	//"time"
-	"../../shared"
+	"genapp/shared"
 )
 
 

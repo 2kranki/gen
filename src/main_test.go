@@ -6,7 +6,7 @@
 package main
 
 import (
-    "./shared"
+    "genapp/shared"
 	"testing"
 )
 

@@ -9,7 +9,7 @@ import (
 	"log"
 	"testing"
 	//"time"
-	"../../shared"
+	"genapp/shared"
 )
 
 

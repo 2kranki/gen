@@ -8,10 +8,10 @@
 package dbMysql
 
 import (
-	"../../shared"
-	"../dbJson"
-	"../dbPlugin"
-	"../dbType"
+	"genapp/shared"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
+	"genapp/genSqlApp/dbType"
 	"log"
 
 	"github.com/2kranki/go_util"

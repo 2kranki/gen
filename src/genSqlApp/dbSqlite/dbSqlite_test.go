@@ -8,9 +8,9 @@ package dbSqlite
 import (
 	"log"
 	"testing"
-	"../../shared"
+	"genapp/shared"
 	//"time"
-	"../dbJson"
+	"genapp/genSqlApp/dbJson"
 )
 
 const jsonTestPath = "../../../misc/test01/db.json.txt"

@@ -14,9 +14,9 @@ import (
 	"os"
 	"strings"
 
-	"./genCObj"
-	"./genSqlApp"
-	"./shared"
+	"genapp/genCObj"
+	"genapp/genSqlApp"
+	"genapp/shared"
 
 	"github.com/2kranki/go_util"
 )

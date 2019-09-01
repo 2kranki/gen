@@ -16,8 +16,8 @@
 package genCmn
 
 import (
-	"../mainData"
-	"../shared"
+	"genapp/mainData"
+	"genapp/shared"
 	"errors"
 	"flag"
 	"fmt"

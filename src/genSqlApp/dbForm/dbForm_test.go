@@ -6,7 +6,7 @@
 package dbForm
 
 import (
-	"../../shared"
+	"genapp/shared"
 	"log"
 	"testing"
 )

@@ -6,7 +6,7 @@
 package genSqlApp
 
 import (
-	"../shared"
+	"genapp/shared"
 	"fmt"
 	"io/ioutil"
 	"log"

@@ -15,8 +15,8 @@
 package genCObj
 
 import (
-	"../genCmn"
-	"../shared"
+	"genapp/genCmn"
+	"genapp/shared"
 	"flag"
 	"fmt"
 	"log"

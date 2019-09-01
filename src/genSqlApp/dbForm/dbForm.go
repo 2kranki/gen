@@ -8,7 +8,7 @@
 package dbForm
 
 import (
-	"../dbJson"
+	"genapp/genSqlApp/dbJson"
 )
 
 //============================================================================

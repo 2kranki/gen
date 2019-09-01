@@ -6,9 +6,9 @@
 package genSqlApp
 
 import (
-	"../shared"
-	"../util"
-	"./dbJson"
+	"genapp/shared"
+	"genapp/util"
+	"genapp/genSqlApp/dbJson"
 	"fmt"
 	"log"
 	"os"

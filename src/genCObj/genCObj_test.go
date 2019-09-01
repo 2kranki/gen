@@ -8,8 +8,8 @@ package genCObj
 import (
 	"testing"
 	"time"
-	"../appData"
-	"../shared"
+	"genapp/appData"
+	"genapp/shared"
 )
 
 const jsonTestPath = "../misc/"

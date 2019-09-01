@@ -43,11 +43,11 @@ genSqlApp
 package genSqlApp
 
 import (
-	"../genCmn"
-	"../shared"
-	_ "./dbForm"
-	_ "./dbGener"
-	"./dbJson"
+	"genapp/genCmn"
+	"genapp/shared"
+	_ "genapp/genSqlApp/dbForm"
+	_ "genapp/genSqlApp/dbGener"
+	"genapp/genSqlApp/dbJson"
 	"errors"
 	"flag"
 	"fmt"
@@ -56,11 +56,11 @@ import (
 	"strings"
 	// Include the various Database Plugins so that they will register
 	// with dbPlugin.
-	_ "./dbMariadb"
-	_ "./dbMssql"
-	_ "./dbMysql"
-	_ "./dbPostgres"
-	_ "./dbSqlite"
+	_ "genapp/genSqlApp/dbMariadb"
+	_ "genapp/genSqlApp/dbMssql"
+	_ "genapp/genSqlApp/dbMysql"
+	_ "genapp/genSqlApp/dbPostgres"
+	_ "genapp/genSqlApp/dbSqlite"
 
 	"github.com/2kranki/go_util"
 )
@@ -127,6 +127,14 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"main.menu.html.tmpl.txt",
 		[]string{"html"},
 		"${DbName}.menu.html",
+		"text",
+		0644,
+		"one",
+		0,
+	},
+	{"go.mod.tmpl.txt",
+		[]string{"src"},
+		"go.mod",
 		"text",
 		0644,
 		"one",

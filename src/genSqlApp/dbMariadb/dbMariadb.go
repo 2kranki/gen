@@ -8,9 +8,9 @@
 package dbMariadb
 
 import (
-	"../dbJson"
-	"../dbPlugin"
-	"../dbType"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
+	"genapp/genSqlApp/dbType"
 	"log"
 
 	"github.com/2kranki/go_util"

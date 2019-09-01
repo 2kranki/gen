@@ -6,9 +6,9 @@
 package dbJson
 
 import (
-	"../../shared"
-	"../dbPlugin"
-	"../dbType"
+	"genapp/shared"
+	"genapp/genSqlApp/dbPlugin"
+	"genapp/genSqlApp/dbType"
 	"fmt"
 	"log"
 	"path/filepath"

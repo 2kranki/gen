@@ -33,10 +33,10 @@
 package dbMssql
 
 import (
-	"../../shared"
-	"../dbJson"
-	"../dbPlugin"
-	"../dbType"
+	"genapp/shared"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
+	"genapp/genSqlApp/dbType"
 	"fmt"
 	"log"
 	"strings"

@@ -7,7 +7,7 @@
 package mainData
 
 import (
-	"../shared"
+	"genapp/shared"
 	"errors"
 	"fmt"
 	"github.com/2kranki/go_util"

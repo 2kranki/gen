@@ -6,16 +6,16 @@
 package dbJson
 
 import (
-	"../../shared"
+	"genapp/shared"
 	"log"
 	"testing"
 	// Include the various Database Plugins so that they will register
 	// with dbPlugin.
-	_ "../dbMariadb"
-	_ "../dbMssql"
-	_ "../dbMysql"
-	_ "../dbPostgres"
-	_ "../dbSqlite"
+	_ "genapp/genSqlApp/dbMariadb"
+	_ "genapp/genSqlApp/dbMssql"
+	_ "genapp/genSqlApp/dbMysql"
+	_ "genapp/genSqlApp/dbPostgres"
+	_ "genapp/genSqlApp/dbSqlite"
 )
 
 const jsonTestPath = "../../../misc/test01/db.json.txt"

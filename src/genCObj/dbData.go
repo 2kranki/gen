@@ -13,7 +13,7 @@
 package genCObj
 
 import (
-	"../shared"
+	"genapp/shared"
 	"errors"
 	"fmt"
 	"log"

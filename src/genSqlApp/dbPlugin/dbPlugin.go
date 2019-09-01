@@ -20,7 +20,7 @@
 package dbPlugin
 
 import (
-	"../dbType"
+	"genapp/genSqlApp/dbType"
 	"fmt"
 	"sync"
 )

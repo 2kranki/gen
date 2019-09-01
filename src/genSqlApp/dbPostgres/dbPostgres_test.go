@@ -6,7 +6,7 @@
 package dbPostgres
 
 import (
-	"../../shared"
+	"genapp/shared"
 	"log"
 	"testing"
 )

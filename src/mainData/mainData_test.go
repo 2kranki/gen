@@ -7,7 +7,7 @@
 package mainData
 
 import (
-	"../shared"
+	"genapp/shared"
 	"fmt"
 	"testing"
 )

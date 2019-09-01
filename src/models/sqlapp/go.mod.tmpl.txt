@@ -1,0 +1,3 @@
+module [[.TD.Data.Name]]
+
+go 1.12

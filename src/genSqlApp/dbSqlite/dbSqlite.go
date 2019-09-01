@@ -17,9 +17,9 @@
 package dbSqlite
 
 import (
-	"../dbJson"
-	"../dbPlugin"
-	"../dbType"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
+	"genapp/genSqlApp/dbType"
 	"fmt"
 	"log"
 	"strings"

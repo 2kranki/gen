@@ -14,9 +14,9 @@
 package dbGener
 
 import (
-	"../../shared"
-	"../dbJson"
-	"../dbPlugin"
+	"genapp/shared"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
 	"fmt"
 	"log"
 	"strings"

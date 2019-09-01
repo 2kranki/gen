@@ -8,19 +8,19 @@
 package dbGener
 
 import (
-	"../../shared"
-	"../dbJson"
-	"../dbPlugin"
+	"genapp/shared"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
 	"fmt"
 	"log"
 	"testing"
 	// Include the various Database Plugins so that they will register
 	// with dbPlugin.
-	_ "../dbMariadb"
-	_ "../dbMssql"
-	_ "../dbMysql"
-	_ "../dbPostgres"
-	_ "../dbSqlite"
+	_ "genapp/genSqlApp/dbMariadb"
+	_ "genapp/genSqlApp/dbMssql"
+	_ "genapp/genSqlApp/dbMysql"
+	_ "genapp/genSqlApp/dbPostgres"
+	_ "genapp/genSqlApp/dbSqlite"
 )
 
 const jsonTestPath = "../test/db.json.txt"

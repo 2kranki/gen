@@ -16,9 +16,9 @@
 package dbPostgres
 
 import (
-	"../dbJson"
-	"../dbPlugin"
-	"../dbType"
+	"genapp/genSqlApp/dbJson"
+	"genapp/genSqlApp/dbPlugin"
+	"genapp/genSqlApp/dbType"
 	"fmt"
 	"log"
 

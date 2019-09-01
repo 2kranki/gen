@@ -28,11 +28,14 @@ buildApp () {
         rebuild="-a"
     fi
 
-    ./modelSetup.sh
     cd ${srcDir}
     mkdir -p ${dstDir}
-   if go build -o ${pgmPath} -v -race ${rebuild} ; then
+    test -z "$fQuiet" && echo "...Executing: go build -o ${pgmPath} -v -race ${rebuild}"
+    if go build -o ${pgmPath} -v -race ${rebuild} ; then
         test -z "$fQuiet" && echo "...Build was successful!"
+    else
+        test -z "$fQuiet" && echo "...Build failed!"
+        exit 4
     fi
     cd -
 
