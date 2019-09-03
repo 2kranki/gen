@@ -1,4 +1,6 @@
 github.com/2kranki/go_util v0.0.0-20190817173706-9e602a80c724 h1:Dg7u7FN1r+WNHDW54w2om+qGk8pNgUKEadLvL5MEXk0=
 github.com/2kranki/go_util v0.0.0-20190817173706-9e602a80c724/go.mod h1:88l4a3Nw68SJnxHLSIe43dopsy9JczXMaqfmB7JwP8g=
+github.com/2kranki/go_util v1.0.1 h1:WVesL/S29rYnHBxFz2cAAkgpJjQ2qYx3WhLSmXCMYEY=
+github.com/2kranki/go_util v1.0.1/go.mod h1:88l4a3Nw68SJnxHLSIe43dopsy9JczXMaqfmB7JwP8g=
 github.com/2kranki/jsonpreprocess v0.0.0-20190327145444-f8d1095d2ad6 h1:4946A4OQr6xfvytTkb4DOi82WqoZh61cXQOmgATDrPY=
 github.com/2kranki/jsonpreprocess v0.0.0-20190327145444-f8d1095d2ad6/go.mod h1:YeGfkfW78LfYzlCuRbrav4uPPCC8XdxHCoqhq0fczqU=

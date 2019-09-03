@@ -15,14 +15,15 @@
 package genCObj
 
 import (
-	"genapp/genCmn"
-	"genapp/shared"
 	"flag"
 	"fmt"
+	"genapp/genCmn"
 	"log"
 
 	"github.com/2kranki/go_util"
 )
+
+var	sd			*util.SharedData
 
 // FileDefns controls what files are generated.
 var FileDefs1 	[]genCmn.FileDefn = []genCmn.FileDefn{
@@ -92,7 +93,7 @@ func CreateOutputDir(g *genCmn.GenData, dir []string) error {
 		return ""
 	}
 
-	outPath = util.NewPath(sharedData.OutDir())
+	outPath = util.NewPath(sd.OutDir())
 	for _, d := range dir {
 		if len(dir) > 0 {
 			outPath = outPath.Append(d)
@@ -118,15 +119,15 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 	var err 	error
 	var outDir	*util.Path
 
-	if sharedData.Noop() {
+	if sd.Noop() {
 		log.Printf("NOOP -- Skipping Creating directories\n")
 		return nil
 	}
-	outDir = util.NewPath(sharedData.OutDir())
+	outDir = util.NewPath(sd.OutDir())
 
 	// We only delete main directory if forced to. Otherwise, we
 	// will simply replace our files within it.
-	if sharedData.Force() {
+	if sd.Force() {
 		log.Printf("\tRemoving directory: %s...\n", outDir.String())
 		if err = outDir.RemoveDir(); err != nil {
 			return fmt.Errorf("Error: Could not remove output directory: %s: %s\n",
@@ -171,7 +172,7 @@ func CreateOutputFilePath(name string, dir []string, fn string) (*util.Path, err
 		return ""
 	}
 
-	outPath = util.NewPath(sharedData.OutDir())
+	outPath = util.NewPath(sd.OutDir())
 	for _, d := range dir {
 		outPath = outPath.Append(d)
 	}
@@ -179,7 +180,7 @@ func CreateOutputFilePath(name string, dir []string, fn string) (*util.Path, err
 	outPath = outPath.Expand(mapper)
 
 	if outPath.IsPathRegularFile() {
-		if !sharedData.Force() {
+		if !sd.Force() {
 			return outPath, fmt.Errorf("Over-write error of: %s\n", outPath)
 		}
 	}
@@ -196,9 +197,9 @@ func CreateOutputFilePath(name string, dir []string, fn string) (*util.Path, err
 func ReadJsonFileData(g *genCmn.GenData) error {
 	var err error
 
-	if err = ReadJsonFile(sharedData.DataPath()); err != nil {
+	if err = ReadJsonFile(sd.DataPath()); err != nil {
 		return fmt.Errorf("Error: Reading Data Json Input:%s %s\n",
-			sharedData.DataPath(), err.Error())
+			sd.DataPath(), err.Error())
 	}
 	g.TmplData.Data = DbStruct()
 
@@ -225,7 +226,7 @@ func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error
 	if err != nil {
 		return fmt.Errorf("Error: %s: %s\n", data.PathIn.String(), err.Error())
 	}
-	if sharedData.Debug() {
+	if sd.Debug() {
 		log.Println("\t\tmodelPath=", data.PathIn.String())
 	}
 
@@ -234,7 +235,7 @@ func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if sharedData.Debug() {
+	if sd.Debug() {
 		log.Println("\t\t outPath=", data.PathOut)
 	}
 
@@ -265,7 +266,7 @@ func GenCObj(inDefns map[string]interface{}) error {
 	genData.SetupFile = SetupFile
 	genData.TmplData.Data = DbStruct()
 
-	if sharedData.Debug() {
+	if sd.Debug() {
 		log.Println("GenCObj: In Debug Mode...")
 		log.Printf("\t  args: %q\n", flag.Args())
 	}

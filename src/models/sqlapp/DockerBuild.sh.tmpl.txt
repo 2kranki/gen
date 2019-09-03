@@ -1,0 +1,8 @@
+[[- $dot := .]]
+[[- $d   := .TD.Data]]
+[[- $dn  := .TD.Data.TitledName]]
+#!/usr/bin/env bash
+
+docker build -t [[$d.Name]] .
+
+

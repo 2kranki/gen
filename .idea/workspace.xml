@@ -2,50 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/genapp.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gen.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/genapp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/genapp.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.scannerwork/.sonar_lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.scannerwork/report-task.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.scannerwork/uast-generator-go-darwin-amd64" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/b.sh" beforeDir="false" afterPath="$PROJECT_DIR$/b.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelSetup.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCObj/dbData.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCObj/dbData.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genCObj/genCObj.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCObj/genCObj.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCObj/genCObj_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCObj/genCObj_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/genCmn.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/genCmn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/genHtmlFile.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/genHtmlFile.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/genTextFile.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/genTextFile.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genCmn/tasks.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genCmn/tasks.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbForm/dbForm.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbForm/dbForm.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbForm/dbForm_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbForm/dbForm_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbType/dbType_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbType/dbType_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genHtmlFile.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genHtmlFile.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genTextFile.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genTextFile.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mainData/mainData.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/mainData/mainData.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mainData/mainData_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/mainData/mainData_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/main_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/src/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/src/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tag.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tag.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -54,7 +18,35 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1062">
+              <caret line="59" column="48" selection-start-line="59" selection-start-column="48" selection-end-line="59" selection-end-column="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1652">
+              <caret line="46" column="18" selection-start-line="46" selection-start-column="18" selection-end-line="46" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="252">
+              <caret line="14" column="18" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
   <component name="Git.Settings">
@@ -63,13 +55,17 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main.go" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt" />
         <option value="$PROJECT_DIR$/src/genCObj/genCObj.go" />
+        <option value="$PROJECT_DIR$/src/genCmn/genCmn.go" />
+        <option value="$PROJECT_DIR$/src/main.go" />
+        <option value="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" />
+        <option value="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="81" />
+    <option name="x" value="80" />
     <option name="y" value="79" />
     <option name="width" value="1420" />
     <option name="height" value="963" />
@@ -90,13 +86,62 @@
             <path>
               <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
               <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="misc" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="misc" type="462c0819:PsiDirectoryNode" />
+              <item name="test01pg" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
               <item name="genapp" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="genCmn" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="genCObj" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="genSqlApp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="genSqlApp" type="462c0819:PsiDirectoryNode" />
+              <item name="dbPostgres" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+              <item name="sqlapp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="genapp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="genapp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="shared" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -139,7 +184,7 @@
   <component name="RunManager">
     <configuration name="go build " type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="genapp" />
-      <working_directory value="$PROJECT_DIR$/" />
+      <working_directory value="$PROJECT_DIR$/src" />
       <go_parameters value="-i --race" />
       <parameters value="-mdldir ./src/models -x misc/test01sq.exec.json.txt" />
       <kind value="FILE" />
@@ -149,9 +194,10 @@
     </configuration>
   </component>
   <component name="ToolWindowManager">
-    <frame x="81" y="79" width="1420" height="963" extended-state="0" />
+    <frame x="80" y="79" width="1420" height="963" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25841874" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27672035" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -181,17 +227,83 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main.go">
+    <entry file="file://$PROJECT_DIR$/misc/test01pg/main.json.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/test01pg/db.json.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/test01pg.exec.json.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+        <state relative-caret-position="-1082" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2125" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1062">
+          <caret line="59" column="48" selection-start-line="59" selection-start-column="48" selection-end-line="59" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/shared/shared.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="186" selection-start-line="174" selection-end-line="186" />
+          <folding>
+            <element signature="e#353#378#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/genCObj/genCObj.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="17" column="5" lean-forward="true" selection-start-line="17" selection-start-column="5" selection-end-line="17" selection-end-column="5" />
+        <state relative-caret-position="-3964">
+          <caret line="27" selection-start-line="25" selection-end-line="27" />
+          <folding>
+            <element signature="e#467#547#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="44" column="39" lean-forward="true" selection-start-line="44" selection-start-column="39" selection-end-line="44" selection-end-column="39" />
+          <folding>
+            <element signature="e#199#345#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genCmn/genCmn.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-125">
+          <caret line="74" column="17" selection-start-line="74" selection-start-column="17" selection-end-line="74" selection-end-column="17" />
+          <folding>
+            <element signature="e#489#604#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/genSqlApp/genSqlApp.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1652">
+          <caret line="46" column="18" selection-start-line="46" selection-start-column="18" selection-end-line="46" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="14" column="18" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
         </state>
       </provider>
     </entry>
