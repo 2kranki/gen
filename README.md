@@ -30,16 +30,18 @@ definition and having them control the generation process.
 - [x] Finish MS-SQL Support
 - [x] Finish MySQL/MariaDB Support
 - [x] Finish Postgres Support
-- [ ] Change structure of genapp and the application generated to conform to Go's package requirements. In our case, that means that everything will be package "main" instead of how it is currently structured.  Currently, everything compiles and runs properly, but it is not according to Go's GOPATH standard.
-- [ ] Clean up form templating
-- [ ] Add more testing to xx_test.go files in both genapp and the generated code
+- [x] Change structure of generated application to conform to Go's package requirements. 
+- [x] Changed genapp to conform to Go's new module format.
+- [x] Clean up form templating
+- [x] Add more testing to the generated code
 - [x] Add **csv** save/restore per table
-- [ ] Convert golang compile and testing to use Docker so that it is the same for linux, 
+- [x] Convert golang compile and testing to use Docker so that it is the same for linux, 
         macOS and windows if possible. Right now, the scripts are for bash and only
         support linux and macOS
+- [ ] Add docker-compose yml script to run the MariaDB, MS Server, MySQL and PostGres generated programs.
+- [ ] Declare version 0.2
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
-- [ ] Declare version 0.2
 - [ ] Add HTTP support for JSON data to/from client
 
 

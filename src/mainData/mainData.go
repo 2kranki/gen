@@ -7,9 +7,9 @@
 package mainData
 
 import (
-	"genapp/shared"
 	"errors"
 	"fmt"
+	"genapp/shared"
 	"github.com/2kranki/go_util"
 	"log"
 	"path/filepath"
@@ -18,11 +18,11 @@ import (
 )
 
 type MainFlag struct {
-	Name 		string 		`json:"Name,omitempty"`
+	Name 		string 		`json:"Name,omitempty"`		// External Flag Name
 	Internal 	string 		`json:"Internal,omitempty"`	// Internal Data Name
-	Desc 		string 		`json:"Desc,omitempty"`
-	FlagType	string 		`json:"Type,omitempty"`
-	Init 		string 		`json:"Init,omitempty"`
+	Desc 		string 		`json:"Desc,omitempty"`		// Description
+	FlagType	string 		`json:"Type,omitempty"`		// Flag Type - "bool", "int", "string", "var"
+	Init 		string 		`json:"Init,omitempty"`		// Initial Value
 }
 
 type MainUsage struct {
@@ -90,6 +90,25 @@ func genFlagVar(flg MainFlag) string {
 	return str.String()
 }
 
+// GenEnvSetup generate the O/S Environment declarations.
+func GenEnvSetup(appName string) string {
+	var str			util.StringBuilder
+	var intName		string
+
+	for _, v := range mainStruct.Flags {
+		if len(v.Internal) > 0 {
+			intName = v.Internal
+		} else {
+			intName = v.Name
+		}
+		str.WriteStringf("\twrk = os.Getenv(\"%s_%s\")\n", appName, strings.ToUpper(v.Name))
+		str.WriteString("\tif len(wrk)>0 {\n")
+		str.WriteStringf("\t\t%s = wrk\n", intName)
+		str.WriteString("\t}\n")
+	}
+	return str.String()
+}
+
 // GenFlagSetup generates the flag.~Var definitions for the
 // CLI variables
 func GenFlagSetup() string {
@@ -122,6 +141,7 @@ func GenVarDefns() string {
 // init() adds the functions needed for templating to
 // shared data.
 func init() {
+	sharedData.SetFunc("GenEnvSetup", GenEnvSetup)
 	sharedData.SetFunc("GenFlagSetup", GenFlagSetup)
 	sharedData.SetFunc("GenVarDefns", GenVarDefns)
 }

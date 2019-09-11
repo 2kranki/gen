@@ -60,4 +60,6 @@
     * https://github.com/gin-gonic/gin
     * https://github.com/volatiletech/openapi-generator
     * https://github.com/volatiletech/sqlboiler
+    * https://github.com/etcd-io/bbolt#comparison-with-other-databases
+
 

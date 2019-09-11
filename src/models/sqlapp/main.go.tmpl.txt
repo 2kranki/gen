@@ -60,6 +60,7 @@ func usage() {
 [[- end ]]
 
 func main() {
+    var wrk     string
 
     // Set up flag variables
 [[ if .TD.Main.Usage ]]
@@ -84,6 +85,20 @@ func main() {
 	if debug {
 		log.Println("\tIn Debug Mode...")
 	}
+
+	// Collect variables from Environment and override value if present.
+    wrk = os.Getenv("[[$d.UpperName]]_HTTPPORT")
+    if len(wrk) > 0 {
+        http_port = wrk
+    }
+    wrk = os.Getenv("[[$d.UpperName]]_HTTPSERVER")
+    if len(wrk) > 0 {
+        http_srvr = wrk
+    }
+[[ if .TD.Main.Flags -]]
+    [[ GenEnvSetup $d.UpperName ]]
+[[ end -]]
+    [[ $d.Plugin.Plugin.GenEnvArgDefns $d.UpperName ]]
 
     // Execute the main process.
 	exec()

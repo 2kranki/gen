@@ -680,6 +680,10 @@ func (d *Database) TitledName( ) string {
 	return strings.Title(d.Name)
 }
 
+func (d *Database) UpperName( ) string {
+	return strings.ToUpper(d.Name)
+}
+
 //----------------------------------------------------------------------------
 //						Global Support Functions
 //----------------------------------------------------------------------------

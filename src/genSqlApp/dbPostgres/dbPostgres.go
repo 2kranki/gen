@@ -16,13 +16,12 @@
 package dbPostgres
 
 import (
+	"fmt"
 	"genapp/genSqlApp/dbJson"
 	"genapp/genSqlApp/dbPlugin"
 	"genapp/genSqlApp/dbType"
-	"fmt"
-	"log"
-
 	"github.com/2kranki/go_util"
+	"log"
 )
 
 const(
@@ -108,6 +107,34 @@ func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 
 	str.WriteString("\tstr.WriteStringf(\"CREATE DATABASE %s;\", dbName)\n")
 
+	return str.String()
+}
+
+// GenEnvArgDefns generates a check for an environment variable over-ride and
+// over-rides the parsed CLI option if the environment variable is present.
+func (pd Plugin) GenEnvArgDefns(appName string) string {
+	var str			util.StringBuilder
+
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DBPW\")\n", appName)
+	str.WriteString("\tif len(wrk)>0 {\n")
+	str.WriteString("\t\tdb_pw = wrk\n")
+	str.WriteString("\t}\n")
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DBPORT\")\n", appName)
+	str.WriteString("\tif len(wrk)>0 {\n")
+	str.WriteString("\t\tdb_port = wrk\n")
+	str.WriteString("\t}\n")
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DBSERVER\")\n", appName)
+	str.WriteString("\tif len(wrk)>0 {\n")
+	str.WriteString("\t\tdb_srvr = wrk\n")
+	str.WriteString("\t}\n")
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DBUSER\")\n", appName)
+	str.WriteString("\tif len(wrk)>0 {\n")
+	str.WriteString("\t\tdb_user = wrk\n")
+	str.WriteString("\t}\n")
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DBNAME\")\n", appName)
+	str.WriteString("\tif len(wrk)>0 {\n")
+	str.WriteString("\t\tdb_name = wrk\n")
+	str.WriteString("\t}\n")
 	return str.String()
 }
 

@@ -63,6 +63,11 @@ import (
 	[[- end ]]
 )
 
+[[ if ne $typ "sqlite" -]]
+const connect_retries=100
+[[- end ]]
+
+
 [[$d.Plugin.Plugin.GenHeader]]
 
 //============================================================================
@@ -173,7 +178,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 	connStr := cfg.FormatDSN()
 
     // Allow for the Docker Container to get operational.
-    for i:=0; i<7; i++ {
+    for i:=0; i<connect_retries; i++ {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
@@ -228,7 +233,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 	connStr := u.String()
 
     // Allow for the Docker Container to get operational.
-    for i:=0; i<7; i++ {
+    for i:=0; i<connect_retries; i++ {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
@@ -282,7 +287,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 	connStr := cfg.FormatDSN()
 
     // Allow for the Docker Container to get operational.
-    for i:=0; i<7; i++ {
+    for i:=0; i<connect_retries; i++ {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
@@ -332,7 +337,7 @@ func (io *IO_[[$dn]]) Connect(dbName string) error {
 	connStr += "sslmode=disable"
 
     // Allow for the Docker Container to get operational.
-    for i:=0; i<7; i++ {
+    for i:=0; i<connect_retries; i++ {
         [[ if GenDebugging -]]
             log.Printf("\tConnecting %d to [[$typ]] with %s...\n", i, connStr)
         [[- end ]]
