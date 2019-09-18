@@ -38,8 +38,8 @@ definition and having them control the generation process.
 - [x] Convert golang compile and testing to use Docker so that it is the same for linux, 
         macOS and windows if possible. Right now, the scripts are for bash and only
         support linux and macOS
-- [ ] Add docker-compose yml script to run the MariaDB, MS Server, MySQL and PostGres generated programs.
-- [ ] Declare version 0.2
+- [x] Add docker-compose yml script to run the MariaDB, MS Server, MySQL and PostGres generated programs.
+- [x] Declare version 0.2
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
 - [ ] Add HTTP support for JSON data to/from client
@@ -72,10 +72,7 @@ will display them.
 I am running this on MacOSX for now with golang v1.12.7.  I will adapt the above for Windows at some point.
 My editor is Goland from Intellij.  It has worked well for me.
 
-I have added repository, app01. It contains the latest output of *genapp* for the Test01
-example.  See the *misc* directory in this repo for the controlling JSON files and 
-[app01](https://github.com/2kranki/app01) repostiory for the generated  code. *gen01.sh*
-generates app01 for all sql servers supported.
+I have added repository, app01. It contains the latest output of *genapp* for the Test01 example.  See the *misc* directory in this repo for the controlling JSON files and [app01](https://github.com/2kranki/app01) repostiory for the generated code. The README in [app01](https://github.com/2kranki/app01) explains how to run the generated applications as well. *gen01.sh* generates app01 for all sql servers supported.
 
 If you are new to Golang, I strongly recommend that you buy "The GO Programming Language" by
 Alan Donovan and Brian Kernighan.  It is an excellent book and reference.  I also bought "GO in Action" by William Kennedy but I can not recommend it.  "The GO Programming Language" book is far superior from my point of view and is a great reference on the language and its libraries.

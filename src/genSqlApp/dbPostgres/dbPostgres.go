@@ -69,7 +69,7 @@ func (pd *Plugin) DefaultDatabase(db *dbJson.Database) string {
 
 // DefaultPort returns default docker port.
 func (pd *Plugin) DefaultPort() string {
-	return "5430"
+	return "5432"
 }
 
 // DefaultPW returns default docker password.
@@ -90,6 +90,11 @@ func (pd *Plugin) DefaultUser() string {
 // DockerName returns docker name used to pull the image.
 func (pd Plugin) DockerName() string {
 	return "postgres"
+}
+
+// DockerPort returns docker port used by the image.
+func (pd Plugin) DockerPort() string {
+	return "5432"
 }
 
 // DockerTag returns docker tag used to pull the image.
@@ -115,23 +120,23 @@ func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 func (pd Plugin) GenEnvArgDefns(appName string) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("\twrk = os.Getenv(\"%s_DBPW\")\n", appName)
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_PW\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
 	str.WriteString("\t\tdb_pw = wrk\n")
 	str.WriteString("\t}\n")
-	str.WriteStringf("\twrk = os.Getenv(\"%s_DBPORT\")\n", appName)
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_PORT\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
 	str.WriteString("\t\tdb_port = wrk\n")
 	str.WriteString("\t}\n")
-	str.WriteStringf("\twrk = os.Getenv(\"%s_DBSERVER\")\n", appName)
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_SERVER\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
 	str.WriteString("\t\tdb_srvr = wrk\n")
 	str.WriteString("\t}\n")
-	str.WriteStringf("\twrk = os.Getenv(\"%s_DBUSER\")\n", appName)
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_USER\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
 	str.WriteString("\t\tdb_user = wrk\n")
 	str.WriteString("\t}\n")
-	str.WriteStringf("\twrk = os.Getenv(\"%s_DBNAME\")\n", appName)
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_NAME\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
 	str.WriteString("\t\tdb_name = wrk\n")
 	str.WriteString("\t}\n")

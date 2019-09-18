@@ -2,18 +2,29 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/css.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/docker-compose.yaml.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/html.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Todo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Notes.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/test01ma/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01ma/main.json.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/test01ms/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01ms/main.json.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/test01my/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01my/main.json.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/test01pg/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01pg/main.json.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/misc/test01sq/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01sq/main.json.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mainData/mainData.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/mainData/mainData.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/notes.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/run.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker.py.tmpl.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,7 +38,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1QbPfMzeN6BuAbA7OIRWFHdisDM" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable.Global.GOPATH.is.expanded" value="true" />
@@ -80,11 +95,16 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

@@ -102,7 +102,7 @@ func (pd *Plugin) DriverName() string {
 func (pd Plugin) GenEnvArgDefns(appName string) string {
 	var str			util.StringBuilder
 
-	str.WriteStringf("\twrk = os.Getenv(\"%s_DBNAME\")\n", appName)
+	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_NAME\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
 	str.WriteString("\t\tdb_name = wrk\n")
 	str.WriteString("\t}\n")

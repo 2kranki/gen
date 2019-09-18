@@ -8,7 +8,7 @@ is:
 This adds the PostgreSQL container image to your local Docker images. Once, you have it
 added to the images, you will want to run it. The following will do that with the
 defaults that the generated application will automatically use:
-    docker run --name postgres1 -e POSTGRES_PASSWORD="Passw0rd" -port 5430:5432 -d postgres:latest
+    docker run --name postgres1 -e POSTGRES_PASSWORD="Passw0rd" -port 5432:5432 -d postgres:latest
                                 or
     ./run.sh
 You may get a "missing postgres1" message and that is ok. Ignore it.  You can issue
@@ -45,8 +45,6 @@ done and running.
 Now that I had it running native, I turned to running it through docker. To set up
 a Docker image of PostgreSQL, I did the following:
 
-    * I changed the port from 5432 to 5430 since it seemed to conflict with the
-        installed PostgreSQL.
     * "./run.sh" loads postgres1 from the Docker Postgres Image with everything
         established properly except for the database being defined.
     * I had to use pgAdmin to create the "Finances" database under 'postgres' user.

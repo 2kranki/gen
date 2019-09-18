@@ -4,7 +4,7 @@ name="postgres1"
 user="postgres"
 pw="Passw0rd"
 server="localhost"
-port=5430
+port=5432
 dockerName="postgres"
 dockerTag="latest"
 

@@ -87,13 +87,17 @@ func main() {
 	}
 
 	// Collect variables from Environment and override value if present.
-    wrk = os.Getenv("[[$d.UpperName]]_HTTPPORT")
+    wrk = os.Getenv("[[$d.UpperName]]_HTTP_PORT")
     if len(wrk) > 0 {
         http_port = wrk
     }
-    wrk = os.Getenv("[[$d.UpperName]]_HTTPSERVER")
+    wrk = os.Getenv("[[$d.UpperName]]_HTTP_SERVER")
     if len(wrk) > 0 {
         http_srvr = wrk
+    }
+    wrk = os.Getenv("[[$d.UpperName]]_BASEDIR")
+    if len(wrk) > 0 {
+        baseDir = wrk
     }
 [[ if .TD.Main.Flags -]]
     [[ GenEnvSetup $d.UpperName ]]

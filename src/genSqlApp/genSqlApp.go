@@ -84,8 +84,32 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		"one",
 		0,
 	},
+	{"css.txt",
+		[]string{"css"},
+		"README.txt",
+		"copy",
+		0644,
+		"one",
+		0,
+	},
+	{"html.txt",
+		[]string{"html"},
+		"README.txt",
+		"copy",
+		0644,
+		"one",
+		0,
+	},
 	{"static.txt",
 		[]string{"static"},
+		"README.txt",
+		"copy",
+		0644,
+		"one",
+		0,
+	},
+	{"tmpl.txt",
+		[]string{"tmpl"},
 		"README.txt",
 		"copy",
 		0644,
@@ -140,9 +164,9 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		"one",
 		0,
 	},
-	{"docker.py.tmpl.txt",
+	{"dockerCli.py.tmpl.txt",
 		[]string{""},
-		"docker.py",
+		"dockerCli.py",
 		"text",
 		0755,
 		"one",
@@ -151,6 +175,14 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"Dockerfile.tmpl.txt",
 		[]string{""},
 		"Dockerfile",
+		"text",
+		0644,
+		"one",
+		0,
+	},
+	{"docker-compose.yaml.tmpl.txt",
+		[]string{""},
+		"docker-compose.yaml",
 		"text",
 		0644,
 		"one",
@@ -342,15 +374,15 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 	}
 
 	log.Printf("\tCreating general directories...\n")
+	err = CreateOutputDir([]string{"css"}, dn, "")
+	if err != nil {
+		return err
+	}
 	err = CreateOutputDir([]string{"html"}, dn, "")
 	if err != nil {
 		return err
 	}
 	err = CreateOutputDir([]string{"static"}, dn, "")
-	if err != nil {
-		return err
-	}
-	err = CreateOutputDir([]string{"style"}, dn, "")
 	if err != nil {
 		return err
 	}

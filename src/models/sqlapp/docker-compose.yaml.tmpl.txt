@@ -1,0 +1,71 @@
+[[- $dot := .]]
+[[- $d   := .TD.Data]]
+[[- $dn  := .TD.Data.TitledName]]
+[[- $m   := .TD.Main ]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+# vi:nu:et:sts=4 ts=4 sw=4
+
+version: "3"
+
+#================================================
+networks:
+#================================================
+    net:
+
+#================================================
+services:
+#================================================
+
+    [[ if ne $typ "sqlite" -]]
+    #----------------------------------------------
+    db:
+    #----------------------------------------------
+        # Create and the docker sql server container
+        # with the appropriate startup arguments such
+        # as root password.
+        image: "[[$plg.DockerName]]:[[$plg.DockerTag]]"
+        environment:
+            [[ if eq $typ "mariadb" -]]
+            MYSQL_ROOT_PASSWORD: "[[$plg.DefaultPW]]"
+            MYSQL_DATABASE: "[[$d.Name]]"
+            [[ else if eq $typ "mssql" -]]
+            ACCEPT_EULA: "Y"
+            MSSQL_SA_PASSWORD: "[[$plg.DefaultPW]]"
+            [[ else if eq $typ "mysql" -]]
+            MYSQL_ROOT_PASSWORD: "[[$plg.DefaultPW]]"
+            MYSQL_DATABASE: "[[$d.Name]]"
+            [[ else if eq $typ "postgres" -]]
+            POSTGRES_PASSWORD: "[[$plg.DefaultPW]]"
+            [[- end ]]
+        expose:
+            - "[[$plg.DockerPort]]"
+        networks:
+            - net
+        restart: always
+    [[- end ]]
+
+    #----------------------------------------------
+    [[$d.Name]]:
+    #----------------------------------------------
+        # Run the latest version of our application
+        # container passing the appropriate startup
+        # parameters such as sql server password.
+        image: "[[$d.Name]]:latest"
+        build:
+            context: "."
+            dockerfile: "./Dockerfile"
+        ports:
+            - "127.0.0.1:[[$m.Port]]:[[$m.Port]]"
+        [[ if ne $typ "sqlite" -]]
+        environment:
+            [[$d.UpperName]]_DB_SERVER: "db"
+            [[$d.UpperName]]_DB_PORT: "[[$plg.DockerPort]]"
+        depends_on:
+            - db
+        [[- end ]]
+        networks:
+            - net
+        restart: always
+
+

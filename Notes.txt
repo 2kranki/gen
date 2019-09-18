@@ -3,6 +3,12 @@ The objective with this program is to be able to generate applications and objec
 in several programming languages. I found the templating system in Go to have
 every feature that I needed for this project.
 
+There are port conflicts if we did not change some of the defaults.  For instance,
+MariaDB and MySQL use the same port for communication. So, I changed the default
+port for MariaDB when not being accessed in a docker-compose. Also, each application
+needs a unique port number. We handle that in the test generation. Look in "/misc".
+
+
 
 
 
