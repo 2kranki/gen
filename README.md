@@ -40,6 +40,7 @@ definition and having them control the generation process.
         support linux and macOS
 - [x] Add docker-compose yml script to run the MariaDB, MS Server, MySQL and PostGres generated programs.
 - [x] Declare version 0.2
+- [ ] Fix sqlite generated code to run in Docker.
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
 - [ ] Add HTTP support for JSON data to/from client
