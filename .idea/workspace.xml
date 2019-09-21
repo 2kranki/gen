@@ -2,30 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/css.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/docker-compose.yaml.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/html.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/sqlapp/tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Notes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01ma/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01ma/main.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01ms/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01ms/main.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01my/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01my/main.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01pg/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01pg/main.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01sq/main.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01sq/main.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/notes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/run.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker.py.tmpl.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tag.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tag.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
