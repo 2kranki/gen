@@ -3,12 +3,15 @@
     * write any extra needed documentation
 
 * GenSqlApp:
-    * Add "docker image pull" to each of the "run.sh" so that it does not need
-        to be a separate step.
-        *   MariaDB
-        *   MSSQL
-        *   MySQL
-        *   Postgres
+    * Change Table template and tests to optionally generate JSON input/output for
+        the table
+    * Add a JSON variation of the HTML data retrieval/maintenace handlers. So, that
+        we can handle requests in JSON which one of the packages like React or Angular
+        might request.
+    * Change special steps to generate html output instead of string output and use
+        the status line to indicate what happened
+    * Add HTML parsing to test routines where needed and test for values generated.
+    * Better simulate browser input for test routines
     * Learn decimal library and start using it. Apply it accross all the SQL servers.
     * Look into https://github.com/jmoiron/sqlx
     * Look into https://gorm.io and https://xorm.io Both have a lot of stars.

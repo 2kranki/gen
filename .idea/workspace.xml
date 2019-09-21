@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Todo.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tag.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tag.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
