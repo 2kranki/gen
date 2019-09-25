@@ -1,8 +1,14 @@
+[[- $d   := .TD.Data]]
+[[- $dn  := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+[[- $t   := .Table]]
+[[- $tn  := .Table.TitledName]]
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[.TD.Data.TitledName]]/[[.Table.TitledName]] Maintenance</title>
+    <title>[[$dn]]/[[$tn]] Maintenance</title>
     <style>
         html, body, p {
             padding: 0;
@@ -41,7 +47,7 @@
     </style>
 </head>
 <body>
-    <form id="dataForm" method="get" action="/[[.Table.TitledName]]">
+    <form id="dataForm" method="get" action="/[[$tn]]">
         [[GenFormDataDisplay .Table]]
         <p/>
         <p/>

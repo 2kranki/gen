@@ -154,7 +154,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListFirst(w http.ResponseWriter, r *http.Reques
     }
 
     // Display the row in the form.
-    h.ListShow(w, 0)
+    h.ListShow(w, 0, "")
 
     [[if GenDebugging]]
         log.Printf("...end hndlr[[$tn]].ListFirst()\n")
@@ -196,7 +196,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListLast(w http.ResponseWriter, r *http.Request
     }
 
     // Display the row in the form.
-    h.ListShow(w, offset)
+    h.ListShow(w, offset, "")
 
     [[if GenDebugging]]
         log.Printf("...end hndlr[[$tn]].ListLast()\n")
@@ -240,7 +240,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListNext(w http.ResponseWriter, r *http.Request
     }
 
     // Display the row in the form.
-    h.ListShow(w, offset)
+    h.ListShow(w, offset, "")
 
     [[if GenDebugging]]
         log.Printf("...end hndlr[[$tn]].ListNext()\n")
@@ -292,7 +292,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListPrev(w http.ResponseWriter, r *http.Request
     }
 
     // Display the row in the form.
-    h.ListShow(w, offset)
+    h.ListShow(w, offset, "")
 
     [[if GenDebugging]]
         log.Printf("...end hndlr[[$tn]].ListPrev()\n")
@@ -304,7 +304,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListPrev(w http.ResponseWriter, r *http.Request
 //----------------------------------------------------------------------------
 
 // ListShow displays a list page given a starting offset.
-func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int) {
+func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int, msg string) {
     var err     error
     var rcds    [][[$dn]][[$tn]]
     var name    = "[[$dn]].[[$tn]].list.gohtml"
@@ -331,7 +331,8 @@ func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int) {
     data := struct {
                 Rcds        [][[$dn]][[$tn]]
                 Offset      int
-            }{rcds, offset}
+                Msg         string
+            }{rcds, offset, msg}
 
     [[if GenDebugging]]
         log.Printf("\tData: %+v\n", data)
@@ -906,6 +907,7 @@ func (h *Handlers[[$dn]][[$tn]]) TableCreate(w http.ResponseWriter, r *http.Requ
     // Create the table.
     err = h.db.TableCreate()
     if err == nil {
+        //h.ListShow(w, 0, "Table was created")
         w.Write([]byte("Table was created"))
     } else {
         w.Write([]byte("Table creation had an error of:" + err.Error()))

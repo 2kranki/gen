@@ -12,17 +12,19 @@
 package main
 
 import (
-	_ "fmt"
-	_ "net/http"
-	_ "io"
+	"fmt"
+	"io"
 	_ "io/ioutil"
     "html/template"
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         "log"
-    [[end]]
+    [[- end ]]
+	"net/http"
     _ "os"
     "sort"
+    "strings"
 
+    "github.com/2kranki/go_util"
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 
@@ -40,10 +42,6 @@ func (Tmpls[[$dn]]) Body(i interface{}) string {
     return "Body() - NOT Implemented"
 }
 
-func init() {
-
-}
-
 func (t *Tmpls[[$dn]]) SetTmplsDir(d string) {
     t.tmplsDir = d
 }
@@ -52,6 +50,48 @@ func NewTmpls[[$dn]]() *Tmpls[[$dn]] {
     t := &Tmpls[[$dn]]{}
     t.tmplsDir = "./tmpl"
     return t
+}
+
+//----------------------------------------------------------------------------
+//                             Main Display
+//----------------------------------------------------------------------------
+
+// Display the main menu with any needed messages.
+func (h *Tmpls[[$dn]]) MainDisplay(w http.ResponseWriter, msg string) {
+    var err     error
+    var name    = "[[$dn]].main.menu.gohtml"
+    [[if GenDebugging]]
+        var str     strings.Builder
+    [[end]]
+
+    [[if GenDebugging]]
+        log.Printf("[[$dn]].MainDisplay(%s)\n", msg)
+        log.Printf("\tname: %s\n", name)
+        w2 := io.MultiWriter(w, &str)
+    [[end]]
+
+    data := struct {
+                Msg         string
+            }{msg}
+
+    [[if GenDebugging]]
+        log.Printf("\tData: %+v\n", data)
+    [[end]]
+
+    [[if GenDebugging -]]
+        log.Printf("\tExecuting template: %s\n", name)
+        err = h.Tmpls.ExecuteTemplate(w2, name, data)
+    [[else]]
+        err = h.Tmpls.ExecuteTemplate(w, name, data)
+    [[end -]]
+    if err != nil {
+        fmt.Fprintf(w, err.Error())
+    }
+
+    [[if GenDebugging]]
+        log.Printf("\t output: %s\n", str.String())
+        log.Printf("...end [[$dn]].MainDisplay(%s)\n", util.ErrorString(err))
+    [[end]]
 }
 
 //----------------------------------------------------------------------------
@@ -87,5 +127,9 @@ func (t *Tmpls[[$dn]]) SetupTmpls() {
         }
         log.Printf("\tend of SetupTmpls()\n")
     [[end]]
+}
+
+func init() {
+
 }
 

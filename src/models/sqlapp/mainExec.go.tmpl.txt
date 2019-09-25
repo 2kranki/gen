@@ -67,7 +67,8 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
     [[if GenDebugging]]
         fmt.Printf("\tHndlrHome Serving File: ./html/[[$dn]].menu.html\n")
     [[end]]
-    http.ServeFile(w, r, baseDir+"/html/[[$dn]].menu.html")
+    hndlrs[[$dn]].MainDisplay(w, "")
+    //http.ServeFile(w, r, baseDir+"/html/[[$dn]].menu.html")
 
     [[if GenDebugging]]
         fmt.Printf("...end HndlrHome()\n")

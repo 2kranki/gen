@@ -80,6 +80,7 @@
         <input type=submit onclick='onListMenu()'  value="Menu">
     </form>
     <p/>
+    <p>{{.Msg}}</p>
     <script>
         function onListFirst() {
             document.getElementById("listForm").action = "/[[.Table.TitledName]]/list/first";

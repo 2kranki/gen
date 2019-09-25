@@ -1,6 +1,8 @@
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
 <!doctype html>
 <html lang="en">
 <head>
@@ -48,6 +50,8 @@
                 <li><input type=submit onclick='onLoadTest[[$tn]]()' value="Create Table and load test data"></li>
             </ul>
     </form>
+    <p/>
+    <p>{{.Msg}}</p>
     <script>
         function onCreate[[$tn]]() {
             document.getElementById("menuForm[[$tn]]").action = "/[[$tn]]/table/create";

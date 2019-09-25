@@ -189,6 +189,49 @@ class BuildCmd(Cmd):
         return 0
 
 
+class BuildCliCmd(Cmd):
+    """ Build the Docker container
+    """
+
+    def cmd(self, name=None, path='/tmp/bin', **kwargs):
+        """ Execute a command to build a cli program
+
+            :param name:
+                executable name
+            :param path:
+                executable directory
+        """
+        if name == None:
+            name = oArgs.name
+        if oArgs.debug:
+            print("doBuildCli(%s)" % (name))
+
+        # Perform the specified actions.
+        szCmd = "dgo build -o %s/%s ./src" % (path, name)
+        iRc = 0                 # Assume that it works
+        try:
+            if not oArgs.debug:
+                try:
+                    iRC = os.system(szCmd)
+                except OSError:
+                    pass
+            else:
+                print("Debug:", szCmd)
+        finally:
+            pass
+
+        return iRc
+
+    def help(self):
+        return 'Build the command-line Executable'
+
+    def name(self):
+        return 'buildcli'
+
+    def numArgs(self):
+        return 0
+
+
 class ComposeUpCmd(Cmd):
     """ Start the App
     """
@@ -341,7 +384,7 @@ class NetUpCmd(Cmd):
 def         mainCLI( listArgV=None ):
     """ Command-line interface """
     global      oArgs
-    oCmds = Cmds(BuildCmd(), NetDownCmd(), NetInspectCmd(), NetUpCmd())
+    oCmds = Cmds(BuildCmd(), BuildCliCmd(), NetDownCmd(), NetInspectCmd(), NetUpCmd())
     szEpilog = oCmds.cmdDescs()
 
     # Do initialization.

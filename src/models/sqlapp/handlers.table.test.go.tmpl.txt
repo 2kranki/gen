@@ -278,15 +278,17 @@ func Test[[$dn]][[$tn]]HndlrDB(t *testing.T) {
 func Test[[$dn]][[$tn]]HndlrListIndex(t *testing.T) {
     var err         error
     var td          *TestData_[[$dn]][[$tn]]
+    var r           string
 
     t.Logf("Test[[$tn]].HndlrListIndex()...\n")
     td = &TestData_[[$dn]][[$tn]]{}
     td.Setup(t)
 
-    //TODO: err = db.Ping()
     if err != nil {
         t.Fatalf("Error: Cannot connect: %s\n", err.Error())
     }
+
+    r = td.ResponseBody()
 
     t.Logf("Test[[$tn]].HndlrListIndex() - End of Test\n\n\n")
 }
