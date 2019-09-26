@@ -3,6 +3,10 @@
 
 //  Handle HTTP Events
 
+// Notes:
+//  *   All static (ie non-changing) files should be served from the 'static'
+//      subdirectory.
+
 // Generated: [[Time]]
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
@@ -17,7 +21,6 @@ import (
 	"encoding/csv"
     "fmt"
     "io"
-    "html/template"
     [[if GenDebugging]]
         "log"
     [[end]]
@@ -50,7 +53,7 @@ type Handlers[[$dn]][[$tn]] struct {
     mu          sync.Mutex
     db          *IO_[[$dn]][[$tn]]
     rowsPerPage int
-    Tmpls       *template.Template
+    Tmpls       *Tmpls[[$dn]]
 }
 
 //----------------------------------------------------------------------------
@@ -340,9 +343,9 @@ func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int, msg
 
     [[if GenDebugging -]]
         log.Printf("\tExecuting template: %s\n", name)
-        err = h.Tmpls.ExecuteTemplate(w2, name, data)
+        err = h.Tmpls.Tmpls.ExecuteTemplate(w2, name, data)
     [[else]]
-        err = h.Tmpls.ExecuteTemplate(w, name, data)
+        err = h.Tmpls.Tmpls.ExecuteTemplate(w, name, data)
     [[end -]]
     if err != nil {
         fmt.Fprintf(w, err.Error())
@@ -441,7 +444,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]]
             log.Printf("\tMsg: %s\n", data.Msg)
             log.Printf("\tname: %s\n", name)
         [[end]]
-        err = h.Tmpls.ExecuteTemplate(w, name, data)
+        err = h.Tmpls.Tmpls.ExecuteTemplate(w, name, data)
         if err != nil {
             fmt.Fprintf(w, err.Error())
         }

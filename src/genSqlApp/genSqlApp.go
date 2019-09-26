@@ -84,22 +84,6 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		"one",
 		0,
 	},
-	{"css.txt",
-		[]string{"css"},
-		"README.txt",
-		"copy",
-		0644,
-		"one",
-		0,
-	},
-	{"html.txt",
-		[]string{"html"},
-		"README.txt",
-		"copy",
-		0644,
-		"one",
-		0,
-	},
 	{"static.txt",
 		[]string{"static"},
 		"README.txt",
@@ -117,7 +101,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"tst.sh.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"t.sh",
 		"text",
 		0755,
@@ -125,7 +109,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"form.html",
-		[]string{"html"},
+		[]string{"static"},
 		"form.html",
 		"copy",
 		0644,
@@ -157,7 +141,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"go.mod.tmpl.txt",
-		[]string{"src"},
+		[]string{""},
 		"go.mod",
 		"text",
 		0644,
@@ -189,7 +173,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"main.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"main.go",
 		"text",
 		0644,
@@ -197,7 +181,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"mainExec.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"mainExec.go",
 		"text",
 		0644,
@@ -205,7 +189,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"handlers.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"hndlr${DbName}.go",
 		"text",
 		0644,
@@ -213,7 +197,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"table.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"${DbName}${TblName}.go",
 		"text",
 		0644,
@@ -221,7 +205,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"table.test.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"${DbName}${TblName}_test.go",
 		"text",
 		0644,
@@ -229,7 +213,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"handlers.table.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"hndlr${DbName}${TblName}.go",
 		"text",
 		0644,
@@ -237,7 +221,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"handlers.table.test.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"hndlr${DbName}${TblName}_test.go",
 		"text",
 		0644,
@@ -245,7 +229,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"io.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"io${DbName}.go",
 		"text",
 		0644,
@@ -253,7 +237,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"docker_test.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"docker_test.go",
 		"text",
 		0644,
@@ -261,7 +245,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"io_test.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"io${DbName}_test.go",
 		"text",
 		0644,
@@ -269,7 +253,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		0,
 	},
 	{"io.table.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"io${DbName}${TblName}.go",
 		"text",
 		0644,
@@ -277,7 +261,7 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		2,
 	},
 	{"io.table.test.go.tmpl.txt",
-		[]string{"src"},
+		[]string{"cmd/${DbName}"},
 		"io${DbName}${TblName}_test.go",
 		"text",
 		0644,
@@ -374,23 +358,29 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 	}
 
 	log.Printf("\tCreating general directories...\n")
-	err = CreateOutputDir([]string{"css"}, dn, "")
+	// cmd is used for main.go
+	err = CreateOutputDir([]string{"cmd/${DbName}"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = CreateOutputDir([]string{"html"}, dn, "")
+	// pkg is used for application packages.
+	err = CreateOutputDir([]string{"pkg"}, dn, "")
 	if err != nil {
 		return err
 	}
+	// Static is used for CSS, HTML, JPG and any other static data
 	err = CreateOutputDir([]string{"static"}, dn, "")
 	if err != nil {
 		return err
 	}
+	// tmpl is used for web page templates normally named *.gohtml.
 	err = CreateOutputDir([]string{"tmpl"}, dn, "")
 	if err != nil {
 		return err
 	}
-	err = CreateOutputDir([]string{"src"}, dn, "")
+	// vendor is used for application dependencies which should
+	// probably not be commited in git.
+	err = CreateOutputDir([]string{"vendor"}, dn, "")
 	if err != nil {
 		return err
 	}

@@ -1,8 +1,18 @@
-* Clean up when done:
-    * unneeded files
-    * write any extra needed documentation
+
+* main program
+    * Change output structure to conform to github.com/golang-standards/project-layout
+    * Clean up when done:
+        * unneeded files
+        * write any extra needed documentation
 
 * GenSqlApp:
+    * Change all output to be html format
+    * Add html parsing to test code to further verify output
+    * Add https support
+    * Add user authentication
+    * Support HTTP PUT (ie update requests) look at adding column names (string) to
+        table entries
+    * Change output structure to conform to github.com/golang-standards/project-layout
     * Change Table template and tests to optionally generate JSON input/output for
         the table
     * Add a JSON variation of the HTML data retrieval/maintenace handlers. So, that

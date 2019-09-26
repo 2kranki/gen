@@ -3,6 +3,10 @@
 
 //  Handle HTTP Events
 
+// Notes:
+//  *   All static (ie non-changing) files should be served from the 'static'
+//      subdirectory.
+
 // Generated: [[Time]]
 [[- $dot := .]]
 [[- $d   := .TD.Data]]
@@ -44,12 +48,6 @@ func (Tmpls[[$dn]]) Body(i interface{}) string {
 
 func (t *Tmpls[[$dn]]) SetTmplsDir(d string) {
     t.tmplsDir = d
-}
-
-func NewTmpls[[$dn]]() *Tmpls[[$dn]] {
-    t := &Tmpls[[$dn]]{}
-    t.tmplsDir = "./tmpl"
-    return t
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +93,18 @@ func (h *Tmpls[[$dn]]) MainDisplay(w http.ResponseWriter, msg string) {
 }
 
 //----------------------------------------------------------------------------
+//                                  N e w
+//----------------------------------------------------------------------------
+
+func NewTmpls[[$dn]](dir string) *Tmpls[[$dn]] {
+    t := &Tmpls[[$dn]]{}
+    if "" == dir {
+        t.tmplsDir = "./tmpl"
+    }
+    return t
+}
+
+//----------------------------------------------------------------------------
 //                           Setup Templates
 //----------------------------------------------------------------------------
 
@@ -108,15 +118,15 @@ func (t *Tmpls[[$dn]]) SetupTmpls() {
         var name        string
     [[end]]
 
-    [[if GenDebugging]]
+    [[- if GenDebugging ]]
         log.Printf("\tSetupTmpls(%s/*.gohtml)\n", t.tmplsDir)
-    [[end]]
+    [[- end ]]
 
     funcs := map[string]interface{}{"Title":t.Title, "Body":t.Body,}
     path := t.tmplsDir + "/*.gohtml"
 	t.Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
 
-    [[if GenDebugging]]
+    [[- if GenDebugging ]]
         templates = t.Tmpls.Templates()
         for _, tt = range templates {
             names = append(names, tt.Name())
@@ -126,7 +136,7 @@ func (t *Tmpls[[$dn]]) SetupTmpls() {
             log.Printf("\t\t template: %s\n", name)
         }
         log.Printf("\tend of SetupTmpls()\n")
-    [[end]]
+    [[- end ]]
 }
 
 func init() {

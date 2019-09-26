@@ -3,6 +3,10 @@
 
 // SQL Application main program
 
+// Notes:
+//  *   All static (ie non-changing) files should be served from the 'static'
+//      subdirectory.
+
 // Generated: [[Time]]
 [[- $dot := .]]
 [[- $d  := .TD.Data]]
@@ -34,45 +38,45 @@ var     hndlrs[[$dn]]    *Tmpls[[$dn]]
 // returning a 405 status to indicate that no Icon is available.
 func HndlrFavIcon(w http.ResponseWriter, r *http.Request) {
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         fmt.Printf("HndlrFavIcon(%s)\n", r.Method)
-    [[end]]
+    [[- end ]]
 
     if r.Method != "GET" {
 	    http.NotFound(w, r)
 	}
     http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         fmt.Printf("...end HndlrFavIcon(Error:405)\n")
-    [[end]]
+    [[- end ]]
 }
 
 // HndlrHome responds to a URL with no sub-elements.  It defaults to
 // providing the default Menu to the browser/caller.
 func HndlrHome(w http.ResponseWriter, r *http.Request) {
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         fmt.Printf("HndlrHome(%s)\n", r.Method)
-    [[end]]
+    [[- end ]]
 
     if r.URL.Path != "/" {
-        [[if GenDebugging]]
+        [[ if GenDebugging -]]
             fmt.Printf("...end HndlrHome(Error 404) Not '/' URL\n")
-        [[end]]
+        [[- end ]]
         http.NotFound(w, r)
         return
     }
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         fmt.Printf("\tHndlrHome Serving File: ./html/[[$dn]].menu.html\n")
-    [[end]]
+    [[- end ]]
     hndlrs[[$dn]].MainDisplay(w, "")
     //http.ServeFile(w, r, baseDir+"/html/[[$dn]].menu.html")
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         fmt.Printf("...end HndlrHome()\n")
-    [[end]]
+    [[- end ]]
 }
 
 [[ if GenMuxWrapper -]]
@@ -123,9 +127,9 @@ func MuxHandlerWrapper(f http.Handler) http.HandlerFunc {
 func exec() {
 
     // Connect the databases.
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("\tConnecting to the Database...\n")
-    [[end]]
+    [[- end ]]
     io[[$dn]] := NewIo[[$dn]]()
     //io[[$dn]].SetName(db_name)
     io[[$dn]].SetPort(db_port)
@@ -154,38 +158,38 @@ func exec() {
         if io[[$dn]][[$tn]] == nil {
             log.Fatalf("ERROR - Failed to Connect to Table, [[$dn]][[$tn]]\n\n\n")
         }
-	[[end]]
+	[[- end ]]
 
     // Set up templates.
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("\tSetting up the Templates...\n")
-    [[end]]
-    hndlrs[[$dn]] = NewTmpls[[$dn]]()
+    [[- end ]]
+    hndlrs[[$dn]] = NewTmpls[[$dn]]("")
     hndlrs[[$dn]].SetTmplsDir(baseDir + "/tmpl")
     hndlrs[[$dn]].SetupTmpls()
 
     // Set up default URL handlers
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("\tSetting up the Mux Handlers...\n")
-    [[end]]
+    [[- end ]]
     mux := http.NewServeMux()
 	mux.HandleFunc("/", HndlrHome)
 	mux.HandleFunc("/favicon.ico", HndlrFavIcon)
 
 	[[range $t := $d.Tables -]]
-	    [[ $tn := $t.TitledName -]]
+	    [[ $tn := $t.TitledName ]]
 	    // [[$dn]].[[$tn]] URL handlers for table maintenance
 	    hndlrs[[$dn]][[$tn]] = NewHandlers[[$dn]][[$tn]](io[[$dn]][[$tn]], RowsPerPage, mux)
-	    hndlrs[[$dn]][[$tn]].Tmpls = hndlrs[[$dn]].Tmpls
+	    hndlrs[[$dn]][[$tn]].Tmpls = hndlrs[[$dn]]
         if hndlrs[[$dn]][[$tn]].Tmpls == nil {
             log.Fatalf("ERROR - Failed to load templates from hndlrs[[$dn]]\n\n\n")
         }
-	[[ end -]]
+	[[- end ]]
 
 	// Start the HTTP Server.
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("\tStarting Server at %s:%s...\n", http_srvr, http_port)
-    [[end]]
+    [[- end ]]
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
     [[ if GenMuxWrapper -]]
         s := &http.Server{
