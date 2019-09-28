@@ -8,7 +8,8 @@ MariaDB and MySQL use the same port for communication. So, I changed the default
 port for MariaDB when not being accessed in a docker-compose. Also, each application
 needs a unique port number. We handle that in the test generation. Look in "/misc".
 
-
+Over a period of time, I am going to move the components around to better match the
+"https://github.com/golang-standards/project-layout" standards.
 
 
 

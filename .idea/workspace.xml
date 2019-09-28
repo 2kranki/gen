@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Todo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Notes.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/handlers.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/static.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/static.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
