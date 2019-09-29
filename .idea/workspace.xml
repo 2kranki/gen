@@ -2,11 +2,253 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/jsonSample.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/main_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmd/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/cobj/obj_c.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/cobj/obj_h.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/cobj/obj_int_h.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/cobj/obj_obj_c.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/cobj/obj_test_c.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/DockerBuild.sh.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/base.html.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/bld.sh.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/css.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mariadb/exec.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mariadb/kill.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mariadb/notes.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mariadb/run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mssql/docker-ip.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mssql/exec.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mssql/kill.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mssql/notes.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mssql/pull.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mssql/run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mysql/docker-ip.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mysql/exec.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mysql/kill.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mysql/notes.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/mysql/run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/notes.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/postgres/exec.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/postgres/kill.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/postgres/notes.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dbs/postgres/run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker-compose.yaml.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker/docker.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker/dockerContainer.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker/dockerImage.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker/docker_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/dockerCli.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/docker_test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/form.html.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/go.mod.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/handlers.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/handlers.table.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/handlers.table.test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/handlers.test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/html.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/io.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/io.table.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/io.table.test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/io_test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/list.html.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/main.menu.html.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/mainExecGorillaMux.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/sqlCreateTable.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/sqlLoad.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/sqlLoadCsv.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/static.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/table.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/table.test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/tst.sh.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/tst2.sh.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/update.gohtml.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCObj/dbData.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCObj/genCObj.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCObj/genCObj_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCmn/genCmn.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCmn/genCmn_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCmn/genHtmlFile.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCmn/genTextFile.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCmn/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genCmn/tasks.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbForm/dbForm.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbForm/dbForm_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbForm/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbGener/dbGener.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbGener/dbGener_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbGener/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbJson/dbJson.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbJson/dbJson_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbJson/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMariadb/dbMariadb.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMariadb/dbMariadb_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMariadb/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMssql/dbMssql.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMssql/dbMssql_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMssql/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMysql/dbMysql.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMysql/dbMysql_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbMysql/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbPlugin/dbPlugin.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbPlugin/dbPlugin_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbPlugin/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbPostgres/dbPostgres.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbPostgres/dbPostgres_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbPostgres/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbSqlite/dbSqlite.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbSqlite/dbSqlite_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbSqlite/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbType/dbType.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbType/dbType_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbType/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genHtmlFile.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genTextFile.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/t.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/test/db.json.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/test/main.json.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/mainData/mainData.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/mainData/mainData_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/mainData/test/main.json.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/sharedData/shared.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/sharedData/shared_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Notes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/b.sh" beforeDir="false" afterPath="$PROJECT_DIR$/b.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCObj/dbData.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCObj/genCObj.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCObj/genCObj_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/genCmn.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/genCmn_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/genHtmlFile.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/genTextFile.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genCmn/tasks.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbForm/dbForm.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbForm/dbForm_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbForm/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbGener/dbGener_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbGener/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/dbJson_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbJson/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/dbMariadb_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMariadb/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/dbMssql_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMssql/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/dbMysql_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbMysql/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/dbPlugin_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPlugin/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/dbPostgres_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbPostgres/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/dbSqlite_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbSqlite/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbType/dbType.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbType/dbType_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/dbType/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genHtmlFile.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genSqlApp_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/genTextFile.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/test/db.json.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/genSqlApp/test/main.json.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/go.mod" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/go.sum" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jsonSample.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mainData/mainData.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mainData/mainData_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mainData/test/main.json.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_c.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_h.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_int_h.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_obj_c.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/cobj/obj_test_c.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/DockerBuild.sh.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/base.html.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/bld.sh.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/css.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mariadb/exec.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mariadb/kill.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mariadb/notes.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mariadb/run.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/docker-ip.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/exec.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/kill.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/notes.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/pull.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mssql/run.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mysql/docker-ip.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mysql/exec.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mysql/kill.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mysql/notes.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/mysql/run.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/notes.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/exec.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/kill.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/notes.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dbs/postgres/run.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker-compose.yaml.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker/docker.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker/dockerContainer.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker/dockerImage.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker/docker_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker/t.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/dockerCli.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/docker_test.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/form.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/form.html.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/go.mod.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.fakedb.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.table.test.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/handlers.test.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/html.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.table.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io.table.test.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/io_test.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/list.html.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/main.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/main.menu.html.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/mainExecGorillaMux.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/sqlCreateTable.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/sqlLoad.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/sqlLoadCsv.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/static.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/table.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/table.test.go.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/tst.sh.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/tst2.sh.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/sqlapp/update.gohtml.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/shared.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/shared/shared_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/t.sh" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,7 +283,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -58,11 +300,11 @@
   <component name="RunManager">
     <configuration name="go build " type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="genapp" />
-      <working_directory value="$PROJECT_DIR$/src" />
+      <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i --race" />
       <parameters value="-mdldir ./models -x ../misc/test01sq.exec.json.txt" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/src/main.go" />
+      <filePath value="$PROJECT_DIR$/cmd/main.go" />
       <directory value="$PROJECT_DIR$/" />
       <output_directory value="/tmp/bin" />
       <method v="2" />

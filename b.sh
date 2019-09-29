@@ -9,7 +9,7 @@ fDebug=
 fForce=
 fQuiet=
 pgmname="genapp"
-srcDir="src"
+srcDir="cmd"
 dstDir="/tmp/bin"
 pgmPath="${dstDir}/${pgmname}"
 
@@ -28,16 +28,16 @@ buildApp () {
         rebuild="-a"
     fi
 
-    cd ${srcDir}
+    #cd ${srcDir}
     mkdir -p ${dstDir}
-    test -z "$fQuiet" && echo "...Executing: go build -o ${pgmPath} -v -race ${rebuild}"
-    if go build -o ${pgmPath} -v -race ${rebuild} ; then
+    test -z "$fQuiet" && echo "...Executing: go build -o ${pgmPath} -v -race ${rebuild} ./cmd/*.go"
+    if go build -o ${pgmPath} -v -race ${rebuild} ./cmd/*.go ; then
         test -z "$fQuiet" && echo "...Build was successful!"
     else
         test -z "$fQuiet" && echo "...Build failed!"
         exit 4
     fi
-    cd -
+    #cd -
 
     if [ -x ${pgmPath} ] ; then
         if [ -d "${HOME}/Support" ] ; then
@@ -46,7 +46,7 @@ buildApp () {
             test -z "$fQuiet" && echo "...Installing models in ${HOME}/Support/${pgmname}"
             rm -fr    ${HOME}/Support/${pgmname}
             mkdir -p  ${HOME}/Support/${pgmname}
-            cp -R ./src/models ${HOME}/Support/${pgmname}/
+            cp -R ./models ${HOME}/Support/${pgmname}/
         fi
     fi
 
