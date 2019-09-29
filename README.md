@@ -42,9 +42,17 @@ definition and having them control the generation process.
 - [x] Declare version 0.2
 - [x] Fix sqlite generated code to run in Docker
 - [x] Changed all displays to contain a possible completion message
+- [x] Change structure of application to conform to Go's module/package requirements/standards.
+- [ ] Change handlers that issue text message to issue html page with message
+- [ ] Change haneler test routines to parse generated html and check for data
+- [ ] Add HTTPS support 
+- [ ] Add User Authentication and x- header authentication support
 - [ ] Add support for JSON data to/from HTTP client
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
+- [ ] Declare version 0.3
+- [ ] Add GORM support 
+- [ ] Add SQL Generation for C#/.Net applications 
 
 
 **Usage**:
