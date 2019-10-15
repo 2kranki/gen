@@ -141,9 +141,6 @@ def genapp(szExecFileName, szOutPath):
     except OSError:
         iRc = 4
 
-    if iRc == 0:
-        iRc = genJenkins(szOutPath)
-
     # Return to caller.
     return iRc
 

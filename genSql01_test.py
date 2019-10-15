@@ -88,15 +88,6 @@ class testBuild(TestCase):
         self.assertEqual(iRc, 0)
 
 
-class testJenkins(TestCase):
-    def setUp(self):
-        genSql01.parseArgs(["--debug"])
-
-    def test_one(self):
-        iRc = genSql01.genJenkins("/tmp/app01/app01ma")
-        self.assertEqual(iRc, 0)
-
-
 ################################################################################
 #                           Command-line interface
 ################################################################################
