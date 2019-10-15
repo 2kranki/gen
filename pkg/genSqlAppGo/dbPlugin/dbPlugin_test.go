@@ -6,24 +6,21 @@
 package dbPlugin
 
 import (
+	"genapp/pkg/sharedData"
 	"log"
 	"testing"
-	//"time"
-	"genapp/shared"
 )
-
 
 func TestRegister(t *testing.T) {
 	//var err			error
 	//var str			string
 
-	log.Printf("TestRegister()..\n")
+	log.Printf("dbPlugin::TestRegister()..\n")
 	sharedData.SetDebug(true)
 
 	// Do some form of testing
 
 	//t.Log(logData.String())
-	t.Log("TestRegister: end of test\n")
+	t.Log("dbPlugin::TestRegister: end of test\n")
 
 }
-

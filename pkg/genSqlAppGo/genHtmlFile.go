@@ -6,8 +6,8 @@
 package genSqlAppGo
 
 import (
-	sharedData "genapp/pkg/sharedData"
 	"fmt"
+	sharedData "genapp/pkg/sharedData"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -42,7 +42,7 @@ func GenHtmlFile(mdl *util.Path, outPath *util.Path, data interface{}) error {
 
 	if !sharedData.Noop() {
 		// Delete existing file.
-		if outPath.IsPathRegularFile( ) {
+		if outPath.IsPathRegularFile() {
 			if !sharedData.Replace() {
 				return fmt.Errorf("Error - overwrite error of %s\n", outPath)
 			}

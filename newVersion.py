@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
+# vi:nu:et:sts=4 ts=4 sw=4
 
 
 import      commands
-#import      csv
-#import      decimal
 import      math
 import      optparse
 import      os
@@ -46,7 +45,7 @@ class       execCmd:
 #                   Execute a set of Bash Commands.
 #-------------------------------------------------------------------------------
     def doBashSys( self, oCmds, fIgnoreRC=False ):
-        "Execute a set of Bash Commands."
+        '''Execute a set of Bash Commands.'''
         if oOptions.fDebug:
             print "execCmd::doBashSys(%s)" % ( oCmds )
 
@@ -84,7 +83,7 @@ class       execCmd:
 #                           Execute a System Command.
 #-------------------------------------------------------------------------------
     def doCmd( self, szCmd, fIgnoreRC=False ):
-        "Execute a System Command."
+        '''Execute a System Command.'''
 
         # Do initialization.
         if oOptions.fDebug:
@@ -134,7 +133,7 @@ class       execCmd:
 #                       Execute a list of System Commands.
 #-------------------------------------------------------------------------------
     def doCmds( self, oCmds, fIgnoreRC=False ):
-        "Execute a list of System Commands."
+        '''Execute a list of System Commands.'''
 
         # Make sure that we have a sequence type for the commands.
         import  types
@@ -152,7 +151,7 @@ class       execCmd:
 #           Execute a System Command with output directly to terminal.
 #-------------------------------------------------------------------------------
     def doSys( self, szCmd, fIgnoreRC=False ):
-        "Execute a System Command with output directly to terminal."
+        '''Execute a System Command with output directly to terminal.'''
 
         # Do initialization.
         if oOptions.fDebug:
@@ -227,7 +226,7 @@ class       execCmd:
 #---------------------------------------------------------------------
 
 def getAbsolutePath( szPath ):
-    "Convert Path to an absolute path."
+    '''Convert Path to an absolute path.'''
     if oOptions.fDebug:
         print "getAbsolutePath(%s)" % ( szPath )
 
@@ -251,7 +250,7 @@ def getAbsolutePath( szPath ):
 ################################################################################
 
 def         mainCLI( listArgV=None ):
-    "Command-line interface."
+    '''Command-line interface.'''
     global      oDB
     global      oOptions
     

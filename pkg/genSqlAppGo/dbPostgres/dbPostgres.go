@@ -24,27 +24,27 @@ import (
 	"log"
 )
 
-const(
-	extName="postgres"
+const (
+	extName = "postgres"
 )
 
 // Notes:
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
-var tds	= dbType.TypeDefns {
-	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
-	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
-	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
-	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},
-	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
-	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
+var tds = dbType.TypeDefns{
+	{Name: "date", Html: "date", Sql: "DATE", Go: "string", DftLen: 0},
+	{Name: "datetime", Html: "datetime", Sql: "DATETIME", Go: "string", DftLen: 0},
+	{Name: "email", Html: "email", Sql: "VARCHAR", Go: "string", DftLen: 50},
+	{Name: "dec", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "decimal", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "int", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "integer", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "money", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "number", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "tel", Html: "tel", Sql: "VARCHAR", Go: "string", DftLen: 19}, //+nnn (nnn) nnn-nnnn
+	{Name: "text", Html: "text", Sql: "VARCHAR", Go: "string", DftLen: 0},
+	{Name: "time", Html: "time", Sql: "TIME", Go: "string", DftLen: 0},
+	{Name: "url", Html: "url", Sql: "VARCHAR", Go: "string", DftLen: 50},
 }
 
 //----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ var tds	= dbType.TypeDefns {
 // PluginData defines some of the data for the plugin.  Data within this package may also be
 // used.  However, we use methods based off the PluginData to supply the data or other
 // functionality.
-type	Plugin struct {}
+type Plugin struct{}
 
 // CreateDatabase indicatess if the Database needs to be
 // created before it can be used.
@@ -108,7 +108,7 @@ func (pd *Plugin) DriverName() string {
 }
 
 func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteString("\tstr.WriteStringf(\"CREATE DATABASE %s;\", dbName)\n")
 
@@ -118,7 +118,7 @@ func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 // GenEnvArgDefns generates a check for an environment variable over-ride and
 // over-rides the parsed CLI option if the environment variable is present.
 func (pd Plugin) GenEnvArgDefns(appName string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_PW\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
@@ -146,7 +146,7 @@ func (pd Plugin) GenEnvArgDefns(appName string) string {
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("\tflag.StringVar(&db_pw,\"dbPW\",\"%s\",\"the database password\")\n", pd.DefaultPW())
 	str.WriteStringf("\tflag.StringVar(&db_port,\"dbPort\",\"%s\",\"the database port\")\n", pd.DefaultPort())
@@ -159,7 +159,7 @@ func (pd Plugin) GenFlagArgDefns(name string) string {
 // GenHeader returns any header information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenHeader() string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	return str.String()
 }
@@ -171,7 +171,7 @@ func (pd Plugin) GenImportString() string {
 }
 
 func (pd Plugin) GenRowPageStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	db := t.DB
 
@@ -183,8 +183,8 @@ func (pd Plugin) GenRowPageStmt(t *dbJson.DbTable) string {
 
 // GenSqlBuildConn generates the code to build the connection string that would be
 // issued to sql.Open() which is unique for each database server.
-func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
-	var str			util.StringBuilder
+func (pd *Plugin) GenSqlBuildConn(dbServer, dbPort, dbUser, dbPW, dbName string) string {
+	var str util.StringBuilder
 
 	str.WriteString("\tconnStr := fmt.Sprintf(\"user=%s password='%s' host=%s port=%s \", ")
 	str.WriteString(dbUser)
@@ -206,7 +206,7 @@ func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) str
 // GenTrailer returns any trailer information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenTrailer() string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	return str.String()
 }
@@ -238,8 +238,8 @@ func (pd Plugin) Types() *dbType.TypeDefns {
 // GenDataPlaceHolder generates the string for table columns when a list of them
 // is involved such as used in RowInsert().  Example: "$1, $2, $3"
 func (pd Plugin) GenDataPlaceHolder(tb *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var cnt			int
+	var str util.StringBuilder
+	var cnt int
 
 	// Accumulate field name count.
 	for _, f := range tb.Fields {
@@ -248,9 +248,9 @@ func (pd Plugin) GenDataPlaceHolder(tb *dbJson.DbTable) string {
 		}
 	}
 
-	for i := 0; i<cnt; i++ {
+	for i := 0; i < cnt; i++ {
 		cm := ", "
-		if i == cnt - 1 {
+		if i == cnt-1 {
 			cm = ""
 		}
 		//str.WriteStringf("?%s", cm)
@@ -269,7 +269,7 @@ func (pd Plugin) GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string 
 	keys, _ := tb.Keys()
 	for i, _ := range keys {
 		cm := " AND "
-		if i == len(keys) - 1 {
+		if i == len(keys)-1 {
 			cm = ""
 		}
 		insertStr += fmt.Sprintf("%s %s $%d%s", keys[i], rel, i+1, cm)
@@ -284,9 +284,9 @@ func (pd Plugin) GenKeysPlaceHolder(tb *dbJson.DbTable) string {
 
 	insertStr := ""
 	keys, _ := tb.Keys()
-	for i:=0; i < len(keys); i++ {
+	for i := 0; i < len(keys); i++ {
 		cm := ", "
-		if i == len(tb.Fields) - 1 {
+		if i == len(tb.Fields)-1 {
 			cm = ""
 		}
 		//insertStr += fmt.Sprintf("?%s", cm)
@@ -299,13 +299,12 @@ func (pd Plugin) GenKeysPlaceHolder(tb *dbJson.DbTable) string {
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
-var plug		*Plugin
-var pluginData	*dbPlugin.PluginData
+var plug *Plugin
+var pluginData *dbPlugin.PluginData
 
 func init() {
 	log.Printf("\tRegistering Postgres\n")
 	plug = &Plugin{}
-	pluginData = &dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug}
+	pluginData = &dbPlugin.PluginData{Name: extName, Types: &tds, Plugin: plug}
 	dbPlugin.Register(extName, *pluginData)
 }
-

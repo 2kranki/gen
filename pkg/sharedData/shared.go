@@ -13,19 +13,19 @@ import (
 	"time"
 )
 
-var cmd			string
-var dataPath	string
-var defns		map[string]interface{}
-var funcs		map[string]interface{}
-var mainPath	string
-var	mdlDir		string
-var	outDir		string
+var cmd string
+var dataPath string
+var defns map[string]interface{}
+var funcs map[string]interface{}
+var mainPath string
+var mdlDir string
+var outDir string
 
 func init() {
-	defns  = map[string]interface{}{}
-	funcs  = map[string]interface{}{}
-	mdlDir = "./src/models"
-	outDir = "./src/test"
+	defns = map[string]interface{}{}
+	funcs = map[string]interface{}{}
+	mdlDir = "./models"
+	outDir = "./test"
 	defns["Debug"] = false
 	defns["Force"] = false
 	defns["GenDebugging"] = false
@@ -79,7 +79,7 @@ func Defn(nm string) interface{} {
 	case "outDir":
 		return outDir
 	}
-	 d, _ := defns[nm]
+	d, _ := defns[nm]
 	return d
 }
 
@@ -92,9 +92,9 @@ func IsDefined(nm string) bool {
 }
 
 func SetDefn(nm string, d interface{}) {
-	var ok		bool
-	var sw		bool
-	var str		string
+	var ok bool
+	var sw bool
+	var str string
 
 	switch nm {
 	case "cmd":
@@ -205,7 +205,7 @@ func SetMdlDir(f string) {
 // data definitions optionally replacing any that
 // already exist.
 func MergeFrom(m map[string]interface{}, rep bool) {
-	var ok			bool
+	var ok bool
 
 	for k, v := range m {
 		if rep {
@@ -221,7 +221,7 @@ func MergeFrom(m map[string]interface{}, rep bool) {
 // MergeTo merges the shared into the given map
 // optionally replacing any in the given map.\
 func MergeTo(m map[string]interface{}, rep bool) {
-	var ok			bool
+	var ok bool
 
 	for k, v := range defns {
 		if rep {
@@ -269,16 +269,16 @@ func SetReplace(f bool) {
 // String returns a stringified version of the shared data
 func String() string {
 	s := "{"
-	s += fmt.Sprintf("cmd:%q,",cmd)
-	s += fmt.Sprintf("dataPath:%q,",dataPath)
-	s += fmt.Sprintf("Debug:%v,",defns["Debug"])
-	s += fmt.Sprintf("Force:%v,",defns["Force"])
-	s += fmt.Sprintf("mainPath:%q,",mainPath)
-	s += fmt.Sprintf("mdlDir:%q,",mdlDir)
-	s += fmt.Sprintf("Noop:%v,",defns["Noop"])
-	s += fmt.Sprintf("outDir:%q,",outDir)
-	s += fmt.Sprintf("Quiet:%v,",defns["Quiet"])
-	s += fmt.Sprintf("Time:%q,",defns["Time"])
+	s += fmt.Sprintf("cmd:%q,", cmd)
+	s += fmt.Sprintf("dataPath:%q,", dataPath)
+	s += fmt.Sprintf("Debug:%v,", defns["Debug"])
+	s += fmt.Sprintf("Force:%v,", defns["Force"])
+	s += fmt.Sprintf("mainPath:%q,", mainPath)
+	s += fmt.Sprintf("mdlDir:%q,", mdlDir)
+	s += fmt.Sprintf("Noop:%v,", defns["Noop"])
+	s += fmt.Sprintf("outDir:%q,", outDir)
+	s += fmt.Sprintf("Quiet:%v,", defns["Quiet"])
+	s += fmt.Sprintf("Time:%q,", defns["Time"])
 	s += "}"
 	return s
 }
@@ -291,4 +291,3 @@ func Time() string {
 func SetTime(f string) {
 	defns["Time"] = f
 }
-

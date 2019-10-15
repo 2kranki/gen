@@ -186,6 +186,9 @@ func exec() {
         }
 	[[- end ]]
 
+    // mkdir ssl
+    // openssl req -x509 -days 365 -nodes -newkey rsa:2048 -keyout ./ssl/ssl_key.pem -out ./ssl/ssl_cert.pem
+
 	// Start the HTTP Server.
     [[ if GenDebugging -]]
         log.Printf("\tStarting Server at %s:%s...\n", http_srvr, http_port)

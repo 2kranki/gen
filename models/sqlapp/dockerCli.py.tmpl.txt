@@ -12,20 +12,22 @@ import      os
 import      sys
 import      time
 
-oArgs       = None
-szDesc      = 'Perform various Docker CLI commands'
-szAppName   = '[[$d.Name]]'
-szImageName = '[[$d.Name]]'
-szImageTag  = 'latest'
-szUser      = '[[$d.Plugin.Plugin.DefaultUser]]'
-szPW        = '[[$d.Plugin.Plugin.DefaultPW]]'
-szPortDef   = '[[$d.Plugin.Plugin.DefaultPort]]'
+oArgs           = None
+szDesc          = 'Perform various Docker CLI commands'
+szAppName       = '[[$d.Name]]'
+szImageName     = '[[$d.Name]]'
+szImageTag      = 'latest'
+szUser          = '[[$plg.DefaultUser]]'
+szPW            = '[[$plg.DefaultPW]]'
+szPortDef       = '[[$plg.DefaultPort]]'
 [[ if ne $typ "sqlite" -]]
-szPortDoc   = '[[$d.Plugin.Plugin.DockerPort]]'
+szDbImageName   = '[[$plg.DockerName]]'
+szDbImageTag    = '[[$plg.DockerTag]]'
+szPortDoc       = '[[$plg.DockerPort]]'
 [[- end ]]
-szServer    = '[[$d.Plugin.Plugin.DefaultServer]]'
-szNetwork   = '[[$d.Name]]_net'
-szNetworkSuffix  = 'net'
+szServer        = '[[$plg.DefaultServer]]'
+szNetwork       = '[[$d.Name]]_net'
+szNetworkSuffix = 'net'
 
 
 def getNetName(self, name=None, **kwargs):
@@ -132,7 +134,7 @@ class       Cmds(object):
         return iRc
 
     def cmdDescs(self):
-        """ Build the description of the current commends in this object
+        """ Build the description of the current commands in this object
         """
         szDesc = "Commands:\n"
         for key in sorted(self.oCmdDict.keys()):

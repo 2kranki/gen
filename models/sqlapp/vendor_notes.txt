@@ -1,0 +1,3 @@
+This subdirectory is for vendor packages and data. Normally, it would not be
+included in the git repository.
+

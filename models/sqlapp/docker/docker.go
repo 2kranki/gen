@@ -6,12 +6,10 @@
 // Found:   https://blog.kowalczyk.info/book/go-cookbook.html
 // License: Public Domain
 
-
 /******
 docker image ls -a --format "{{json .}}"
 
  ******/
-
 
 package docker
 
@@ -51,7 +49,7 @@ var (
 type Docker struct {
 }
 
-func (d *Docker) ClientVersion( ) string {
+func (d *Docker) ClientVersion() string {
 	cmd := util.NewExecCmd("docker", "version", "--format", "{{.Client.Version}}")
 	outBytes, err := cmd.RunWithOutput()
 	util.PanicIfErr(err, "cmd.RunWithOutput() for '%s' failed with %s", cmd.CommandString(), err)
@@ -61,8 +59,7 @@ func (d *Docker) ClientVersion( ) string {
 	return s
 }
 
-func NewDocker( ) *Docker {
+func NewDocker() *Docker {
 	d := Docker{}
 	return &d
 }
-

@@ -13,7 +13,7 @@ import (
 	"genapp/pkg/genSqlAppGo/dbJson"
 )
 
-const jsonTestPath = "../../../misc/test01/db.json.txt"
+const jsonTestPath = "../../../misc/test01sq/db.json.txt"
 
 var fld0sql = "\tCustNo\tINT NOT NULL PRIMARY KEY,\n"
 var fld0struct = "\tCustNo\tint64\n"
@@ -23,9 +23,9 @@ var tbl0sql = "DROP TABLE Customer IF EXISTS;\nCREATE TABLE Customer (\n\tCustNo
 var tbl0struct = "type Customer struct {\n\tCustNo\tint64\n\tCustName\tstring\n\tCustAddr1\tstring\n\tCustAddr2\tstring\n\tCustCity\tstring\n\tCustState\tstring\n\tCustZip\tstring\n\tCustCurBal\tfloat64\n}\n"
 
 func TestCreate(t *testing.T) {
-	var err			error
+	var err error
 
-	log.Printf("TestCreate()..\n")
+	log.Printf("dbSqlite::TestCreate()..\n")
 	sharedData.SetDebug(true)
 	sharedData.SetMainPath(jsonTestPath)
 	if err = dbJson.ReadJsonFile(sharedData.MainPath()); err != nil {
@@ -35,33 +35,31 @@ func TestCreate(t *testing.T) {
 		t.Fatalf("TestCreate() SetupPlugin failed: %s\n", err)
 	}
 
-	t.Log("TestCreate: end of test\n")
+	t.Log("...end of dbSqlite::TestCreate\n")
 }
 
 func TestGenSqlOpen(t *testing.T) {
-	var str		    string
-	var plg			= Plugin{}
-	var dataTest	= "\tconnStr := fmt.Sprintf(\"%s\", dbName)\n\tlog.Printf(\"\\tConnecting to %s\\n\", connStr)\n\tdbSql, err = sql.Open(\"sqlite3\", connStr)\n"
+	var str string
+	var plg = Plugin{}
+	var dataTest = "\tconnStr := fmt.Sprintf(\"%s\", dbName)\n"
 
-	log.Printf("TestGenSqlOpen()..\n")
+	log.Printf("dbSqlite::TestGenSqlOpen()..\n")
 
 	sharedData.SetDebug(true)
 	sharedData.SetDefn("GenDebugging", true)
-	str = plg.GenSqlOpen("dbSql", "dbServer", "dbPort", "dbUser", "dbPW", "dbName")
-    t.Log("===")
-    t.Logf("Generated: \"%s\"\n", str)
-    t.Logf("Expected:  \"%s\"\n", dataTest)
-    t.Log("===")
+	str = plg.GenSqlBuildConn("dbServer", "dbPort", "dbUser", "dbPW", "dbName")
+	t.Log("===")
+	t.Logf("Generated: \"%s\"\n", str)
+	t.Logf("Expected:  \"%s\"\n", dataTest)
+	t.Log("===")
 	if len(str) != len(dataTest) {
 		t.Fatalf("TestGenSqlOpen() Invalid generation: length was %d vs %d\n", len(str), len(dataTest))
 	}
-    if str != dataTest {
-        t.Errorf(" generated: %s\n", str)
-        t.Errorf("expected: %s\n", dataTest)
-        t.Fatalf("TestGenSqlOpen() generated data did not match saved data!\n")
+	if str != dataTest {
+		t.Errorf(" generated: %s\n", str)
+		t.Errorf("expected: %s\n", dataTest)
+		t.Fatalf("TestGenSqlOpen() generated data did not match saved data!\n")
 	}
 
-	t.Log("TestGenSqlOpen: end of test\n")
+	t.Log("...end of dbSqlite::TestGenSqlOpen\n")
 }
-
-

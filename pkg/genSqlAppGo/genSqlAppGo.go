@@ -37,19 +37,18 @@ genSqlAppGo
 		- dbForm
 			- Responsible for generating the HTML form data needed to
 				access/manage the database
- */
-
+*/
 
 package genSqlAppGo
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"genapp/pkg/genCmn"
 	_ "genapp/pkg/genSqlAppGo/dbForm"
 	_ "genapp/pkg/genSqlAppGo/dbGener"
 	"genapp/pkg/genSqlAppGo/dbJson"
+	"genapp/pkg/genSqlAppGo/dbPlugin"
 	sharedData "genapp/pkg/sharedData"
 	"log"
 	"os"
@@ -65,12 +64,91 @@ import (
 	"github.com/2kranki/go_util"
 )
 
-
 // FileDefns controls what files are generated.
 var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"bld.sh.txt",
 		[]string{},
 		"b.sh",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_build.py.tmpl.txt",
+		[]string{"jenkins", "build"},
+		"build.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_build_test.py.tmpl.txt",
+		[]string{"jenkins", "build"},
+		"build_test.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_deploy.py.tmpl.txt",
+		[]string{"jenkins", "deploy"},
+		"deploy.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_deploy_test.py.tmpl.txt",
+		[]string{"jenkins", "deploy"},
+		"deploy_test.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_lint.py.tmpl.txt",
+		[]string{"jenkins", "lint"},
+		"lint.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_lint_test.py.tmpl.txt",
+		[]string{"jenkins", "lint"},
+		"lint_test.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_push.py.tmpl.txt",
+		[]string{"jenkins", "push"},
+		"push.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_push_test.py.tmpl.txt",
+		[]string{"jenkins", "push"},
+		"push_test.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_test.py.tmpl.txt",
+		[]string{"jenkins", "test"},
+		"test.py",
+		"text",
+		0755,
+		"one",
+		0,
+	},
+	{"jenkins_test_test.py.tmpl.txt",
+		[]string{"jenkins", "test"},
+		"test_test.py",
 		"text",
 		0755,
 		"one",
@@ -268,6 +346,14 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		"single",
 		2,
 	},
+	{"vendor_notes.txt",
+		[]string{"vendor"},
+		"Notes.txt",
+		"text",
+		0644,
+		"single",
+		0,
+	},
 }
 
 var FileDefs2 []genCmn.FileDefn = []genCmn.FileDefn{
@@ -288,7 +374,7 @@ var FileDefs2 []genCmn.FileDefn = []genCmn.FileDefn{
 // CreateOutputDir creates the output directory on disk given a
 // subdirectory (dir).
 func CreateOutputDir(dir []string, dn string, tn string) error {
-	var err 	error
+	var err error
 	var outPath *util.Path
 
 	mapper := func(placeholderName string) string {
@@ -328,8 +414,8 @@ func CreateOutputDir(dir []string, dn string, tn string) error {
 // CreateOutputDir creates the output directory on disk given a
 // subdirectory (dir).
 func CreateOutputDirs(g *genCmn.GenData) error {
-	var err 	error
-	var outDir	*util.Path
+	var err error
+	var outDir *util.Path
 
 	dn := dbJson.DbStruct().Name
 	if sharedData.Noop() {
@@ -423,6 +509,12 @@ func CreateOutputPath(dir []string, dn, tn, fn string) (*util.Path, error) {
 	}
 	outPath = os.Expand(outPath, mapper)
 	path = util.NewPath(outPath)
+
+	oDirPath := util.NewPath(path.Dir())
+	if !oDirPath.IsPathDir() {
+		oDirPath.CreateDir()
+	}
+
 	if path.IsPathRegularFile() {
 		if !sharedData.Replace() {
 			err = fmt.Errorf("Over-write error of %s!\n", outPath)
@@ -439,8 +531,8 @@ func CreateOutputPath(dir []string, dn, tn, fn string) (*util.Path, error) {
 // SetupFile sets up the task data defining what is to be done and
 // pushes it on the work queue.
 func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error {
-	var err		error
-	var pathIn	*util.Path
+	var err error
+	var pathIn *util.Path
 
 	// Create the input model file path.
 	pathIn, err = g.CreateModelPath(fd.ModelName)
@@ -453,9 +545,8 @@ func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error
 
 	// Now set up to generate the file.
 	switch fd.PerGrp {
-	case 0:
-		// Standard File
-		data := &genCmn.TaskData{FD:&fd, TD:&g.TmplData, PathIn:pathIn, Data:dbJson.DbStruct()}
+	case 0: // Standard File
+		data := &genCmn.TaskData{FD: &fd, TD: &g.TmplData, PathIn: pathIn, Data: dbJson.DbStruct()}
 		// Create the output path
 		data.PathOut, err = CreateOutputPath(fd.FileDir, dbJson.DbStruct().Name, "", fd.FileName)
 		if err != nil {
@@ -466,11 +557,11 @@ func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error
 		}
 		// Generate the file.
 		wrk.PushWork(data)
-	case 2:
-		// Output File is Titled Table Name in Titled Database Name directory
+	case 2: // Output File is Titled Table Name in Titled Database
+		// Name directory
 		dbJson.DbStruct().ForTables(
 			func(v *dbJson.DbTable) {
-				data := &genCmn.TaskData{FD:&fd, TD:&g.TmplData, Table:v, PathIn:pathIn.Copy()}
+				data := &genCmn.TaskData{FD: &fd, TD: &g.TmplData, Table: v, PathIn: pathIn.Copy()}
 				data.PathOut, err = CreateOutputPath(fd.FileDir, dbJson.DbStruct().Name, v.Name, fd.FileName)
 				if err != nil {
 					log.Fatalln(err)
@@ -493,24 +584,110 @@ func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error
 //----------------------------------------------------------------------------
 
 // ReadJsonFiles reads in the two JSON files that define the
-// application to be generated.
+// application to be generated and validates them.
 func ReadJsonFileData(g *genCmn.GenData) error {
 	var err error
+	var db *dbJson.Database
 
-	if err = dbJson.ReadJsonFile(sharedData.DataPath()); err != nil {
-		return errors.New(fmt.Sprintln("Error: Reading Data Json Input:", sharedData.DataPath(), err))
+	db = dbJson.DbStruct()
+	if err = db.ReadJsonFile(sharedData.DataPath()); err != nil {
+		return fmt.Errorf("Error: Reading Data Json Input: %s - %s\n",
+			sharedData.DataPath(), err)
 	}
-	g.TmplData.Data = dbJson.DbStruct()
+	g.TmplData.Data = db
 
-    return nil
+	if err = db.SetupPlugin(); err != nil {
+		return err
+	}
+	if err = db.ValidatePlugin(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// SetupPlugin finds the plugin needed and sets it up within the database.
+func SetupPlugin() error {
+	var err error
+	var intr dbPlugin.SchemaNamer
+	var ok bool
+	var plg dbPlugin.PluginData
+	var db *dbJson.Database
+
+	// Indicate the plugin needed.
+	db = dbJson.DbStruct()
+	if sharedData.Debug() {
+		log.Printf("\t\tSqtype: %s\n", db.SqlType)
+	}
+
+	// Find the plugin for this database.
+	if plg, err = dbPlugin.FindPlugin(db.SqlType); err != nil {
+		return fmt.Errorf("Error: Can't find plugin for %s!\n\n\n", db.SqlType)
+	}
+	if sharedData.Debug() {
+		log.Printf("\t\tPlugin Type: %T\n", plg)
+		log.Printf("\t\tPlugin: %+v\n", plg)
+		log.Printf("\t\tPlugin.Plugin: %+v\n", plg.Plugin)
+	}
+
+	// Validate the Plugin if possible.
+	if plg.Types == nil {
+		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", db.SqlType)
+	}
+
+	// Save the plugin.
+	db.Plugin = plg
+
+	if len(db.Schema) == 0 {
+		intr, ok = plg.Plugin.(dbPlugin.SchemaNamer)
+		if ok {
+			db.Schema = intr.SchemaName()
+		}
+	}
+
+	// Set up the Table Fields so that point to the Plugin Field Type definition.
+	for _, t := range db.Tables {
+		for ii, _ := range t.Fields {
+			t.Fields[ii].Typ = plg.Types.FindDefn(t.Fields[ii].TypeDefn)
+			if t.Fields[ii].Typ == nil {
+				return fmt.Errorf("Error: Invalid Field Type for %s:%s!\n\n\n", t.Name, t.Fields[ii].Name)
+			}
+		}
+	}
+	return nil
+}
+
+// ValidatePlugin checks the JSON built structures for errors with
+// respect to the plugin. This assumes that the data was previously
+// validated.
+func validatePlugin() error {
+	var err error
+	var plg dbPlugin.PluginData
+
+	// Set up Plugin Support for this database type.
+	if plg, err = dbPlugin.FindPlugin(dbJson.DbStruct().SqlType); err != nil {
+		return err
+	}
+
+	for _, t := range dbJson.DbStruct().Tables {
+		for _, f := range t.Fields {
+			td := plg.Types.FindDefn(f.TypeDefn)
+			if td == nil {
+				fmt.Errorf("Error - Could not find Type definition for field: %s  type: %s\n",
+					f.Name, f.TypeDefn)
+			}
+		}
+	}
+
+	return nil
 }
 
 //============================================================================
 //								GenSqlApp
 //============================================================================
 
-func GenSqlApp(inDefns map[string]interface{}) error {
-	var genData		genCmn.GenData
+func Generate(inDefns map[string]interface{}) error {
+	var genData genCmn.GenData
 
 	// Set up genData.
 	genData.Name = "sqlapp"
@@ -522,7 +699,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	genData.TmplData.Data = dbJson.DbStruct()
 
 	if sharedData.Debug() {
-		log.Println("\t sql_app: In Debug Mode")
+		log.Println("\t sqlapp: In Debug Mode")
 		log.Printf("\t  args: %q\n", flag.Args())
 		log.Printf("\tmdldir: %s\n", sharedData.MdlDir())
 	}

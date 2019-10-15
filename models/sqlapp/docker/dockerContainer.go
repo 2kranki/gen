@@ -5,13 +5,11 @@
 // Found:   https://blog.kowalczyk.info/book/go-cookbook.html
 // License: Public Domain
 
-
 /******
 To figure out --format argument, use:
 	docker container <command and parameters> --format='{{json .}}'
 
  ******/
-
 
 package docker
 
@@ -27,14 +25,14 @@ import (
 // name:tag is the external identifier and id is the internal identifier for
 // docker images.
 type ContainerInfo struct {
-	id       	string
-	imageName   string
-	imageTag	string
-	name     	string
-	status		string
+	id        string
+	imageName string
+	imageTag  string
+	name      string
+	status    string
 }
 
-func (c *ContainerInfo) Id( ) string {
+func (c *ContainerInfo) Id() string {
 	return c.id
 }
 
@@ -42,7 +40,7 @@ func (c *ContainerInfo) SetId(s string) {
 	c.id = s
 }
 
-func (c *ContainerInfo) ImageName( ) string {
+func (c *ContainerInfo) ImageName() string {
 	return c.imageName
 }
 
@@ -50,7 +48,7 @@ func (c *ContainerInfo) SetImageName(s string) {
 	c.imageName = s
 }
 
-func (c *ContainerInfo) ImageTag( ) string {
+func (c *ContainerInfo) ImageTag() string {
 	return c.imageTag
 }
 
@@ -58,7 +56,7 @@ func (c *ContainerInfo) SetImageTag(s string) {
 	c.imageTag = s
 }
 
-func (c *ContainerInfo) Name( ) string {
+func (c *ContainerInfo) Name() string {
 	return c.name
 }
 
@@ -66,7 +64,7 @@ func (c *ContainerInfo) SetName(s string) {
 	c.name = s
 }
 
-func (c *ContainerInfo) Status( ) string {
+func (c *ContainerInfo) Status() string {
 	return c.status
 }
 
@@ -74,9 +72,9 @@ func (c *ContainerInfo) SetStatus(s string) {
 	c.status = s
 }
 
-func (i *ContainerInfo) Setup( ) {
+func (i *ContainerInfo) Setup() {
 
-	cmd := util.NewExecCmd("docker", "container","inspect", i.id, "--format", "{{json .}}")
+	cmd := util.NewExecCmd("docker", "container", "inspect", i.id, "--format", "{{json .}}")
 	s, err := cmd.RunWithOutput()
 	util.PanicIfErr(err, "Error - docker container ps -a failed with %s", err)
 	if len(s) > 0 {
@@ -97,7 +95,7 @@ func (c *ContainerInfo) String() string {
 	return c.id + "|" + c.name + ":" + c.tag + " " + c.status
 }
 
-func NewContainerInfo( ) *ContainerInfo {
+func NewContainerInfo() *ContainerInfo {
 	container := &ContainerInfo{}
 	return container
 }
@@ -107,10 +105,10 @@ func NewContainerInfo( ) *ContainerInfo {
 //----------------------------------------------------------------------------
 
 type ContainerInfos struct {
-	containers  	[]*ContainerInfo
+	containers []*ContainerInfo
 }
 
-func (c *ContainerInfos) Containers( ) []*ContainerInfo {
+func (c *ContainerInfos) Containers() []*ContainerInfo {
 	return c.containers
 }
 
@@ -132,8 +130,8 @@ func (c *ContainerInfos) FindImage(name, tag string) *ContainerInfo {
 }
 
 func (i *ContainerInfos) PullImage(name, tag string) error {
-	var err		error
-	var ii		*ContainerInfo
+	var err error
+	var ii *ContainerInfo
 
 	ii = i.FindImage(name, tag)
 	if ii == nil {
@@ -152,8 +150,8 @@ func (i *ContainerInfos) PullImage(name, tag string) error {
 }
 
 func (i *ContainerInfos) RemoveImage(name, tag string) error {
-	var err		error
-	var ii		*ContainerInfo
+	var err error
+	var ii *ContainerInfo
 
 	ii = i.FindImage(name, tag)
 	if ii != nil {
@@ -161,7 +159,7 @@ func (i *ContainerInfos) RemoveImage(name, tag string) error {
 		if len(tag) > 0 {
 			nameTag += ":" + tag
 		}
-		cmd := util.NewExecCmd("docker", "container","rm", nameTag)
+		cmd := util.NewExecCmd("docker", "container", "rm", nameTag)
 		err = cmd.Run()
 		if err == nil {
 			i.Setup()
@@ -171,20 +169,20 @@ func (i *ContainerInfos) RemoveImage(name, tag string) error {
 	return err
 }
 
-func (i *ContainerInfos) Run(imageName,imageTag,portIn,portOut string) {
+func (i *ContainerInfos) Run(imageName, imageTag, portIn, portOut string) {
 
 	if len(imageTag) > 0 {
 		imageName += ":" + imageTag
 	}
 
-	cmd := util.NewExecCmd("docker", "container","run", imageName)
+	cmd := util.NewExecCmd("docker", "container", "run", imageName)
 	s, err := cmd.RunWithOutput()
 	util.PanicIfErr(err, "Error - docker container run failed with %s", err)
 }
 
-func (i *ContainerInfos) Setup( ) {
+func (i *ContainerInfos) Setup() {
 
-	cmd := util.NewExecCmd("docker", "container","ps", "-a", "--format", "{{.ID}}|{{.Names}}|{{.Image}}|{{.Labels}}|{{.Status}}")
+	cmd := util.NewExecCmd("docker", "container", "ps", "-a", "--format", "{{.ID}}|{{.Names}}|{{.Image}}|{{.Labels}}|{{.Status}}")
 	s, err := cmd.RunWithOutput()
 	util.PanicIfErr(err, "Error - docker container ps -a failed with %s", err)
 	if len(s) > 0 {
@@ -201,14 +199,8 @@ func (i *ContainerInfos) Setup( ) {
 	}
 }
 
-func NewContainerInfos( ) *ContainerInfos {
+func NewContainerInfos() *ContainerInfos {
 	images := &ContainerInfos{}
 	images.Setup()
 	return images
 }
-
-
-
-
-
-

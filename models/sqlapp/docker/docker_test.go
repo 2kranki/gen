@@ -12,7 +12,7 @@ import (
 func TestNewContainerInfos(t *testing.T) {
 	//var err			error
 	//var expected	string
-	var containers		*ContainerInfos
+	var containers *ContainerInfos
 
 	t.Log("TestNewContainerInfos()")
 
@@ -28,7 +28,7 @@ func TestNewContainerInfos(t *testing.T) {
 func TestNewImageInfos(t *testing.T) {
 	//var err			error
 	//var expected	string
-	var imgs		*ImageInfos
+	var imgs *ImageInfos
 
 	t.Log("TestNewImageInfos()")
 
@@ -42,9 +42,9 @@ func TestNewImageInfos(t *testing.T) {
 }
 
 func TestPullImage(t *testing.T) {
-	var err			error
+	var err error
 	//var expected	string
-	var imgs		*ImageInfos
+	var imgs *ImageInfos
 
 	t.Log("TestNewImageInfos()")
 	t.Log("\tWarning: This may take a little bit of time!")
@@ -66,4 +66,3 @@ func TestPullImage(t *testing.T) {
 
 	t.Log("\tend: TestNewImageInfos")
 }
-

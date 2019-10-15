@@ -20,8 +20,8 @@
 package dbPlugin
 
 import (
-	"genapp/pkg/genSqlAppGo/dbType"
 	"fmt"
+	"genapp/pkg/genSqlAppGo/dbType"
 	"sync"
 )
 
@@ -31,20 +31,20 @@ import (
 
 // GenBaseStringer is the interface that must be defined minimally for each Database
 // Server module supported.
-type GenBaseStringer	interface {
+type GenBaseStringer interface {
 	GenFlagArgDefns(name string) string
-	GenImportString()	string
+	GenImportString() string
 }
 
 // GenTableCreateStringer is the interface that defines the Table Creation and Deletion
 // methods.
-type GenTableCreateStringer	interface {
+type GenTableCreateStringer interface {
 	GenCreateTableSQL(table interface{}) string
 	GenDeleteTableSQL(table interface{}) string
 }
 
 type SchemaNamer interface {
-	SchemaName()	string
+	SchemaName() string
 }
 
 //============================================================================
@@ -55,12 +55,11 @@ type SchemaNamer interface {
 // plugin must address all the definitions within this structure.  It also
 // provides a consistent external interface used by the rest of the system.
 
-type PluginData	struct {
-	Name			string				// Name of database
-	Types			*dbType.TypeDefns	// Type definitions useable for this database
-	Plugin			interface{}			// Used to supply various interfaces declared above
+type PluginData struct {
+	Name   string            // Name of database
+	Types  *dbType.TypeDefns // Type definitions useable for this database
+	Plugin interface{}       // Used to supply various interfaces declared above
 }
-
 
 //----------------------------------------------------------------------------
 //					Global Plugin Support Functions
@@ -70,8 +69,8 @@ type PluginData	struct {
 // into it is the database name as used in the JSON input (ie mariadb, mssql,
 // mysql, postgresql, sqlite) Each plugin registers with this package at init()
 // insuring that the package is available when needed.
-var plugins		map[string]PluginData
-var mtxPlugins	sync.Mutex
+var plugins map[string]PluginData
+var mtxPlugins sync.Mutex
 
 // FindPlugin returns the Plugin interface for a name if possible. NIL is
 // returned if it is not found.
@@ -120,4 +119,3 @@ func UnregisterAll() {
 		delete(plugins, n)
 	}
 }
-

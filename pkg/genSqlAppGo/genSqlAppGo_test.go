@@ -6,9 +6,9 @@
 package genSqlAppGo
 
 import (
+	"genapp/pkg/genSqlAppGo/dbJson"
 	"genapp/pkg/sharedData"
 	"github.com/2kranki/go_util"
-	"genapp/pkg/genSqlAppGo/dbJson"
 	"log"
 	"os"
 	"testing"
@@ -16,8 +16,8 @@ import (
 )
 
 func TestReadJsonFiles(t *testing.T) {
-	var data        *dbJson.Database
-    var err         error
+	var data *dbJson.Database
+	var err error
 
 	t.Log("TestReadJsonFiles()")
 	sharedData.SetDebug(true)
@@ -27,14 +27,14 @@ func TestReadJsonFiles(t *testing.T) {
 	sharedData.SetMdlDir("../models/")
 	sharedData.SetOutDir("/tmp/gen")
 	sharedData.SetTime(time.Now().Format("Mon Jan _2, 2006 15:04"))
-    sharedData.SetFunc("Time", sharedData.Time)
-    sharedData.SetDataPath("./test/db.json.txt")
-    sharedData.SetMainPath("./test/main.json.txt")
+	sharedData.SetFunc("Time", sharedData.Time)
+	sharedData.SetDataPath("./test/db.json.txt")
+	sharedData.SetMainPath("./test/main.json.txt")
 
 	if err = readJsonFiles(); err != nil {
 		t.Errorf("ReadJsonFile() failed: %s\n", err)
 	}
-    data = dbJson.DbStruct()
+	data = dbJson.DbStruct()
 
 	if data.Name != "Finances" {
 		t.Errorf("ReadJsonFile() failed: Name should be 'Finances' but is '%s'\n", data.Name)
@@ -50,9 +50,9 @@ func TestReadJsonFiles(t *testing.T) {
 }
 
 func TestCreateModelPath(t *testing.T) {
-	var err         error
-	var name        util.Path
-	var name2       util.Path
+	var err error
+	var name util.Path
+	var name2 util.Path
 
 	t.Log("TestCreateModelPath()")
 	sharedData.SetDebug(true)
@@ -62,9 +62,9 @@ func TestCreateModelPath(t *testing.T) {
 	sharedData.SetMdlDir("../models/")
 	sharedData.SetOutDir("/tmp/gen")
 	sharedData.SetTime(time.Now().Format("Mon Jan _2, 2006 15:04"))
-    sharedData.SetFunc("Time", sharedData.Time)
-    sharedData.SetDataPath("./test/db.json.txt")
-    sharedData.SetMainPath("./test/main.json.txt")
+	sharedData.SetFunc("Time", sharedData.Time)
+	sharedData.SetDataPath("./test/db.json.txt")
+	sharedData.SetMainPath("./test/main.json.txt")
 
 	if name, err = createModelPath("../sqlapp/io.table.go.tmpl.txt"); err != nil {
 		t.Errorf("createModelPath() failed: %s\n", err)
@@ -76,7 +76,7 @@ func TestCreateModelPath(t *testing.T) {
 	}
 	t.Logf("\tio.table.go.tmpl.txt -> '%s'\n", name2)
 
-    if name.String() != name2.String() {
+	if name.String() != name2.String() {
 		t.Errorf("createModelPath() file names don't match!\n")
 	}
 
@@ -89,8 +89,8 @@ func TestCreateModelPath(t *testing.T) {
 }
 
 func TestCreateOutputPath(t *testing.T) {
-	var name        util.Path
-    var err         error
+	var name util.Path
+	var err error
 
 	t.Log("TestCreateOutputPath()")
 	sharedData.SetDebug(true)
@@ -100,15 +100,15 @@ func TestCreateOutputPath(t *testing.T) {
 	sharedData.SetMdlDir("../models/")
 	sharedData.SetOutDir("/tmp/gen")
 	sharedData.SetTime(time.Now().Format("Mon Jan _2, 2006 15:04"))
-    sharedData.SetFunc("Time", sharedData.Time)
-    sharedData.SetDataPath("./test/db.json.txt")
-    sharedData.SetMainPath("./test/main.json.txt")
+	sharedData.SetFunc("Time", sharedData.Time)
+	sharedData.SetDataPath("./test/db.json.txt")
+	sharedData.SetMainPath("./test/main.json.txt")
 
 	if name, err = createOutputPath("dir", "dn", "tn", "fn"); err != nil {
 		t.Errorf("createModelPath() failed: %s\n", err)
 	}
 	t.Logf("\t dir/fn -> '%s'\n", name)
-    if name.String() != "/tmp/gen/dir/fn" {
+	if name.String() != "/tmp/gen/dir/fn" {
 		t.Errorf("createOutputPath() file path isn't correct!\n")
 	}
 
@@ -132,10 +132,10 @@ func TestCreateOutputPath(t *testing.T) {
 }
 
 func TestCreateDirs(t *testing.T) {
-	var name        string
-	var err         error
-	var data        *dbJson.Database
-	var fi			os.FileInfo
+	var name string
+	var err error
+	var data *dbJson.Database
+	var fi os.FileInfo
 
 	t.Log("TestCreateDirs()")
 	sharedData.SetDebug(true)
@@ -338,11 +338,11 @@ func TestCreateDirs(t *testing.T) {
 }
 
 func TestCopyDocker(t *testing.T) {
-	var name        string
-	var err         error
-	var data        *dbJson.Database
-	var fi			os.FileInfo
-	var pathIn		util.Path
+	var name string
+	var err error
+	var data *dbJson.Database
+	var fi os.FileInfo
+	var pathIn util.Path
 	var FileDefns2 []FileDefn = []FileDefn{
 		{"docker",
 			"/src/",
@@ -361,7 +361,6 @@ func TestCopyDocker(t *testing.T) {
 			0,
 		},
 	}
-
 
 	t.Log("TestCreateDirs()")
 	sharedData.SetDebug(true)
@@ -406,14 +405,14 @@ func TestCopyDocker(t *testing.T) {
 
 	// Create the input model file path.
 	if pathIn, err = createModelPath(FileDefns2[0].ModelName); err != nil {
-		t.Fatalf("Error: %s: %s\n", pathIn.String(), err.Error()))
+		t.Fatalf("Error: %s: %s\n", pathIn.String(), err.Error())
 	}
 	if sharedData.Debug() {
 		log.Println("\t\tmodelPath=", pathIn)
 	}
 
 	// Standard File
-	data := TaskData{FD:&FileDefns[i], TD:&tmplData, PathIn:pathIn}
+	data := TaskData{FD: &FileDefns[i], TD: &tmplData, PathIn: pathIn}
 	// Create the output path
 	data.PathOut, err = createOutputPath(def.FileDir, tmplData.Data.Name, "", def.FileName)
 	if err != nil {
@@ -426,6 +425,3 @@ func TestCopyDocker(t *testing.T) {
 	data.genFile()
 	t.Log("...End of TestCreateDirs")
 }
-
-
-

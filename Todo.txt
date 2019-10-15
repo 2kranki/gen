@@ -1,3 +1,7 @@
+# vi:nu:et:sts=4 ts=4 sw=4
+
+* https://github.com/gavv/httpexpect
+* docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:latest golangci-lint run -v
 
 * main program
     * Change output structure to conform to github.com/golang-standards/project-layout

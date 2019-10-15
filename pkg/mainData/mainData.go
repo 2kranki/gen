@@ -18,30 +18,30 @@ import (
 )
 
 type MainFlag struct {
-	Name 		string 		`json:"Name,omitempty"`		// External Flag Name
-	Internal 	string 		`json:"Internal,omitempty"`	// Internal Data Name
-	Desc 		string 		`json:"Desc,omitempty"`		// Description
-	FlagType	string 		`json:"Type,omitempty"`		// Flag Type - "bool", "int", "string", "var"
-	Init 		string 		`json:"Init,omitempty"`		// Initial Value
+	Name     string `json:"Name,omitempty"`     // External Flag Name
+	Internal string `json:"Internal,omitempty"` // Internal Data Name
+	Desc     string `json:"Desc,omitempty"`     // Description
+	FlagType string `json:"Type,omitempty"`     // Flag Type - "bool", "int", "string", "var"
+	Init     string `json:"Init,omitempty"`     // Initial Value
 }
 
 type MainUsage struct {
-	Line		string
-	Notes 		[]string
+	Line  string   `json:"Line,omitempty"`
+	Notes []string `json:"Notes,omitempty"`
 }
 
 type MainData struct {
-	Flags		[]MainFlag
-	Usage 		MainUsage
+	Flags []MainFlag `json:"Flags,omitempty"`
+	Usage MainUsage  `json:"Usage,omitempty"`
 }
 
-var	mainStruct	MainData
-var	mainJson	interface{}
+var mainStruct MainData
+var mainJson interface{}
 
 // genFlagVar generates the flag.~Var definition for given
 // CLI variable definition
 func genFlagVar(flg MainFlag) string {
-	var str			strings.Builder
+	var str strings.Builder
 
 	// Now create the string from the names
 	switch flg.FlagType {
@@ -68,10 +68,10 @@ func genFlagVar(flg MainFlag) string {
 		str.WriteString(flg.Name)
 	}
 	str.WriteString(",")
-	str.WriteString(fmt.Sprintf("\"%s\",",flg.Name))
+	str.WriteString(fmt.Sprintf("\"%s\",", flg.Name))
 	if len(flg.Init) > 0 {
 		if flg.FlagType == "string" {
-			str.WriteString(fmt.Sprintf("\"%s\"",flg.Init))
+			str.WriteString(fmt.Sprintf("\"%s\"", flg.Init))
 		} else {
 			str.WriteString(flg.Init)
 		}
@@ -83,7 +83,7 @@ func genFlagVar(flg MainFlag) string {
 		}
 	}
 	if len(flg.Desc) > 0 {
-		str.WriteString(fmt.Sprintf(",\"%s\"",flg.Desc))
+		str.WriteString(fmt.Sprintf(",\"%s\"", flg.Desc))
 	}
 	str.WriteString(")\n")
 
@@ -92,8 +92,8 @@ func genFlagVar(flg MainFlag) string {
 
 // GenEnvSetup generate the O/S Environment declarations.
 func GenEnvSetup(appName string) string {
-	var str			util.StringBuilder
-	var intName		string
+	var str util.StringBuilder
+	var intName string
 
 	for _, v := range mainStruct.Flags {
 		if len(v.Internal) > 0 {
@@ -158,10 +158,10 @@ func MainStruct() *MainData {
 // and stores the generic JSON Table as well as the
 // decoded structs.
 func ReadJsonFileMain(fn string) error {
-	var err 		error
-	var jsonPath 	string
+	var err error
+	var jsonPath string
 
-	jsonPath,_ = filepath.Abs(fn)
+	jsonPath, _ = filepath.Abs(fn)
 	if sharedData.Debug() {
 		log.Println("json path:", jsonPath)
 	}
@@ -184,9 +184,9 @@ func ReadJsonFileMain(fn string) error {
 	return nil
 }
 
-func rowScan(mp map[string]interface{}, ) string {
-	var str			strings.Builder
-	var desc		string
+func rowScan(mp map[string]interface{}) string {
+	var str strings.Builder
+	var desc string
 	//var init		string
 	//var internal	string
 	//var name		string
@@ -206,7 +206,7 @@ func rowScan(mp map[string]interface{}, ) string {
 	// Now create the string from the flag fields
 	str.WriteString(",")
 	if len(desc) > 0 {
-		str.WriteString(fmt.Sprintf(",\"%s\"",desc))
+		str.WriteString(fmt.Sprintf(",\"%s\"", desc))
 	}
 	str.WriteString(")")
 
@@ -216,4 +216,3 @@ func rowScan(mp map[string]interface{}, ) string {
 func Setup(inDefns map[string]interface{}) {
 
 }
-

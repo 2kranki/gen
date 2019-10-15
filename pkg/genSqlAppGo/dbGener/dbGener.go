@@ -14,10 +14,10 @@
 package dbGener
 
 import (
-	"genapp/pkg/sharedData"
+	"fmt"
 	"genapp/pkg/genSqlAppGo/dbJson"
 	"genapp/pkg/genSqlAppGo/dbPlugin"
-	"fmt"
+	"genapp/pkg/sharedData"
 	"log"
 	"strings"
 
@@ -52,7 +52,6 @@ type GenExecErrorChecker interface {
 type GenQueryErrorChecker interface {
 	GenQueryErrorCheck(db *dbJson.Database) string
 }
-
 
 //----------------------------------------------------------------------------
 //                        	Database SQL Interface Support
@@ -150,7 +149,6 @@ type GenFormDataKeyser interface {
 	GenFormDataKeys(tb *dbJson.DbTable) string
 }
 
-
 //----------------------------------------------------------------------------
 //                        	Miscellaneous Interface Support
 //----------------------------------------------------------------------------
@@ -178,15 +176,14 @@ type GenPlaceHolderer interface {
 	GenKeysPlaceHolder(tb *dbJson.DbTable) string
 }
 
-
 //----------------------------------------------------------------------------
 //               Exec/Query Error Processing Interface Support
 //----------------------------------------------------------------------------
 
 func GenExecErrorCheck(db *dbJson.Database) string {
-	var str			util.StringBuilder
-	var intr		GenExecErrorChecker
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenExecErrorChecker
+	var ok bool
 
 	pluginData := db.Plugin.(dbPlugin.PluginData)
 	plugin := pluginData.Plugin
@@ -199,9 +196,9 @@ func GenExecErrorCheck(db *dbJson.Database) string {
 }
 
 func GenQueryErrorCheck(db *dbJson.Database) string {
-	var str			util.StringBuilder
-	var intr		GenQueryErrorChecker
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenQueryErrorChecker
+	var ok bool
 
 	pluginData := db.Plugin.(dbPlugin.PluginData)
 	plugin := pluginData.Plugin
@@ -218,9 +215,9 @@ func GenQueryErrorCheck(db *dbJson.Database) string {
 //----------------------------------------------------------------------------
 
 func GenDatabaseCreateStmt(db *dbJson.Database) string {
-	var str			strings.Builder
-	var intr		GenDatabaseCreateStmter
-	var ok			bool
+	var str strings.Builder
+	var intr GenDatabaseCreateStmter
+	var ok bool
 
 	pluginData := db.Plugin.(dbPlugin.PluginData)
 	plugin := pluginData.Plugin
@@ -235,9 +232,9 @@ func GenDatabaseCreateStmt(db *dbJson.Database) string {
 }
 
 func GenDatabaseDeleteStmt(db *dbJson.Database) string {
-	var str			strings.Builder
-	var intr		GenDatabaseDeleteStmter
-	var ok			bool
+	var str strings.Builder
+	var intr GenDatabaseDeleteStmter
+	var ok bool
 
 	pluginData := db.Plugin.(dbPlugin.PluginData)
 	plugin := pluginData.Plugin
@@ -256,9 +253,9 @@ func GenDatabaseDeleteStmt(db *dbJson.Database) string {
 //----------------------------------------------------------------------------
 
 func GenTableCountStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
-	var intr		GenTableCountStmter
-	var ok			bool
+	var str strings.Builder
+	var intr GenTableCountStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -274,10 +271,10 @@ func GenTableCountStmt(t *dbJson.DbTable) string {
 }
 
 func GenTableCreateStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
-	var intr		GenTableCreateStmter
-	var ok			bool
-	var hasKeys		bool
+	var str strings.Builder
+	var intr GenTableCreateStmter
+	var ok bool
+	var hasKeys bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -289,13 +286,13 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 
 	str.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s%s (\\n", db.Schema, t.Name))
 	for i, _ := range t.Fields {
-		var cm  		string
-		var f			*dbJson.DbField
-		var ft			string
-		var incr		string
-		var nl			string
-		var pk			string
-		var sp			string
+		var cm string
+		var f *dbJson.DbField
+		var ft string
+		var incr string
+		var nl string
+		var pk string
+		var sp string
 
 		f = &t.Fields[i]
 		cm = ""
@@ -310,7 +307,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		td := f.Typ
 		if td == nil {
 			log.Fatalln("Error - Could not find Type definition for field,",
-				f.Name,"type:",f.TypeDefn)
+				f.Name, "type:", f.TypeDefn)
 		}
 		tdd := f.Typ.SqlType()
 
@@ -331,7 +328,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		if f.Incr {
 			if db.SqlType == "postgres" {
 				ft = "SERIAL"
-			} else if db.SqlType == "sqlite"{
+			} else if db.SqlType == "sqlite" {
 				incr = " AUTOINCREMENT"
 			} else {
 				incr = " AUTO_INCREMENT"
@@ -369,9 +366,9 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 }
 
 func GenTableDeleteStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
-	var intr		GenTableDeleteStmter
-	var ok			bool
+	var str strings.Builder
+	var intr GenTableDeleteStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -391,9 +388,9 @@ func GenTableDeleteStmt(t *dbJson.DbTable) string {
 //----------------------------------------------------------------------------
 
 func GenRowDeleteStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
-	var intr		GenRowDeleteStmter
-	var ok			bool
+	var str strings.Builder
+	var intr GenRowDeleteStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -410,9 +407,9 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 }
 
 func GenRowFindStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
-	var intr		GenRowFindStmter
-	var ok			bool
+	var str strings.Builder
+	var intr GenRowFindStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -428,9 +425,9 @@ func GenRowFindStmt(t *dbJson.DbTable) string {
 }
 
 func GenRowFirstStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowFirstStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowFirstStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -448,9 +445,9 @@ func GenRowFirstStmt(t *dbJson.DbTable) string {
 }
 
 func GenRowInsertStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowInsertStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowInsertStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -467,9 +464,9 @@ func GenRowInsertStmt(t *dbJson.DbTable) string {
 }
 
 func GenRowLastStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowLastStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowLastStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -489,16 +486,16 @@ func GenRowLastStmt(t *dbJson.DbTable) string {
 // GenRowLimit defines the interface for generating the LIMIT n option on
 // SELECT.  LIMIT is used in general SQL, but not supported by T-SQL (Microsoft).
 func GenRowLimit(t *dbJson.DbTable, n string) string {
-	var str			util.StringBuilder
-	var intr		GenRowLimiter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowLimiter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
 	plugin := pluginData.Plugin
 	intr, ok = plugin.(GenRowLimiter)
 	if ok {
-		return intr.GenRowLimit(t,  n)
+		return intr.GenRowLimit(t, n)
 	}
 
 	str.WriteStringf("LIMIT %s", n)
@@ -507,9 +504,9 @@ func GenRowLimit(t *dbJson.DbTable, n string) string {
 }
 
 func GenRowNextStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowNextStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowNextStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -529,16 +526,16 @@ func GenRowNextStmt(t *dbJson.DbTable) string {
 // GenRowOffset defines the interface for generating the OFFSET n option on
 // SELECT.  OFFSET has a slightly different grammar on T-SQL (Microsoft).
 func GenRowOffset(t *dbJson.DbTable, n string) string {
-	var str			util.StringBuilder
-	var intr		GenRowOffseter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowOffseter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
 	plugin := pluginData.Plugin
 	intr, ok = plugin.(GenRowOffseter)
 	if ok {
-		return intr.GenRowOffset(t,  n)
+		return intr.GenRowOffset(t, n)
 	}
 
 	str.WriteStringf("OFFSET %s", n)
@@ -547,9 +544,9 @@ func GenRowOffset(t *dbJson.DbTable, n string) string {
 }
 
 func GenRowPageStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowPageStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowPageStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -567,9 +564,9 @@ func GenRowPageStmt(t *dbJson.DbTable) string {
 }
 
 func GenRowPrevStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowPrevStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowPrevStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -587,9 +584,9 @@ func GenRowPrevStmt(t *dbJson.DbTable) string {
 }
 
 func GenRowUpdateStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var intr		GenRowUpdateStmter
-	var ok			bool
+	var str util.StringBuilder
+	var intr GenRowUpdateStmter
+	var ok bool
 
 	db := t.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -611,13 +608,13 @@ func GenRowUpdateStmt(t *dbJson.DbTable) string {
 //----------------------------------------------------------------------------
 
 func GenFormDataDisplay(tb *dbJson.DbTable) string {
-	var str			strings.Builder
-	var lbl			string
-	var m			string
-	var intr		GenFormDataDisplayer
-	var ok			bool
-	var keys  		[]string
-	var err			error
+	var str strings.Builder
+	var lbl string
+	var m string
+	var intr GenFormDataDisplayer
+	var ok bool
+	var keys []string
+	var err error
 
 	db := tb.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -699,11 +696,11 @@ func GenFormDataDisplay(tb *dbJson.DbTable) string {
 }
 
 func GenFormDataKeyGet(tb *dbJson.DbTable) string {
-	var str			strings.Builder
-	var intr		GenFormDataKeyGetter
-	var ok			bool
-	var keys  		[]string
-	var err			error
+	var str strings.Builder
+	var intr GenFormDataKeyGetter
+	var ok bool
+	var keys []string
+	var err error
 
 	db := tb.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -718,18 +715,18 @@ func GenFormDataKeyGet(tb *dbJson.DbTable) string {
 		panic("GenFormDataDisplay: error getting keys!")
 	}
 	for i, _ := range keys {
-		str.WriteString(fmt.Sprintf("\t\t\tkey%d = document.getElementById(\"key%d\").value\n",i,i))
+		str.WriteString(fmt.Sprintf("\t\t\tkey%d = document.getElementById(\"key%d\").value\n", i, i))
 	}
 
 	return str.String()
 }
 
 func GenFormDataKeys(tb *dbJson.DbTable) string {
-	var err			error
-	var str			strings.Builder
-	var intr		GenFormDataKeyser
-	var ok			bool
-	var keys  		[]string
+	var err error
+	var str strings.Builder
+	var intr GenFormDataKeyser
+	var ok bool
+	var keys []string
 
 	db := tb.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -747,9 +744,9 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 		str.WriteString("\"?\"")
 	}
 	for i, _ := range keys {
-		str.WriteString(fmt.Sprintf("+\"key=\"+key%d",i))
+		str.WriteString(fmt.Sprintf("+\"key=\"+key%d", i))
 		//tdd := f.Typ.Html
-		if i < len(keys) - 1 {
+		if i < len(keys)-1 {
 			str.WriteString("+\",\"+")
 		}
 	}
@@ -764,10 +761,10 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 // GenDataPlaceHolder generates the string for table columns when a list of them
 // is involved such as used in RowInsert().  Example: "?, ?, ?"
 func GenDataPlaceHolder(tb *dbJson.DbTable) string {
-	var str			util.StringBuilder
-	var cnt			int
-	var intr		GenPlaceHolderer
-	var ok			bool
+	var str util.StringBuilder
+	var cnt int
+	var intr GenPlaceHolderer
+	var ok bool
 
 	db := tb.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -784,9 +781,9 @@ func GenDataPlaceHolder(tb *dbJson.DbTable) string {
 		}
 	}
 
-	for i := 0; i<cnt; i++ {
+	for i := 0; i < cnt; i++ {
 		cm := ", "
-		if i == cnt - 1 {
+		if i == cnt-1 {
 			cm = ""
 		}
 		str.WriteStringf("?%s", cm)
@@ -800,8 +797,8 @@ func GenDataPlaceHolder(tb *dbJson.DbTable) string {
 // is involved such as used in RowFind(). The expression will always be '=' and will
 // apply to all keys in the table. Example: "key1 = $1 AND key2 = $2"
 func GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
-	var intr		GenPlaceHolderer
-	var ok			bool
+	var intr GenPlaceHolderer
+	var ok bool
 
 	db := tb.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -815,7 +812,7 @@ func GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
 	keys, _ := tb.Keys()
 	for i, _ := range keys {
 		cm := " AND "
-		if i == len(keys) - 1 {
+		if i == len(keys)-1 {
 			cm = ""
 		}
 		insertStr += fmt.Sprintf("%s %s ?%s", keys[i], rel, cm)
@@ -827,8 +824,8 @@ func GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string {
 // GenKeysPlaceHolder generates the string for multiple keys when a list of key
 // is involved such as used in RowFind().  Example: "?, ?, ?"
 func GenKeysPlaceHolder(tb *dbJson.DbTable) string {
-	var intr		GenPlaceHolderer
-	var ok			bool
+	var intr GenPlaceHolderer
+	var ok bool
 
 	db := tb.DB
 	pluginData := db.Plugin.(dbPlugin.PluginData)
@@ -840,9 +837,9 @@ func GenKeysPlaceHolder(tb *dbJson.DbTable) string {
 
 	insertStr := ""
 	keys, _ := tb.Keys()
-	for i:=0; i < len(keys); i++ {
+	for i := 0; i < len(keys); i++ {
 		cm := ", "
-		if i == len(tb.Fields) - 1 {
+		if i == len(tb.Fields)-1 {
 			cm = ""
 		}
 		insertStr += fmt.Sprintf("?%s", cm)
@@ -850,8 +847,6 @@ func GenKeysPlaceHolder(tb *dbJson.DbTable) string {
 	}
 	return insertStr
 }
-
-
 
 //----------------------------------------------------------------------------
 //							Global Support Functions
@@ -880,4 +875,3 @@ func init() {
 	sharedData.SetFunc("GenFormDataKeyGet", GenFormDataKeyGet)
 	sharedData.SetFunc("GenFormDataKeys", GenFormDataKeys)
 }
-

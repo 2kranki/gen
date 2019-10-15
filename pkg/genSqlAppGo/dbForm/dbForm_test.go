@@ -11,13 +11,16 @@ import (
 	"testing"
 )
 
-func TestNew(t *testing.T) {
+func TestNewFormWork(t *testing.T) {
+	var fw *FormWork
 
-	log.Printf("TestNew()..\n")
+	log.Printf("dbForm::TestNewFormWork()..\n")
 	sharedData.SetDebug(true)
 
-	//t.Log(logData.String())
-	t.Log("TestNew: end of test\n")
+	if fw = NewFormWork(nil); fw == nil {
+		t.Errorf("Error: Could not allocate a FormWork object!\n")
+	}
+
+	t.Log("...end of dbForm::TestNewFormWork\n")
 
 }
-

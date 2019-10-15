@@ -14,7 +14,6 @@
 //					or
 // 			@p1 to @pN (ordinal position)
 
-
 /***				T-SQL Examples
 
 	// Create a database.
@@ -47,20 +46,20 @@ import (
 // Notes:
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
-var tds	= dbType.TypeDefns {
-	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"time.Time",	DftLen:0,},
-	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"time.Time",	DftLen:0,},
-	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
-	{Name:"text", 		Html:"text",		Sql:"NVARCHAR",		Go:"string",	DftLen:0,},
-	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"time.Time",	DftLen:0,},
-	{Name:"url", 		Html:"url",			Sql:"TEXT",			Go:"string",	DftLen:50,},
+var tds = dbType.TypeDefns{
+	{Name: "date", Html: "date", Sql: "DATE", Go: "time.Time", DftLen: 0},
+	{Name: "datetime", Html: "datetime", Sql: "DATETIME", Go: "time.Time", DftLen: 0},
+	{Name: "email", Html: "email", Sql: "VARCHAR", Go: "string", DftLen: 50},
+	{Name: "dec", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "decimal", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "int", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "integer", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "money", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "number", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "tel", Html: "tel", Sql: "VARCHAR", Go: "string", DftLen: 19}, //+nnn (nnn) nnn-nnnn
+	{Name: "text", Html: "text", Sql: "NVARCHAR", Go: "string", DftLen: 0},
+	{Name: "time", Html: "time", Sql: "TIME", Go: "time.Time", DftLen: 0},
+	{Name: "url", Html: "url", Sql: "TEXT", Go: "string", DftLen: 50},
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +69,7 @@ var tds	= dbType.TypeDefns {
 // PluginData defines some of the data for the plugin.  Data within this package may also be
 // used.  However, we use methods based off the PluginData to supply the data or other
 // functionality.
-type	Plugin struct {}
+type Plugin struct{}
 
 // CreateDatabase indicatess if the Database needs to be
 // created before it can be used.
@@ -124,7 +123,7 @@ func (pd *Plugin) DriverName() string {
 }
 
 func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteString("\tstr.WriteStringf(\"CREATE DATABASE %s;\", dbName)\n")
 
@@ -132,7 +131,7 @@ func (pd *Plugin) GenDatabaseCreateStmt(db *dbJson.Database) string {
 }
 
 func (pd *Plugin) GenDatabaseDeleteStmt(db *dbJson.Database) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteString("\tstr.WriteStringf(\"IF DB_ID (N'%s') IS NOT NULL\\n\", dbName)")
 	str.WriteString("str.WriteStringf(\"DROP DATABASE %s ;\", dbName)")
@@ -143,7 +142,7 @@ func (pd *Plugin) GenDatabaseDeleteStmt(db *dbJson.Database) string {
 // GenEnvArgDefns generates a check for an environment variable over-ride and
 // over-rides the parsed CLI option if the environment variable is present.
 func (pd Plugin) GenEnvArgDefns(appName string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_PW\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
@@ -169,7 +168,7 @@ func (pd Plugin) GenEnvArgDefns(appName string) string {
 }
 
 func (pd *Plugin) GenExecErrorCheck(db *dbJson.Database) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteString("if err != nil {\n")
 	str.WriteString("\t\textra, ok := err.(ErrorWithExtraInfo)\n")
@@ -184,7 +183,7 @@ func (pd *Plugin) GenExecErrorCheck(db *dbJson.Database) string {
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd *Plugin) GenFlagArgDefns(name string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("\tflag.StringVar(&db_pw,\"dbPW\",\"%s\",\"the database password\")\n", pd.DefaultPW())
 	str.WriteStringf("\tflag.StringVar(&db_port,\"dbPort\",\"%s\",\"the database port\")\n", pd.DefaultPort())
@@ -197,7 +196,7 @@ func (pd *Plugin) GenFlagArgDefns(name string) string {
 // GenHeader returns any header information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenHeader() string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteString("type ErrorWithExtraInfo interface {\n")
 	str.WriteString("\tSQLErrorLineNo() int32\n")
@@ -222,7 +221,7 @@ func (pd *Plugin) GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string
 	keys, _ := tb.Keys()
 	for i, _ := range keys {
 		cm := " AND "
-		if i == len(keys) - 1 {
+		if i == len(keys)-1 {
 			cm = ""
 		}
 		insertStr += fmt.Sprintf("%s %s ?%s", keys[i], rel, cm)
@@ -232,7 +231,7 @@ func (pd *Plugin) GenKeySearchPlaceHolder(tb *dbJson.DbTable, rel string) string
 }
 
 func (pd *Plugin) GenRowFirstStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	db := t.DB
 
@@ -245,7 +244,7 @@ func (pd *Plugin) GenRowFirstStmt(t *dbJson.DbTable) string {
 }
 
 func (pd *Plugin) GenRowLastStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	db := t.DB
 
@@ -260,7 +259,7 @@ func (pd *Plugin) GenRowLastStmt(t *dbJson.DbTable) string {
 // GenRowLimit defines the interface for generating the LIMIT n option on
 // SELECT.  LIMIT is used in general SQL, but not supported by T-SQL (Microsoft).
 func (pd *Plugin) GenRowLimit(t *dbJson.DbTable, n string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	if n == "1" {
 		str.WriteStringf("FETCH NEXT 1 ROW ONLY")
@@ -272,7 +271,7 @@ func (pd *Plugin) GenRowLimit(t *dbJson.DbTable, n string) string {
 }
 
 func (pd *Plugin) GenRowNextStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	db := t.DB
 
@@ -287,7 +286,7 @@ func (pd *Plugin) GenRowNextStmt(t *dbJson.DbTable) string {
 // GenRowOffset defines the interface for generating the OFFSET n option on
 // SELECT.  OFFSET has a slightly different grammar on T-SQL (Microsoft).
 func (pd *Plugin) GenRowOffset(t *dbJson.DbTable, n string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("OFFSET %s ROWS", n)
 
@@ -295,7 +294,7 @@ func (pd *Plugin) GenRowOffset(t *dbJson.DbTable, n string) string {
 }
 
 func (pd *Plugin) GenRowPageStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	db := t.DB
 
@@ -308,22 +307,22 @@ func (pd *Plugin) GenRowPageStmt(t *dbJson.DbTable) string {
 }
 
 func (pd *Plugin) GenRowPrevStmt(t *dbJson.DbTable) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	db := t.DB
 
 	// ORDER BY xx [OFFSET n ROWS [FETCH NEXT n ROWS ONLY]]
 	str.WriteStringf("SELECT * FROM %s%s WHERE %s ORDER BY %s %s;\\n",
 		db.Schema, t.TitledName(), pd.GenKeySearchPlaceHolder(t, "<"), t.KeysList("", " DESC"),
-		pd.GenRowOffset(t, "0"), pd.GenRowLimit(t, "1"))
+		pd.GenRowOffset(t, "0"))
 
 	return str.String()
 }
 
 // GenSqlBuildConn generates the code to build the connection string that would be
 // issued to sql.Open() which is unique for each database server.
-func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
-	var strs		util.StringBuilder
+func (pd *Plugin) GenSqlBuildConn(dbServer, dbPort, dbUser, dbPW, dbName string) string {
+	var strs util.StringBuilder
 
 	strs.WriteString("\tquery := url.Values{}\n")
 	strs.WriteString("\tquery.Add(\"connection+timeout\", \"30\")\n")
@@ -349,8 +348,7 @@ func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) str
 // GenSqlOpen generates the code to issue sql.Open() which is unique
 // for each database server.
 func (pd *Plugin) GenSqlOpen(dbSql string) string {
-	var strs		util.StringBuilder
-
+	var strs util.StringBuilder
 
 	if sharedData.GenDebugging() {
 		strs.WriteStringf("\t\tlog.Printf(\"\\tConnecting to %s using %%s\\n\", connStr)\n", pd.DriverName())
@@ -361,20 +359,20 @@ func (pd *Plugin) GenSqlOpen(dbSql string) string {
 }
 
 func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
-	var str			strings.Builder
-	var hasKeys		bool
+	var str strings.Builder
+	var hasKeys bool
 
 	db := t.DB
 
 	str.WriteString(fmt.Sprintf("CREATE TABLE %s%s (\\n", db.Schema, t.TitledName()))
 	for i, _ := range t.Fields {
-		var cm  		string
-		var f			*dbJson.DbField
-		var ft			string
-		var incr		string
-		var nl			string
-		var pk			string
-		var sp			string
+		var cm string
+		var f *dbJson.DbField
+		var ft string
+		var incr string
+		var nl string
+		var pk string
+		var sp string
 
 		f = &t.Fields[i]
 		cm = ""
@@ -389,7 +387,7 @@ func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
 		td := f.Typ
 		if td == nil {
 			log.Fatalln("Error - Could not find Type definition for field,",
-				f.Name,"type:",f.TypeDefn)
+				f.Name, "type:", f.TypeDefn)
 		}
 		tdd := f.Typ.SqlType()
 
@@ -440,7 +438,7 @@ func (pd *Plugin) GenTableCreateStmt(t *dbJson.DbTable) string {
 // GenTrailer returns any trailer information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenTrailer() string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	return str.String()
 }
@@ -469,13 +467,12 @@ func (pd *Plugin) Types() *dbType.TypeDefns {
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
-var plug		*Plugin
-var pluginData	*dbPlugin.PluginData
+var plug *Plugin
+var pluginData *dbPlugin.PluginData
 
 func init() {
 	log.Printf("\tRegistering MS SQL\n")
 	plug = &Plugin{}
-	pluginData = &dbPlugin.PluginData{Name:"mssql", Types:&tds, Plugin:plug}
+	pluginData = &dbPlugin.PluginData{Name: "mssql", Types: &tds, Plugin: plug}
 	dbPlugin.Register("mssql", *pluginData)
 }
-

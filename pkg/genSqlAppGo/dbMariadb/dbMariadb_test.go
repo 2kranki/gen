@@ -13,21 +13,18 @@ import (
 
 const jsonTestPath = "../misc/"
 
-
 func TestImportString(t *testing.T) {
-	var str			string
+	var str string
 
-	log.Printf("TestImportString()..\n")
+	log.Printf("dbMariadb::TestImportString()..\n")
 	sharedData.SetDebug(true)
 
-	str = ImportString()
+	str = plug.GenImportString()
 	if str != "\"github.com/go-sql-driver/mysql\"" {
 		t.Fatalf("TestImportString() failed: %s should be \"github.com/go-sql-driver/mysql\"\n", str)
 	}
 
 	//t.Log(logData.String())
-	t.Log("TestImportString: end of test\n")
+	t.Log("...end of dbMariadb::TestImportString\n")
 
 }
-
-

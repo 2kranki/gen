@@ -23,10 +23,10 @@ import (
 	"github.com/2kranki/go_util"
 )
 
-var	sd			*util.SharedData
+var sd *util.SharedData
 
 // FileDefns controls what files are generated.
-var FileDefs1 	[]genCmn.FileDefn = []genCmn.FileDefn{
+var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 	{"obj_int_h.txt",
 		[]string{"src"},
 		"${Name}_internal.h",
@@ -69,6 +69,113 @@ var FileDefs1 	[]genCmn.FileDefn = []genCmn.FileDefn{
 	},
 }
 
+//============================================================================
+//								GenCObj Object
+//============================================================================
+
+type GenCObj struct {
+	g *genCmn.GenData
+}
+
+//----------------------------------------------------------------------------
+//								createOutputPath
+//----------------------------------------------------------------------------
+
+// CreateOutputPath creates the output file path for the given file name (fn)
+// and set of zero or more subdirectories. This method creates all necessary
+// subdirectories if they do not already exist.
+func (g *GenCObj) CreateOutputPath(dir []string, fn string) (*util.Path, error) {
+	var err error
+	var outPath *util.Path
+
+	mapper := func(placeholderName string) string {
+		var name = DbStruct().Name
+		switch placeholderName {
+		case "Name":
+			if len(name) > 0 {
+				return name
+			}
+		}
+		return ""
+	}
+
+	outPath, err = g.g.CreateOutputPath(mapper, dir, fn)
+
+	return outPath, err
+}
+
+//----------------------------------------------------------------------------
+//							readJsonFileData
+//----------------------------------------------------------------------------
+
+// ReadJsonFileData reads in the Data JSON file(s) that define the
+// application to be generated.
+func (g *GenCObj) ReadJsonFileData(gd *genCmn.GenData) error {
+	var err error
+
+	if err = ReadJsonFile(sd.DataPath()); err != nil {
+		return fmt.Errorf("Error: Reading Data Json Input:%s %s\n",
+			sd.DataPath(), err.Error())
+	}
+	gd.TmplData.Data = DbStruct()
+
+	return nil
+}
+
+//----------------------------------------------------------------------------
+//							SetupFile
+//----------------------------------------------------------------------------
+
+// SetupFile sets up the task data defining what is to be done and
+// pushes it on the work queue given a File Definition.
+func (g *GenCObj) SetupFile(gd *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error {
+	var err error
+
+	data := &genCmn.TaskData{}
+	data.FD = &fd
+	data.TD = DbStruct()
+	data.Data = DbStruct()
+
+	// Create the input model file path.
+	data.PathIn, err = gd.CreateModelPath(fd.ModelName)
+	if err != nil {
+		return fmt.Errorf("Error: %s: %s\n", data.PathIn.String(), err.Error())
+	}
+	if sd.Debug() {
+		log.Println("\t\tmodelPath=", data.PathIn.String())
+	}
+
+	// Create the output path
+	data.PathOut, err = g.CreateOutputPath(fd.FileDir, fd.FileName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if sd.Debug() {
+		log.Println("\t\t outPath=", data.PathOut)
+	}
+
+	// Generate the file.
+	wrk.PushWork(data)
+
+	return nil
+}
+
+//----------------------------------------------------------------------------
+//								NewGenCObj
+//----------------------------------------------------------------------------
+
+func NewGenCObj() *GenCObj {
+	gc := &GenCObj{}
+	if gc != nil {
+		gc.g = genCmn.NewGenData()
+	}
+	return gc
+}
+
+//----------------------------------------------------------------------------
+//								init
+//----------------------------------------------------------------------------
+
 func init() {
 
 }
@@ -80,14 +187,15 @@ func init() {
 // CreateOutputDir creates the output directory on disk given a
 // subdirectory (dir).
 func CreateOutputDir(g *genCmn.GenData, dir []string) error {
-	var err 	error
+	var err error
 	var outPath *util.Path
 
 	mapper := func(placeholderName string) string {
+		var name = DbStruct().Name
 		switch placeholderName {
 		case "Name":
-			if len(dbStruct.Name) > 0 {
-				return dbStruct.Name
+			if len(name) > 0 {
+				return name
 			}
 		}
 		return ""
@@ -116,8 +224,8 @@ func CreateOutputDir(g *genCmn.GenData, dir []string) error {
 // createOutputDir creates the output directory on disk given a
 // subdirectory (dir).
 func CreateOutputDirs(g *genCmn.GenData) error {
-	var err 	error
-	var outDir	*util.Path
+	var err error
+	var outDir *util.Path
 
 	if sd.Noop() {
 		log.Printf("NOOP -- Skipping Creating directories\n")
@@ -162,12 +270,12 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 //----------------------------------------------------------------------------
 
 func CreateOutputFilePath(name string, dir []string, fn string) (*util.Path, error) {
-	var outPath 	*util.Path
+	var outPath *util.Path
 
 	mapper := func(varSub string) string {
 		switch varSub {
 		case "Name":
-			return name
+			return DbStruct().Name
 		}
 		return ""
 	}
@@ -203,7 +311,6 @@ func ReadJsonFileData(g *genCmn.GenData) error {
 	}
 	g.TmplData.Data = DbStruct()
 
-
 	return nil
 }
 
@@ -214,7 +321,7 @@ func ReadJsonFileData(g *genCmn.GenData) error {
 // SetupFile sets up the task data defining what is to be done and
 // pushes it on the work queue.
 func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error {
-	var err		error
+	var err error
 
 	data := &genCmn.TaskData{}
 	data.FD = &fd
@@ -249,8 +356,8 @@ func SetupFile(g *genCmn.GenData, fd genCmn.FileDefn, wrk *util.WorkQueue) error
 //								GenCObj
 //============================================================================
 
-func GenCObj(inDefns map[string]interface{}) error {
-	var genData		genCmn.GenData
+func Generate(inDefns map[string]interface{}) error {
+	var genData genCmn.GenData
 
 	genData.Name = "cobj"
 	genData.Mapper = func(varSub string) string {

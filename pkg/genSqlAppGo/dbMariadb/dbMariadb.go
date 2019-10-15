@@ -16,27 +16,27 @@ import (
 	"github.com/2kranki/go_util"
 )
 
-const(
-	extName="mariadb"
+const (
+	extName = "mariadb"
 )
 
 // Notes:
 //	* We are now using a Decimal Package for support of decimal operations including
 //		monetary calculations via https://github.com/ericlagergren/decimal
-var tds	= dbType.TypeDefns {
-	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
-	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
-	{Name:"email", 		Html:"email", 		Sql:"VARCHAR", 		Go:"string",	DftLen:50,},
-	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
-	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int64",		DftLen:0,},
-	{Name:"tel", 		Html:"tel",			Sql:"VARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
-	{Name:"text", 		Html:"text",		Sql:"VARCHAR",		Go:"string",	DftLen:0,},
-	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
-	{Name:"url", 		Html:"url",			Sql:"VARCHAR",		Go:"string",	DftLen:50,},
+var tds = dbType.TypeDefns{
+	{Name: "date", Html: "date", Sql: "DATE", Go: "string", DftLen: 0},
+	{Name: "datetime", Html: "datetime", Sql: "DATETIME", Go: "string", DftLen: 0},
+	{Name: "email", Html: "email", Sql: "VARCHAR", Go: "string", DftLen: 50},
+	{Name: "dec", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "decimal", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "int", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "integer", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "money", Html: "number", Sql: "DEC", Go: "float64", DftLen: 0},
+	{Name: "number", Html: "number", Sql: "INT", Go: "int64", DftLen: 0},
+	{Name: "tel", Html: "tel", Sql: "VARCHAR", Go: "string", DftLen: 19}, //+nnn (nnn) nnn-nnnn
+	{Name: "text", Html: "text", Sql: "VARCHAR", Go: "string", DftLen: 0},
+	{Name: "time", Html: "time", Sql: "TIME", Go: "string", DftLen: 0},
+	{Name: "url", Html: "url", Sql: "VARCHAR", Go: "string", DftLen: 50},
 }
 
 //----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ var tds	= dbType.TypeDefns {
 // PluginData defines some of the data for the plugin.  Data within this package may also be
 // used.  However, we use methods based off the PluginData to supply the data or other
 // functionality.
-type	Plugin struct {
+type Plugin struct {
 }
 
 // CreateDatabase indicates that the Database needs to be
@@ -103,7 +103,7 @@ func (pd *Plugin) DriverName() string {
 // GenEnvArgDefns generates a check for an environment variable over-ride and
 // over-rides the parsed CLI option if the environment variable is present.
 func (pd Plugin) GenEnvArgDefns(appName string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("\twrk = os.Getenv(\"%s_DB_PW\")\n", appName)
 	str.WriteString("\tif len(wrk)>0 {\n")
@@ -131,7 +131,7 @@ func (pd Plugin) GenEnvArgDefns(appName string) string {
 // GenFlagArgDefns generates a string that defines the various CLI options to allow the
 // user to modify the connection string parameters for the Database connection.
 func (pd Plugin) GenFlagArgDefns(name string) string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	str.WriteStringf("\tflag.StringVar(&db_pw,\"dbPW\",\"%s\",\"the database password\")\n", pd.DefaultPW())
 	str.WriteStringf("\tflag.StringVar(&db_port,\"dbPort\",\"%s\",\"the database port\")\n", pd.DefaultPort())
@@ -144,7 +144,7 @@ func (pd Plugin) GenFlagArgDefns(name string) string {
 // GenHeader returns any header information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenHeader() string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	return str.String()
 }
@@ -157,8 +157,8 @@ func (pd Plugin) GenImportString() string {
 
 // GenSqlBuildConn generates the code to build the connection string that would be
 // issued to sql.Open() which is unique for each database server.
-func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) string {
-	var strs		util.StringBuilder
+func (pd *Plugin) GenSqlBuildConn(dbServer, dbPort, dbUser, dbPW, dbName string) string {
+	var strs util.StringBuilder
 
 	strs.WriteString("cfg := mysql.NewConfig()\n")
 	strs.WriteString("\tcfg.User = io.dbUser\n")
@@ -173,7 +173,7 @@ func (pd *Plugin) GenSqlBuildConn(dbServer,dbPort,dbUser,dbPW,dbName string) str
 // GenTrailer returns any trailer information needed for I/O.
 // This is included in both Database I/O and Table I/O.
 func (pd *Plugin) GenTrailer() string {
-	var str			util.StringBuilder
+	var str util.StringBuilder
 
 	return str.String()
 }
@@ -202,13 +202,12 @@ func (pd Plugin) Types() *dbType.TypeDefns {
 //							Global Support Functions
 //----------------------------------------------------------------------------
 
-var plug		*Plugin
-var pluginData	*dbPlugin.PluginData
+var plug *Plugin
+var pluginData *dbPlugin.PluginData
 
 func init() {
 	log.Printf("\tRegistering MariaDB\n")
 	plug = &Plugin{}
-	pluginData = &dbPlugin.PluginData{Name:extName, Types:&tds, Plugin:plug}
+	pluginData = &dbPlugin.PluginData{Name: extName, Types: &tds, Plugin: plug}
 	dbPlugin.Register(extName, *pluginData)
 }
-

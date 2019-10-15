@@ -6,8 +6,8 @@
 package genCmn
 
 import (
-	"genapp/pkg/sharedData"
 	"fmt"
+	"genapp/pkg/sharedData"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -17,8 +17,8 @@ import (
 )
 
 func GenTextFile(mdl *util.Path, outPath *util.Path, data interface{}) error {
-	var err	    error
-	var tmpl	*template.Template
+	var err error
+	var tmpl *template.Template
 
 	log.Printf("\tGenTextFile mdl:%s fn:%s ...", mdl.String(), outPath.String())
 
@@ -42,7 +42,7 @@ func GenTextFile(mdl *util.Path, outPath *util.Path, data interface{}) error {
 	// Save the generated file to the output file path.
 	if !sharedData.Noop() {
 		// Delete existing file.
-		if outPath.IsPathRegularFile( ) {
+		if outPath.IsPathRegularFile() {
 			if !sharedData.Replace() {
 				return fmt.Errorf("Error - overwrite error of %s\n", outPath)
 			}

@@ -22,21 +22,20 @@ import (
 )
 
 var (
-	debug    		bool
-	execPath 		string
-	force    		bool
-	genDebugging	bool
-	genLogging		bool
-	genMuxWrapper	bool
-	jsonPath 		string
-	mainPath 		string
-	mdldir   		string
-	noop     		bool
-	outdir   		string
-	quiet    		bool
-	replace    		bool
+	debug         bool
+	execPath      string
+	force         bool
+	genDebugging  bool
+	genLogging    bool
+	genMuxWrapper bool
+	jsonPath      string
+	mainPath      string
+	mdldir        string
+	noop          bool
+	outdir        string
+	quiet         bool
+	replace       bool
 )
-
 
 var defns map[string]interface{}
 
@@ -54,7 +53,7 @@ func (t *defineFlags) Set(value string) error {
 var defnFlags defineFlags
 
 func ChkSetMdlDir(s string) {
-	var path	*util.Path
+	var path *util.Path
 
 	if len(s) == 0 {
 		s = "./models"
@@ -111,8 +110,8 @@ func SetupShared(execPath string, cmd string) error {
 	if len(execPath) > 0 {
 		jsonOut, err = util.ReadJsonFile(execPath)
 		if err != nil {
-			return errors.New(fmt.Sprintln("Error: Exec JSON,",execPath,", " +
-												"file did not unmarshal properly:", err))
+			return errors.New(fmt.Sprintln("Error: Exec JSON,", execPath, ", "+
+				"file did not unmarshal properly:", err))
 		}
 		if debug {
 			fmt.Println("\tData:", jsonOut)
@@ -167,7 +166,7 @@ func SetupShared(execPath string, cmd string) error {
 }
 
 func main() {
-	var err 		error
+	var err error
 
 	flag.Usage = usage
 	flag.BoolVar(&debug, "debug", true, "enable debugging")
@@ -180,7 +179,7 @@ func main() {
 	flag.BoolVar(&genMuxWrapper, "genMuxWrapper", true, "generate a wrapper around the mux")
 	flag.StringVar(&mainPath, "main", "", "set json main input path")
 	flag.StringVar(&jsonPath, "json", "", "set json main input path")
-	flag.StringVar(&mdldir, "mdldir", "./src/models", "set model input directory")
+	flag.StringVar(&mdldir, "mdldir", "./models", "set model input directory")
 	flag.BoolVar(&noop, "noop", false, "execute program, but do not make real changes")
 	flag.StringVar(&outdir, "outdir", "/tmp", "set output directory")
 	flag.BoolVar(&quiet, "quiet", false, "enable quiet mode")
@@ -200,13 +199,13 @@ func main() {
 
 	// Execute the command
 	if debug {
-		log.Println("\tcmd: '",sharedData.Cmd(),"'")
+		log.Println("\tcmd: '", sharedData.Cmd(), "'")
 	}
 	switch sharedData.Cmd() {
 	case "cobj":
-		err = genCObj.GenCObj(defns)
-	case "sqlapp":
-		err = genSqlAppGo.GenSqlApp(defns)
+		err = genCObj.Generate(defns)
+	case "sqlappgo":
+		err = genSqlAppGo.Generate(defns)
 	default:
 		fmt.Println("\nError: command must be 'cobj' or 'sqlapp'")
 	}

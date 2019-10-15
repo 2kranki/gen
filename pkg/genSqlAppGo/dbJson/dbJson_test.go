@@ -3,23 +3,18 @@
 
 // Test Generate SQL Application Generator
 
+// Warning: We can not check the plugin portion because it causes
+// circular imports. dbJson is imported into each of the plugins.
+
 package dbJson
 
 import (
 	"genapp/pkg/sharedData"
 	"log"
 	"testing"
-	// Include the various Database Plugins so that they will register
-	// with dbPlugin.
-	_ "genapp/pkg/genSqlAppGo/dbMariadb"
-	_ "genapp/pkg/genSqlAppGo/dbMssql"
-	_ "genapp/pkg/genSqlAppGo/dbMysql"
-	_ "genapp/pkg/genSqlAppGo/dbPostgres"
-	_ "genapp/pkg/genSqlAppGo/dbSqlite"
 )
 
-const jsonTestPath = "../../../misc/test01/db.json.txt"
-
+const jsonTestPath = "../../../misc/test01sq/db.json.txt"
 
 //----------------------------------------------------------------------------
 //								TestTableNames
@@ -29,13 +24,13 @@ func TestTableNames(t *testing.T) {
 	//var err			error
 	//var str			string
 
-	log.Printf("TableNames()..\n")
+	log.Printf("dbJson::TableNames()..\n")
 	sharedData.SetDebug(true)
 
 	// Do some form of testing
 
 	//t.Log(logData.String())
-	t.Log("TableNames: end of test\n")
+	t.Log("dbJson::TableNames: end of test\n")
 
 }
 
@@ -44,15 +39,15 @@ func TestTableNames(t *testing.T) {
 //----------------------------------------------------------------------------
 
 func TestReadJsonFile(t *testing.T) {
-	var err			error
-	var keys		[]string
+	var err error
+	var keys []string
 
-	t.Logf("TestReadJsonFile()..\n")
+	t.Logf("dbJson::TestReadJsonFile()..\n")
 	sharedData.SetDebug(true)
 	sharedData.SetMainPath(jsonTestPath)
 	err = ReadJsonFile(sharedData.MainPath())
 	if err != nil {
-		t.Fatalf("TestReadJsonFile() Reading Main JSON failed: %s: %s\n", sharedData.MainPath(),err.Error())
+		t.Fatalf("TestReadJsonFile() Reading Main JSON failed: %s: %s\n", sharedData.MainPath(), err.Error())
 	}
 	if err = ValidateData(); err != nil {
 		t.Fatalf("TestReadJsonFile() Validation failed: %s'\n", sharedData.MainPath())
@@ -73,14 +68,11 @@ func TestReadJsonFile(t *testing.T) {
 	if len(keys) != 1 {
 		t.Fatalf("TestReadJsonFile() failed: invalid keys length\n")
 	}
-	if keys[0] != "Num" {
+	if keys[0] != "num" {
 		t.Fatalf("TestReadJsonFile() failed: invalid keys data\n")
 	}
 
 	//t.Log(logData.String())
-	t.Logf("TestReadJsonFile: end of test\n")
+	t.Logf("dbJson::TestReadJsonFile: end of test\n")
 
 }
-
-
-

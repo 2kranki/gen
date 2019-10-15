@@ -1,5 +1,5 @@
 {
-    "cmd":"sqlapp",
+    "cmd":"sqlappgo",
     "data":"./misc/test01ma/db.json.txt",
     "debug":true,
     "force":false,

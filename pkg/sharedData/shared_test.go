@@ -5,7 +5,7 @@
 
 package sharedData
 
-import	"testing"
+import "testing"
 
 func TestDataPath(t *testing.T) {
 	SetDataPath("xyzzy")
@@ -13,7 +13,7 @@ func TestDataPath(t *testing.T) {
 		t.Errorf("TestDataPath() failed: should be 'xyzzy' but is %s\n", DataPath())
 	}
 	SetDataPath("abc")
-	if DataPath() != "abc"{
+	if DataPath() != "abc" {
 		t.Errorf("TestDataPath() failed: should be 'abc' but is %s\n", DataPath())
 	}
 }
@@ -33,12 +33,12 @@ func TestDefn(t *testing.T) {
 	if Defn("mdlDir") != "./models" {
 		t.Errorf("TestMainPath() failed: should be './models' but is %s\n", Defn("mdlDir"))
 	}
-	SetDefn("mdlDir","xyzzy")
+	SetDefn("mdlDir", "xyzzy")
 	if Defn("mdlDir") != "xyzzy" {
 		t.Errorf("TestMainPath() failed: should be 'xyzzy' but is %s\n", Defn("mdlDir"))
 	}
-	SetDefn("mdlDir","abc")
-	if Defn("mdlDir") != "abc"{
+	SetDefn("mdlDir", "abc")
+	if Defn("mdlDir") != "abc" {
 		t.Errorf("TestMainPath() failed: should be 'abc' but is %s\n", Defn("mdlDir"))
 	}
 }
@@ -60,7 +60,7 @@ func TestMainPath(t *testing.T) {
 		t.Errorf("TestMainPath() failed: should be 'xyzzy' but is %s\n", MainPath())
 	}
 	SetMainPath("abc")
-	if MainPath() != "abc"{
+	if MainPath() != "abc" {
 		t.Errorf("TestMainPath() failed: should be 'abc' but is %s\n", MainPath())
 	}
 }
@@ -71,7 +71,7 @@ func TestMdlDir(t *testing.T) {
 		t.Errorf("TestMdlDir() failed: should be 'xyzzy' but is %s\n", MdlDir())
 	}
 	SetMdlDir("abc")
-	if MdlDir() != "abc"{
+	if MdlDir() != "abc" {
 		t.Errorf("TestMdlDir() failed: should be 'abc' but is %s\n", MdlDir())
 	}
 }
@@ -93,7 +93,7 @@ func TestOutDir(t *testing.T) {
 		t.Errorf("TestOutDir() failed: should be 'xyzzy' but is %s\n", OutDir())
 	}
 	SetOutDir("abc")
-	if OutDir() != "abc"{
+	if OutDir() != "abc" {
 		t.Errorf("TestOutDir() failed: should be 'abc' but is %s\n", OutDir())
 	}
 }
@@ -108,4 +108,3 @@ func TestQuiet(t *testing.T) {
 		t.Errorf("TestQuiet() failed: should be false but is true\n")
 	}
 }
-

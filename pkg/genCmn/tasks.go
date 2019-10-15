@@ -12,12 +12,11 @@
 //		structures well especially arrays of structures within
 //		structures.
 
-
 package genCmn
 
 import (
-	"genapp/pkg/sharedData"
 	"fmt"
+	"genapp/pkg/sharedData"
 	"io"
 	"log"
 	"os"
@@ -30,17 +29,16 @@ import (
 //============================================================================
 
 type TaskData struct {
-	FD			*FileDefn
-	TD			interface{}
-	PathIn	  	*util.Path					// Input File Path
-	PathOut	  	*util.Path					// Output File Path
-	Data		interface{}
-	Table		interface{}
-
+	FD      *FileDefn
+	TD      interface{}
+	PathIn  *util.Path // Input File Path
+	PathOut *util.Path // Output File Path
+	Data    interface{}
+	Table   interface{}
 }
 
 func (t *TaskData) genFile() {
-	var err         error
+	var err error
 
 	if t.PathOut == nil {
 		log.Fatalf("Error - Missing output path for %s!\n", t.PathIn.String())
@@ -117,7 +115,6 @@ func (t *TaskData) genFile() {
 			t.FD.ModelName, err.Error())
 	}
 
-
 }
 
 //----------------------------------------------------------------------------
@@ -125,14 +122,14 @@ func (t *TaskData) genFile() {
 //----------------------------------------------------------------------------
 
 func (t *TaskData) copyDir(modelPath, outPath *util.Path) error {
-	var err 	error
-	var base	string
-	var pathOut	*util.Path
+	var err error
+	var base string
+	var pathOut *util.Path
 
-	if !modelPath.IsPathDir( ) {
+	if !modelPath.IsPathDir() {
 		return fmt.Errorf("Error - model directory, %s, does not exist!\n", modelPath.String())
 	}
-	base = modelPath.Base( )
+	base = modelPath.Base()
 	if len(base) == 0 {
 		return fmt.Errorf("Error - model directory, %s, does not have base directory!\n", modelPath.String())
 	}
@@ -140,17 +137,17 @@ func (t *TaskData) copyDir(modelPath, outPath *util.Path) error {
 	pathOut = outPath.Append(base)
 	log.Printf("\tcopyDir:  inPath: %s\n", modelPath.String())
 	log.Printf("\tcopyDir: outPath: %s base: %s\n", pathOut.String(), base)
-	if outPath.IsPathDir( ) {
+	if outPath.IsPathDir() {
 		if sharedData.Replace() {
 			log.Printf("\tcopyDir: Removing %s\n", pathOut.String())
-			if err = pathOut.RemoveDir( ); err != nil {
+			if err = pathOut.RemoveDir(); err != nil {
 				return fmt.Errorf("Error - could not delete %s: %s\n", pathOut.String(), err.Error())
 			}
 		} else {
 			return fmt.Errorf("Error - overwrite error of %s\n", pathOut.String())
 		}
 	}
-	pathOut = pathOut.Append("")		// Add trailing path separator.
+	pathOut = pathOut.Append("") // Add trailing path separator.
 
 	err = util.CopyDir(modelPath, pathOut)
 
@@ -166,11 +163,11 @@ func (t *TaskData) copyFile(modelPath, outPath *util.Path) (int64, error) {
 	var err error
 	var src *os.File
 
-	if !modelPath.IsPathRegularFile( ) {
+	if !modelPath.IsPathRegularFile() {
 		return 0, fmt.Errorf("Error - model file does not exist for %s: %s\n", modelPath.String(), err.Error())
 	}
 
-	if outPath.IsPathRegularFile( ) {
+	if outPath.IsPathRegularFile() {
 		if !sharedData.Replace() {
 			return 0, fmt.Errorf("Error - overwrite error of %s\n", outPath.String())
 		}
@@ -189,5 +186,3 @@ func (t *TaskData) copyFile(modelPath, outPath *util.Path) (int64, error) {
 
 	return amt, err
 }
-
-

@@ -3,15 +3,15 @@
 {
     "Name":"Finances",
     "SqlType":"sqlite",         # mariadb | mssql | mysql | postgres | sqlite (required)
-    "dbServer":"test.db",      # sqlite
+    "dbServer":"test.db",       # sqlite
     //"dbServer":"localhost",
-    "dbPort":"4306",            # mariadb  default port
+    #"dbPort":"4306",           # mariadb  default port
     #"dbPort":"1433",           # mssql    default port
     #"dbPort":"3306",           # mysql    default port
-    #"dbPort":"5432",            # postgres default port
-    #"dbPort":"",               # sqlite   default port
+    #"dbPort":"5432",           # postgres default port
+    "dbPort":"",                # sqlite   default port
     "dbPW":"Passw0rd!",
-    "User":"sa",                # NOT sqlite
+    #"User":"sa",               # NOT sqlite
     "GenDebugging":true,
     "GenLogging":true,
     "Tables":[

@@ -1,15 +1,21 @@
 // See License.txt in main repository directory
 
 // dbJson contains the database definitions as defined
-// by the user.
+// by the user in the json.
+
+// Notes:
+//	*	The methods assume that ValidateData() has been executed and
+//		generally do little error checking.
+//	*	The tables are not fully functional until the plugin has been
+//		determined and linked into the tables.
 
 package dbJson
 
 import (
-	"genapp/pkg/sharedData"
+	"fmt"
 	"genapp/pkg/genSqlAppGo/dbPlugin"
 	"genapp/pkg/genSqlAppGo/dbType"
-	"fmt"
+	"genapp/pkg/sharedData"
 	"log"
 	"path/filepath"
 	"sort"
@@ -26,34 +32,34 @@ import (
 // DbField defines a Table's field mostly in terms of
 // SQL.
 type DbField struct {
-	Name		string				`json:"Name,omitempty"`			// Field Name
-	Label		string				`json:"Label,omitempty"`		// Form Label
-	TypeDefn	string				`json:"TypeDef,omitempty"`		// Type Definition
-	Len		    int		    		`json:"Len,omitempty"`			// Data Maximum Length
-	Dec		    int		    		`json:"Dec,omitempty"`			// Decimal Positions
-	KeyNum  	int	    			`json:"KeyNum,omitempty"`		// If not a key field, then 0. Otherwise, 1 for
+	Name     string `json:"Name,omitempty"`    // Field Name
+	Label    string `json:"Label,omitempty"`   // Form Label
+	TypeDefn string `json:"TypeDef,omitempty"` // Type Definition
+	Len      int    `json:"Len,omitempty"`     // Data Maximum Length
+	Dec      int    `json:"Dec,omitempty"`     // Decimal Positions
+	KeyNum   int    `json:"KeyNum,omitempty"`  // If not a key field, then 0. Otherwise, 1 for
 	//																// highest level key, 2 for 2nd highest, ...
-	Hidden		bool	    		`json:"Hidden,omitempty"`		// Do not display in the browser
-	Nullable	bool				`json:"Null,omitempty"`			// Add NULL for this field
-	Unique		bool				`json:"Unique,omitempty"`		// Add UNIQUE to this field
-	Incr		bool				`json:"Incr,omitempty"`			// true == Auto Increment Field
-	SQLParms	string				`json:"SQLParms,omitempty"`		// Extra SQL Parameters
-	List		bool	    		`json:"List,omitempty"`			// Include in List Report
-	Tbl			*DbTable			`json:"-"`						// (ignored)  Filled in after JSON is parsed
-	Typ			*dbType.TypeDefn	`json:"-"`						// (ignored) Filled in after JSON is parsed
+	Hidden   bool             `json:"Hidden,omitempty"`   // Do not display in the browser
+	Nullable bool             `json:"Null,omitempty"`     // Add NULL for this field
+	Unique   bool             `json:"Unique,omitempty"`   // Add UNIQUE to this field
+	Incr     bool             `json:"Incr,omitempty"`     // true == Auto Increment Field
+	SQLParms string           `json:"SQLParms,omitempty"` // Extra SQL Parameters
+	List     bool             `json:"List,omitempty"`     // Include in List Report
+	Tbl      *DbTable         `json:"-"`                  // (ignored)  Filled in after JSON is parsed
+	Typ      *dbType.TypeDefn `json:"-"`                  // (ignored) Filled in after JSON is parsed
 }
 
 func (f *DbField) CreateSql(cm string) string {
-	var str			strings.Builder
-	var ft			string
-	var nl			string
-	var pk			string
-	var sp			string
+	var str strings.Builder
+	var ft string
+	var nl string
+	var pk string
+	var sp string
 
 	td := f.Typ
 	if td == nil {
 		log.Fatalln("Error - Could not find Type definition for field,",
-			f.Name,"type:",f.TypeDefn)
+			f.Name, "type:", f.TypeDefn)
 	}
 	tdd := f.Typ.SqlType()
 
@@ -72,7 +78,7 @@ func (f *DbField) CreateSql(cm string) string {
 	}
 	pk = ""
 	//FIXME: if f.PrimaryKey {
-		//pk = " PRIMARY KEY"
+	//pk = " PRIMARY KEY"
 	//}
 	sp = ""
 	if len(f.SQLParms) > 0 {
@@ -85,17 +91,17 @@ func (f *DbField) CreateSql(cm string) string {
 }
 
 func (f *DbField) CreateStruct() string {
-	var str			strings.Builder
+	var str strings.Builder
 
-	str.WriteString(fmt.Sprintf("\t%s\t%s\n", strings.Title(f.Name),f.GoType()))
+	str.WriteString(fmt.Sprintf("\t%s\t%s\n", strings.Title(f.Name), f.GoType()))
 
 	return str.String()
 }
 
 func (f *DbField) FormInput() string {
-	var str			strings.Builder
-	var lbl			string
-	var m			string
+	var str strings.Builder
+	var lbl string
+	var m string
 
 	tdd := f.Typ.Html
 	if len(f.Label) > 0 {
@@ -123,9 +129,9 @@ func (f *DbField) FormInput() string {
 
 // GenFromStringArray generates the code to go from a string array
 // (sn) element (n) to a field (dn).  sn and dn are variable names.
-func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
-	var str			string
-	var src			string
+func (f *DbField) GenFromStringArray(dn, sn string, n int) string {
+	var str string
+	var src string
 
 	src = sn + "[" + strconv.Itoa(n) + "]"
 	str = f.GenFromString(dn, src)
@@ -135,8 +141,8 @@ func (f *DbField) GenFromStringArray(dn,sn string, n int) string {
 
 // GenFromString generates the code to go from a string (sn) to
 // a field of (dn).  sn and dn are variable names.
-func (f *DbField) GenFromString(dn,sn string) string {
-	var str			string
+func (f *DbField) GenFromString(dn, sn string) string {
+	var str string
 
 	switch f.Typ.GoType() {
 	case "int":
@@ -146,17 +152,17 @@ func (f *DbField) GenFromString(dn,sn string) string {
 	case "int64":
 		{
 			wrk := "\t%s.%s, _ = strconv.ParseInt(%s,0,64)\n"
-			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn)
 		}
 	case "float64":
 		{
-			wrk := 	"\t\t%s.%s, _ = strconv.ParseFloat(%s, 64)\n"
+			wrk := "\t\t%s.%s, _ = strconv.ParseFloat(%s, 64)\n"
 			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn)
 		}
 	case "time.Time":
 		{
 			wrk := "\t%s.%s, _ = time.Parse(time.RFC3339, %s)\n"
-			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn )
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn)
 		}
 	default:
 		str = fmt.Sprintf("\t%s.%s = %s\n", dn, f.TitledName(), sn)
@@ -167,8 +173,8 @@ func (f *DbField) GenFromString(dn,sn string) string {
 
 // GenToString generates code to convert the struct st.f field to string in variable, v.
 func (f *DbField) GenToString(v string, st string) string {
-	var str			string
-	var fldName		string
+	var str string
+	var fldName string
 
 	fldName = st + "." + f.TitledName()
 	if st == "" {
@@ -269,7 +275,7 @@ func (f *DbField) IsText() bool {
 	return false
 }
 
-func (f *DbField) TitledName( ) string {
+func (f *DbField) TitledName() string {
 	return strings.Title(f.Name)
 }
 
@@ -282,17 +288,17 @@ func (f *DbField) TitledName( ) string {
 // Fields should be in the order in which they are to
 // be displayed in the list form and the main form.
 type DbTable struct {
-	Name			string		`json:"Name,omitempty"`
-	Fields			[]DbField	`json:"Fields,omitempty"`
-	SQLParms		[]string	`json:"SQLParms,omitempty"`		// Extra SQL Parameters
-	DB				*Database	`json:"-"`
+	Name     string    `json:"Name,omitempty"`
+	Fields   []DbField `json:"Fields,omitempty"`
+	SQLParms []string  `json:"SQLParms,omitempty"` // Extra SQL Parameters
+	DB       *Database `json:"-"`
 }
 
-func (t *DbTable) CreateStruct( ) string {
-	var str			strings.Builder
+func (t *DbTable) CreateStruct() string {
+	var str strings.Builder
 
-	str.WriteString(fmt.Sprintf("type %s%s struct {\n", t.DB.TitledName(),t.TitledName()))
-	for i,_ := range t.Fields {
+	str.WriteString(fmt.Sprintf("type %s%s struct {\n", t.DB.TitledName(), t.TitledName()))
+	for i, _ := range t.Fields {
 		str.WriteString(t.Fields[i].CreateStruct())
 	}
 	str.WriteString("}\n\n")
@@ -305,7 +311,7 @@ func (t *DbTable) CreateStruct( ) string {
 }
 
 func (t *DbTable) DeleteSql() string {
-	var str			strings.Builder
+	var str strings.Builder
 
 	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s;\\n", t.Name))
 	if dbStruct.SqlType == "mssql" {
@@ -330,11 +336,11 @@ func (t *DbTable) FieldIndex(name string) int {
 // FieldNameList returns struct fields separated by
 // commas with an optional per field prefix.
 func (t *DbTable) FieldNameList(prefix string) string {
-	var str			strings.Builder
+	var str strings.Builder
 
-	for i,f := range t.Fields {
+	for i, f := range t.Fields {
 		cm := ", "
-		if i == len(t.Fields) - 1 {
+		if i == len(t.Fields)-1 {
 			cm = ""
 		}
 		if len(prefix) > 0 {
@@ -362,7 +368,7 @@ func (t *DbTable) FindIndex(idx int) *DbField {
 	return nil
 }
 
-func (t *DbTable) ForFields(f func(f *DbField) ) {
+func (t *DbTable) ForFields(f func(f *DbField)) {
 	for i, _ := range t.Fields {
 		f(&t.Fields[i])
 	}
@@ -372,7 +378,7 @@ func (t *DbTable) ForFields(f func(f *DbField) ) {
 // date or datetime type.
 func (t *DbTable) HasDate() bool {
 
-	for i,_ := range t.Fields {
+	for i, _ := range t.Fields {
 		if t.Fields[i].IsDate() {
 			return true
 		}
@@ -384,7 +390,7 @@ func (t *DbTable) HasDate() bool {
 // decimal type which will need string conversion
 func (t *DbTable) HasDec() bool {
 
-	for i,_ := range t.Fields {
+	for i, _ := range t.Fields {
 		if t.Fields[i].IsDec() {
 			return true
 		}
@@ -444,11 +450,11 @@ func (t *DbTable) HasText() bool {
 // commas with an optional per field prefix. If a field
 // is an auto-increment field then it is skipped.
 func (t *DbTable) InsertNameList(prefix string) string {
-	var str			strings.Builder
+	var str strings.Builder
 
-	for i,f := range t.Fields {
+	for i, f := range t.Fields {
 		cm := ", "
-		if i == len(t.Fields) - 1 {
+		if i == len(t.Fields)-1 {
 			cm = ""
 		}
 		if !f.Incr {
@@ -464,7 +470,7 @@ func (t *DbTable) InsertNameList(prefix string) string {
 
 // KeyCount returns the number of key fields in the table.
 func (t *DbTable) KeyCount() int {
-	var count		int
+	var count int
 
 	// accumulate the number of key fields
 	for _, v := range t.Fields {
@@ -479,8 +485,8 @@ func (t *DbTable) KeyCount() int {
 // Keys returns the field names marked as keys in ascending order
 // by KeyNum which is descending order of importance.
 func (t *DbTable) Keys() ([]string, error) {
-	var strs  	[]string
-	var mapKeys	[]int
+	var strs []string
+	var mapKeys []int
 
 	// accumulate the keys
 	keys := map[int]string{}
@@ -507,13 +513,13 @@ func (t *DbTable) Keys() ([]string, error) {
 // KeysList returns the table's keys in number order as
 // a comma separated list.
 func (t *DbTable) KeysList(prefix, suffix string) string {
-	var str			strings.Builder
-	var strs		[]string
+	var str strings.Builder
+	var strs []string
 
 	strs, _ = t.Keys()
 	for i, fn := range strs {
 		cm := ", "
-		if i == len(strs) - 1 {
+		if i == len(strs)-1 {
 			cm = ""
 		}
 		pref := ""
@@ -532,13 +538,13 @@ func (t *DbTable) KeysList(prefix, suffix string) string {
 // KeysListStr returns the table's keys in number order as
 // a comma separated list of strings.
 func (t *DbTable) KeysListStr() string {
-	var str			strings.Builder
-	var strs		[]string
+	var str strings.Builder
+	var strs []string
 
 	strs, _ = t.Keys()
 	for i, fn := range strs {
 		cm := ", "
-		if i == len(strs) - 1 {
+		if i == len(strs)-1 {
 			cm = ""
 		}
 		str.WriteString(fmt.Sprintf("\"%s\"%s", fn, cm))
@@ -549,11 +555,11 @@ func (t *DbTable) KeysListStr() string {
 // TitledFieldNameList returns struct fields separated by
 // commas with an optional per field prefix.
 func (t *DbTable) TitledFieldNameList(prefix string) string {
-	var str			strings.Builder
+	var str strings.Builder
 
-	for i,f := range t.Fields {
+	for i, f := range t.Fields {
 		cm := ", "
-		if i == len(t.Fields) - 1 {
+		if i == len(t.Fields)-1 {
 			cm = ""
 		}
 		if len(prefix) > 0 {
@@ -569,11 +575,11 @@ func (t *DbTable) TitledFieldNameList(prefix string) string {
 // commas with an optional per field prefix. If a field
 // is an auto-increment field then it is skipped.
 func (t *DbTable) TitledInsertNameList(prefix string) string {
-	var str			strings.Builder
+	var str strings.Builder
 
-	for i,f := range t.Fields {
+	for i, f := range t.Fields {
 		cm := ", "
-		if i == len(t.Fields) - 1 {
+		if i == len(t.Fields)-1 {
 			cm = ""
 		}
 		if !f.Incr {
@@ -590,13 +596,13 @@ func (t *DbTable) TitledInsertNameList(prefix string) string {
 // TitledKeysList returns the table's keys in number order as
 // a comma separated list.
 func (t *DbTable) TitledKeysList(prefix, suffix string) string {
-	var str			strings.Builder
-	var strs		[]string
+	var str strings.Builder
+	var strs []string
 
 	strs, _ = t.Keys()
 	for i, fn := range strs {
 		cm := ", "
-		if i == len(strs) - 1 {
+		if i == len(strs)-1 {
 			cm = ""
 		}
 		pref := ""
@@ -612,7 +618,7 @@ func (t *DbTable) TitledKeysList(prefix, suffix string) string {
 	return str.String()
 }
 
-func (t *DbTable) TitledName( ) string {
+func (t *DbTable) TitledName() string {
 	return strings.Title(t.Name)
 }
 
@@ -621,17 +627,17 @@ func (t *DbTable) TitledName( ) string {
 //============================================================================
 
 type Database struct {
-	Name		string			`json:"Name,omitempty"`
-	SqlType		string			`json:"SqlType,omitempty"`
-	SQLParms	string			`json:"SQLParms,omitempty"`		// Extra SQL Parameters
-	Schema		string			`json:"Schema,omitempty"`		// Optional Schema Name
-	Server		string			`json:"Server,omitempty"`
-	Port		string			`json:"Port,omitempty"`
-	PW			string			`json:"PW,omitempty"`
-	Tables  	[]DbTable		`json:"Tables,omitempty"`
+	Name     string    `json:"Name,omitempty"`
+	SqlType  string    `json:"SqlType,omitempty"`
+	SQLParms string    `json:"SQLParms,omitempty"` // Extra SQL Parameters
+	Schema   string    `json:"Schema,omitempty"`   // Optional Schema Name
+	Server   string    `json:"Server,omitempty"`
+	Port     string    `json:"Port,omitempty"`
+	PW       string    `json:"PW,omitempty"`
+	Tables   []DbTable `json:"Tables,omitempty"`
 	// There can only be one Plugin per Database Definition.  Once we have decoded
 	// the JSON, we will establish which plugin works with this JSON data if any.
-	Plugin		interface{}		`json:"-"`
+	Plugin interface{} `json:"-"`
 }
 
 func (d *Database) FindTable(name string) *DbTable {
@@ -643,7 +649,7 @@ func (d *Database) FindTable(name string) *DbTable {
 	return nil
 }
 
-func (d *Database) ForTables(f func(t *DbTable) ) {
+func (d *Database) ForTables(f func(t *DbTable)) {
 	for i, _ := range d.Tables {
 		f(&d.Tables[i])
 	}
@@ -676,12 +682,160 @@ func (d *Database) HasFloat() bool {
 	return false
 }
 
-func (d *Database) TitledName( ) string {
+// ReadJsonFile reads the input JSON file for app
+// and stores the generic JSON Table as well as the
+// decoded structs.
+func (d *Database) ReadJsonFile(fn string) error {
+	var err error
+	var jsonPath string
+
+	jsonPath, _ = filepath.Abs(fn)
+	if sharedData.Debug() {
+		log.Println("json path:", jsonPath)
+	}
+
+	// Read in the json file structurally
+	if err = util.ReadJsonFileToData(jsonPath, d); err != nil {
+		return fmt.Errorf("Error: unmarshalling: %s : %s", jsonPath, err)
+	}
+
+	// Fix up the tables with back pointers that we do not store externally.
+	for i, t := range d.Tables {
+		for ii, _ := range t.Fields {
+			t.Fields[ii].Tbl = &t
+		}
+		// Link each table back to the database.
+		d.Tables[i].DB = DbStruct()
+	}
+
+	if err = d.ValidateData(); err != nil {
+		return err
+	}
+
+	if sharedData.Debug() {
+		log.Printf("\tdbStruct: %+v\n", dbStruct)
+	}
+
+	return nil
+}
+
+// SetupPlugin finds the plugin needed and sets it up within the database.
+func (d *Database) SetupPlugin() error {
+	var err error
+	var intr dbPlugin.SchemaNamer
+	var ok bool
+	var plg dbPlugin.PluginData
+
+	// Indicate the plugin needed.
+	if sharedData.Debug() {
+		log.Printf("\t\tSqtype: %s\n", d.SqlType)
+	}
+
+	// Find the plugin for this database.
+	if plg, err = dbPlugin.FindPlugin(d.SqlType); err != nil {
+		return fmt.Errorf("Error: Can't find plugin for %s!\n\n\n", d.SqlType)
+	}
+	if sharedData.Debug() {
+		log.Printf("\t\tPlugin Type: %T\n", plg)
+		log.Printf("\t\tPlugin: %+v\n", plg)
+		log.Printf("\t\tPlugin.Plugin: %+v\n", plg.Plugin)
+	}
+
+	// Validate the Plugin if possible.
+	if plg.Types == nil {
+		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", d.SqlType)
+	}
+
+	// Save the plugin.
+	d.Plugin = plg
+
+	if len(d.Schema) == 0 {
+		intr, ok = plg.Plugin.(dbPlugin.SchemaNamer)
+		if ok {
+			d.Schema = intr.SchemaName()
+		}
+	}
+
+	// Set up the Table Fields so that point to the Plugin Field Type definition.
+	for _, t := range d.Tables {
+		for ii, _ := range t.Fields {
+			t.Fields[ii].Typ = plg.Types.FindDefn(t.Fields[ii].TypeDefn)
+			if t.Fields[ii].Typ == nil {
+				return fmt.Errorf("Error: Invalid Field Type for %s:%s!\n\n\n",
+					t.Name, t.Fields[ii].Name)
+			}
+		}
+	}
+	return nil
+}
+
+func (d *Database) TitledName() string {
 	return strings.Title(d.Name)
 }
 
-func (d *Database) UpperName( ) string {
+func (d *Database) UpperName() string {
 	return strings.ToUpper(d.Name)
+}
+
+// ValidateData checks the JSON built structures for errors. Some of
+// errors may be duplicates of the JSON Unmarshalling process which
+// is ok, because this function can be used if the data is from a
+// different source.
+func (d *Database) ValidateData() error {
+	var err error
+
+	if d.Name == "" {
+		return fmt.Errorf("Error: Database Name is missing!")
+	}
+	if d.SqlType == "" {
+		return fmt.Errorf("Error: SQL Type is missing!")
+	}
+	if len(d.Tables) == 0 {
+		return fmt.Errorf("There are no tables defined for %s!", dbStruct.Name)
+	}
+	for i, t := range d.Tables {
+		if t.Name == "" {
+			return fmt.Errorf("%d Table Name is missing!", i)
+		}
+		if len(t.Fields) == 0 {
+			return fmt.Errorf("There are no fields defined for %s!", t.Name)
+		}
+		if _, err = t.Keys(); err != nil {
+			return err
+		}
+		for j, f := range t.Fields {
+			if f.Name == "" {
+				return fmt.Errorf("%d Field Name is missing from table %s!", j, t.Name)
+			}
+		}
+	}
+
+	return nil
+}
+
+// ValidatePlugin checks the JSON built structures for errors with
+// respect to the plugin. This assumes that the data was previously
+// validated.
+func (d *Database) ValidatePlugin() error {
+	var err error
+	var plg dbPlugin.PluginData
+
+	// Set up Plugin Support for this database type.
+	if plg, err = dbPlugin.FindPlugin(d.SqlType); err != nil {
+		return err
+	}
+
+	for _, t := range d.Tables {
+		for _, f := range t.Fields {
+			td := plg.Types.FindDefn(f.TypeDefn)
+			if td == nil {
+				fmt.Errorf("Error - Could not find Type definition for field: %s  type: %s\n",
+					f.Name, f.TypeDefn)
+			}
+		}
+	}
+
+	return nil
 }
 
 //----------------------------------------------------------------------------
@@ -689,12 +843,12 @@ func (d *Database) UpperName( ) string {
 //----------------------------------------------------------------------------
 
 // New provides a factory method to create an Sql Object.
-func New() (*Database) {
+func NewDatabase() *Database {
 	db := &Database{}
 	return db
 }
 
-var	dbStruct	Database
+var dbStruct Database
 
 func DbStruct() *Database {
 	return &dbStruct
@@ -708,9 +862,8 @@ func DefaultJsonFileName() string {
 // and stores the generic JSON Table as well as the
 // decoded structs.
 func ReadJsonFile(fn string) error {
-	var err		    error
-	var jsonPath	string
-	var plg			dbPlugin.PluginData
+	var err error
+	var jsonPath string
 
 	jsonPath, _ = filepath.Abs(fn)
 	if sharedData.Debug() {
@@ -722,21 +875,13 @@ func ReadJsonFile(fn string) error {
 		return fmt.Errorf("Error: unmarshalling: %s : %s", jsonPath, err)
 	}
 
-	// Set up Plugin Support for this database type.
-	if sharedData.Debug() {
-		log.Printf("\t\tSqtype: %s\n", dbStruct.SqlType)
-	}
-	if plg, err = dbPlugin.FindPlugin(dbStruct.SqlType); err != nil {
-		return fmt.Errorf("Error: Can't find plugin for %s!\n\n\n", dbStruct.SqlType)
-	}
-	if sharedData.Debug() {
-		log.Printf("\t\tPlugin Type: %T\n", plg)
-		log.Printf("\t\tPlugin: %+v\n", plg)
-		log.Printf("\t\tPlugin.Plugin: %+v\n", plg.Plugin)
-	}
-	err = SetupPlugin(plg)
-	if err != nil {
-		return fmt.Errorf("Error: Plugin Setup failed - %s\n", err)
+	// Fix up the tables with back pointers that we do not store externally.
+	for i, t := range dbStruct.Tables {
+		for ii, _ := range t.Fields {
+			t.Fields[ii].Tbl = &t
+		}
+		// Link each table back to the database.
+		dbStruct.Tables[i].DB = DbStruct()
 	}
 
 	if err = ValidateData(); err != nil {
@@ -750,43 +895,8 @@ func ReadJsonFile(fn string) error {
 	return nil
 }
 
-// SetupPlugin sets up the plugin within the database.
-func SetupPlugin(plg dbPlugin.PluginData) error {
-	var intr		dbPlugin.SchemaNamer
-	var ok			bool
-
-	// Validate the Plugin if possible.
-	if plg.Types == nil {
-		return fmt.Errorf("Error: Plugin missing types for %s!\n\n\n", dbStruct.SqlType)
-	}
-
-	// Save the plugin.
-	dbStruct.Plugin = plg
-
-	// Fix up the tables with back pointers that we do not store externally.
-	for i, t := range dbStruct.Tables {
-		for ii, _ := range t.Fields {
-			t.Fields[ii].Tbl = &t
-			t.Fields[ii].Typ = plg.Types.FindDefn(t.Fields[ii].TypeDefn)
-			if t.Fields[ii].Typ == nil {
-				return fmt.Errorf("Error: Invalid Field Type for %s:%s!\n\n\n", t.Name, t.Fields[ii].Name)
-			}
-		}
-		dbStruct.Tables[i].DB = &dbStruct
-	}
-
-	if len(dbStruct.Schema) == 0 {
-		intr, ok = plg.Plugin.(dbPlugin.SchemaNamer)
-		if ok {
-			dbStruct.Schema = intr.SchemaName()
-		}
-	}
-
-	return nil
-}
-
 func TableNames() []string {
-	var list	[]string
+	var list []string
 
 	for _, v := range dbStruct.Tables {
 		list = append(list, v.Name)
@@ -800,13 +910,7 @@ func TableNames() []string {
 // is ok, because this function can be used if the data is from a
 // different source.
 func ValidateData() error {
-	var plg		dbPlugin.PluginData
-	var err		error
-
-	// Set up Plugin Support for this database type.
-	if plg, err = dbPlugin.FindPlugin(dbStruct.SqlType); err != nil {
-		return err
-	}
+	var err error
 
 	if dbStruct.Name == "" {
 		return fmt.Errorf("Error: Database Name is missing!")
@@ -827,18 +931,12 @@ func ValidateData() error {
 		if _, err = t.Keys(); err != nil {
 			return err
 		}
-		for j,f := range t.Fields {
+		for j, f := range t.Fields {
 			if f.Name == "" {
 				return fmt.Errorf("%d Field Name is missing from table %s!", j, t.Name)
-			}
-			td := plg.Types.FindDefn(f.TypeDefn)
-			if td == nil {
-				fmt.Errorf("Error - Could not find Type definition for field: %s  type: %s",
-					f.Name, f.TypeDefn)
 			}
 		}
 	}
 
 	return nil
 }
-

@@ -30,11 +30,11 @@ func TestSetupShared(t *testing.T) {
 	}
 
 	t.Logf("Test SetupDefns w/exec json file\n")
-	if err = SetupShared("misc/test01.exec.json.txt", "cmdx"); err != nil {
+	if err = SetupShared("../../misc/test02.exec.json.txt", "cmd"); err != nil {
 		t.Errorf("SetupDefns() failed: %s\n", err)
 	}
-	if "sqlapp" != sharedData.Cmd() {
-		t.Errorf("ERROR - cmd should be 'cmd', but is %s\n", sharedData.Cmd())
+	if "sqlappgo" != sharedData.Cmd() {
+		t.Errorf("ERROR - cmd should be 'sqlappgo', but is %s\n", sharedData.Cmd())
 	}
 
 }

@@ -25,23 +25,23 @@ import (
 
 // DbProp defines an Objects Property.
 type DbProp struct {
-	Name		string		`json:"name,omitempty"`			// External Name
-	Internal	string		`json:"internal,omitempty"`		// Optional Internal Name
-	External	string		`json:"external,omitempty"`		// Optional External Name
-	Desc		string		`json:"desc,omitempty"`			// Optional Description
-	TypeDefn	string		`json:"type,omitempty"`			// Type Definition
-	Init		string		`json: init,omitempty`			// Initialization
-	Object  	bool	    `json:"object,omitempty"`
-	Vis			string		`json:"vis,omitempty"`			// Visibility: public,private,read-only,none
-	Base		string		`json:"base,omitempty"`			// Base Struct or Pointer for Offset
-	Offset		int	    	`json:"offset,omitempty"`		// Offset into Base in bytes
-	Shift	    int		    `json:"len,omitempty"`			// Shift Amount to put field in lowest bit
-	Size	    int		    `json:"Dec,omitempty"`			// Size in bits
+	Name     string `json:"name,omitempty"`     // External Name
+	Internal string `json:"internal,omitempty"` // Optional Internal Name
+	External string `json:"external,omitempty"` // Optional External Name
+	Desc     string `json:"desc,omitempty"`     // Optional Description
+	TypeDefn string `json:"type,omitempty"`     // Type Definition
+	Init     string `json: init,omitempty`      // Initialization
+	Object   bool   `json:"object,omitempty"`
+	Vis      string `json:"vis,omitempty"`    // Visibility: public,private,read-only,none
+	Base     string `json:"base,omitempty"`   // Base Struct or Pointer for Offset
+	Offset   int    `json:"offset,omitempty"` // Offset into Base in bytes
+	Shift    int    `json:"len,omitempty"`    // Shift Amount to put field in lowest bit
+	Size     int    `json:"Dec,omitempty"`    // Size in bits
 }
 
-func (f *DbProp) GenBody( ) string {
-	var str			strings.Builder
-	var name		string
+func (f *DbProp) GenBody() string {
+	var str strings.Builder
+	var name string
 
 	if f.Vis == "none" {
 		return ""
@@ -116,7 +116,7 @@ func (f *DbProp) GenBody( ) string {
 }
 
 func (f *DbProp) GenDefn() string {
-	var str			strings.Builder
+	var str strings.Builder
 
 	if f.Vis != "none" && f.Vis != "private" {
 		if len(f.Desc) > 0 {
@@ -151,7 +151,7 @@ func (f *DbProp) GenDefn() string {
 }
 
 func (f *DbProp) GenDefnPrivate() string {
-	var str			strings.Builder
+	var str strings.Builder
 
 	if f.Vis == "private" || f.Vis == "read-only" || f.Vis == "ro" {
 		if len(f.Desc) > 0 {
@@ -185,9 +185,9 @@ func (f *DbProp) GenDefnPrivate() string {
 	return str.String()
 }
 
-func (f *DbProp) GenInit( ) string {
-	var str			strings.Builder
-	var name		string
+func (f *DbProp) GenInit() string {
+	var str strings.Builder
+	var name string
 
 	if len(f.Internal) > 0 {
 		name = f.Internal
@@ -202,9 +202,9 @@ func (f *DbProp) GenInit( ) string {
 	return str.String()
 }
 
-func (f *DbProp) GenProp( ) string {
-	var str			strings.Builder
-	var name		string
+func (f *DbProp) GenProp() string {
+	var str strings.Builder
+	var name string
 
 	if len(f.Internal) > 0 {
 		name = f.Internal
@@ -246,8 +246,8 @@ func (f *DbProp) GenProp( ) string {
 }
 
 func (f *DbProp) GenStruct() string {
-	var str			strings.Builder
-	var name		string
+	var str strings.Builder
+	var name string
 
 	if len(f.Internal) > 0 {
 		name = f.Internal
@@ -264,7 +264,7 @@ func (f *DbProp) GenStruct() string {
 	return str.String()
 }
 
-func (f *DbProp) TitledName( ) string {
+func (f *DbProp) TitledName() string {
 	return strings.Title(f.Name)
 }
 
@@ -273,18 +273,18 @@ func (f *DbProp) TitledName( ) string {
 // Fields should be in the order in which they are to
 // be displayed in the list form and the main form.
 type DbObject struct {
-	Name		string		`json:"name,omitempty"`
-	Super		string		`json:"super,omitempty"`
-	Props		[]DbProp	`json:"properties,omitempty"`
+	Name  string   `json:"name,omitempty"`
+	Super string   `json:"super,omitempty"`
+	Props []DbProp `json:"properties,omitempty"`
 }
 
-func (t *DbObject) DataName( ) string {
+func (t *DbObject) DataName() string {
 	name := strings.ToUpper(t.Name)
 	return fmt.Sprintf("%s_DATA", name)
 }
 
-func (t *DbObject) DataSuper( ) string {
-	var name	string
+func (t *DbObject) DataSuper() string {
+	var name string
 	if len(t.Super) > 0 {
 		name = strings.ToUpper(t.Super)
 	} else {
@@ -293,30 +293,30 @@ func (t *DbObject) DataSuper( ) string {
 	return fmt.Sprintf("%s_DATA", name)
 }
 
-func (t *DbObject) ForFields(f func(f *DbProp) ) {
+func (t *DbObject) ForFields(f func(f *DbProp)) {
 	for i, _ := range t.Props {
 		f(&t.Props[i])
 	}
 }
 
-func (t *DbObject) PropCount( ) string {
+func (t *DbObject) PropCount() string {
 	str := fmt.Sprintf("%d", len(t.Props))
 	return str
 }
 
-func (t *DbObject) TitledName( ) string {
+func (t *DbObject) TitledName() string {
 	return strings.Title(t.Name)
 }
 
-func (t *DbObject) TitledSuper( ) string {
+func (t *DbObject) TitledSuper() string {
 	return strings.Title(t.Super)
 }
 
-func (t *DbObject) UpperName( ) string {
+func (t *DbObject) UpperName() string {
 	return strings.ToUpper(t.Name)
 }
 
-var	dbStruct	DbObject
+var dbStruct DbObject
 
 func DbStruct() *DbObject {
 	return &dbStruct
@@ -326,10 +326,10 @@ func DbStruct() *DbObject {
 // and stores the generic JSON Table as well as the
 // decoded structs.
 func ReadJsonFile(fn string) error {
-	var err		    error
-	var jsonPath	string
+	var err error
+	var jsonPath string
 
-	jsonPath,_ = filepath.Abs(fn)
+	jsonPath, _ = filepath.Abs(fn)
 	if sharedData.Debug() {
 		log.Println("json path:", jsonPath)
 	}
@@ -345,4 +345,3 @@ func ReadJsonFile(fn string) error {
 
 	return nil
 }
-

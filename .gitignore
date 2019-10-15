@@ -1,5 +1,6 @@
 *.DS_Store
 vendor/*
+__pycache__/*
 
 # Binaries for programs and plugins
 *.exe
@@ -16,3 +17,6 @@ vendor/*
 
 # Work files
 *.swp
+
+# python
+*.pyc

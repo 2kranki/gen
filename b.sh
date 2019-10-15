@@ -30,8 +30,8 @@ buildApp () {
 
     #cd ${srcDir}
     mkdir -p ${dstDir}
-    test -z "$fQuiet" && echo "...Executing: go build -o ${pgmPath} -v -race ${rebuild} ./cmd/*.go"
-    if go build -o ${pgmPath} -v -race ${rebuild} ./cmd/*.go ; then
+    test -z "$fQuiet" && echo "...Executing: go build -o ${pgmPath} -v -race ${rebuild} ./${srcDir}/${pgmname}/*.go"
+    if go build -o ${pgmPath} -v -race ${rebuild} ./${srcDir}/${pgmname}/*.go ; then
         test -z "$fQuiet" && echo "...Build was successful!"
     else
         test -z "$fQuiet" && echo "...Build failed!"
