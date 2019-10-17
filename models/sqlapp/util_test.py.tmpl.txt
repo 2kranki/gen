@@ -6,9 +6,11 @@
 [[- $typ := $plg.Name ]]
 # vi:nu:et:sts=4 ts=4 sw=4
 
-""" Test the Application
+""" Test util.py
 
-The module must be executed from the repository that contains the Jenkinsfile.
+This module tests the util.py classes and functions.
+
+The module must be executed from the repository that contains the util.py.
 
 """
 
@@ -39,24 +41,46 @@ The module must be executed from the repository that contains the Jenkinsfile.
 #   For more information, please refer to <http://unlicense.org/>
 
 
+from io import StringIO
 from unittest import TestCase
-import test
-import os
+import      util
+import      os
+import      sys
+
+
 
 
 ################################################################################
 #                               Test Classes
 ################################################################################
 
-class testParseArgs(TestCase):
-    def setUp(self):
-        pass
+class testAbsolutePath(TestCase):
+
+    def test_1(self):
+        txt = "${HOME}/a.txt"
+        a = util.absolutePath(txt)
+        b = os.path.expandvars(txt)
+        self.assertEqual(a,b)
+        a = util.absolutePath('~/a.txt')
+        self.assertEqual(a,b)
+
+
+    def test_2(self):
+        txt = "."
+        a = util.absolutePath(txt)
+        b = os.getcwd()
+        self.assertEqual(a,b)
+
+
+class testBuild(TestCase):
 
     def test_one(self):
-        args = ["--debug"]
-        test.parseArgs(args)
-        self.assertTrue(test.oArgs.fDebug)
-        self.assertEqual(test.oArgs.szAppName, '[[$d.Name]]')
+        util.fDebug = True
+        util.fTrace = True
+        err = util.buildGoApp('cmd', '[[$d.Name]]')
+        if err:
+            print(err.Error())
+        self.assertEqual(err, None)
 
 
 ################################################################################

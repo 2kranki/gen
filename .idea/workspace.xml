@@ -2,9 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/util_test.py.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genSql01.py" beforeDir="false" afterPath="$PROJECT_DIR$/genSql01.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genSql01_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/genSql01_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_build.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_build.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_build_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_build_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_deploy.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_deploy.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_deploy_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_deploy_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_lint.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_lint.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_lint_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_lint_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_push.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_push.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_push_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_push_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_test_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_test_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/genCmn/genCmn.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genCmn/genCmn.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,6 +42,7 @@
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
+    <property name="go.vendoring.notification.had.been.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -149,6 +162,7 @@
       <item itemvalue="Go Test.TestGenFormDataDisplay in genapp/pkg/genSqlAppGo/dbGener" />
       <item itemvalue="Go Test.TestNewFormWork in genapp/pkg/genSqlAppGo/dbForm" />
       <item itemvalue="Go Test.TestReadJsonFile in genapp/pkg/genSqlAppGo/dbJson" />
+      <item itemvalue="Python.genSql01" />
     </list>
   </component>
   <component name="SvnConfiguration">

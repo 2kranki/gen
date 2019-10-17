@@ -49,6 +49,9 @@ import      subprocess
 import      sys
 import      time
 
+sys.path.append('.')
+import      util
+
 
 oArgs       = None
 szAppName   = '[[$dn]]'
@@ -64,230 +67,8 @@ szGoDir     = '${HOME}/go'
 ################################################################################
 
 #---------------------------------------------------------------------
-#       getAbsolutePath -- Convert a Path to an absolute path
+#               parseArgs -- Parse the CLI Arguments
 #---------------------------------------------------------------------
-
-def getAbsolutePath( szPath, fCreateDirs=False ):
-    '''Convert Path to an absolute path.'''
-    if oArgs.fDebug:
-        print("getAbsolutePath(%s)" % ( szPath ))
-
-    # Convert the path.
-    szWork = os.path.normpath( szPath )
-    szWork = os.path.expanduser( szWork )
-    szWork = os.path.expandvars( szWork )
-    szWork = os.path.abspath( szWork )
-
-    if fCreateDirs:
-        szDir = os.path.dirname(szWork)
-        if len(szDir) > 0:
-            os.mkdirs(szDir)
-
-    # Return to caller.
-    if oArgs.fDebug:
-        print("\tabsolute_path=", szWork)
-    return szWork
-
-
-#---------------------------------------------------------------------
-#       buildApp -- Build the Application
-#---------------------------------------------------------------------
-
-def         buildApp(appDir):
-    ''' Build an application '''
-
-    curDir = os.getcwd()
-    tmpDir = None
-    if sys.platform == 'darwin':
-        # /tmp is easiest to use from bash/zsh which really is /private/tmp.
-        # The other options are:
-        # /var/tmp
-        # ${TMPDIR}
-        tmpDir = '/tmp'
-    if tmpDir == None:
-        tmpDir = os.getenv('TMP')
-    if tmpDir == None:
-        tmpDir = os.getenv('TEMP')
-    if tmpDir == None:
-        print("Error - Can't find temporary Directory, TMP or TEMP, in environment!")
-        sys.exit(4)
-    appDirAbs = getAbsolutePath(os.path.join(curDir, 'cmd', appDir))
-
-    try:
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: cd {0}".format(appDirAbs))
-        os.chdir(appDirAbs)
-        szCmd = 'go fmt ./...'
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: {0}".format(szCmd))
-        os.system('go fmt ./...')
-        tmpBin = os.path.join(tmpDir, 'bin')
-        if not os.path.exists(tmpBin):
-            if oArgs.iVerbose or oArgs.fDebug:
-                print("Making: {0}".format(tmpBin))
-            os.makedirs(tmpBin, 0o777)
-        szCmd = 'go build -o {0} -v'.format(os.path.join(tmpDir, 'bin', appDir))
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: {0}".format(szCmd))
-        os.system(szCmd)
-    finally:
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: cd {0}".format(curDir))
-        os.chdir(curDir)
-
-    return
-
-
-#---------------------------------------------------------------------
-#    dockerContainerRun -- Run a Docker Image Creating a Container
-#---------------------------------------------------------------------
-
-def         dockerContainerRun(szName, szTag):
-    ''' Pull a Docker Image
-    '''
-
-    image = dockerImageFind(szName, szTag)
-    if image == None:
-        pass
-    else:
-        if oArgs.fForce:
-            pass
-        else:
-            return
-
-    szImageName = szName
-    if len(szTag):
-        szImageName += ':' + szTag
-    szContainerName = szImageName + '_1'
-
-    # Get rid of any prior images if necessary
-    if image == None:
-        pass
-    else:
-        szCmd = 'docker image rm -f {0}'.format(szImageName)
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: {0}".format(szCmd))
-        try:
-            os.system(szCmd)
-        except OSError:
-            pass
-
-    # Pull the image
-    szCmd = "docker image pull {0} --format='{{json .}}'".format(szImageName)
-    if oArgs.iVerbose or oArgs.fDebug:
-        print("Issuing: {0}".format(szCmd))
-    try:
-        os.system(szCmd)
-    except OSError:
-        pass
-
-    return
-
-
-#---------------------------------------------------------------------
-# dockerImageFind -- Find information about a current Docker Image
-#---------------------------------------------------------------------
-
-def         dockerImageFind(szName, szTag):
-    ''' Find information about a current Docker Image '''
-    imageInfo = None
-
-    images = dockerImages()
-    if len(images):
-        for image in images:
-            if szName == image['Repository'] and szTag == image['Tag']:
-                imageInfo = image
-
-    return imageInfo
-
-
-#---------------------------------------------------------------------
-# dockerImages -- Get information about all the current Docker Images
-#---------------------------------------------------------------------
-
-def         dockerImages( ):
-    ''' Get Docker Image(s) Summary Data '''
-
-    szCmd = "docker image ls --format='{{json .}}'"
-    if oArgs.iVerbose or oArgs.fDebug:
-        print("Issuing: {0}".format(szCmd))
-    result = subprocess.getstatusoutput(szCmd)
-    if oArgs.fDebug:
-        print("\tResult = %s, %s..." % (result[0], result[1]))
-    iRC = result[0]
-    szOutput = result[1]
-    lines = szOutput.splitlines(False)
-    szInput = '['
-    for l in lines:
-        szInput += l + ','
-    szInput = szInput[:-1] + ']'
-
-
-    jsonImages = None
-    if len(szOutput):
-        jsonImages = json.loads(szInput)
-
-    return jsonImages
-
-
-#---------------------------------------------------------------------
-#       dockerImagePull -- Pull a Docker Image
-#---------------------------------------------------------------------
-
-def         dockerImagePull(szName, szTag):
-    ''' Pull a Docker Image
-    '''
-
-    image = dockerImageFind(szName, szTag)
-    if image == None:
-        pass
-    else:
-        if oArgs.fForce:
-            pass
-        else:
-            return
-
-    szImageName = szName
-    if len(szTag):
-        szImageName += ':' + szTag
-
-    # Get rid of any prior images if necessary
-    if image == None:
-        pass
-    else:
-        szCmd = 'docker image rm -f {0}'.format(szImageName)
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: {0}".format(szCmd))
-        try:
-            os.system(szCmd)
-        except OSError:
-            pass
-
-    # Pull the image
-    szCmd = "docker image pull {0} --format='{{json .}}'".format(szImageName)
-    if oArgs.iVerbose or oArgs.fDebug:
-        print("Issuing: {0}".format(szCmd))
-    try:
-        os.system(szCmd)
-    except OSError:
-        pass
-
-    return
-
-
-#---------------------------------------------------------------------
-#   goget -- Go Get Specific Packages if not already downloaded
-#---------------------------------------------------------------------
-
-def         goget(pkgDir):
-    ''' Build an application '''
-    goPkgDir = getAbsolutePath(os.path.join(szGoDir, 'src', pkgDir))
-
-    if not os.path.exists(goPkgDir) :
-        os.system('go get {0}'.format(pkgDir))
-
-    return
-
 
 def         parseArgs(listArgV=None):
     '''
@@ -313,7 +94,7 @@ def         parseArgs(listArgV=None):
                          default='/tmp', help='Set Application Base Directory'
                          )
     oCmdPrs.add_argument('--appname', action='store', dest='szAppName',
-                         default='app01', help='Set Application Base Name'
+                         default='[[$d.Name]]', help='Set Application Base Name'
                          )
     oCmdPrs.add_argument('--bindir', action='store', dest='szBinDir',
                          default='/tmp/bin', help='Set Binary Directory'
@@ -344,33 +125,13 @@ def         mainCLI( listArgV=None ):
     """ Command-line interface. """
     global      oArgs
     
-    # Do initialization.
-    iRc = 20
-
     # Parse the command line.
-    parseArgs(lisArgV)
+    parseArgs(listArgV)
 
     # Perform the specified actions.
     iRc = 0
     try:
-        image = dockerImageFind(szDbName, szDbTag)
-        if image == None:
-            pass
-        else:
-            print(image)
-        [[ if eq $typ "mariadb" -]]
-        #goget('github.com/go-sql-driver/mysql')
-        [[ else if eq $typ "mssql" -]]
-        #goget('github.com/denisenkom/go-mssqldb')
-        [[ else if eq $typ "mysql" -]]
-        #goget('github.com/go-sql-driver/mysql')
-        [[ else if eq $typ "postgres" -]]
-        #goget('github.com/lib/pq')
-        [[ else if eq $typ "sqlite" -]]
-        #goget('github.com/mattn/go-sqlite3')
-        [[ end -]]
-        #goget('github.com/shopspring/decimal')
-        #buildApp(szAppName)
+        print("Do something here!")
     finally:
         pass
 

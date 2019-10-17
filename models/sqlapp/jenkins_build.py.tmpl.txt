@@ -42,10 +42,14 @@ The module must be executed from the repository that contains the Jenkinsfile.
 
 
 import      argparse
+import      contextlib
 import      os
 import      re
 import      sys
 import      time
+
+sys.path.append('.')
+import      util
 
 
 oArgs = None
@@ -59,93 +63,8 @@ szGoDir = '${HOME}/go'
 ################################################################################
 
 #---------------------------------------------------------------------
-#       getAbsolutePath -- Convert a Path to an absolute path
+#               parseArgs -- Parse the CLI Arguments
 #---------------------------------------------------------------------
-
-def getAbsolutePath( szPath, fCreateDirs=False ):
-    '''Convert Path to an absolute path.'''
-    if oArgs.fDebug:
-        print("getAbsolutePath(%s)" % ( szPath ))
-
-    # Convert the path.
-    szWork = os.path.normpath( szPath )
-    szWork = os.path.expanduser( szWork )
-    szWork = os.path.expandvars( szWork )
-    szWork = os.path.abspath( szWork )
-
-    if fCreateDirs:
-        szDir = os.path.dirname(szWork)
-        if len(szDir) > 0:
-            os.mkdirs(szDir)
-
-    # Return to caller.
-    if oArgs.fDebug:
-        print("\tabsolute_path=", szWork)
-    return szWork
-
-
-#---------------------------------------------------------------------
-#       buildApp -- Build the Application
-#---------------------------------------------------------------------
-
-def         buildApp(appDir):
-    ''' Build an application '''
-
-    curDir = os.getcwd()
-    tmpDir = None
-    if sys.platform == 'darwin':
-        # /tmp is easiest to use from bash/zsh which really is /private/tmp.
-        # The other options are:
-        # /var/tmp
-        # ${TMPDIR}
-        tmpDir = '/tmp'
-    if tmpDir == None:
-        tmpDir = os.getenv('TMP')
-    if tmpDir == None:
-        tmpDir = os.getenv('TEMP')
-    if tmpDir == None:
-        print("Error - Can't find temporary Directory, TMP or TEMP, in environment!")
-        sys.exit(4)
-    appDirAbs = getAbsolutePath(os.path.join(curDir, 'cmd', appDir))
-
-    try:
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: cd {0}".format(appDirAbs))
-        os.chdir(appDirAbs)
-        szCmd = 'go fmt ./...'
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: {0}".format(szCmd))
-        os.system('go fmt ./...')
-        tmpBin = os.path.join(tmpDir, 'bin')
-        if not os.path.exists(tmpBin):
-            if oArgs.iVerbose or oArgs.fDebug:
-                print("Making: {0}".format(tmpBin))
-            os.makedirs(tmpBin, 0o777)
-        szCmd = 'go build -o {0} -v'.format(os.path.join(tmpDir, 'bin', appDir))
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: {0}".format(szCmd))
-        os.system(szCmd)
-    finally:
-        if oArgs.iVerbose or oArgs.fDebug:
-            print("Issuing: cd {0}".format(curDir))
-        os.chdir(curDir)
-
-    return
-
-
-#---------------------------------------------------------------------
-#   goget -- Go Get Specific Packages if not already downloaded
-#---------------------------------------------------------------------
-
-def         goget(pkgDir):
-    ''' Build an application '''
-    goPkgDir = getAbsolutePath(os.path.join(szGoDir, 'src', pkgDir))
-
-    if not os.path.exists(goPkgDir) :
-        os.system('go get {0}'.format(pkgDir))
-
-    return
-
 
 def         parseArgs(listArgV=None):
     '''
@@ -171,7 +90,7 @@ def         parseArgs(listArgV=None):
                          default='/tmp', help='Set Application Base Directory'
                          )
     oCmdPrs.add_argument('--appname', action='store', dest='szAppName',
-                         default='app01', help='Set Application Base Name'
+                         default='[[$d.Name]]', help='Set Application Base Name'
                          )
     oCmdPrs.add_argument('--bindir', action='store', dest='szBinDir',
                          default='/tmp/bin', help='Set Binary Directory'
@@ -202,34 +121,35 @@ def         mainCLI( listArgV=None ):
     """ Command-line interface. """
     global      oArgs
     
-    # Do initialization.
-    iRc = 20
-
-    # Parse the command line.       
-    parseArgs(lisArgV)
+    # Parse the command line.
+    parseArgs(listArgV)
 
     # Perform the specified actions.
-    iRc = 0
-    try:
-        goget('github.com/2kranki/jsonpreprocess')
-        goget('github.com/2kranki/go_util')
-        [[ if eq $typ "mariadb" -]]
-        goget('github.com/go-sql-driver/mysql')
-        [[ else if eq $typ "mssql" -]]
-        goget('github.com/denisenkom/go-mssqldb')
-        [[ else if eq $typ "mysql" -]]
-        goget('github.com/go-sql-driver/mysql')
-        [[ else if eq $typ "postgres" -]]
-        goget('github.com/lib/pq')
-        [[ else if eq $typ "sqlite" -]]
-        goget('github.com/mattn/go-sqlite3')
-        [[ end -]]
-        goget('github.com/shopspring/decimal')
-        buildApp(szAppName)
-    finally:
-        pass
+    err = util.goget('github.com/2kranki/jsonpreprocess')
+    if not err == None:
+        return err
+    err = util.goget('github.com/2kranki/go_util')
+    if not err == None:
+        return err
+    [[ if eq $typ "mariadb" -]]
+    err = util.goget('github.com/go-sql-driver/mysql')
+    [[ else if eq $typ "mssql" -]]
+    err = util.goget('github.com/denisenkom/go-mssqldb')
+    [[ else if eq $typ "mysql" -]]
+    err = util.goget('github.com/go-sql-driver/mysql')
+    [[ else if eq $typ "postgres" -]]
+    err = util.goget('github.com/lib/pq')
+    [[ else if eq $typ "sqlite" -]]
+    goget('github.com/mattn/go-sqlite3')
+    [[ end -]]
+    if not err == None:
+        return err
+    err = goget('github.com/shopspring/decimal')
+    if not err == None:
+        return err
+    err = util.buildGoApp(szAppName)
 
-    return iRc
+    return None
 
 
 

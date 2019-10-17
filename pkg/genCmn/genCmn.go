@@ -193,9 +193,10 @@ func (g *GenData) ReadJsonFileMain() error {
 }
 
 //----------------------------------------------------------------------------
-//							Generate the Output
+//						Generate phase specific files
 //----------------------------------------------------------------------------
 
+// GenFiles generates all the files in a specific phase (ie File Definition Table).
 func (g *GenData) GenFiles(fd *[]FileDefn) error {
 	var err error
 	var pathIn *util.Path
@@ -217,7 +218,7 @@ func (g *GenData) GenFiles(fd *[]FileDefn) error {
 		nil,
 		0)
 
-	// Run the first phase of file generation.
+	// Generate all the files for this phase.
 	for _, def := range *fd {
 
 		if !sharedData.Quiet() {
@@ -244,6 +245,10 @@ func (g *GenData) GenFiles(fd *[]FileDefn) error {
 
 	return err
 }
+
+//----------------------------------------------------------------------------
+//							Generate the Output
+//----------------------------------------------------------------------------
 
 func (g *GenData) GenOutput() error {
 	var err error
@@ -290,6 +295,7 @@ func (g *GenData) GenOutput() error {
 
 	return nil
 }
+
 
 //----------------------------------------------------------------------------
 //						Create a New GenData Structure
