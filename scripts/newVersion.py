@@ -290,7 +290,7 @@ def         mainCLI( listArgV=None ):
     iRc = 0
     try:
         # Read in the tag file.
-        with open('tag.txt', 'r') as tag:
+        with open('scripts/tag.txt', 'r') as tag:
             ver = tag.read().strip().split('.')
 
         # Update the version.
@@ -300,7 +300,7 @@ def         mainCLI( listArgV=None ):
         print newVer
 
         # Write out the new file
-        tagOut = open("tag.txt", "w")
+        tagOut = open("scripts/tag.txt", "w")
         tagOut.write(newVer)
         tagOut.close()
 
