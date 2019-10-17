@@ -87,7 +87,7 @@ def         parseArgs(listArgV=None):
                         dest='iVerbose', help='increase output verbosity'
                         )
     oCmdPrs.add_argument('--appdir', action='store', dest='szAppDir',
-                         default='/tmp', help='Set Application Base Directory'
+                         default='cmd', help='Set Application Source Subdirectory'
                          )
     oCmdPrs.add_argument('--appname', action='store', dest='szAppName',
                          default='[[$d.Name]]', help='Set Application Base Name'
@@ -102,7 +102,7 @@ def         parseArgs(listArgV=None):
     oArgs = oCmdPrs.parse_args( listArgV )
     if oArgs.iVerbose:
         print('*****************************************')
-        print('*      Generating the Application       *')
+        print('*       Building the Application        *')
         print('*****************************************')
         print()
     oArgs.szAppPath = os.path.join(oArgs.szAppDir, oArgs.szAppName)
@@ -123,14 +123,22 @@ def         mainCLI( listArgV=None ):
     
     # Parse the command line.
     parseArgs(listArgV)
+    if oArgs.fDebug:
+        util.fDebug = True
+    if oArgs.fForce:
+        util.fForce = True
+    if oArgs.iVerbose > 0:
+        util.fTrace = True
 
     # Perform the specified actions.
     err = util.goget('github.com/2kranki/jsonpreprocess')
     if not err == None:
-        return err
+        print(err.Error())
+        return 4
     err = util.goget('github.com/2kranki/go_util')
     if not err == None:
-        return err
+        print(err.Error())
+        return 4
     [[ if eq $typ "mariadb" -]]
     err = util.goget('github.com/go-sql-driver/mysql')
     [[ else if eq $typ "mssql" -]]
@@ -140,18 +148,26 @@ def         mainCLI( listArgV=None ):
     [[ else if eq $typ "postgres" -]]
     err = util.goget('github.com/lib/pq')
     [[ else if eq $typ "sqlite" -]]
-    goget('github.com/mattn/go-sqlite3')
+    err = util.goget('github.com/mattn/go-sqlite3')
     [[ end -]]
     if not err == None:
-        return err
-    err = goget('github.com/shopspring/decimal')
+        print(err.Error())
+        return 4
+    err = util.goget('github.com/shopspring/decimal')
     if not err == None:
-        return err
-    err = util.buildGoApp(szAppName)
+        print(err.Error())
+        return 4
+    err = util.buildGoApp(oArgs.szAppDir, oArgs.szAppName)
+    if not err == None:
+        print(err.Error())
+        return 4
+    di = util.DockerImage()
+    err = di.Build('[[$d.Name]]', '', True)
+    if not err == None:
+        print(err.Error())
+        return 4
 
-    return None
-
-
+    return 0
 
 
 ################################################################################
@@ -174,7 +190,7 @@ if '__main__' == __name__:
         iSecs = int(diffTime % 60.0)
         iMins = int((diffTime / 60.0) % 60.0)
         iHrs = int(diffTime / 3600.0)
-        print("run   Time: %d:%02d:%02d" % (iHrs, iMins, iSecs))
+        print("Run   Time: %d:%02d:%02d" % (iHrs, iMins, iSecs))
     sys.exit( iRc or 0 )
 
 

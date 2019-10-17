@@ -62,17 +62,16 @@ To use this as I do, try the following:
 1. Install GO
 2. `git clone github.com/2kranki/genapp.git`
 3. `cd genapp`
-4. `./b.sh`     <- builds /tmp/bin/genapp
-5. `./gen01.sh` will generate /tmp/app01 for all the sql servers.
+5. `./genSql01.py` builds /tmp/bin/genapp and then generates /tmp/app01 for all the sql servers.
 6. `cd /tmp/app01/app01xx` where xx stands for ma (MariaDB), ms (MS SQL), my (MySQL), pg (PostGres), or sq (SQLite)
-7. `./b.sh`     <- builds app01 as app
-8. `/tmp/bin/app01xx` <- (See Step 6 for xx) SQLite Application on localhost:8080
-9. `localhost:8080` in your browser
+7. `docker-compose up &` <- builds the app and runs it with its SQL Server Container. The output will indicate which localhost port # to log into.
+9. `localhost:????` in your browser where '????' is the port number indicated above.
 10. Select "Load test data" for Customer Table
 11. Back to main menu
 12. Select "Maintain Table" for Customer Table
 13. Play and have fun.
-14. Please send me any comments or problems.
+14. `docker-compose down` closes the application and SQL Server containers. 
+15. Please send me any comments or problems.
 
 Look in the "dbs" directory for specific notes on what I did to get each database driver running.  Each was a little different on my system and it might be that way for you.  Remember that you can over-ride the connection parameters from the command line.  To see the arguments, just run "/tmp/bin/app --help" and it will display them.  Actually, I no longer use the dbs shell scripts much. They should still work. I am just migrating to Python scripts, Docker and Jenkins.
 
