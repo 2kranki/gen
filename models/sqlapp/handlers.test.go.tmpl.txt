@@ -9,7 +9,7 @@
 [[- $d  := .TD.Data]]
 [[- $dn := .TD.Data.TitledName]]
 
-package main
+package hndlr[[$dn]]
 
 import (
 	"testing"

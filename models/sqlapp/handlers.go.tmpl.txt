@@ -13,7 +13,7 @@
 [[- $dn  := .TD.Data.TitledName]]
 
 
-package main
+package hndlr[[$dn]]
 
 import (
 	"fmt"

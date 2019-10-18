@@ -11,7 +11,7 @@
 [[- $t := .Table]]
 [[- $tn := .Table.TitledName]]
 
-package main
+package hndlr[[$dn]][[$tn]]
 
 import (
     "fmt"

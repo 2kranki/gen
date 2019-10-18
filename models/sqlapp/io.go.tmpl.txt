@@ -32,7 +32,7 @@
 
 // Generated: [[Time]] for [[$typ]] Database
 
-package main
+package io[[$dn]]
 
 import (
     "database/sql"

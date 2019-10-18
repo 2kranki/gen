@@ -14,7 +14,7 @@
 
 // Generated: [[Time]] for [[$typ]] Database
 
-package main
+package io[[$dn]][[$tn]]
 
 import (
 	"testing"

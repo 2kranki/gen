@@ -13,7 +13,7 @@
 [[- $t  := .Table]]
 [[- $tn := .Table.TitledName]]
 
-package main
+package [[$dn]][[$tn]]
 
 import (
     "fmt"

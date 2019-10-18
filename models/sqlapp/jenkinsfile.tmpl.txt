@@ -19,14 +19,23 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh './jenkins/build/build.sh'
+                sh './jenkins/build/build.py'
             }
         }
 
     /***
         stage('Test') {
             steps {
-                sh './jenkins/test/test.sh'
+                sh './jenkins/test/test.py'
+            }
+        }
+     ***/
+
+    /***
+        // Perform various code reviews.
+        stage('Review') {
+            steps {
+                sh './jenkins/review/review.py'
             }
         }
      ***/
@@ -34,7 +43,7 @@ pipeline {
     /***
         stage('Push') {
             steps {
-                sh './jenkins/push/push.sh'
+                sh './jenkins/push/push.py'
             }
         }
      ***/
@@ -42,7 +51,7 @@ pipeline {
     /***
         stage('Deploy') {
             steps {
-                sh './jenkins/deploy/deploy.sh'
+                sh './jenkins/deploy/deploy.py'
             }
         }
      ***/

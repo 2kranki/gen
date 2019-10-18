@@ -12,7 +12,7 @@
 
 // Generated: [[Time]] for [[$typ]] Database
 
-package main
+package io[[$dn]]
 
 import (
 	"testing"
@@ -34,7 +34,9 @@ func Test[[$dn]]Connect(t *testing.T) {
     var err         error
 
 	t.Logf("TestConnect()...\n")
-	DockerRun(t)
+[[ if ne $typ "sqlite" -]]
+	// DockerRun(t)
+[[- end ]]
 
 	io[[$dn]] = NewIo[[$dn]]()
 	io[[$dn]].DefaultParms()
@@ -101,7 +103,9 @@ func Test[[$dn]]IsDatabaseDefined(t *testing.T) {
     var err         error
 
 	t.Logf("TestIsDatabaseDefined()...\n")
-	DockerRun(t)
+[[ if ne $typ "sqlite" -]]
+	//DockerRun(t)
+[[- end ]]
 
 	io[[$dn]] = NewIo[[$dn]]()
 	io[[$dn]].DefaultParms()
@@ -135,7 +139,9 @@ func Test[[$dn]]DatabaseCreate(t *testing.T) {
     var err         error
 
 	t.Logf("TestDatabaseCreate()...\n")
-	DockerRun(t)
+[[ if ne $typ "sqlite" -]]
+	//DockerRun(t)
+[[- end ]]
 
 	io[[$dn]] = NewIo[[$dn]]()
 	io[[$dn]].DefaultParms()

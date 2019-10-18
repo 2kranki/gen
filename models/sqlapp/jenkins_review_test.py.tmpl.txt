@@ -6,7 +6,7 @@
 [[- $typ := $plg.Name ]]
 # vi:nu:et:sts=4 ts=4 sw=4
 
-""" Test the Application(s)
+""" Test Code Review script
 
 The module must be executed from the repository that contains the Jenkinsfile.
 
@@ -40,7 +40,7 @@ The module must be executed from the repository that contains the Jenkinsfile.
 
 
 from unittest import TestCase
-import lint
+import review
 import os
 
 
@@ -54,9 +54,9 @@ class testParseArgs(TestCase):
 
     def test_one(self):
         args = ["--debug"]
-        lint.parseArgs(args)
-        self.assertTrue(lint.oArgs.fDebug)
-        self.assertEqual(lint.oArgs.szAppName, '[[$d.Name]]')
+        review.parseArgs(args)
+        self.assertTrue(review.oArgs.fDebug)
+        self.assertEqual(review.oArgs.szAppName, '[[$d.Name]]')
 
 
 ################################################################################

@@ -22,16 +22,24 @@ import (
 	"net/http"
 	"os"
     "os/signal"
+
+    "[[$d.Name]]/pkg/hndlr[[$dn]]"
+	[[ range $t := $d.Tables -]]
+        [[- $tn := $t.TitledName ]]
+        "[[$d.Name]]/pkg/hndlr[[$dn]][[$tn]]"
+        "[[$d.Name]]/pkg/io[[$dn]][[$tn]]"
+	[[- end ]]
+    "[[$d.Name]]/pkg/io[[$dn]]"
 )
 
 const (
     RowsPerPage = 15
 )
 
-var     hndlrs[[$dn]]    *Tmpls[[$dn]]
+var     hndlrs[[$dn]]    *hndlr[[$dn]].Tmpls[[$dn]]
 	[[ range $t := $d.Tables -]]
         [[- $tn := $t.TitledName ]]
-	    var hndlrs[[$dn]][[$tn]]     *Handlers[[$dn]][[$tn]]
+	    var hndlrs[[$dn]][[$tn]]     *hndlr[[$dn]][[$tn]].Handlers[[$dn]][[$tn]]
 	[[- end ]]
 
 // HndlrFavIcon is the default Favorite Icon Handler.  It defaults to
@@ -130,7 +138,7 @@ func exec() {
     [[ if GenDebugging -]]
         log.Printf("\tConnecting to the Database...\n")
     [[- end ]]
-    io[[$dn]] := NewIo[[$dn]]()
+    io[[$dn]] := io[[$dn]].NewIo[[$dn]]()
     //io[[$dn]].SetName(db_name)
     io[[$dn]].SetPort(db_port)
     io[[$dn]].SetPW(db_pw)
@@ -154,7 +162,7 @@ func exec() {
     // Set up the Table I/O.
 	[[range $t := $d.Tables -]]
         [[- $tn := $t.TitledName]]
-	    io[[$dn]][[$tn]] := NewIo[[$dn]][[$tn]](io[[$dn]])
+	    io[[$dn]][[$tn]] := io[[$dn]][[$tn]].NewIo[[$dn]][[$tn]](io[[$dn]])
         if io[[$dn]][[$tn]] == nil {
             log.Fatalf("ERROR - Failed to Connect to Table, [[$dn]][[$tn]]\n\n\n")
         }
@@ -164,7 +172,7 @@ func exec() {
     [[ if GenDebugging -]]
         log.Printf("\tSetting up the Templates...\n")
     [[- end ]]
-    hndlrs[[$dn]] = NewTmpls[[$dn]]("")
+    hndlrs[[$dn]] = hndlr[[$dn]].NewTmpls[[$dn]]("")
     hndlrs[[$dn]].SetTmplsDir(baseDir + "/tmpl")
     hndlrs[[$dn]].SetupTmpls()
 
@@ -179,7 +187,7 @@ func exec() {
 	[[range $t := $d.Tables -]]
 	    [[ $tn := $t.TitledName ]]
 	    // [[$dn]].[[$tn]] URL handlers for table maintenance
-	    hndlrs[[$dn]][[$tn]] = NewHandlers[[$dn]][[$tn]](io[[$dn]][[$tn]], RowsPerPage, mux)
+	    hndlrs[[$dn]][[$tn]] = hndlr[[$dn]][[$tn]].NewHandlers[[$dn]][[$tn]](io[[$dn]][[$tn]], RowsPerPage, mux)
 	    hndlrs[[$dn]][[$tn]].Tmpls = hndlrs[[$dn]]
         if hndlrs[[$dn]][[$tn]].Tmpls == nil {
             log.Fatalf("ERROR - Failed to load templates from hndlrs[[$dn]]\n\n\n")

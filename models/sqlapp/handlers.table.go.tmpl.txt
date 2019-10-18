@@ -15,7 +15,7 @@
 [[- $tn := .Table.TitledName]]
 
 
-package main
+package hndlr[[$dn]][[$tn]]
 
 import (
 	"encoding/csv"
@@ -37,6 +37,9 @@ import (
 
 	"github.com/2kranki/go_util"
 	_ [[$d.Plugin.Plugin.GenImportString]]
+	"[[$d.Name]]/pkg/[[$dn]][[$tn]]"
+	"[[$d.Name]]/pkg/hndlr[[$dn]]"
+	"[[$d.Name]]/pkg/io[[$dn]][[$tn]]"
 )
 
 
@@ -51,20 +54,20 @@ import (
 
 type Handlers[[$dn]][[$tn]] struct {
     mu          sync.Mutex
-    db          *IO_[[$dn]][[$tn]]
+    db          *io[[$dn]][[$tn]].IO_[[$dn]][[$tn]]
     rowsPerPage int
-    Tmpls       *Tmpls[[$dn]]
+    Tmpls       *hndlr[[$dn]].Tmpls[[$dn]]
 }
 
 //----------------------------------------------------------------------------
 //                             Accessors
 //----------------------------------------------------------------------------
 
-func (h *Handlers[[$dn]][[$tn]]) DB() *IO_[[$dn]][[$tn]] {
+func (h *Handlers[[$dn]][[$tn]]) DB() *io[[$dn]][[$tn]].IO_[[$dn]][[$tn]] {
     return h.db
 }
 
-func (h *Handlers[[$dn]][[$tn]]) SetDB(db *IO_[[$dn]][[$tn]]) {
+func (h *Handlers[[$dn]][[$tn]]) SetDB(db *io[[$dn]][[$tn]].IO_[[$dn]][[$tn]]) {
     h.db = db
 }
 
@@ -121,7 +124,7 @@ func (h *Handlers[[$dn]][[$tn]]) SetupHandlers(mux *http.ServeMux) {
 // New creates a new Handlers object given the parameters needed by the handlers
 // and returns it to the caller if successful.  If it fails to properly create
 // the handlers then it must fail rather than return an error indicator.
-func NewHandlers[[$dn]][[$tn]](db *IO_[[$dn]][[$tn]], rowsPerPage int, mux *http.ServeMux) *Handlers[[$dn]][[$tn]] {
+func NewHandlers[[$dn]][[$tn]](db *io[[$dn]][[$tn]].IO_[[$dn]][[$tn]], rowsPerPage int, mux *http.ServeMux) *Handlers[[$dn]][[$tn]] {
     var h       *Handlers[[$dn]][[$tn]]
 
  	h = &Handlers[[$dn]][[$tn]]{db:db, rowsPerPage:rowsPerPage}
@@ -309,7 +312,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListPrev(w http.ResponseWriter, r *http.Request
 // ListShow displays a list page given a starting offset.
 func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int, msg string) {
     var err     error
-    var rcds    [][[$dn]][[$tn]]
+    var rcds    [][[$dn]][[$tn]].[[$dn]][[$tn]]
     var name    = "[[$dn]].[[$tn]].list.gohtml"
     [[if GenDebugging]]
         var str     strings.Builder
@@ -332,7 +335,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int, msg
     }
 
     data := struct {
-                Rcds        [][[$dn]][[$tn]]
+                Rcds        [][[$dn]][[$tn]].[[$dn]][[$tn]]
                 Offset      int
                 Msg         string
             }{rcds, offset, msg}
@@ -368,7 +371,7 @@ func (h *Handlers[[$dn]][[$tn]]) ListShow(w http.ResponseWriter, offset int, msg
 // RowDelete handles an delete request which comes from the row display form.
 func (h *Handlers[[$dn]][[$tn]]) RowDelete(w http.ResponseWriter, r *http.Request) {
     var err     error
-    var rcd     [[$dn]][[$tn]]
+    var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
     var i       int
     var key     string
 
@@ -426,7 +429,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowDelete(w http.ResponseWriter, r *http.Reques
 //----------------------------------------------------------------------------
 
 // RowDisplay displays the given record.
-func (h *Handlers[[$dn]][[$tn]]) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]], msg string) {
+func (h *Handlers[[$dn]][[$tn]]) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]][[$tn]].[[$dn]][[$tn]], msg string) {
     var err     error
 
     [[if GenDebugging]]
@@ -435,7 +438,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]]
 
     if h.Tmpls != nil {
         data := struct {
-                    Rcd         *[[$dn]][[$tn]]
+                    Rcd         *[[$dn]][[$tn]].[[$dn]][[$tn]]
                     Msg         string
                 }{rcd, msg}
         name := "[[$dn]].[[$tn]].form.gohtml"
@@ -461,7 +464,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowDisplay(w http.ResponseWriter, rcd  *[[$dn]]
 
 // RowEmpty displays the table row form with an empty row.
 func (h *Handlers[[$dn]][[$tn]]) RowEmpty(w http.ResponseWriter, r *http.Request) {
-    var rcd     [[$dn]][[$tn]]
+    var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowEmpty(%s)\n", r.Method)
@@ -489,7 +492,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowEmpty(w http.ResponseWriter, r *http.Request
 // RowFind handles displaying of the table row form display.
 func (h *Handlers[[$dn]][[$tn]]) RowFind(w http.ResponseWriter, r *http.Request) {
     var err     error
-    var rcd     [[$dn]][[$tn]]
+    var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
     var msg     string
     var i       int
     var key     string
@@ -540,7 +543,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowFind(w http.ResponseWriter, r *http.Request)
 
 // RowFirst displays the first row.
 func (h *Handlers[[$dn]][[$tn]]) RowFirst(w http.ResponseWriter, r *http.Request) {
-    var rcd     [[$dn]][[$tn]]
+    var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
     var err     error
 
     [[if GenDebugging]]
@@ -608,7 +611,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowForm(w http.ResponseWriter, r *http.Request)
 
 // RowInsert handles an add row request which comes from the row display form.
 func (h *Handlers[[$dn]][[$tn]]) RowInsert(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var err         error
 
     [[if GenDebugging]]
@@ -650,7 +653,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowInsert(w http.ResponseWriter, r *http.Reques
 
 // RowLast displays the first row.
 func (h *Handlers[[$dn]][[$tn]]) RowLast(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var err         error
 
     [[if GenDebugging]]
@@ -689,7 +692,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowLast(w http.ResponseWriter, r *http.Request)
 // RowNext handles an next request which comes from the row display form and
 // should display the next row from the current one.
 func (h *Handlers[[$dn]][[$tn]]) RowNext(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var err         error
     var i           int
     var key         string
@@ -735,7 +738,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowNext(w http.ResponseWriter, r *http.Request)
 // RowPrev handles an previous request which comes from the row display form
 // and should display the previous row from the current one.
 func (h *Handlers[[$dn]][[$tn]]) RowPrev(w http.ResponseWriter, r *http.Request) {
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var err         error
     var i           int
     var key         string
@@ -781,7 +784,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowPrev(w http.ResponseWriter, r *http.Request)
 func (h *Handlers[[$dn]][[$tn]]) RowShow(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].RowShow(%s)\n", r.Method)
@@ -831,7 +834,7 @@ func (h *Handlers[[$dn]][[$tn]]) RowShow(w http.ResponseWriter, r *http.Request)
 func (h *Handlers[[$dn]][[$tn]]) RowUpdate(w http.ResponseWriter, r *http.Request) {
     var err         error
     var key         string
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var i           int
 
     [[if GenDebugging]]
@@ -929,7 +932,7 @@ func (h *Handlers[[$dn]][[$tn]]) TableCreate(w http.ResponseWriter, r *http.Requ
 // data from a CSV file.
 func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var fileIn      multipart.File
     var cnt         int
     var maxMem      int64
@@ -1026,7 +1029,7 @@ func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Req
 // in some test rows.
 func (h *Handlers[[$dn]][[$tn]]) TableLoadTestData(w http.ResponseWriter, r *http.Request) {
     var err         error
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     [[if GenDebugging]]
         log.Printf("hndlr[[$tn]].TableLoadTestData(%s)\n", r.Method)
@@ -1091,7 +1094,7 @@ func (h *Handlers[[$dn]][[$tn]]) TableSaveCSV(w http.ResponseWriter, r *http.Req
 
     // Write the CSV file.
     if wtr != nil {
-        apply := func (rcd [[$dn]][[$tn]]) error {
+        apply := func (rcd [[$dn]][[$tn]].[[$dn]][[$tn]]) error {
                     log.Printf("\tRow: %v\n", rcd.ToStrings())
                     err2 := wtr.Write(rcd.ToStrings())
                     cntTotal++

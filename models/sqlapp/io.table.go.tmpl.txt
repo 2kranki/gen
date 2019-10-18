@@ -30,7 +30,7 @@
 [[- end ]]
 // Generated: [[Time]] for [[$typ]] Database
 
-package main
+package io[[$dn]][[$tn]]
 
 import (
     "database/sql"
@@ -38,11 +38,13 @@ import (
     _ "github.com/shopspring/decimal"
     [[ if GenDebugging -]]
         "log"
-    [[- end ]]
+    [[ end -]]
 	_ "strconv"
 
     "github.com/2kranki/go_util"
 	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
+    "[[$d.Name]]/pkg/[[$dn]][[$tn]]"
+    "[[$d.Name]]/pkg/io[[$dn]]"
 )
 
 //============================================================================
@@ -50,7 +52,7 @@ import (
 //============================================================================
 
 type IO_[[$dn]][[$tn]] struct {
-    io          *IO_[[$dn]]
+    io          *io[[$dn]].IO_[[$dn]]
 }
 
 //----------------------------------------------------------------------------
@@ -58,7 +60,7 @@ type IO_[[$dn]][[$tn]] struct {
 //----------------------------------------------------------------------------
 
 // RowDelete deletes the row with keys from the provided record, rcd.
-func (io *IO_[[$dn]][[$tn]]) RowDelete(rcd *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowDelete(rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowDeleteStmt .Table]]"
 
@@ -86,7 +88,7 @@ func (io *IO_[[$dn]][[$tn]]) RowDelete(rcd *[[$dn]][[$tn]]) error {
 
 // RowFind searches the Database for a matching row for the keys found in
 // the given record and returns the output in that same record.
-func (io *IO_[[$dn]][[$tn]]) RowFind(rcd *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowFind(rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err         error
     var sqlStmt     = "[[GenRowFindStmt $t]]"
 
@@ -111,7 +113,7 @@ func (io *IO_[[$dn]][[$tn]]) RowFind(rcd *[[$dn]][[$tn]]) error {
 // RowFirst returns the first row in the table, [[.Table.TitledName]].
 // If there are no rows in the table, then a blank/null record is returned
 // without error.
-func (io *IO_[[$dn]][[$tn]]) RowFirst(rcd *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowFirst(rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowFirstStmt .Table]]"
 
@@ -139,7 +141,7 @@ func (io *IO_[[$dn]][[$tn]]) RowFirst(rcd *[[$dn]][[$tn]]) error {
 //                             Row Insert
 //----------------------------------------------------------------------------
 
-func (io *IO_[[$dn]][[$tn]]) RowInsert(d *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowInsert(d *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
@@ -169,7 +171,7 @@ func (io *IO_[[$dn]][[$tn]]) RowInsert(d *[[$dn]][[$tn]]) error {
 //                             Row Last
 //----------------------------------------------------------------------------
 
-func (io *IO_[[$dn]][[$tn]]) RowLast(rcd *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowLast(rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowLastStmt .Table]]"
 
@@ -199,7 +201,7 @@ func (io *IO_[[$dn]][[$tn]]) RowLast(rcd *[[$dn]][[$tn]]) error {
 
 // RowNext returns the next row from the row given. If row after the current
 // one does not exist, then the first row is returned.
-func (io *IO_[[$dn]][[$tn]]) RowNext(rcd *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowNext(rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowNextStmt .Table]]"
 
@@ -228,10 +230,10 @@ func (io *IO_[[$dn]][[$tn]]) RowNext(rcd *[[$dn]][[$tn]]) error {
 // 'offset' is the offset into the result set ordered by the main index. Both
 // 'limit' and 'offset' are relative to 1. We return an address to the array
 // rows (structs) so that we don't have the overhead of copying them everwhere.
-func (io *IO_[[$dn]][[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]], error) {
+func (io *IO_[[$dn]][[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]].[[$dn]][[$tn]], error) {
     var err         error
     var sqlStmt = "[[GenRowPageStmt $t]]"
-    data := [][[$dn]][[$tn]]{}
+    data := [][[$dn]][[$tn]].[[$dn]][[$tn]]{}
 
     [[ if GenDebugging -]]
         log.Printf("io[[$tn]].RowPage(%d,%d)\n",offset,limit)
@@ -240,7 +242,7 @@ func (io *IO_[[$dn]][[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]], e
     err = io.io.Query(
                     sqlStmt,
                     func(r *sql.Rows) {
-                        var rcd     [[$dn]][[$tn]]
+                        var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
                         err = r.Scan([[$t.TitledFieldNameList "&rcd."]])
                         if err != nil {
                             log.Fatal(err)
@@ -266,7 +268,7 @@ func (io *IO_[[$dn]][[$tn]]) RowPage(offset int, limit int) ([][[$dn]][[$tn]], e
 //                             Row Prev
 //----------------------------------------------------------------------------
 
-func (io *IO_[[$dn]][[$tn]]) RowPrev(rcd *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowPrev(rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err         error
     var sqlStmt = "[[GenRowPrevStmt .Table]]"
 
@@ -291,7 +293,7 @@ func (io *IO_[[$dn]][[$tn]]) RowPrev(rcd *[[$dn]][[$tn]]) error {
 //                             Row Update
 //----------------------------------------------------------------------------
 
-func (io *IO_[[$dn]][[$tn]]) RowUpdate(d *[[$dn]][[$tn]]) error {
+func (io *IO_[[$dn]][[$tn]]) RowUpdate(d *[[$dn]][[$tn]].[[$dn]][[$tn]]) error {
     var err     error
     var sqlStmt = "[[GenRowInsertStmt .Table]]"
 
@@ -405,10 +407,10 @@ func (io *IO_[[$dn]][[$tn]]) TableDelete() error {
 
 // TableScan reads all the rows in the table applying a function to each of
 // them.
-func (io *IO_[[$dn]][[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]]) error) error {
+func (io *IO_[[$dn]][[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$dn]][[$tn]]) error) error {
     var sqlStmt = "[[GenTableDeleteStmt .Table]]"
     var err     error
-    var rcd     [[$dn]][[$tn]]
+    var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
     var sqlFirstStmt = "[[GenRowFirstStmt .Table]]"
     var sqlNextStmt = "[[GenRowNextStmt .Table]]"
     var row     *sql.Row
@@ -456,10 +458,10 @@ func (io *IO_[[$dn]][[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]]) error) er
 //----------------------------------------------------------------------------
 
 // New creates a new io struct.
-func NewIo[[$dn]][[$tn]](io *IO_[[$dn]]) *IO_[[$dn]][[$tn]] {
+func NewIo[[$dn]][[$tn]](io *io[[$dn]].IO_[[$dn]]) *IO_[[$dn]][[$tn]] {
     db := &IO_[[$dn]][[$tn]]{}
     if io == nil {
-        db.io = NewIo[[$dn]]()
+        db.io = io[[$dn]].NewIo[[$dn]]()
     } else {
         db.io = io
     }
