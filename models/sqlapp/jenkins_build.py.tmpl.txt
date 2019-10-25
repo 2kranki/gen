@@ -111,26 +111,16 @@ def         parseArgs(listArgV=None):
         print('Args:', oArgs)
 
 
+#---------------------------------------------------------------------
+#               performActions -- Perform the requested actions
+#---------------------------------------------------------------------
 
-
-################################################################################
-#                           Main Program Processing
-################################################################################
-
-def         mainCLI( listArgV=None ):
-    """ Command-line interface. """
+def         performActions():
+    '''
+    '''
     global      oArgs
-    
-    # Parse the command line.
-    parseArgs(listArgV)
-    if oArgs.fDebug:
-        util.fDebug = True
-    if oArgs.fForce:
-        util.fForce = True
-    if oArgs.iVerbose > 0:
-        util.fTrace = True
 
-    # Perform the specified actions.
+   # Go get the needed supplementals.
     err = util.goget('github.com/2kranki/jsonpreprocess')
     if not err == None:
         print(err.Error())
@@ -161,13 +151,38 @@ def         mainCLI( listArgV=None ):
     if not err == None:
         print(err.Error())
         return 4
+
+    # Build the application.
     di = util.DockerImage()
-    err = di.Build('[[$d.Name]]', '', True)
+    err = di.Build('[[$d.Name]]', '', '.', True)
     if not err == None:
         print(err.Error())
         return 4
 
     return 0
+
+
+################################################################################
+#                           Main Program Processing
+################################################################################
+
+def         mainCLI( listArgV=None ):
+    """ Command-line interface. """
+    global      oArgs
+    
+    # Parse the command line.
+    parseArgs(listArgV)
+    if oArgs.fDebug:
+        util.fDebug = True
+    if oArgs.fForce:
+        util.fForce = True
+    if oArgs.iVerbose > 0:
+        util.fTrace = True
+
+    # Perform the specified actions.
+    iRc = performActions()
+
+    return iRc
 
 
 ################################################################################

@@ -26,6 +26,10 @@
 # than Ubuntu. But, it uses a glibc substitute.
 
 
+# WARNING: This file must be located in the main directory
+#           because of docker limitations.
+
+
 # Build the application program using Debian-Golang container.
 FROM golang:1.12-stretch AS golang
 LABEL maintainer="bob@2kranki.us"
@@ -41,16 +45,16 @@ RUN go get github.com/2kranki/jsonpreprocess \
     && go get github.com/2kranki/go_util \
     && go get github.com/shopspring/decimal \
     && go get [[$plg.GenImportString]]
-WORKDIR /go/src/cmd
+WORKDIR /go/src/[[$d.Name]]/cmd
 COPY ./cmd      ./
-WORKDIR /go/src/pkg
+WORKDIR /go/src/[[$d.Name]]/pkg
 COPY ./pkg      ./
-WORKDIR /go/src/vendor
+WORKDIR /go/src/[[$d.Name]]/vendor
 COPY ./vendor   ./
-WORKDIR /go/src
+WORKDIR /go/src/[[$d.Name]]
 COPY go.mod     ./
 COPY go.sum     ./
-RUN go build -o /go/bin/[[$d.Name]] /go/src/cmd/[[$dn]]/*.go
+RUN go build -o /go/bin/[[$d.Name]] /go/src/[[$d.Name]]/cmd/[[$dn]]/*.go
 
 
 # Create the Production Container with the program built in the

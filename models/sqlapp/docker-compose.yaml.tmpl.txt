@@ -6,6 +6,9 @@
 [[- $typ := $plg.Name]]
 # vi:nu:et:sts=4 ts=4 sw=4
 
+# WARNING: This file must be located in the main directory
+#           because of docker-compose limitations.
+
 version: "3"
 
 #================================================
