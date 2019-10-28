@@ -33,6 +33,7 @@ import (
 // SQL.
 type DbField struct {
 	Name     string `json:"Name,omitempty"`    // Field Name
+	JsonName string `json:"JsonName,omitempty"`// Json Field Name
 	Label    string `json:"Label,omitempty"`   // Form Label
 	TypeDefn string `json:"TypeDef,omitempty"` // Type Definition
 	Len      int    `json:"Len,omitempty"`     // Data Maximum Length
@@ -85,15 +86,19 @@ func (f *DbField) CreateSql(cm string) string {
 		sp = fmt.Sprintf(" %s", f.SQLParms)
 	}
 
-	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp))
+	fmt.Fprintf(&str,"\\t%s\\t%s%s%s%s%s\\n", f.Name, ft, nl, pk, cm, sp)
 
 	return str.String()
 }
 
 func (f *DbField) CreateStruct() string {
-	var str strings.Builder
+	var str 	strings.Builder
+	var json	string
 
-	str.WriteString(fmt.Sprintf("\t%s\t%s\n", strings.Title(f.Name), f.GoType()))
+	if len(f.JsonName) > 0 {
+		json = fmt.Sprintf("\t`json:\"%s,omitempty\"`", f.JsonName)
+	}
+	fmt.Fprintf(&str,"\t%s\t%s%s\n", strings.Title(f.Name), f.GoType(), json)
 
 	return str.String()
 }
@@ -117,11 +122,11 @@ func (f *DbField) FormInput() string {
 	}
 
 	if f.Hidden {
-		str.WriteString(fmt.Sprintf("\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
-			f.TitledName(), f.TitledName(), m, f.TitledName()))
+		fmt.Fprintf(&str,"\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
+			f.TitledName(), f.TitledName(), m, f.TitledName())
 	} else {
-		str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></label>\n",
-			lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
+		fmt.Fprintf(&str,"\t<label>%s: <input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></label>\n",
+			lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName())
 	}
 
 	return str.String()
@@ -295,14 +300,26 @@ type DbTable struct {
 }
 
 func (t *DbTable) CreateStruct() string {
-	var str strings.Builder
+	var str 	strings.Builder
 
-	str.WriteString(fmt.Sprintf("type %s%s struct {\n", t.DB.TitledName(), t.TitledName()))
+	fmt.Fprintf(&str, "type %s%s struct {\n", t.DB.TitledName(), t.TitledName())
 	for i, _ := range t.Fields {
 		str.WriteString(t.Fields[i].CreateStruct())
 	}
-	str.WriteString("}\n\n")
+	fmt.Fprintf(&str,"}\n\n")
 
+	fmt.Fprintf(&str,"type %s%ss []*%s%s\n\n", t.DB.TitledName(), t.TitledName(),
+					t.DB.TitledName(), t.TitledName())
+
+	fmt.Fprintf(&str,"type Key struct {\n")
+	keys, _ := t.Keys()
+	for i, _ := range keys {
+		str.WriteString(t.Fields[i].CreateStruct())
+	}
+	fmt.Fprintf(&str,"}\n\n")
+
+	fmt.Fprintf(&str,"type %s%sIndex map[Key]*%s%s\n\n", t.DB.TitledName(), t.TitledName(),
+					t.DB.TitledName(), t.TitledName())
 	// I was generating some of the struct functions here.  It turned out to be a
 	// mistake.  Using the template system and supplement it with small functions
 	// is far easier making it a much better strategy.
@@ -313,7 +330,7 @@ func (t *DbTable) CreateStruct() string {
 func (t *DbTable) DeleteSql() string {
 	var str strings.Builder
 
-	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s;\\n", t.Name))
+	fmt.Fprintf(&str,"DROP TABLE IF EXISTS %s;\\n", t.Name)
 	if dbStruct.SqlType == "mssql" {
 		str.WriteString("GO\\n")
 	}
@@ -344,9 +361,9 @@ func (t *DbTable) FieldNameList(prefix string) string {
 			cm = ""
 		}
 		if len(prefix) > 0 {
-			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
+			fmt.Fprintf(&str,"%s%s%s", prefix, f.Name, cm)
 		} else {
-			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+			fmt.Fprintf(&str,"%s%s", f.Name, cm)
 		}
 	}
 	return str.String()
@@ -459,9 +476,9 @@ func (t *DbTable) InsertNameList(prefix string) string {
 		}
 		if !f.Incr {
 			if len(prefix) > 0 {
-				str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.Name, cm))
+				fmt.Fprintf(&str,"%s%s%s", prefix, f.Name, cm)
 			} else {
-				str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+				fmt.Fprintf(&str,"%s%s", f.Name, cm)
 			}
 		}
 	}
@@ -530,7 +547,7 @@ func (t *DbTable) KeysList(prefix, suffix string) string {
 		if len(suffix) > 0 {
 			suf = suffix
 		}
-		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, fn, suf, cm))
+		fmt.Fprintf(&str,"%s%s%s%s", pref, fn, suf, cm)
 	}
 	return str.String()
 }
@@ -547,7 +564,7 @@ func (t *DbTable) KeysListStr() string {
 		if i == len(strs)-1 {
 			cm = ""
 		}
-		str.WriteString(fmt.Sprintf("\"%s\"%s", fn, cm))
+		fmt.Fprintf(&str,"\"%s\"%s", fn, cm)
 	}
 	return str.String()
 }
@@ -563,9 +580,9 @@ func (t *DbTable) TitledFieldNameList(prefix string) string {
 			cm = ""
 		}
 		if len(prefix) > 0 {
-			str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.TitledName(), cm))
+			fmt.Fprintf(&str,"%s%s%s", prefix, f.TitledName(), cm)
 		} else {
-			str.WriteString(fmt.Sprintf("%s%s", f.TitledName(), cm))
+			fmt.Fprintf(&str,"%s%s", f.TitledName(), cm)
 		}
 	}
 	return str.String()
@@ -584,9 +601,9 @@ func (t *DbTable) TitledInsertNameList(prefix string) string {
 		}
 		if !f.Incr {
 			if len(prefix) > 0 {
-				str.WriteString(fmt.Sprintf("%s%s%s", prefix, f.TitledName(), cm))
+				fmt.Fprintf(&str,"%s%s%s", prefix, f.TitledName(), cm)
 			} else {
-				str.WriteString(fmt.Sprintf("%s%s", f.TitledName(), cm))
+				fmt.Fprintf(&str,"%s%s", f.TitledName(), cm)
 			}
 		}
 	}
@@ -613,7 +630,7 @@ func (t *DbTable) TitledKeysList(prefix, suffix string) string {
 		if len(suffix) > 0 {
 			suf = suffix
 		}
-		str.WriteString(fmt.Sprintf("%s%s%s%s", pref, strings.Title(fn), suf, cm))
+		fmt.Fprintf(&str,"%s%s%s%s", pref, strings.Title(fn), suf, cm)
 	}
 	return str.String()
 }

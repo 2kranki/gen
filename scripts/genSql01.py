@@ -112,8 +112,8 @@ def build():
             if not os.path.exists(oArgs.szBinDir):
                 os.makedirs(oArgs.szBinDir, 0o777)
             print("\tExecuting:", szCmd)
-            os.system(szCmd)
-    except OSError:
+            iRc = subprocess.call(szCmd, shell=True)
+    except:
         iRc = 4
 
     # Return to caller.
@@ -138,7 +138,7 @@ def genapp(szExecFileName, szOutPath):
         else:
             print("\tExecuting:", szCmd)
             os.system(szCmd)
-    except OSError:
+    except:
         iRc = 4
 
     # Return to caller.

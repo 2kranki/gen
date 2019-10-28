@@ -290,11 +290,48 @@ class   DockerContainer(object):
     """
     """
 
-    def run(self, szName, szTag, fForce=False):
-        ''' Pull a Docker Image
+    def __init__(self, szName, szTag):
+        ''' Set default parameters.
         '''
-        di = DockerImage()
-        image = di.Find(szName, szTag)
+        self._dockerName = szName
+        self._dockerTag = szTag
+
+    def _image_name(self):
+        szImageName = self._dockerName
+        if len(szTag):
+            szImageName += ':' + self._dockerTag
+        return szImageName
+
+    def kill(self, fForce=False):
+        ''' Kill a Docker Container and/or delete it.
+        Returns:
+            0 - Successful Completion
+            4 - Error occurred
+        '''
+        szImageName = self._image_name()
+
+        iRc = 0
+        if image == None:
+            pass
+        else:
+            szCmd = 'docker container rm -f {0}'.format(szContainerName)
+            if fTrace:
+                print("Issuing:", szCmd)
+            try:
+                os.system(szCmd)
+            except OSError:
+                iRc = 4
+
+        return iRc
+
+    def run(self, szParms, fForce=False):
+        ''' Run a Docker Container
+        '''
+        szImageName = self._image_name()
+        self.kill()
+
+        di = DockerImage(self._dockerName, self._dockerTag)
+        image = di.Find()
         if image == None:
             pass
         else:
@@ -303,10 +340,6 @@ class   DockerContainer(object):
             else:
                 return
 
-        szImageName = szName
-        if len(szTag):
-            szImageName += ':' + szTag
-        szContainerName = szImageName + '_1'
 
         # Get rid of any prior images if necessary
         if image == None:
@@ -321,6 +354,7 @@ class   DockerContainer(object):
                 pass
 
         # Pull the image
+        di.Pull()
         szCmd = "docker image pull {0} --format='{{json .}}'".format(szImageName)
         if fTrace:
             print("Issuing: {0}".format(szCmd))
@@ -340,7 +374,19 @@ class   DockerImage(object):
     """
     """
 
-    def Build(self, szName, szTag, szDockerFilePath='.', fForce=False):
+    def __init__(self, szName, szTag):
+        ''' Set default parameters.
+        '''
+        self._dockerName = szName
+        self._dockerTag = szTag
+
+    def _image_name(self):
+        szImageName = szName
+        if len(szTag):
+            szImageName += ':' + szTag
+        return szImageName
+
+    def build(self, szDockerFilePath='.', fForce=False):
         ''' Build a current Docker Image
         '''
         imageInfo = None
@@ -386,12 +432,12 @@ class   DockerImage(object):
         return None
 
 
-    def Find(self, szName, szTag):
+    def find(self):
         ''' Find information about a current Docker Image
         '''
         imageInfo = None
 
-        images = self.Images()
+        images = self.images()
         if len(images):
             for image in images:
                 if szName == image['Repository'] and szTag == image['Tag']:
@@ -400,7 +446,7 @@ class   DockerImage(object):
         return imageInfo
 
 
-    def Images(self):
+    def images(self):
         ''' Get Docker Image(s) Summary Data '''
 
         szCmd = "docker image ls --format='{{json .}}'"
@@ -424,7 +470,7 @@ class   DockerImage(object):
         return jsonImages
 
 
-    def Pull(self, szName, szTag):
+    def pull(self):
         ''' Pull a Docker Image
         '''
 
@@ -490,6 +536,15 @@ class   Error(object):
 #                           OS Execute
 #---------------------------------------------------------------------
 
+def DoCmd(szCmd, cwd=None):
+    """ Execute an O/S command without capturing input or output.
+
+    Returns:
+        r.returncode
+    """
+    r = subprocess.run(szCmd,cwd=cwd,shell=True)
+    return r
+
 def DoSys(szCmd, cwd=None):
     """ Execute an O/S command capturing output.
 
@@ -527,6 +582,48 @@ def         goget(pkgDir, szGoDir=None):
             os.system(szCmd)
 
     return None
+
+
+#---------------------------------------------------------------------
+#                           Mariadb Docker Class
+#---------------------------------------------------------------------
+
+class   MariadbDocker(object):
+        ''' Mariadb SQL Container Class
+        This class is for executing the Mariadb Docker Container.
+        '''
+
+    def __init__(self):
+        ''' Set default parameters.
+        '''
+        self._name = "mariadb1"
+        self._user = "root"
+        self._pw = "Passw0rd"
+        self._server = "localhost"
+        self._port = 4306
+        self._dockerName = "mariadb"
+        self._dockerTag = "latest"
+
+    def kill(self):
+        ''' Stop and delete the docker container if present.
+        '''
+        dc = DockerContainer(self._dockerName, self._dockerTag)
+        iRc = dc.kill()
+        return iRc
+
+    def pull(self):
+        ''' Pull the latest image if needed.
+        '''
+        di = DockerImage(self._dockerName, self._dockerTag)
+        iRc = di.pull()
+        return iRc
+
+    def run(self):
+        ''' Run the container.
+        '''
+        di = DockerImage(self._dockerName, self._dockerTag)
+        iRc = di.pull()
+        return iRc
 
 
 ################################################################################

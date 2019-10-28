@@ -16,6 +16,7 @@
 package [[$dn]][[$tn]]
 
 import (
+	"encoding/json"
     "fmt"
     [[if GenDebugging]]
         "log"
@@ -110,6 +111,9 @@ type [[$dn]][[$tn]]DbTableScanner interface {
 
 [[$t.CreateStruct]]
 
+// NOTE: For JsonMarshal() and JsonUnmarshal() to work properly, the JSON
+//  names must be defined above.
+
 //----------------------------------------------------------------------------
 //                              Compare
 //----------------------------------------------------------------------------
@@ -195,6 +199,35 @@ func (s *[[$dn]][[$tn]]) FieldsToValue() string {
 	[[end -]]
 
 	return v.Encode()
+}
+
+//----------------------------------------------------------------------------
+//                  		JSON Marshal
+//----------------------------------------------------------------------------
+
+func (d *[[$dn]][[$tn]]) JsonMarshal() ([]byte, error) {
+	var err         error
+    var text        []byte
+
+    if text, err = json.Marshal(d); err != nil {
+		return nil, fmt.Errorf("Error: marshalling json: %s : %v", err, d)
+	}
+
+	return text, err
+}
+
+//----------------------------------------------------------------------------
+//                             JSON Unmarshal
+//----------------------------------------------------------------------------
+
+func (d *[[$dn]][[$tn]]) JsonUnmarshal(text []byte) error {
+	var err         error
+
+	if err = json.Unmarshal(text, d); err != nil {
+		return fmt.Errorf("Error: unmarshalling json: %s : %s", err, text)
+	}
+
+	return err
 }
 
 //----------------------------------------------------------------------------
@@ -401,6 +434,10 @@ func (s *[[$dn]][[$tn]]) ToStrings() []string {
 // [[$tn]]New creates a new empty struct.
 func New[[$dn]][[$tn]]() *[[$dn]][[$tn]] {
     return &[[$dn]][[$tn]]{}
+}
+
+func New[[$dn]][[$tn]]s() *[[$dn]][[$tn]]s {
+    return &[[$dn]][[$tn]]s{}
 }
 
 

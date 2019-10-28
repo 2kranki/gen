@@ -21,6 +21,7 @@
             "Fields":[
                 {
                     "Name":"num",
+                    "JsonName":"num",
                     "TypeDef":"int",
                     "KeyNum":1,
                     //"Incr":true,
@@ -28,6 +29,7 @@
                 },
                 {
                     "Name":"name",
+                    "JsonName":"name",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30,
@@ -35,36 +37,49 @@
                 },
                 {
                     "Name":"addr1",
+                    "JsonName":"addr1",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30
                 },
                 {
                     "Name":"addr2",
+                    "JsonName":"addr2",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":30
                 },
                 {
                     "Name":"city",
+                    "JsonName":"city",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":20
                 },
                 {
                     "Name":"state",
+                    "JsonName":"state",
                     "Null":true,
                     "TypeDef":"text",
                     "Len":10
                 },
                 {
                     "Name":"zip",
+                    "JsonName":"zip",
                     "Null":true,
                     "TypeDef":"text",
-                    "Len": 15
+                    "Len": 20
+                },
+                {
+                    "Name":"country",
+                    "JsonName":"country",
+                    "Null":true,
+                    "TypeDef":"text",
+                    "Len": 30
                 },
                 {
                     "Name":"curbal",
+                    "JsonName":"curbal",
                     "Null":true,
                     "TypeDef":"money",
                     "Len":15,

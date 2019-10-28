@@ -30,6 +30,10 @@ szNetwork       = '[[$d.Name]]_net'
 szNetworkSuffix = 'net'
 
 
+sys.path.append('./scripts')
+import      util
+
+
 def getNetName(self, name=None, **kwargs):
     """ """
     if name == None:
@@ -42,108 +46,6 @@ def getNetName(self, name=None, **kwargs):
         print("getNetName(%s)" % (netname))
 
     return netname
-
-
-class       Cmd(object):
-
-    def __init__(self, **kwargs):
-        #super(cmd, self).__init(**kwargs)
-        pass
-
-    def cmd(self, **kwargs):
-        """ Command to be executed.
-            Warning - Commands should override this method.
-        """
-        raise NotImplementedError
-
-    def help(self):
-        """ Commands should override this method.
-        """
-        raise NotImplementedError
-
-    def name(self):
-        """ Commands should override this method.
-        """
-        raise NotImplementedError
-
-    def numArgs(self):
-        """ Commands should override this method.
-        """
-        raise NotImplementedError
-
-    def run(self, *argv, **kwargs):
-        """ Run the cmd
-        """
-        iRc = self.cmd(**kwargs)
-        return iRc
-
-
-class       Cmds(object):
-
-    def __init__(self, *argv, **kwargs):
-        self.oCmdDict = {}
-        for arg in argv:
-            self.oCmdDict[arg.name()] = arg
-
-
-    def __contains__(self, key):
-        if key in self.oCmdDict:
-            return True
-        else:
-            return False
-
-    def __getitem__(self, key):
-        if self.oCmdDict.has_key(key):
-            return self.oCmdDict[key]
-        else:
-            raise IndexError
-
-    def __setitem__(self, key, value):
-        self.oCmdDict[key] = value
-
-    def doCmd(self, name, *argv, **kwargs):
-        if name in self.oCmdDict:
-            iRc = self.oCmdDict[name].run(**kwargs)
-            return iRc
-        else:
-            raise IndexError
-
-    def doCmds(self, cmds, *argv, **kwargs):
-        """ Execute a group of commands
-
-        :param cmds:
-            A non-empty list of command names and arguments
-        """
-        if len(cmds) > 0:
-            i = 0
-            while i < len(cmds):
-                if oArgs.debug:
-                    print("Arg:", cmds[i])
-                # By adjusting i, we can have commands with parameters.
-                if cmds[i] in self.oCmdDict:
-                    iRc = self.oCmdDict[cmds[i]].run(**kwargs)
-                    if iRc > 0:
-                        break
-                else:
-                    print("Error - Invalid Command - {}".format(cmds[i]))
-                    iRc = 8
-                    break
-                i += 1
-        else:
-            raise RuntimeError
-        return iRc
-
-    def cmdDescs(self):
-        """ Build the description of the current commands in this object
-        """
-        szDesc = "Commands:\n"
-        for key in sorted(self.oCmdDict.keys()):
-            szName = self.oCmdDict[key].name()
-            szHelp = self.oCmdDict[key].help()
-            szDesc += "\t{} - {}\n".format(szName, szHelp)
-        szDesc += '\n\n'
-        return szDesc
-
 
 
 class BuildCmd(Cmd):
