@@ -265,7 +265,7 @@ func GenTableCountStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCountStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT COUNT(*) FROM %s%s;\\n", db.Schema, t.Name))
+	fmt.Fprintf(&str, "SELECT COUNT(*) FROM %s%s;\\n", db.Schema, t.Name)
 
 	return str.String()
 }
@@ -284,7 +284,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 		return intr.GenTableCreateStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s%s (\\n", db.Schema, t.Name))
+	fmt.Fprintf(&str, "CREATE TABLE IF NOT EXISTS %s%s (\\n", db.Schema, t.Name)
 	for i, _ := range t.Fields {
 		var cm string
 		var f *dbJson.DbField
@@ -347,7 +347,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 			sp = " " + f.SQLParms
 		}
 
-		str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s%s%s\\n", f.Name, ft, nl, pk, incr, cm, sp))
+		fmt.Fprintf(&str, "\\t%s\\t%s%s%s%s%s%s\\n", f.Name, ft, nl, pk, incr, cm, sp)
 	}
 	if hasKeys {
 		wrk := fmt.Sprintf("\\tCONSTRAINT PK_%s PRIMARY KEY(%s)\\n", t.Name, t.KeysList("", ""))
@@ -357,7 +357,7 @@ func GenTableCreateStmt(t *dbJson.DbTable) string {
 	if len(t.SQLParms) > 0 {
 		str.WriteString(",\\n")
 		for _, l := range t.SQLParms {
-			str.WriteString(fmt.Sprintf("%s\\n", l))
+			fmt.Fprintf(&str, "%s\\n", l)
 		}
 	}
 	str.WriteString(";\\n")
@@ -378,7 +378,7 @@ func GenTableDeleteStmt(t *dbJson.DbTable) string {
 		return intr.GenTableDeleteStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s%s;\\n", db.Schema, t.Name))
+	fmt.Fprintf(&str, "DROP TABLE IF EXISTS %s%s;\\n", db.Schema, t.Name)
 
 	return str.String()
 }
@@ -401,7 +401,7 @@ func GenRowDeleteStmt(t *dbJson.DbTable) string {
 	}
 
 	//TODO: Finish Row Delete SQL
-	str.WriteString(fmt.Sprintf("DELETE FROM %s%s WHERE %s;\\n", db.Schema, t.Name, GenKeySearchPlaceHolder(t, "=")))
+	fmt.Fprintf(&str, "DELETE FROM %s%s WHERE %s;\\n", db.Schema, t.Name, GenKeySearchPlaceHolder(t, "="))
 
 	return str.String()
 }
@@ -419,7 +419,7 @@ func GenRowFindStmt(t *dbJson.DbTable) string {
 		return intr.GenRowFindStmt(t)
 	}
 
-	str.WriteString(fmt.Sprintf("SELECT * FROM %s%s WHERE %s;\\n", db.Schema, t.Name, GenKeySearchPlaceHolder(t, "=")))
+	fmt.Fprintf(&str, "SELECT * FROM %s%s WHERE %s;\\n", db.Schema, t.Name, GenKeySearchPlaceHolder(t, "="))
 
 	return str.String()
 }
@@ -641,8 +641,8 @@ func GenFormDataDisplay(tb *dbJson.DbTable) string {
 			default:
 				m = ""
 			}
-			str.WriteString(fmt.Sprintf("\t<tr><td><label>%s</label></td> <td><input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></td></tr>\n",
-				lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName()))
+			fmt.Fprintf(&str, "\t<tr><td><label>%s</label></td> <td><input type=\"%s\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\"></td></tr>\n",
+				lbl, tdd, f.TitledName(), f.TitledName(), m, f.TitledName())
 		}
 	}
 	str.WriteString("</table>\n")
@@ -662,8 +662,8 @@ func GenFormDataDisplay(tb *dbJson.DbTable) string {
 			default:
 				m = ""
 			}
-			str.WriteString(fmt.Sprintf("\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
-				f.TitledName(), f.TitledName(), m, f.TitledName()))
+			fmt.Fprintf(&str, "\t<input type=\"hidden\" name=\"%s\" id=\"%s\" %svalue=\"{{.Rcd.%s}}\">\n",
+				f.TitledName(), f.TitledName(), m, f.TitledName())
 		}
 	}
 
@@ -688,8 +688,8 @@ func GenFormDataDisplay(tb *dbJson.DbTable) string {
 		default:
 			m = ""
 		}
-		str.WriteString(fmt.Sprintf("<input type=\"hidden\" id=\"key%d\" name=\"key%d\"%svalue=\"{{.Rcd.%s}}\">\n",
-			i, i, m, f.TitledName()))
+		fmt.Fprintf(&str, "<input type=\"hidden\" id=\"key%d\" name=\"key%d\"%svalue=\"{{.Rcd.%s}}\">\n",
+			i, i, m, f.TitledName())
 	}
 
 	return str.String()
@@ -715,7 +715,7 @@ func GenFormDataKeyGet(tb *dbJson.DbTable) string {
 		panic("GenFormDataDisplay: error getting keys!")
 	}
 	for i, _ := range keys {
-		str.WriteString(fmt.Sprintf("\t\t\tkey%d = document.getElementById(\"key%d\").value\n", i, i))
+		fmt.Fprintf(&str, "\t\t\tkey%d = document.getElementById(\"key%d\").value\n", i, i)
 	}
 
 	return str.String()
@@ -744,7 +744,7 @@ func GenFormDataKeys(tb *dbJson.DbTable) string {
 		str.WriteString("\"?\"")
 	}
 	for i, _ := range keys {
-		str.WriteString(fmt.Sprintf("+\"key=\"+key%d", i))
+		fmt.Fprintf(&str, "+\"key=\"+key%d", i)
 		//tdd := f.Typ.Html
 		if i < len(keys)-1 {
 			str.WriteString("+\",\"+")
