@@ -3,13 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01sq/db.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01sq/db.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/dockerCli.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/dockerCli.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/sqlapp/table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/table.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/dbJson/dbJson.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/dbJson/dbJson.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/genSql01.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/genSql01.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

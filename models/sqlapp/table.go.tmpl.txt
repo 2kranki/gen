@@ -231,6 +231,23 @@ func (d *[[$dn]][[$tn]]) JsonUnmarshal(text []byte) error {
 }
 
 //----------------------------------------------------------------------------
+//                      Set Keys from a Slice of Strings
+//----------------------------------------------------------------------------
+
+// SetKeysFromStrings creates a URL Value map from the table's key(s). The slice
+// is in field order within the struct, not sorted by field name.
+func (s *[[$dn]][[$tn]]) Key() Key {
+    var k       Key
+
+    [[range $fn := $t.Keys -]]
+        [[ $f := $t.FindField $fn -]]
+        k.[[ $f.TitledName ]] = s.[[ $f.TitledName ]]
+	[[end -]]
+
+	return k
+}
+
+//----------------------------------------------------------------------------
 //                      Keys to URL Value String
 //----------------------------------------------------------------------------
 
