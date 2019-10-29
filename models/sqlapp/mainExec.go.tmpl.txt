@@ -152,11 +152,14 @@ func exec() {
 
     // Set up to disconnect the database upon program interrupt.
     chnl := make(chan os.Signal, 1)
-    signal.Notify(chnl, os.Interrupt, os.Kill)
+    signal.Notify(chnl, os.Interrupt)
     go func(){
         <-chnl
         if io[[$dn]].IsConnected() {
-            io[[$dn]].Disconnect()
+            err = io[[$dn]].Disconnect()
+            if err != nil {
+                log.Fatal(err)
+            }
         }
         os.Exit(1)
     }()

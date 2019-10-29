@@ -254,17 +254,14 @@ func (s *[[$dn]][[$tn]]) Key() Key {
 // KeysToValue creates a URL Value map from the table's key(s).
 func (s *[[$dn]][[$tn]]) KeysToValue() string {
     var wrk string
-    var i   int
 
-    i = 0
     v := url.Values{}
     // Accumulate the key value(s) in KeyNum order.
     [[range $fn := $t.Keys -]]
         [[ $f := $t.FindField $fn -]]
             // Field: [[$f.TitledName]]
             [[$f.GenToString "wrk" "s" -]]
-            v.Add(fmt.Sprintf("key%d", i), wrk)
-            i++
+            v.Add(fmt.Sprintf("key%d", [[$f.KeyNum]]-1), wrk)
 	[[end -]]
 
 	return v.Encode()
@@ -338,18 +335,16 @@ func (s *[[$dn]][[$tn]]) Request2Struct(r *http.Request) error {
 // SetKeysFromStrings creates a URL Value map from the table's key(s). The slice
 // is in field order within the struct, not sorted by field name.
 func (s *[[$dn]][[$tn]]) SetKeysFromStrings(strs []string) error {
-    var i   int
 
     if len(strs) != [[$t.KeyCount]] {
         return fmt.Errorf("Error - Invalid key count of %d, need %d!\n", len(strs), [[$t.KeyCount]])
     }
+
     // Accumulate the key value(s) in KeyNum order.
     [[range $fn := $t.Keys -]]
-        [[ $f := $t.FindField $fn -]]
-            [[$f.GenFromString "s" "strs[i]" -]]
-            i++
-	[[end -]]
-
+        [[- $f := $t.FindField $fn -]]
+        [[ $f.GenFromStringSlice "s" "strs" $f.KeyNum  ]]
+	[[- end ]]
 	return nil
 }
 

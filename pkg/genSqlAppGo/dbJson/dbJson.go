@@ -176,7 +176,39 @@ func (f *DbField) GenFromString(dn, sn string) string {
 	return str
 }
 
-// GenToString generates code to convert the struct st.f field to string in variable, v.
+// GenFromString generates the code to go from a string (sn) to
+// a field of (dn).  sn and dn are variable names.
+func (f *DbField) GenFromStringSlice(dn string, sn string, idx int) string {
+	var str string
+
+	switch f.Typ.GoType() {
+	case "int":
+		fallthrough
+	case "int32":
+		fallthrough
+	case "int64":
+		{
+			wrk := "\t%s.%s, _ = strconv.ParseInt(%s[%d],0,64)\n"
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn, idx-1)
+		}
+	case "float64":
+		{
+			wrk := "\t\t%s.%s, _ = strconv.ParseFloat(%s[%d], 64)\n"
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn,idx-1)
+		}
+	case "time.Time":
+		{
+			wrk := "\t%s.%s, _ = time.Parse(time.RFC3339, %s[%d])\n"
+			str = fmt.Sprintf(wrk, dn, f.TitledName(), sn, idx-1)
+		}
+	default:
+		str = fmt.Sprintf("\t%s.%s = %s[%d]\n", dn, f.TitledName(), sn, idx-1)
+	}
+
+	return str
+}
+
+/// GenToString generates code to convert the struct st.f field to string in variable, v.
 func (f *DbField) GenToString(v string, st string) string {
 	var str string
 	var fldName string
