@@ -1,4 +1,12 @@
 # vi:nu:et:sts=4 ts=4 sw=4
+
+I have started changing genapp to conform to golangci-lint and pylint. Maybe I
+should have started out that way, but we did not have these tools when I first
+started programming and I never really used them until now.  I recommend that 
+you install them and get used to using them. In today's environment, CI is the
+rule not the exception and rightfully so. My bad! I will correct all the code
+over time.
+
 The objective with this program is to be able to generate applications and objects
 in several programming languages. I found the templating system in Go to have
 every feature that I needed for this project.

@@ -50,7 +50,10 @@ definition and having them control the generation process.
 - [ ] Add support for JSON data to/from HTTP client
 - [ ] Add JSON analysis phase that looks for errors in the definitions ahead of
         code generation such as SQLite rowid analysis.
+- [ ] Have the generated application conform to golangci-lint. Have the generated python scripts conform to pylint
 - [ ] Declare version 0.3
+- [ ] Have genapp and its packages conform to golangci-lint. Have genapp's python packages conform to pylint.
+- [ ] Write and debug CI phases, build, test and code review (lint).
 - [ ] Add GORM support 
 - [ ] Add SQL Generation for C#/.Net applications 
 
@@ -72,6 +75,8 @@ To use this as I do, try the following:
 13. Play and have fun.
 14. `docker-compose -f deployment/docker-compose.yaml down` closes the application and SQL Server containers. 
 15. Please send me any comments or problems.
+
+You may want to install golangci-lint and pylint. I have started using them to clean up the code. They are very easy to use and very good at pointing out potential problems. When I actually have Jenkins or a CI process running, I will automate their usage.
 
 Look in the "dbs" directory for specific notes on what I did to get each database driver running.  Each was a little different on my system and it might be that way for you.  Remember that you can over-ride the connection parameters from the command line.  To see the arguments, just run "/tmp/bin/app --help" and it will display them.  Actually, I no longer use the dbs shell scripts much. They should still work. I am just migrating to Python scripts, Docker and Jenkins.
 

@@ -10,6 +10,10 @@
         * write any extra needed documentation
 
 * GenSqlApp:
+    * Finish pylint work on util.py and build.py.
+    * Finish pylint work on genapp itself.
+    * Finish golangci-lint on generated application.
+    * Finish golangci-ling on genapp itself.
     * Change all output to be html format
     * Add html parsing to test code to further verify output
     * Add https support
