@@ -82,5 +82,7 @@
     * https://github.com/volatiletech/openapi-generator
     * https://github.com/volatiletech/sqlboiler
     * https://github.com/etcd-io/bbolt#comparison-with-other-databases
+    * https://github.com/hashicorp/terraform
+    * https://www.grpc.io   <= Use RPC to communicate with plugins ???, so they can be separate load modules
 
 

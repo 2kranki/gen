@@ -158,7 +158,9 @@ def         performActions():
     # Build the docker application.
     di = util.DockerImage('[[$d.Name]]')
     if not di == None:
-        err = di.build(force_flag=oArgs.fForce)
+        # Since we were requested to build the application, the docker
+        # container needs to be rebuilt as well forcefully.
+        err = di.build(force_flag=True)
         if not err == None:
             print(err.Error())
             return 4

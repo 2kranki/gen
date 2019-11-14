@@ -853,22 +853,26 @@ func (io *IO_[[$dn]]) Query(sqlStmt string, process func(rows *sql.Rows), args .
 
 // QueryRow executes an sql statement which does return row(s).
 func (io *IO_[[$dn]]) QueryRow(sqlStmt string, args ...interface{}) *sql.Row {
-    var err     error
+    [[ if GenDebugging -]]
+        var err     error
+    [[- end ]]
     var row     *sql.Row
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("QueryRow(%s)\n", sqlStmt)
-    [[end]]
+    [[- end ]]
 
     row = io.dbSql.QueryRow(sqlStmt, args...)
 
-    [[ if eq $typ "mssql" -]]
-        err = io.ErrChk(err)
+    [[ if GenDebugging -]]
+        [[ if eq $typ "mssql" -]]
+            err = io.ErrChk(err)
+        [[- end ]]
     [[- end ]]
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("...end Query(%s)\n", util.ErrorString(err))
-    [[end]]
+    [[- end ]]
     return row
 }
 

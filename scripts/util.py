@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-[[- $dot := . ]]
-[[- $d   := .TD.Data ]]
-[[- $dn  := .TD.Data.TitledName ]]
-[[- $plg := $d.Plugin.Plugin ]]
-[[- $typ := $plg.Name ]]
 # vi:nu:et:sts=4 ts=4 sw=4
 
 ''' Utility Routines
@@ -40,10 +35,14 @@ scripts.
 #   For more information, please refer to <http://unlicense.org/>
 
 
-import json
-import os
-import subprocess
-import sys
+import      contextlib
+import      json
+import      os
+import      re
+import      stat
+import      subprocess
+import      sys
+import      time
 
 
 debug_flag = False
@@ -88,7 +87,7 @@ def absolute_path(path, create_dirs=False):
 #                       Command Class
 #---------------------------------------------------------------------
 
-class Cmd:
+class       Cmd:
 
     def __init__(self, **kwargs):
         #super(cmd, self).__init(**kwargs)
@@ -125,18 +124,19 @@ class Cmd:
 #                       Commands Class
 #---------------------------------------------------------------------
 
-class Cmds:
+class       Cmds:
 
     def __init__(self, *argv, **kwargs):
         self.cmd_dict = {}
         for arg in argv:
             self.cmd_dict[arg.name()] = arg
 
+
     def __contains__(self, key):
         return key in self.cmd_dict
 
     def __getitem__(self, key):
-        if key in self.cmd_dict:
+        if self.cmd_dict.has_key(key):
             return self.cmd_dict[key]
         else:
             raise IndexError
@@ -192,7 +192,7 @@ class Cmds:
 #                           Docker Container
 #---------------------------------------------------------------------
 
-class DockerContainer:
+class   DockerContainer:
     '''
         This object provides for manipulating docker containers using the
         'docker container' cli command.
@@ -210,12 +210,6 @@ class DockerContainer:
         else:
             self._docker_tag = tag
 
-    def _container_name(self):
-        container_name = self._docker_name
-        if len(container_name) > 0:
-            container_name += '_1'
-        return container_name
-
     def _image_name(self):
         image_name = self._docker_name
         if len(self._docker_tag) > 0:
@@ -230,26 +224,25 @@ class DockerContainer:
             :param path:
                 path of the Dockerfile to use
             :param context:
-                directory path or URL of where the container's data is to come
-                from
+                directory path or URL of where the container's data is to come from
         '''
-
+        if name is None:
+            name = oArgs.name
         if debug_flag:
             print("build(%s)" % (name))
 
         # Perform the specified actions.
-        cmd_line = "docker image build --file %s -t %s %s" % (
-                        path, name, context)
-        rc = 0                  # Assume that it works
+        cmd_line = "docker image build --file %s -t %s %s" % (path, name, context)
+        irc = 0                 # Assume that it works
         try:
             if debug_flag:
                 print("Debug:", cmd_line)
             else:
-                rc = do_cmd(cmd_line)
+                irc = do_cmd(cmd_line)
         finally:
             pass
 
-        return rc
+        return irc
 
     def kill(self, force_flag=False):
         ''' Kill a Docker Container and/or delete it.
@@ -257,10 +250,12 @@ class DockerContainer:
             0 - Successful Completion
             4 - Error occurred
         '''
-        container_name = self._container_name()
+        image_name = self._image_name()
 
         irc = 0
-        if len(container_name) > 0:
+        if image is None:
+            pass
+        else:
             cmd_line = 'docker container rm -f {0}'.format(container_name)
             if trace_flag:
                 print("Issuing:", cmd_line)
@@ -277,7 +272,7 @@ class DockerContainer:
         image_name = self._image_name()
         self.kill()
 
-        di = DockerImage(self._docker_name, self._docker_tag)
+        di = DockerImage(self._docker_name, self.self._docker_tag)
         image = di.find()
         if image is None:
             pass
@@ -301,9 +296,8 @@ class DockerContainer:
                 irc = 4
 
         # Pull the image
-        di.pull()
-        cmd_line = "docker image pull {0} --format='{{json .}}'".format(
-                    image_name)
+        di.Pull()
+        cmd_line = "docker image pull {0} --format='{{json .}}'".format(image_name)
         if trace_flag:
             print("Issuing: {0}".format(cmd_line))
         try:
@@ -318,7 +312,7 @@ class DockerContainer:
 #                           Docker Image
 #---------------------------------------------------------------------
 
-class DockerImage:
+class   DockerImage:
     '''
         This object provides for manipulating docker images using the
         'docker image' cli command.
@@ -347,7 +341,7 @@ class DockerImage:
             Returns:
                 None or Error object
         '''
-        image_name = None
+        imageInfo = None
         print("force_flag:", force_flag)
 
         image_name = self._docker_name
@@ -361,8 +355,7 @@ class DockerImage:
             if force_flag:
                 pass
             else:
-                return Error("Error: image {0} already exists!".format(
-                                image_name))
+                return Error("Error: image {0} already exists!".format(image_name))
 
         # Get rid of any prior images if necessary
         if image is None:
@@ -376,15 +369,12 @@ class DockerImage:
                     print("\tIssuing: {0}".format(cmd_line))
                 irc = do_cmd(cmd_line)
                 if not irc == 0:
-                    return Error("Error: could not remove image {0}".format(
-                                    image_name))
+                    return Error("Error: could not remove image {0}".format(image_name))
             except OSError:
-                return Error("Error: could not remove image {0}".format(
-                                image_name))
+                return Error("Error: could not remove image {0}".format(image_name))
 
         # Pull the image
-        cmd_line = "docker image build -t {0} {1}".format(
-                        image_name, docker_file_path)
+        cmd_line = "docker image build -t {0} {1}".format(image_name, docker_file_path)
         if debug_flag:
             print("\tDebug: {0}".format(cmd_line))
         try:
@@ -392,26 +382,24 @@ class DockerImage:
                 print("\tIssuing: {0}".format(cmd_line))
             irc = do_cmd(cmd_line)
             if not irc == 0:
-                return Error("Error: could not build image {0}".format(
-                                image_name))
+                return Error("Error: could not build image {0}".format(image_name))
         except OSError:
-            return Error("Error: could not build image {0}".format(image_name))
+                return Error("Error: could not build image {0}".format(image_name))
 
         return None
 
     def find(self):
         ''' Find information about a current Docker Image
         '''
-        image_info = None
+        imageInfo = None
 
         images = self.images()
         if len(images) > 0:
             for image in images:
-                if self._docker_name == image['Repository']:
-                    if self._docker_tag == image['Tag']:
-                        image_info = image
+                if self._docker_name == image['Repository'] and self._docker_tag == image['Tag']:
+                    imageInfo = image
 
-        return image_info
+        return imageInfo
 
 
     def images(self):
@@ -468,8 +456,7 @@ class DockerImage:
                 pass
 
         # Pull the image
-        cmd_line = "docker image pull {0} --format='{{json .}}'".format(
-                    image_name)
+        cmd_line = "docker image pull {0} --format='{{json .}}'".format(image_name)
         if debug_flag:
             print("\tDebug: {0}".format(cmd_line))
         try:
@@ -486,7 +473,7 @@ class DockerImage:
 #                           Error Class
 #---------------------------------------------------------------------
 
-class Error:
+class   Error:
 
     def __init__(self, msg=None):
         ''' Convert Path to an absolute path.
@@ -511,7 +498,6 @@ def do_cmd(cmd_line, cwd='.'):
     '''
     r = subprocess.run(cmd_line, cwd=cwd, shell=True)
     return r.returncode
-
 
 def do_sys(cmd_line, cwd='.'):
     ''' Execute an O/S command capturing output.
@@ -558,8 +544,7 @@ def go_build_app(app_dir, app_name):
     if tmp_dir is None:
         tmp_dir = os.getenv('TEMP')
     if tmp_dir is None:
-        return Error("Error: Can't find temporary Directory,"
-                     " TMP or TEMP, in environment!")
+        return Error("Error: Can't find temporary Directory, TMP or TEMP, in environment!")
     app_dir_abs = absolute_path(os.path.join(cur_dir, app_dir, app_name))
     if trace_flag:
         print("\ttmp_dir:", tmp_dir)
@@ -568,8 +553,7 @@ def go_build_app(app_dir, app_name):
     # Reformat the source code.
     err = None
     try:
-        cmd_line = "go fmt {0}".format(os.path.join(cur_dir, app_dir,
-                                       app_name, '*.go'))
+        cmd_line = "go fmt {0}".format(os.path.join(cur_dir, app_dir, app_name, '*.go'))
         if trace_flag:
             print("Issuing: {0}".format(cmd_line))
         if debug_flag:
@@ -594,7 +578,7 @@ def go_build_app(app_dir, app_name):
         tmp_bin = os.path.join(tmp_dir, 'bin')
         if not os.path.exists(tmp_bin):
             if trace_flag:
-                print("Making: {0}".format(tmp_dir))
+                print("Making: {0}".format(tmpBin))
             os.makedirs(tmp_bin, 0o777)
         # Build the packages.
         if trace_flag:
@@ -621,11 +605,10 @@ def go_build_app(app_dir, app_name):
 
 def go_get(pkg_dir, go_dir=None):
     ''' Go get a go package if it is not already loaded.
-        The Go Directory is composed of 'bin', 'pkg' and 'src'. All
-        packages are loaded into 'src'.  So, we can just check there
-        to see if the package has already been loaded or not.  If the
-        package is in a repository, the full path must be used excluding
-        the repository type.
+        The Go Directory is composed of 'bin', 'pkg' and 'src'. All packages
+        are loaded into 'src'.  So, we can just check there to see if the
+        package has already been loaded or not.  If the package is in a
+        repository, the full path must be used excluding the repository type.
         example:
             goget('github.com/2kranki/go_util')
     '''
@@ -644,12 +627,11 @@ def go_get(pkg_dir, go_dir=None):
     return None
 
 
-######################################################################
+################################################################################
 #                           Command-line interface
-######################################################################
+################################################################################
 
 if '__main__' == __name__:
-    print("Error: Sorry, util.py provides classes and functions "
-          "for use by other scripts.")
+    print("Error: Sorry, util.py provides classes and functions for use by other scripts.")
     print("\tIt is not meant to be run by itself.")
     sys.exit(4)

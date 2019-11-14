@@ -22,19 +22,20 @@ import (
 )
 
 var (
-	debug         bool
-	execPath      string
-	force         bool
-	genDebugging  bool
-	genLogging    bool
-	genMuxWrapper bool
-	jsonPath      string
-	mainPath      string
-	mdldir        string
-	noop          bool
-	outdir        string
-	quiet         bool
-	replace       bool
+	debug         	bool
+	execPath      	string
+	force         	bool
+	genDebugging  	bool
+	genHttps    	bool			// Generate HTTPS support.
+	genLogging    	bool
+	genMuxWrapper 	bool
+	jsonPath      	string
+	mainPath      	string
+	mdldir        	string
+	noop          	bool
+	outdir        	string
+	quiet         	bool
+	replace       	bool
 )
 
 var defns map[string]interface{}
@@ -174,7 +175,8 @@ func main() {
 	flag.StringVar(&execPath, "x", "", "exec json path (optional)")
 	flag.BoolVar(&force, "force", false, "enable over-writes and deletions")
 	flag.BoolVar(&force, "f", false, "enable over-writes and deletions")
-	flag.BoolVar(&genDebugging, "genDebugging", true, "generate debugging output")
+	flag.BoolVar(&genDebugging, "genDebugging", false, "generate debugging output")
+	flag.BoolVar(&genHttps, "genHttps", true, "generate HTTPS support")
 	flag.BoolVar(&genLogging, "genLogging", true, "generate logging")
 	flag.BoolVar(&genMuxWrapper, "genMuxWrapper", true, "generate a wrapper around the mux")
 	flag.StringVar(&mainPath, "main", "", "set json main input path")

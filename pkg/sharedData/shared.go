@@ -30,6 +30,8 @@ func init() {
 	defns["Force"] = false
 	defns["GenDebugging"] = false
 	funcs["GenDebugging"] = GenDebugging
+	defns["GenHttps"] = false
+	funcs["GenHttps"] = GenHttps
 	defns["GenLogging"] = false
 	funcs["GenLogging"] = GenLogging
 	defns["GenMuxWrapper"] = false
@@ -174,6 +176,10 @@ func SetFunc(nm string, d interface{}) {
 
 func GenDebugging() bool {
 	return defns["GenDebugging"].(bool)
+}
+
+func GenHttps() bool {
+	return defns["GenHttps"].(bool)
 }
 
 func GenLogging() bool {

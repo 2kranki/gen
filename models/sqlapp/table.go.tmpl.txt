@@ -29,7 +29,9 @@ import (
     [[end]]
 	"net/url"
 
+    [[ if GenDebugging -]]
 	"github.com/2kranki/go_util"
+	[[- end ]]
 )
 
 //============================================================================

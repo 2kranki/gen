@@ -132,7 +132,42 @@ func MuxHandlerWrapper(f http.Handler) http.HandlerFunc {
 
 [[- end ]]
 
+[[ if GenHttps -]]
+func genCerts() {
+    var err     error
+
+    log.Printf("\tGenerating HTTPS Certificates if needed...\n")
+    log.Printf("\tChecking for HTTPS Certificates in %s...\n", certDir)
+    certPath := util.NewPath(certDir)
+    if certPath == nil {
+        log.Fatalf("Error: Creating %s path\n\n", certPath.String())
+    }
+    if err = certPath.CreateDir(); err != nil {
+        log.Fatalf("Error: Create %s : %s\n\n", certPath.String(), err.String())
+    }
+
+    certPem = certPath.Append("cert.pem")
+    if certPem == nil {
+        log.Fatalf("Error: Creating %s/cert.pem path\n\n", certPath.String())
+    }
+    keyPem = certPath.Append("key.pem")
+    if keyPem == nil {
+        log.Fatalf("Error: Creating %s/key.pem path\n\n", certPath.String())
+    }
+    if certPem.IsPathRegularFile() && keyPem.IsPathRegularFile():
+        return
+
+    log.Printf("\tMissing HTTPS Certificates will now be generated...\n")
+    //openssl command
+}
+[[- end ]]
+
 func exec() {
+
+    // Generate HTTPS Certificates if needed.
+    [[ if GenHttps -]]
+        genCerts()
+    [[- end ]]
 
     // Connect the databases.
     [[ if GenDebugging -]]

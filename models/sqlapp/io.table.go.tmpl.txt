@@ -36,12 +36,12 @@ import (
     "database/sql"
 	"fmt"
     _ "github.com/shopspring/decimal"
-    [[ if GenDebugging -]]
-        "log"
-    [[ end -]]
+    "log"
 	_ "strconv"
 
-    "github.com/2kranki/go_util"
+    [[ if GenDebugging -]]
+        "github.com/2kranki/go_util"
+    [[- end ]]
 	_ [[.TD.Data.Plugin.Plugin.GenImportString]]
     "[[$d.Name]]/pkg/[[$dn]][[$tn]]"
     "[[$d.Name]]/pkg/io[[$dn]]"
@@ -408,7 +408,6 @@ func (io *IO_[[$dn]][[$tn]]) TableDelete() error {
 // TableScan reads all the rows in the table applying a function to each of
 // them.
 func (io *IO_[[$dn]][[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$dn]][[$tn]]) error) error {
-    var sqlStmt = "[[GenTableDeleteStmt .Table]]"
     var err     error
     var rcd     [[$dn]][[$tn]].[[$dn]][[$tn]]
     var sqlFirstStmt = "[[GenRowFirstStmt .Table]]"
@@ -417,7 +416,7 @@ func (io *IO_[[$dn]][[$tn]]) TableScan(apply func (rcd [[$dn]][[$tn]].[[$dn]][[$
 
     [[ if GenDebugging -]]
         log.Printf("io[[$tn]].TableScanner()\n")
-        log.Printf("\tSQL:\n%s\n", sqlStmt)
+        log.Printf("\tSQL:\n%s\n", sqlFirstStmt)
     [[- end ]]
 
 

@@ -17,7 +17,7 @@ package hndlr[[$dn]]
 
 import (
 	"fmt"
-	"io"
+	_ "io"
 	_ "io/ioutil"
     "html/template"
     [[ if GenDebugging -]]
@@ -25,10 +25,12 @@ import (
     [[- end ]]
 	"net/http"
     _ "os"
-    "sort"
-    "strings"
+    _ "sort"
+    _ "strings"
 
-    "github.com/2kranki/go_util"
+    [[ if GenDebugging -]]
+        "github.com/2kranki/go_util"
+    [[- end ]]
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
 

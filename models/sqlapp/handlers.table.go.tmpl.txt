@@ -21,9 +21,7 @@ import (
 	"encoding/csv"
     "fmt"
     "io"
-    [[if GenDebugging]]
-        "log"
-    [[end]]
+    "log"
     "mime/multipart"
 	"net/http"
 	"strconv"
@@ -936,10 +934,13 @@ func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Req
     var fileIn      multipart.File
     var cnt         int
     var maxMem      int64
+    [[ if GenDebugging -]]
+        var handler     *multipart.FileHeader
+    [[- end ]]
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("hndlr[[$tn]].TableLoadCSV(%s)\n", r.Method)
-    [[end]]
+    [[- end ]]
     if r.Method != "POST" {
         http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
         return
@@ -959,20 +960,24 @@ func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Req
     // specified on the Form Input Type=file Name parameter.
     // it also returns the FileHeader so we can get the Filename,
     // the Header and the size of the file
-    fileIn, handler, err := r.FormFile(name)
+    [[ if GenDebugging -]]
+        fileIn, handler, err = r.FormFile(name)
+    [[- else ]]
+        fileIn, _, err = r.FormFile(name)
+    [[- end ]]
     if err != nil {
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("...end hndlr[[$tn]].TableLoadCSV(Error:500) - %s\n", util.ErrorString(err))
-    [[end]]
+    [[- end ]]
         http.Error(w, http.StatusText(500), http.StatusInternalServerError)
         return
     }
     defer fileIn.Close() //close the file when we finish
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("\tUploaded File: %+v\n", handler.Filename)
         log.Printf("\tFile Size: %+v\n", handler.Size)
         log.Printf("\tMIME Header: %+v\n", handler.Header)
-    [[end]]
+    [[- end ]]
     rdr := csv.NewReader(fileIn)
 
     // Create the table.
@@ -981,9 +986,9 @@ func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Req
         w.Write([]byte("Table creation had an error of:" + util.ErrorString(err)))
     }
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("\tLoading data...\n")
-    [[end]]
+    [[- end ]]
     for {
         record, err := rdr.Read()
         if err == io.EOF {
@@ -998,7 +1003,7 @@ func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Req
         [[ range $f := .Table.Fields ]]
             [[ $i := $t.FieldIndex $f.Name -]]
             [[ $f.GenFromStringArray "rcd" "record" $i ]]
-        [[end]]
+        [[- end ]]
 
         err = h.db.RowInsert(&rcd)
         if err != nil {
@@ -1007,9 +1012,9 @@ func (h *Handlers[[$dn]][[$tn]]) TableLoadCSV(w http.ResponseWriter, r *http.Req
             return
         }
         cnt++
-        [[if GenDebugging]]
+        [[ if GenDebugging -]]
             log.Printf("\t...Added row %d\n", cnt)
-        [[end]]
+        [[- end ]]
     }
     for i := 1; i > 0; i-- {
         str := fmt.Sprintf("Added %d rows\n", cnt)
@@ -1106,11 +1111,12 @@ func (h *Handlers[[$dn]][[$tn]]) TableSaveCSV(w http.ResponseWriter, r *http.Req
         err = h.db.TableScan(apply)
         wtr.Flush()
     } else {
-        err = fmt.Errorf("Error: Could not create CSV Writer!\n")
+        err = fmt.Errorf("Error: Could not create CSV Writer\n")
+        log.Printf("\t%s - for [[$dn]][[$tn]] table!\n", util.ErrorString(err))
     }
 
-    [[if GenDebugging]]
+    [[ if GenDebugging -]]
         log.Printf("...end hndlr[[$tn]].TableSaveCSV(%s)\n", util.ErrorString(err))
-    [[end]]
+    [[- end ]]
 }
 
