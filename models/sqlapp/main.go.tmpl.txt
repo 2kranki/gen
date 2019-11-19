@@ -45,10 +45,10 @@ var (
 	baseDir     string
 [[ if .TD.Main.Flags -]]
     [[GenVarDefns]]
-[[- end -]]
-[[ if GenHttps -]]
+[[- end ]]
+[[- if GenHttps ]]
 	certDir     string
-[[- end -]]
+[[- end ]]
 )
 
 
@@ -151,7 +151,7 @@ func main() {
     [[ if GenDebugging -]]
         log.Printf("\tExecuting the main process...\n")
     [[- end ]]
-	exec()
+	mainExec()
 }
 
 

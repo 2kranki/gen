@@ -36,7 +36,7 @@ func DockerRun(t *testing.T) {
 
 	t.Logf("DockerRun()...\n")
 
-	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	exec = util.NewExecArgs("", "../dbs/[[$typ]]/run.sh")
 	if exec == nil {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
@@ -64,7 +64,7 @@ func DockerRun(t *testing.T) {
 
 	t.Logf("DockerRun()...\n")
 
-	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	exec = util.NewExecArgs("", "../dbs/[[$typ]]/run.sh")
 	if exec == nil {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
@@ -91,7 +91,7 @@ func DockerRun(t *testing.T) {
 
 	t.Logf("DockerRun()...\n")
 
-	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	exec = util.NewExecArgs("", "../dbs/[[$typ]]/run.sh")
 	if exec == nil {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
@@ -118,7 +118,7 @@ func DockerRun(t *testing.T) {
 
 	t.Logf("DockerRun()...\n")
 
-	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
+	exec = util.NewExecArgs("", "../dbs/[[$typ]]/run.sh")
 	if exec == nil {
         t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
 	}
@@ -139,20 +139,8 @@ func DockerRun(t *testing.T) {
 
 // DockerRun executes the dbs/[[$typ]]/run.sh to create a fresh SQL Server.
 func DockerRun(t *testing.T) {
-    var err         error
-    var exec        *util.ExecCmd
 
 	t.Logf("DockerRun()...\n")
-
-	exec = util.NewExecCmd("../dbs/[[$typ]]/run.sh")
-	if exec == nil {
-        t.Fatalf("Error: Failed to create util.ExecCmd instance!\n\n")
-	}
-
-    //err = exec.Run()      // Not needed for sqlite!
-    if err != nil {
-        t.Fatalf("Error: %s\n\n", err)
-    }
 
 	t.Logf("DockerRun() - End\n\n\n")
 }
@@ -165,32 +153,31 @@ func DockerRun(t *testing.T) {
 
 func TestCert[[$dn]](t *testing.T) {
     var err         error
-    var exec        *util.ExecCmd
 
 	t.Logf("TestCert[[$dn]]()...\n")
 
     certDir = "/tmp/certs"
-    certDirPath = util.NewPath(certDir)
+    certDirPath := util.NewPath(certDir)
     err = certDirPath.RemoveDir()
     t.Logf("\tError: (Can be ignored) Deleting directory, %s - %s",
-            certDirPath.String(), err.String())
+            certDirPath.String(), util.ErrorString(err))
 
     genCerts()
 
-    certPath = certDirPath.Append("cert.pem")
+    certPath := certDirPath.Append("cert.pem")
     if !certPath.IsPathRegularFile() {
-        log.Errorf("\tError: Missing %s!\n", certPath.String())
+        t.Errorf("\tError: Missing %s!\n", certPath.String())
     }
 
-    keyPath = certDirPath.Append("key.pem")
+    keyPath := certDirPath.Append("key.pem")
     if !keyPath.IsPathRegularFile() {
-        log.Errorf("\tError: Missing %s!\n", keyPath.String())
+        t.Errorf("\tError: Missing %s!\n", keyPath.String())
     }
 
     // Clean up
     err = certDirPath.RemoveDir()
     t.Logf("\tError: (Can be ignored) Deleting directory, %s - %s",
-            certDirPath.String(), err.String())
+            certDirPath.String(), util.ErrorString(err))
 
 	t.Logf("TestCert[[$dn]]() - End\n\n\n")
 }

@@ -3,6 +3,8 @@
     "data":"./misc/test01sq/db.json.txt",
     "debug":true,
     "force":false,
+    "genDebugging":true,
+    "genHttps":true,
     "main":"./misc/test01sq/main.json.txt",
     "noop":false,
     "outdir":"/tmp/app01/app01sq",

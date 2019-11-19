@@ -22,21 +22,114 @@ import (
 	"testing"
 
     "github.com/2kranki/go_util"
+	"[[$d.Name]]/pkg/[[$dn]][[$tn]]"
+	"[[$d.Name]]/pkg/hndlr[[$dn]]"
+	"[[$d.Name]]/pkg/io[[$dn]]"
+	"[[$d.Name]]/pkg/io[[$dn]][[$tn]]"
 )
 
 //============================================================================
-//                              Test Data
+//                          [[$dn]][[$tn]]TestData
 //============================================================================
+
+type [[$dn]][[$tn]]TestData struct {
+    T           *testing.T
+    Port        string
+    PW          string
+    Server      string
+    User        string
+    NameDB      string
+    io          *io[[$dn]].IO_[[$dn]]
+}
+
+//----------------------------------------------------------------------------
+//                            Check Status Code
+//----------------------------------------------------------------------------
+
+// CheckRcd compares the given record to the needed one and issues an error if
+// they do not match.
+func (td *[[$dn]][[$tn]]TestData) CheckRcd(need int, rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) {
+    var rcd2        [[$dn]][[$tn]].[[$dn]][[$tn]]
+
+    rcd2.TestData(need)
+
+    if rcd.Compare(&rcd2) != 0 {
+        td.T.Fatalf("Error: Record Mismatch: needed:%+v have:%+v\n", rcd2, rcd)
+    }
+
+}
+
+//----------------------------------------------------------------------------
+//                             Disconnect
+//----------------------------------------------------------------------------
+
+// Disconnect disconnects the io[[$dn]] server.
+func (td *[[$dn]][[$tn]]TestData) Disconnect() {
+    var err         error
+
+    err = td.io.Disconnect()
+    if err != nil {
+        td.T.Fatalf("Error: Disconnect Failure: %s\n", err.Error())
+    }
+
+}
+
+//----------------------------------------------------------------------------
+//                             Set up
+//----------------------------------------------------------------------------
+
+// Setup initializes the Test Data.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *[[$dn]][[$tn]]TestData) Setup(t *testing.T) {
+
+    td.T = t
+    td.SetupDB()
+
+}
+
+//----------------------------------------------------------------------------
+//                             Set up DB
+//----------------------------------------------------------------------------
+
+// SetupDB initializes the DB with test records.
+// If it fails at something, it must issue a t.Fatalf().
+func (td *[[$dn]][[$tn]]TestData) SetupDB( ) {
+    var err         error
+
+    // Set connection parameters based on database SQL type.
+    td.io = io[[$dn]].NewIo[[$dn]]()
+    td.io.DefaultParms()
+    err = td.io.DatabaseCreate("[[$dn]]")
+    if err != nil {
+        td.T.Fatalf("Error: Creation Failure: %s\n", err.Error())
+    }
+
+}
+
+//----------------------------------------------------------------------------
+//                                  New
+//----------------------------------------------------------------------------
+
+// New creates a new io struct.
+func NewTest[[$dn]][[$tn]]() *[[$dn]][[$tn]]TestData {
+    td := [[$dn]][[$tn]]TestData{}
+    return &td
+}
+
+//----------------------------------------------------------------------------
+//                          TestData_[[$dn]][[$tn]]
+//----------------------------------------------------------------------------
 
 type TestData_[[$dn]][[$tn]] struct {
     T           *testing.T
     bt          *[[$dn]][[$tn]]TestData
-    db          *IO_[[$dn]][[$tn]]
+    db          *io[[$dn]][[$tn]].IO_[[$dn]][[$tn]]
     H           *Handlers[[$dn]][[$tn]]
     Mux         *http.ServeMux
     w           *httptest.ResponseRecorder
     Req         *http.Request
     Resp        *http.Response
+    tmpls       *hndlr[[$dn]].Tmpls[[$dn]]
 }
 
 //----------------------------------------------------------------------------
@@ -179,7 +272,7 @@ func (td *TestData_[[$dn]][[$tn]]) Setup(t *testing.T) {
 // If it fails at something, it must issue a t.Fatalf().
 func (td *TestData_[[$dn]][[$tn]]) SetupIO( ) {
     var err         error
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     td.bt = NewTest[[$dn]][[$tn]]()
     if td.bt == nil {
@@ -188,7 +281,7 @@ func (td *TestData_[[$dn]][[$tn]]) SetupIO( ) {
         td.bt.Setup(td.T)
     }
 
-    td.db = NewIo[[$dn]][[$tn]](td.bt.io)
+    td.db = io[[$dn]][[$tn]].NewIo[[$dn]][[$tn]](td.bt.io)
     if td.db == nil {
         td.T.Fatalf("Error: Unable to allocate FakeDB!\n")
     }
@@ -222,9 +315,8 @@ func (td *TestData_[[$dn]][[$tn]]) SetupIO( ) {
 func (td *TestData_[[$dn]][[$tn]]) SetupHandlers( ) {
 
 	// Set up main Handler which parses the templates.
-    hndlrs[[$dn]] = NewTmpls[[$dn]]()
-    hndlrs[[$dn]].SetTmplsDir("../tmpl")
-    hndlrs[[$dn]].SetupTmpls()
+    td.tmpls = hndlr[[$dn]].NewTmpls[[$dn]]("../../tmpl")
+    td.tmpls.SetupTmpls()
 
     // Set up the Handler object.
     td.H = &Handlers[[$dn]][[$tn]]{db:td.db, rowsPerPage:2}
@@ -252,8 +344,8 @@ func (td *TestData_[[$dn]][[$tn]]) SetupHandlers( ) {
 func Test[[$dn]][[$tn]]HndlrDB(t *testing.T) {
     var err         error
     var td          *TestData_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
-    var rcd2        [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
+    var rcd2        [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].DB()...\n")
     td = &TestData_[[$dn]][[$tn]]{}
@@ -278,7 +370,7 @@ func Test[[$dn]][[$tn]]HndlrDB(t *testing.T) {
 func Test[[$dn]][[$tn]]HndlrListIndex(t *testing.T) {
     var err         error
     var td          *TestData_[[$dn]][[$tn]]
-    var r           string
+    //var r           string
 
     t.Logf("Test[[$tn]].HndlrListIndex()...\n")
     td = &TestData_[[$dn]][[$tn]]{}
@@ -288,7 +380,19 @@ func Test[[$dn]][[$tn]]HndlrListIndex(t *testing.T) {
         t.Fatalf("Error: Cannot connect: %s\n", err.Error())
     }
 
+    // Issue a request for ???.
+    //TODO: Create a first() request followed by next()'s'.
+
+    // Check response.
+    /*TODO: Uncomment when requests are actually being performed.
     r = td.ResponseBody()
+    if r != "" {
+        t.Logf("\t%s\n", r)
+    }
+    */
+
+    // Parse response to verify
+    //TODO: Parse the response.
 
     t.Logf("Test[[$tn]].HndlrListIndex() - End of Test\n\n\n")
 }
@@ -305,6 +409,13 @@ func Test[[$dn]][[$tn]]HndlrListShow(t *testing.T) {
     td.Setup(t)
 
     // First try a blank record.
+    //TODO: Perform Show()
+
+    // Get the response.
+    //TODO: get the response with initial error checking.
+
+    // Parse response to verify
+    //TODO: Parse the response.
 
     t.Logf("TestListShow() - End of Test\n\n\n")
 }
@@ -316,7 +427,7 @@ func Test[[$dn]][[$tn]]HndlrListShow(t *testing.T) {
 func Test[[$dn]][[$tn]]HndlrRowDelete(t *testing.T) {
     var err         error
     var td          *TestData_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     //expectedBody    := ""
 
     t.Logf("TestRowDelete()...\n")
@@ -388,7 +499,7 @@ func Test[[$dn]][[$tn]]HndlrRowEmpty(t *testing.T) {
 
 func Test[[$dn]][[$tn]]HndlrRowFirst(t *testing.T) {
     var td          *TestData_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
 /*****
     expectedBody    := ""
  *****/
@@ -424,7 +535,7 @@ func Test[[$dn]][[$tn]]HndlrRowFirst(t *testing.T) {
 
 func Test[[$dn]][[$tn]]HndlrRowInsert(t *testing.T) {
     var td          *TestData_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     //expectedBody    := ""
 
     t.Logf("Test[[$tn]]RowInsert()...\n")
@@ -458,7 +569,7 @@ func Test[[$dn]][[$tn]]HndlrRowInsert(t *testing.T) {
 
 func Test[[$dn]][[$tn]]HndlrRowNext(t *testing.T) {
     var td          *TestData_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowNext()...\n")
     td = &TestData_[[$dn]][[$tn]]{}

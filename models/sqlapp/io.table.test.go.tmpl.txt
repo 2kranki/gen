@@ -22,7 +22,9 @@ import (
 	    "time"
 	[[- end ]]
 
-	_ [[$d.Plugin.Plugin.GenImportString]]
+    "[[$d.Name]]/pkg/io[[$dn]]"
+    "[[$d.Name]]/pkg/[[$dn]][[$tn]]"
+	_ [[ $d.Plugin.Plugin.GenImportString ]]
 )
 
 
@@ -37,7 +39,7 @@ type [[$dn]][[$tn]]TestData struct {
     Server      string
     User        string
     NameDB      string
-    io          *IO_[[$dn]]
+    io          *io[[$dn]].IO_[[$dn]]
 }
 
 //----------------------------------------------------------------------------
@@ -46,8 +48,8 @@ type [[$dn]][[$tn]]TestData struct {
 
 // CheckRcd compares the given record to the needed one and issues an error if
 // they do not match.
-func (td *[[$dn]][[$tn]]TestData) CheckRcd(need int, rcd *[[$dn]][[$tn]]) {
-    var rcd2        [[$dn]][[$tn]]
+func (td *[[$dn]][[$tn]]TestData) CheckRcd(need int, rcd *[[$dn]][[$tn]].[[$dn]][[$tn]]) {
+    var rcd2        [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     rcd2.TestData(need)
 
@@ -95,7 +97,7 @@ func (td *[[$dn]][[$tn]]TestData) SetupDB( ) {
     var err         error
 
     // Set connection parameters based on database SQL type.
-    td.io = NewIo[[$dn]]()
+    td.io = io[[$dn]].NewIo[[$dn]]()
     td.io.DefaultParms()
     err = td.io.DatabaseCreate("[[$dn]]")
     if err != nil {
@@ -128,7 +130,7 @@ func Test[[$dn]][[$tn]]CreateDeleteTable(t *testing.T) {
     var io          *IO_[[$dn]][[$tn]]
 
 	t.Logf("TestCreateTable()...\n")
-	DockerRun(t)
+	//TODO: DockerRun(t)
 	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
 	io = NewIo[[$dn]][[$tn]](td.io)
@@ -160,10 +162,10 @@ func Test[[$dn]][[$tn]]RowInsert(t *testing.T) {
     var err         error
     var td          *[[$dn]][[$tn]]TestData
     var io          *IO_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]].RowInsert()...\n")
-	DockerRun(t)
+	//TODO: DockerRun(t)
 	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
 	io = NewIo[[$dn]][[$tn]](td.io)
@@ -244,11 +246,11 @@ func Test[[$dn]][[$tn]]RowPage(t *testing.T) {
     var err         error
     var td          *[[$dn]][[$tn]]TestData
     var io          *IO_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
-    var rcds        [][[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
+    var rcds        [][[$dn]][[$tn]].[[$dn]][[$tn]]
 
     t.Logf("Test[[$tn]]RowPage()...\n")
-	DockerRun(t)
+	//TODO: DockerRun(t)
 	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
 	io = NewIo[[$dn]][[$tn]](td.io)
@@ -336,11 +338,11 @@ func Test[[$dn]][[$tn]]TableScan(t *testing.T) {
     var err         error
     var td          *[[$dn]][[$tn]]TestData
     var io          *IO_[[$dn]][[$tn]]
-    var rcd         [[$dn]][[$tn]]
+    var rcd         [[$dn]][[$tn]].[[$dn]][[$tn]]
     var cnt         int
 
 	t.Logf("TestTableScan()...\n")
-	DockerRun(t)
+	//TODO: DockerRun(t)
 	td = NewTest[[$dn]][[$tn]]()
 	td.Setup(t)
 	io = NewIo[[$dn]][[$tn]](td.io)
@@ -362,7 +364,7 @@ func Test[[$dn]][[$tn]]TableScan(t *testing.T) {
         }
     }
 
-    apply := func (rcd [[$dn]][[$tn]]) error {
+    apply := func (rcd [[$dn]][[$tn]].[[$dn]][[$tn]]) error {
                 t.Logf("\tScan Row %d\n", cnt)
                 cnt++
                 return nil

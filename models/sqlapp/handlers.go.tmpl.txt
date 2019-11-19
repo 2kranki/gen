@@ -17,7 +17,9 @@ package hndlr[[$dn]]
 
 import (
 	"fmt"
-	_ "io"
+    [[ if GenDebugging -]]
+	    "io"
+    [[- end ]]
 	_ "io/ioutil"
     "html/template"
     [[ if GenDebugging -]]
@@ -25,14 +27,20 @@ import (
     [[- end ]]
 	"net/http"
     _ "os"
-    _ "sort"
-    _ "strings"
+    [[ if GenDebugging -]]
+        "sort"
+        "strings"
+    [[- end ]]
 
     [[ if GenDebugging -]]
         "github.com/2kranki/go_util"
     [[- end ]]
 	_ [[$d.Plugin.Plugin.GenImportString]]
 )
+
+//----------------------------------------------------------------------------
+//                     [[$dn]] Templates
+//----------------------------------------------------------------------------
 
 type Tmpls[[$dn]]  struct {
     tmplsDir        string
@@ -95,18 +103,6 @@ func (h *Tmpls[[$dn]]) MainDisplay(w http.ResponseWriter, msg string) {
 }
 
 //----------------------------------------------------------------------------
-//                                  N e w
-//----------------------------------------------------------------------------
-
-func NewTmpls[[$dn]](dir string) *Tmpls[[$dn]] {
-    t := &Tmpls[[$dn]]{}
-    if "" == dir {
-        t.tmplsDir = "./tmpl"
-    }
-    return t
-}
-
-//----------------------------------------------------------------------------
 //                           Setup Templates
 //----------------------------------------------------------------------------
 
@@ -139,6 +135,20 @@ func (t *Tmpls[[$dn]]) SetupTmpls() {
         }
         log.Printf("\tend of SetupTmpls()\n")
     [[- end ]]
+}
+
+//----------------------------------------------------------------------------
+//                                  N e w
+//----------------------------------------------------------------------------
+
+func NewTmpls[[$dn]](dir string) *Tmpls[[$dn]] {
+    t := &Tmpls[[$dn]]{}
+    if dir == "" {
+        t.tmplsDir = "./tmpl"
+    } else {
+        t.tmplsDir = dir
+    }
+    return t
 }
 
 func init() {

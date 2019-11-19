@@ -445,7 +445,7 @@ func (s *[[$dn]][[$tn]]) ToStrings() []string {
 //                             New Struct
 //----------------------------------------------------------------------------
 
-// [[$tn]]New creates a new empty struct.
+// New[[$dn]][[$tn]] creates a new empty struct.
 func New[[$dn]][[$tn]]() *[[$dn]][[$tn]] {
     return &[[$dn]][[$tn]]{}
 }
