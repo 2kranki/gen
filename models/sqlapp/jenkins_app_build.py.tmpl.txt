@@ -53,7 +53,6 @@ import      docker_sql
 
 
 args = None                                         # pylint: disable=C0103
-szAppName = '[[$dn]]'                               # pylint: disable=C0103
 szGoDir = '${HOME}/go'                              # pylint: disable=C0103
 
 
@@ -74,7 +73,7 @@ def         parse_args(listArgV=None):
     # Parse the command line.
     szUsage = "usage: %prog [options] sourceDirectoryPath [destinationDirectoryPath]"
     cmd_prs = argparse.ArgumentParser( )
-    cmd_prs.add_argument('-b', '--build', action='store_false', dest='fBuild',
+    cmd_prs.add_argument('-b', '--build', action='store_false', dest='build',
                          default=True, help='Do not build genapp before using it'
                          )
     cmd_prs.add_argument('-d', '--debug', action='store_true', dest='debug',
@@ -86,24 +85,26 @@ def         parse_args(listArgV=None):
     cmd_prs.add_argument('-v', '--verbose', action='count', default=1,
                          dest='verbose', help='increase output verbosity'
                          )
-    cmd_prs.add_argument('--appdir', action='store', dest='szAppDir',
+    cmd_prs.add_argument('--appdir', action='store', dest='app_dir',
                          default='cmd', help='Set Application Source Subdirectory'
                          )
-    cmd_prs.add_argument('--appname', action='store', dest='szAppName',
+    cmd_prs.add_argument('--appname', action='store', dest='app_name',
                          default='[[$d.Name]]', help='Set Application Base Name'
                          )
-    cmd_prs.add_argument('--bindir', action='store', dest='szBinDir',
+    cmd_prs.add_argument('--bindir', action='store', dest='bin_dir',
                          default='/tmp/bin', help='Set Binary Directory'
                          )
-    cmd_prs.add_argument('--mdldir', action='store', dest='szModelDir',
+    cmd_prs.add_argument('--mdldir', action='store', dest='model_dir',
                          default='./models', help='Set genapp Model Directory'
                          )
     cmd_prs.add_argument('args', nargs=argparse.REMAINDER, default=[])
     args = cmd_prs.parse_args(listArgV)
-    args.szAppPath = os.path.join(args.szAppDir, args.szAppName)
+    args.app_path = os.path.join(args.app_dir, args.app_name)
     if args.debug:
         print("In DEBUG Mode...")
         print('Args:', args)
+
+    return 0
 
 
 #---------------------------------------------------------------------
@@ -150,17 +151,17 @@ def         perform_actions():
         return 4
 
     # Build the application.
-    err = util.go_build_app(args.szAppDir, args.szAppName)
+    err = util.go_build_app(args.app_dir, args.app_name)
     if not err == None:
         err.print()
         return 4
 
     # Build the docker application.
-    di = util.DockerImage('[[$d.Name]]')
+    di = util.DockerImage('[[$d.Name]]', force=True)
     if not di == None:
         # Since we were requested to build the application, the docker
-        # container needs to be rebuilt as well forcefully.
-        err = di.build(force_flag=True)
+        # container needs to be rebuilt as well.
+        err = di.build()
         if not err == None:
             err.print()
             return 4

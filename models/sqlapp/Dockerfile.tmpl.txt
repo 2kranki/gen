@@ -41,10 +41,10 @@ RUN apt-get update && apt-get install --yes sqlite3 libsqlite3-dev
 ENV CGO_ENABLED=0
 [[- end ]]
 ENV GOOS=linux
-RUN go get github.com/2kranki/jsonpreprocess \
-    && go get github.com/2kranki/go_util \
-    && go get github.com/shopspring/decimal \
-    && go get [[$plg.GenImportString]]
+RUN go get -u github.com/2kranki/jsonpreprocess \
+    && go get -u github.com/2kranki/go_util \
+    && go get -u github.com/shopspring/decimal \
+    && go get -u [[$plg.GenImportString]]
 WORKDIR /go/src/[[$d.Name]]/cmd
 COPY ./cmd      ./
 WORKDIR /go/src/[[$d.Name]]/pkg

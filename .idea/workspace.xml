@@ -3,21 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/genapp/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/genapp/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/misc/test01sq.exec.json.txt" beforeDir="false" afterPath="$PROJECT_DIR$/misc/test01sq.exec.json.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/handlers.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/handlers.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/handlers.table.test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/handlers.table.test.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/io.table.test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/io.table.test.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_deploy.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_deploy.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_push.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_push.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_review.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_review.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_test.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/main_test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/main_test.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/table.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build_test.py.tmpl.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
