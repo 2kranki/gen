@@ -2,10 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/cert.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/cert.test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/httpServer.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/httpServer.test.go.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/Dockerfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/Dockerfile.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build_test.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build_test.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/main_test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/main_test.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

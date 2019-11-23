@@ -7,7 +7,12 @@
 // primary application processing.
 
 // Notes:
-//  1.  If HTTPS is specified, we will default to looking for key.pem and
+//  1.  When working with package main, please keep in mind that the
+//      more functionality that you can move into functions, the easier
+//      testing will be. This allows you to test the functionality in
+//      small portions. Moving common functionality to packages that are
+//      easily tested is even better.
+//  2.  If HTTPS is specified, we will default to looking for key.pem and
 //      cert.pem in the certDir ("/tmp/cert" default). If the directory
 //      or the required files are not present, we will generate temporary
 //      versions of them in the specified directory using openssl with
@@ -48,6 +53,7 @@ var (
 [[- end ]]
 [[- if GenHttps ]]
 	certDir     string
+	https_port  string
 [[- end ]]
 )
 
@@ -98,6 +104,7 @@ func parseFlags() {
 	flag.StringVar(&baseDir, "basedir", ".", "Base Directory for Templates, HTML and CSS")
     [[ if GenHttps -]]
 	    flag.StringVar(&certDir, "certdir", "/tmp/certs", "Base Directory for HTTPS Certificates")
+	    flag.StringVar(&https_port, "httpsPort", "8095", "HTTPS server port")
     [[- end ]]
 
     // Parse the flags and check them

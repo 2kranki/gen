@@ -1,0 +1,66 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+[[- $dot := .]]
+[[- $d  := .TD.Data]]
+[[- $dn := .TD.Data.TitledName]]
+[[- $plg := $d.Plugin.Plugin]]
+[[- $typ := $plg.Name]]
+
+// Generated: [[Time]] for [[$typ]] Database
+
+package cert
+
+import (
+	"testing"
+    [[ if ne $typ "sqlite" -]]
+	"time"
+	[[- end ]]
+	"github.com/2kranki/go_util"
+)
+
+//----------------------------------------------------------------------------
+//                         Test Certificate Creation
+//----------------------------------------------------------------------------
+
+func TestCert[[$dn]](t *testing.T) {
+    var err         error
+    var c           *CertControl
+    var tmpDir      string  = "/tmp/certs"
+
+	t.Logf("TestCert[[$dn]]()...\n")
+	c = NewCert(tmpDir)
+	if c == nil {
+        t.Fatalf("Error: Could not create CertControl object!\n")
+	}
+
+    err = c.IsPresent(true)
+	if err == nil {
+        t.Fatalf("Error: IsPresent(true) is nil!\n")
+	}
+
+    err = c.Generate()
+	if err != nil {
+        t.Fatalf("Error: Generate: %s!\n", err.Error())
+	}
+
+    if !c.CertPem().IsPathRegularFile() {
+        t.Errorf("\tError: Missing %s!\n", c.CertPemPath())
+    }
+
+    if !c.KeyPem().IsPathRegularFile() {
+        t.Errorf("\tError: Missing %s!\n", c.KeyPemPath())
+    }
+
+    // Clean up
+    err = util.NewPath(tmpDir).RemoveDir()
+	if err != nil {
+        t.Logf("Clean up error: %s!\n", err.Error())
+	}
+
+	t.Logf("TestCert[[$dn]]() - End\n\n\n")
+}
+

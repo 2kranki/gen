@@ -4,7 +4,12 @@
 // SQL Application main program
 
 // Notes:
-//  *   All static (ie non-changing) files should be served from the 'static'
+//  1.  When working with package main, please keep in mind that the
+//      more functionality that you can move into functions, the easier
+//      testing will be. This allows you to test the functionality in
+//      small portions. Moving common functionality to packages that are
+//      easily tested is even better.
+//  2.  All static (ie non-changing) files should be served from the 'static'
 //      subdirectory.
 
 // Generated: [[Time]]
@@ -30,9 +35,7 @@ import (
         "[[$d.Name]]/pkg/io[[$dn]][[$tn]]"
 	[[- end ]]
     "[[$d.Name]]/pkg/io[[$dn]]"
-    [[ if GenHttps -]]
-        "github.com/2kranki/go_util"
-    [[- end ]]
+    "[[$d.Name]]/pkg/httpServer"
 )
 
 const (
@@ -51,71 +54,6 @@ var [[$d.Name]]IO *io[[$dn]].IO_[[$dn]]
     var [[$d.Name]][[$tn]]IO  *io[[$dn]][[$tn]].IO_[[$dn]][[$tn]]
 [[- end ]]
 
-
-[[ if GenHttps -]]
-// genCerts generates the Certificates needed for HTTPS.
-func genCerts() {
-    var err         error
-    var out         string
-
-    [[ if GenDebugging -]]
-        log.Printf("\tGenerating HTTPS Certificates if needed...\n")
-    [[- end ]]
-    if certDir == "" {
-        log.Fatalf("Error: Missing certificate path!\n\n")
-    }
-
-    [[ if GenDebugging -]]
-        log.Printf("\tChecking for HTTPS Certificates in %s...\n", certDir)
-    [[- end ]]
-    certPath := util.NewPath(certDir)
-    if certPath == nil {
-        log.Fatalf("Error: Creating %s path\n\n", certPath.String())
-    }
-    if err = certPath.CreateDir(); err != nil {
-        log.Fatalf("Error: Create %s : %s\n\n", certPath.String(), err.Error())
-    }
-
-    certPem := certPath.Append("cert.pem")
-    if certPem == nil {
-        log.Fatalf("Error: Creating %s/cert.pem path\n\n", certPath.String())
-    }
-    keyPem := certPath.Append("key.pem")
-    if keyPem == nil {
-        log.Fatalf("Error: Creating %s/key.pem path\n\n", certPath.String())
-    }
-    if certPem.IsPathRegularFile() && keyPem.IsPathRegularFile() && !force {
-        return
-    }
-
-    [[ if GenDebugging -]]
-        log.Printf("\tMissing HTTPS Certificates will now be generated...\n")
-    [[- end ]]
-    // NOTE - The cmd to create the certificates may need to be massaged for
-    //      a more specific installation.
-    //TODO: Allow for password to be substituted.
-    cmd := util.NewExecArgs("openssl", "req", "-x509", "-nodes",
-     "-days", "365", "-newkey", "rsa:2048", "-keyout", keyPem.String(),
-     "-out", certPem.String(), "-passout", "pass:xyzzy",
-     "-subj", "/C=US/ST=Florida/L=Tampa/O=De/OU=Dev/CN=example.com")
-    [[ if GenDebugging -]]
-        log.Printf("\tExecuting %s...\n", cmd.CommandString())
-    [[- end ]]
-    if cmd == nil {
-        log.Fatalf("Error: Could not create cmd object!\n")
-    }
-    out, err = cmd.RunWithOutput()
-    if err != nil {
-        log.Fatalf("Error: Did not create HTTPS Certificates : %s : %s!\n",
-                    err.Error(), out)
-    }
-    if certPem.IsPathRegularFile() && keyPem.IsPathRegularFile() {
-        return
-    }
-
-    log.Fatalf("Error: OpenSSL did not create the certificates!\n")
-}
-[[- end ]]
 
 // HndlrFavIcon is the default Favorite Icon Handler.  It defaults to
 // returning a 405 status to indicate that no Icon is available.
@@ -162,56 +100,19 @@ func HndlrHome(w http.ResponseWriter, r *http.Request) {
     [[- end ]]
 }
 
-[[ if GenMuxWrapper -]]
-// To understand the following, review packages net/http and net/url and review:
-// https://stackoverflow.com/questions/25456390/how-to-log-http-server-errors-in-golang
-
-// MuxResponseWriterWrap provides a wrapper around the Response
-// Writer so that we can intercept data being written out if
-// needed.
-type MuxResponseWriterWrap struct {
-	http.ResponseWriter
-	status int
-}
-
-func (r *MuxResponseWriterWrap) Write(p []byte) (int, error) {
-	return r.ResponseWriter.Write(p)
-}
-
-func (r *MuxResponseWriterWrap) WriteHeader(status int) {
-	r.status = status
-	r.ResponseWriter.WriteHeader(status)
-}
-
-// MuxHandlerWrapper will intercept each mux request and give
-// us access both, before and after, the request is handled.
-func MuxHandlerWrapper(f http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		record := &MuxResponseWriterWrap{
-			ResponseWriter: w,
-		}
-
-        // Intercept before the request is handled.
-		log.Println("mux input: (", r.Method, ") ", r.URL.String())
-
-		f.ServeHTTP(record, r)
-
-        // Intercept after the request is handled.
-		log.Println("Bad Request ", record.status)
-
-		if record.status == http.StatusBadRequest {
-			log.Println("Bad Request ", r)
-		}
-	}
-}
-
-[[- end ]]
-
 func mainExec() {
 
-    // Generate HTTPS Certificates if needed.
+    h := httpServer.NewHttp(http_srvr, http_port, https_port)
+    if h == nil {
+        log.Fatalf("Error: Unable to create HTTP/HTTPS server!\n")
+    }
     [[ if GenHttps -]]
-        genCerts()
+    /*
+        err := h.SetupCerts(certDir)
+        if err != nil {
+            log.Fatalf("Error: Unable to create HTTPS Certificates!\n")
+        }
+    */
     [[- end ]]
 
     // Setup the I/O.
@@ -224,14 +125,13 @@ func mainExec() {
     [[ if GenDebugging -]]
         log.Printf("\tSetting up the Mux Handlers...\n")
     [[- end ]]
-    mux := http.NewServeMux()
-	mux.HandleFunc("/", HndlrHome)
-	mux.HandleFunc("/favicon.ico", HndlrFavIcon)
+	h.Mux.HandleFunc("/", HndlrHome)
+	h.Mux.HandleFunc("/favicon.ico", HndlrFavIcon)
 
 	[[range $t := $d.Tables -]]
 	    [[ $tn := $t.TitledName ]]
 	    // [[$dn]].[[$tn]] URL handlers for table maintenance
-	    hndlrs[[$dn]][[$tn]] = hndlr[[$dn]][[$tn]].NewHandlers[[$dn]][[$tn]]([[$d.Name]][[$tn]]IO, RowsPerPage, mux)
+	    hndlrs[[$dn]][[$tn]] = hndlr[[$dn]][[$tn]].NewHandlers[[$dn]][[$tn]]([[$d.Name]][[$tn]]IO, RowsPerPage, h.Mux)
 	    hndlrs[[$dn]][[$tn]].Tmpls = hndlrs[[$dn]]
         if hndlrs[[$dn]][[$tn]].Tmpls == nil {
             log.Fatalf("ERROR - Failed to load templates from hndlrs[[$dn]]\n\n\n")
@@ -239,20 +139,11 @@ func mainExec() {
 	[[- end ]]
 
 	// Start the HTTP Server.
-    [[ if GenDebugging -]]
-        log.Printf("\tStarting Server at %s:%s...\n", http_srvr, http_port)
-    [[- end ]]
-	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
-    [[ if GenMuxWrapper -]]
-        s := &http.Server{
-            Addr:    srvrStr,
-            Handler: MuxHandlerWrapper(mux),
-        }
-        log.Fatal(s.ListenAndServe())
-    [[ else -]]
-	    log.Fatal(http.ListenAndServe(srvrStr, mux))
-	[[- end ]]
-
+[[ if GenMuxWrapper -]]
+    h.Serve(true)
+[[ else -]]
+    h.Serve(false)
+[[- end ]]
 }
 
 // setupIO connects to the datatbase.

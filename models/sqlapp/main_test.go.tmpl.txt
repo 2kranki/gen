@@ -19,7 +19,7 @@ import (
     [[ if ne $typ "sqlite" -]]
 	"time"
 	[[- end ]]
-	"github.com/2kranki/go_util"
+	//"github.com/2kranki/go_util"
 )
 
 
@@ -146,40 +146,4 @@ func DockerRun(t *testing.T) {
 }
 [[- end ]]
 
-[[ if GenHttps -]]
-//----------------------------------------------------------------------------
-//                         Test Certificate Creation
-//----------------------------------------------------------------------------
-
-func TestCert[[$dn]](t *testing.T) {
-    var err         error
-
-	t.Logf("TestCert[[$dn]]()...\n")
-
-    certDir = "/tmp/certs"
-    certDirPath := util.NewPath(certDir)
-    err = certDirPath.RemoveDir()
-    t.Logf("\tError: (Can be ignored) Deleting directory, %s - %s",
-            certDirPath.String(), util.ErrorString(err))
-
-    genCerts()
-
-    certPath := certDirPath.Append("cert.pem")
-    if !certPath.IsPathRegularFile() {
-        t.Errorf("\tError: Missing %s!\n", certPath.String())
-    }
-
-    keyPath := certDirPath.Append("key.pem")
-    if !keyPath.IsPathRegularFile() {
-        t.Errorf("\tError: Missing %s!\n", keyPath.String())
-    }
-
-    // Clean up
-    err = certDirPath.RemoveDir()
-    t.Logf("\tError: (Can be ignored) Deleting directory, %s - %s",
-            certDirPath.String(), util.ErrorString(err))
-
-	t.Logf("TestCert[[$dn]]() - End\n\n\n")
-}
-[[- end ]]
 

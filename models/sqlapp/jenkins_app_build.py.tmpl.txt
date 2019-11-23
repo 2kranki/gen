@@ -151,6 +151,12 @@ def         perform_actions():
         return 4
 
     # Build the application.
+    print("Formatting the go source")
+    errNo = util.do_cmd('go fmt ./...')
+    if not errNo == 0:
+        print("Error: go fmt rc=%d\n" % (errNo))
+        return 4
+    print("Building /tmp/bin/%s" % args.app_name)
     err = util.go_build_app(args.app_dir, args.app_name)
     if not err == None:
         err.print()
