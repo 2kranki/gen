@@ -2,18 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/cert.go.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/cert.test.go.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/httpServer.go.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/httpServer.test.go.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/gen_sql.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/new_version.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/main_test.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/main_test.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/httpServer.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/httpServer.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/genSql01.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/genSql01_old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/newVersion.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/util.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -27,8 +23,14 @@
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable.Global.GOPATH.is.expanded" value="true" />
@@ -49,19 +51,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Go Test.go test genapp">
+  <component name="RunManager" selected="Python.genSql01">
     <configuration name="go build " type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="genapp" />
       <working_directory value="$PROJECT_DIR$" />
@@ -151,14 +141,20 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Go Build.go build " />
-      <item itemvalue="Go Test.go test genapp" />
-      <item itemvalue="Go Test.go test pkg" />
-      <item itemvalue="Go Test.TestGenFormDataDisplay in genapp/pkg/genSqlAppGo/dbGener" />
-      <item itemvalue="Go Test.TestNewFormWork in genapp/pkg/genSqlAppGo/dbForm" />
-      <item itemvalue="Go Test.TestReadJsonFile in genapp/pkg/genSqlAppGo/dbJson" />
       <item itemvalue="Python.genSql01" />
     </list>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -176,6 +172,8 @@
       <workItem from="1570815346958" duration="1785000" />
       <workItem from="1570836504125" duration="4899000" />
       <workItem from="1570988866147" duration="2604000" />
+      <workItem from="1575948773394" duration="13198000" />
+      <workItem from="1576013524661" duration="7288000" />
     </task>
     <servers />
   </component>
@@ -200,6 +198,12 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="533" y="369" key="com.intellij.ide.util.TipDialog" timestamp="1576013527349">
+      <screen x="29" y="23" width="1651" height="1027" />
+    </state>
+    <state x="533" y="369" key="com.intellij.ide.util.TipDialog/29.23.1651.1027@29.23.1651.1027" timestamp="1576013527349" />
   </component>
   <component name="masterDetails">
     <states>

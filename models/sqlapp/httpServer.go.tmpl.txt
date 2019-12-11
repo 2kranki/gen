@@ -58,7 +58,7 @@ func (h *HttpServer) HndlrRedirect(w http.ResponseWriter, r *http.Request) {
     [[- end ]]
 
     redirectUrl := fmt.Sprintf("https://%s:%s%s", h.SecureHost, h.SecurePort,
-                            r.RequestURI)
+                            r.URL.Path)
     http.Redirect(w, r, redirectUrl, http.StatusMovedPermanently)
 
     [[ if GenDebugging -]]

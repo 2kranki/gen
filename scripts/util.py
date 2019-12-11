@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # vi:nu:et:sts=4 ts=4 sw=4
 
-''' Utility Routines
+""" Utility Routines
 
 This module contains miscellaneous classes and functions used with in other
 scripts.
 
-'''
+"""
 
 
 #   This is free and unencumbered software released into the public domain.
@@ -35,33 +35,26 @@ scripts.
 #   For more information, please refer to <http://unlicense.org/>
 
 
-import      contextlib
-import      json
-import      os
-import      re
-import      stat
-import      subprocess
-import      sys
-import      time
-
-
-debug_flag = False
-force_flag = False
-trace_flag = False
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
 
 
 #---------------------------------------------------------------------
 #       absolute_path -- Convert a Path to an absolute path
 #---------------------------------------------------------------------
 
-def absolute_path(path, create_dirs=False):
-    ''' Convert Path to an absolute path creating subdirectories if needed
+def absolute_path(path, create_dirs=False, trace_flag=False):
+    """ Convert Path to an absolute path creating subdirectories if needed
 
     Returns:
         path string for successful completion or None for error
-    '''
+    """
     if trace_flag:
-        print("absolutePath(%s)" % (path))
+        print("absolutePath(%s)" % path)
 
     # Convert the path.
     work_path = os.path.normpath(path)
@@ -87,36 +80,34 @@ def absolute_path(path, create_dirs=False):
 #                       Command Class
 #---------------------------------------------------------------------
 
-class       Cmd:
-
-    def __init__(self, **kwargs):
-        #super(cmd, self).__init(**kwargs)
-        pass
+class Cmd:
+    """ Command Class
+    """
 
     def cmd(self, **kwargs):
-        ''' Command to be executed.
+        """ Command to be executed.
             Warning - Commands should override this method.
-        '''
+        """
         raise NotImplementedError
 
     def help(self):
-        ''' Commands should override this method.
-        '''
+        """ Commands should override this method.
+        """
         raise NotImplementedError
 
     def name(self):
-        ''' Commands should override this method.
-        '''
+        """ Commands should override this method.
+        """
         raise NotImplementedError
 
     def num_args(self):
-        ''' Commands should override this method.
-        '''
+        """ Commands should override this method.
+        """
         raise NotImplementedError
 
-    def run(self, *argv, **kwargs):
-        ''' Run the cmd
-        '''
+    def run(self, **kwargs):
+        """ Run the cmd
+        """
         return self.cmd(**kwargs)
 
 
@@ -124,39 +115,40 @@ class       Cmd:
 #                       Commands Class
 #---------------------------------------------------------------------
 
-class       Cmds:
+class Cmds:
+    """ Commands Class
+    """
 
-    def __init__(self, *argv, **kwargs):
+    def __init__(self, *argv):
         self.cmd_dict = {}
         for arg in argv:
             self.cmd_dict[arg.name()] = arg
-
 
     def __contains__(self, key):
         return key in self.cmd_dict
 
     def __getitem__(self, key):
-        if self.cmd_dict.has_key(key):
+        if key in self.cmd_dict:
             return self.cmd_dict[key]
-        else:
-            raise IndexError
+        return None
 
     def __setitem__(self, key, value):
         self.cmd_dict[key] = value
 
-    def do_cmd(self, name, *argv, **kwargs):
+    def do_cmd(self, name, **kwargs):
+        """ Execute the given command.
+        """
         if name in self.cmd_dict:
             irc = self.cmd_dict[name].run(**kwargs)
             return irc
-        else:
-            raise IndexError
+        raise IndexError
 
-    def do_cmds(self, cmds, *argv, **kwargs):
-        ''' Execute a group of commands
+    def do_cmds(self, cmds, debug_flag=False, **kwargs):
+        """ Execute a group of commands
 
         :param cmds:
             A non-empty list of command names and arguments
-        '''
+        """
         if len(cmds) > 0:
             i = 0
             while i < len(cmds):
@@ -176,14 +168,14 @@ class       Cmds:
             raise RuntimeError
         return irc
 
-    def cmd_descs(self):
-        ''' Build the description of the current commands in this object
-        '''
+    def cmd_desc(self):
+        """ Build the description of the current commands in this object
+        """
         desc = "Commands:\n"
         for key in sorted(self.cmd_dict.keys()):
             name = self.cmd_dict[key].name()
-            help = self.cmd_dict[key].help()
-            desc += "\t{} - {}\n".format(name, help)
+            help_msg = self.cmd_dict[key].help()
+            desc += "\t{} - {}\n".format(name, help_msg)
         desc += '\n\n'
         return desc
 
@@ -193,13 +185,13 @@ class       Cmds:
 #---------------------------------------------------------------------
 
 class   DockerContainer:
-    '''
+    """
         This object provides for manipulating docker containers using the
         'docker container' cli command.
         This object was written so that the user would not be required
         to install the python docker api.  Otherwise, we would have
         used it.
-    '''
+    """
 
     def __init__(self, name, tag=None):
         ''' Set default parameters.
@@ -216,8 +208,8 @@ class   DockerContainer:
             image_name += ':' + self._docker_tag
         return image_name
 
-    def build(self, name=None, path='./Dockerfile', context='.', **kwargs):
-        '''  Build a docker container
+    def build(self, name=None, path='./Dockerfile', context='.', debug_flag=False):
+        """  Build a docker container
 
             :param name:
                 container name and tag for the new container
@@ -225,38 +217,36 @@ class   DockerContainer:
                 path of the Dockerfile to use
             :param context:
                 directory path or URL of where the container's data is to come from
-        '''
+        """
         if name is None:
-            name = oArgs.name
+            name = self._docker_name
         if debug_flag:
-            print("build(%s)" % (name))
+            print("build(%s)" % name)
 
         # Perform the specified actions.
         cmd_line = "docker image build --file %s -t %s %s" % (path, name, context)
         irc = 0                 # Assume that it works
-        try:
-            if debug_flag:
-                print("Debug:", cmd_line)
-            else:
-                irc = do_cmd(cmd_line)
-        finally:
-            pass
+
+        if debug_flag:
+            print("Debug:", cmd_line)
+        else:
+            irc = do_cmd(cmd_line)
 
         return irc
 
-    def kill(self, force_flag=False):
-        ''' Kill a Docker Container and/or delete it.
+    def kill(self, trace_flag=False):
+        """ Kill a Docker Container and/or delete it.
         Returns:
             0 - Successful Completion
             4 - Error occurred
-        '''
+        """
         image_name = self._image_name()
 
         irc = 0
-        if image is None:
+        if image_name is None:
             pass
         else:
-            cmd_line = 'docker container rm -f {0}'.format(container_name)
+            cmd_line = 'docker container rm -f {0}'.format(image_name)
             if trace_flag:
                 print("Issuing:", cmd_line)
             try:
@@ -266,14 +256,14 @@ class   DockerContainer:
 
         return irc
 
-    def run(self, parms, force_flag=False):
-        ''' Run a Docker Container
-        '''
+    def run(self, force_flag=False, trace_flag=False):
+        """ Run a Docker Container
+        """
         image_name = self._image_name()
         self.kill()
 
-        di = DockerImage(self._docker_name, self.self._docker_tag)
-        image = di.find()
+        dkr_img = DockerImage(self._docker_name, self._docker_tag)
+        image = dkr_img.find()
         if image is None:
             pass
         else:
@@ -281,7 +271,6 @@ class   DockerContainer:
                 pass
             else:
                 return
-
 
         # Get rid of any prior images if necessary
         if image is None:
@@ -291,19 +280,19 @@ class   DockerContainer:
             if trace_flag:
                 print("Issuing: {0}".format(cmd_line))
             try:
-                irc = do_cmd(cmd_line)
+                do_cmd(cmd_line)
             except OSError:
-                irc = 4
+                pass
 
         # Pull the image
-        di.Pull()
+        dkr_img.pull()
         cmd_line = "docker image pull {0} --format='{{json .}}'".format(image_name)
         if trace_flag:
             print("Issuing: {0}".format(cmd_line))
         try:
-            irc = do_cmd(cmd_line)
+            do_cmd(cmd_line)
         except OSError:
-            irc = 4
+            pass
 
         return
 
@@ -312,18 +301,17 @@ class   DockerContainer:
 #                           Docker Image
 #---------------------------------------------------------------------
 
-class   DockerImage:
-    '''
-        This object provides for manipulating docker images using the
+class DockerImage:
+    """ This object provides for manipulating docker images using the
         'docker image' cli command.
         This object was written so that the user would not be required
         to install the python docker api.  Otherwise, we would have
         used it.
-    '''
+    """
 
     def __init__(self, name, tag=None):
-        ''' Set default parameters.
-        '''
+        """ Set default parameters.
+        """
         self._docker_name = name
         if tag is None:
             self._docker_tag = 'latest'
@@ -336,12 +324,11 @@ class   DockerImage:
             image_name += ':' + self._docker_tag
         return image_name
 
-    def build(self, docker_file_path='.', force_flag=False):
-        ''' Build a current Docker Image
+    def build(self, docker_file_path='.', force_flag=False, debug_flag=False, trace_flag=False):
+        """ Build a current Docker Image
             Returns:
                 None or Error object
-        '''
-        imageInfo = None
+        """
         print("force_flag:", force_flag)
 
         image_name = self._docker_name
@@ -349,13 +336,8 @@ class   DockerImage:
             image_name += ':' + self._docker_tag
 
         image = self.find()
-        if image is None:
-            pass
-        else:
-            if force_flag:
-                pass
-            else:
-                return Error("Error: image {0} already exists!".format(image_name))
+        if image is not None and not force_flag:
+            return Error("Error: image {0} already exists!".format(image_name))
 
         # Get rid of any prior images if necessary
         if image is None:
@@ -384,52 +366,50 @@ class   DockerImage:
             if not irc == 0:
                 return Error("Error: could not build image {0}".format(image_name))
         except OSError:
-                return Error("Error: could not build image {0}".format(image_name))
+            return Error("Error: could not build image {0}".format(image_name))
 
         return None
 
     def find(self):
-        ''' Find information about a current Docker Image
-        '''
-        imageInfo = None
+        """ Find information about a current Docker Image
+        """
+        image_info = None
 
         images = self.images()
         if len(images) > 0:
             for image in images:
                 if self._docker_name == image['Repository'] and self._docker_tag == image['Tag']:
-                    imageInfo = image
+                    image_info = image
 
-        return imageInfo
+        return image_info
 
-
-    def images(self):
-        ''' Get Docker Image(s) Summary Data
-        '''
+    def images(self, debug=False, trace=False):     #pylint: disable=no-self-use
+        """ Get Docker Image(s) Summary Data
+        """
 
         cmd_line = "docker image ls --format='{{json .}}'"
-        if debug_flag:
+        if debug:
             print("Issuing: {0}".format(cmd_line))
         result = subprocess.getstatusoutput(cmd_line)
-        if trace_flag:
-            print("\tResult = %s, %s..." % (result[0], result[1]))
-        irc = result[0]
+        if trace:
+            print("\trc = %s, output = %s..." % (result[0], result[1]))
+        # irc = result[0]
         output = result[1]
         lines = output.splitlines(False)
-        input = '['
-        for l in lines:
-            input += l + ','
-        input = input[:-1] + ']'
+        input_array = '['
+        for line in lines:
+            input_array += line + ','
+        input_array = input_array[:-1] + ']'
 
-        jsonImages = None
+        json_images = None
         if len(output) > 0:
-            jsonImages = json.loads(input)
+            json_images = json.loads(input_array)
 
-        return jsonImages
+        return json_images
 
-
-    def pull(self):
-        ''' Pull a Docker Image
-        '''
+    def pull(self, debug_flag=False, force_flag=False, trace_flag=False):
+        """ Pull a Docker Image
+        """
 
         image = self.find()
         if image is None:
@@ -451,7 +431,7 @@ class   DockerImage:
             try:
                 if trace_flag:
                     print("\tIssuing: {0}".format(cmd_line))
-                irc = do_cmd(cmd_line)
+                do_cmd(cmd_line)
             except OSError:
                 pass
 
@@ -462,7 +442,7 @@ class   DockerImage:
         try:
             if trace_flag:
                 print("\tIssuing: {0}".format(cmd_line))
-            irc = do_cmd(cmd_line)
+            do_cmd(cmd_line)
         except OSError:
             pass
 
@@ -473,17 +453,31 @@ class   DockerImage:
 #                           Error Class
 #---------------------------------------------------------------------
 
-class   Error:
+class Error:
+    """ Error Class for dealing with error messages and method/routine
+        completion codes
+    """
 
-    def __init__(self, msg=None):
-        ''' Convert Path to an absolute path.
-        '''
+    def __init__(self, result_code=0, msg=None):
+        """ Set the error message.
+        """
         self._msg = msg
+        self._result_code = result_code
 
-    def Error(self):
-        '''Convert Path to an absolute path.
-        '''
+    def error(self):
+        """ Return the saved error message.
+        """
         return self._msg
+
+    def stderr(self):
+        """ Print the saved error message on stderr.
+        """
+        print(self._msg, file=sys.stderr, flush=True)
+
+    def stdout(self):
+        """ Print the saved error message on stderr.
+        """
+        print(self._msg)
 
 
 #---------------------------------------------------------------------
@@ -491,33 +485,33 @@ class   Error:
 #---------------------------------------------------------------------
 
 def do_cmd(cmd_line, cwd='.'):
-    ''' Execute an O/S command without capturing input or output.
+    """ Execute an O/S command without capturing input or output.
 
         Returns:
             command return code
-    '''
-    r = subprocess.run(cmd_line, cwd=cwd, shell=True)
-    return r.returncode
+    """
+    result = subprocess.run(cmd_line, cwd=cwd, shell=True, check=True)
+    return result.returncode
 
 def do_sys(cmd_line, cwd='.'):
-    ''' Execute an O/S command capturing output.
+    """ Execute an O/S command capturing both, stdout and stderr.
 
         Returns:
-            r.returncode
-            r.stdout
-            r.stderr
-    '''
-    r = subprocess.run(cmd_line, cwd=cwd, stdout=subprocess.PIPE,
-                       stderr=subprocess.PIPE, shell=True)
-    return r
+            result.returncode
+            result.stdout
+            result.stderr
+    """
+    result = subprocess.run(cmd_line, cwd=cwd, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, shell=True, check=True)
+    return result
 
 
 #---------------------------------------------------------------------
 #           go_build -- Build a Golang Application
 #---------------------------------------------------------------------
 
-def go_build_app(app_dir, app_name):
-    ''' Build a golang application including reformatting the source
+def go_build_app(app_dir, app_name, debug=False, trace=False): # pylint: disable=too-many-branches
+    """ Build a golang application including reformatting the source
 
     This builds go packages located in the 'cmd'/szAppName directory.
     The built program can be found at $TMP/bin/szAppName.
@@ -526,10 +520,12 @@ def go_build_app(app_dir, app_name):
         app_dir (str): Application Directory where 'main.go' can be
                         found.
         app_name (str): Application Name
+        debug (bool):   True == dont execute commands
+        trace (bool):   True == trace actions
 
     Returns:
         Error object or None for successful completion
-    '''
+    """
 
     cur_dir = os.getcwd()
     tmp_dir = None
@@ -539,14 +535,12 @@ def go_build_app(app_dir, app_name):
         # /var/tmp
         # ${TMPDIR}
         tmp_dir = '/tmp'
-    if tmp_dir is None:
-        tmp_dir = os.getenv('TMP')
-    if tmp_dir is None:
-        tmp_dir = os.getenv('TEMP')
+    tmp_dir = tmp_dir or os.getenv('TMP')
+    tmp_dir = tmp_dir or os.getenv('TEMP')
     if tmp_dir is None:
         return Error("Error: Can't find temporary Directory, TMP or TEMP, in environment!")
     app_dir_abs = absolute_path(os.path.join(cur_dir, app_dir, app_name))
-    if trace_flag:
+    if trace:
         print("\ttmp_dir:", tmp_dir)
         print("\tapp_dir_abs:", app_dir_abs)
 
@@ -554,17 +548,17 @@ def go_build_app(app_dir, app_name):
     err = None
     try:
         cmd_line = "go fmt {0}".format(os.path.join(cur_dir, app_dir, app_name, '*.go'))
-        if trace_flag:
+        if trace:
             print("Issuing: {0}".format(cmd_line))
-        if debug_flag:
-            print("\t Debug: %s".format(cmd_line))
+        if debug:
+            print("\t Debug: {0}".format(cmd_line))
         else:
             irc = do_cmd(cmd_line)
             if not irc == 0:
                 return Error("Error: '%s' failed!" % cmd_line)
-    except Exception as e:
-        if trace_flag:
-            print("Execption:", e)
+    except Exception as excp:                   # pylint: disable=broad-except
+        if trace:
+            print("Execption:", excp)
         err = Error("Error: '%s' failed!" % cmd_line)
     if err:
         return err
@@ -577,21 +571,21 @@ def go_build_app(app_dir, app_name):
         # Setup output directory if needed.
         tmp_bin = os.path.join(tmp_dir, 'bin')
         if not os.path.exists(tmp_bin):
-            if trace_flag:
-                print("Making: {0}".format(tmpBin))
+            if trace:
+                print("Making: {0}".format(tmp_bin))
             os.makedirs(tmp_bin, 0o777)
         # Build the packages.
-        if trace_flag:
+        if trace:
             print("Issuing: {0}".format(cmd_line))
-        if debug_flag:
-            print("\t Debug: %s".format(cmd_line))
+        if debug:
+            print("\t Debug: {0}".format(cmd_line))
         else:
             irc = do_cmd(cmd_line)
             if not irc == 0:
                 return Error("Error: '%s' failed!" % cmd_line)
-    except Exception as e:
-        if trace_flag:
-            print("Execption:", e)
+    except Exception as excp:                   # pylint: disable=broad-except
+        if trace:
+            print("Execption:", excp)
         err = Error("Error: '%s' failed!" % cmd_line)
     if err:
         return err
@@ -603,15 +597,15 @@ def go_build_app(app_dir, app_name):
 #   go_get -- Go Get Specific Packages if not already downloaded
 #---------------------------------------------------------------------
 
-def go_get(pkg_dir, go_dir=None):
-    ''' Go get a go package if it is not already loaded.
+def go_get(pkg_dir, go_dir=None, debug_flag=False):
+    """ Go get a go package if it is not already loaded.
         The Go Directory is composed of 'bin', 'pkg' and 'src'. All packages
         are loaded into 'src'.  So, we can just check there to see if the
         package has already been loaded or not.  If the package is in a
         repository, the full path must be used excluding the repository type.
         example:
             goget('github.com/2kranki/go_util')
-    '''
+    """
 
     if go_dir is None:
         go_dir = '~/go'
@@ -620,18 +614,103 @@ def go_get(pkg_dir, go_dir=None):
     if not os.path.exists(go_pkg_dir):
         cmd_line = 'go get {0}'.format(pkg_dir)
         if debug_flag:
-            print("\t Debug: %s".format(cmd_line))
+            print("\t Debug: {0}".format(cmd_line))
         else:
             do_cmd(cmd_line)
 
-    return None
+
+#---------------------------------------------------------------------
+#                       Main Command Class
+#---------------------------------------------------------------------
+
+class MainBase:
+    """ Base Command Line Program Class.
+    """
+
+    def __init__(self):
+        self.args = None
+        self.arg_prs = argparse.ArgumentParser()
+        self.result_code = 0
+
+    def arg_parse_exec(self):
+        """ Execute the argument parsing.
+            Warning - Main should override this method if additional cli
+            arguments are needed or argparse needs some form of modification
+            before execution.
+        """
+        self.arg_parse_setup()
+        # You can insert other logic here if you need to when you override.
+        self.arg_parse_parse()
+
+    def arg_parse_parse(self):
+        """ Parse the command line arguments.
+        """
+        self.args = self.arg_prs.parse_args(sys.argv[1:])
+        if self.args.flg_debug:
+            print("In DEBUG Mode...")
+            print('Args:', self.args)
+
+    def arg_parse_setup(self):
+        """ Set up to parse the command line arguments
+        """
+        self.arg_prs.add_argument('-d', '--debug', action='store_true', dest='flg_debug',
+                                  default=False, help='Set debug mode'
+                                 )
+        self.arg_prs.add_argument('--noexc', action='store_false', dest='flg_exec',
+                                  default=True, help='Dont execute O/S routines'
+                                 )
+        self.arg_prs.add_argument('-f', '--force', action='store_true', dest='flg_force',
+                                  default=False, help='Set force mode'
+                                 )
+        self.arg_prs.add_argument('--exec', action='store_false', dest='flg_exec',
+                                  default=True, help='Reset execute mode'
+                                 )
+        self.arg_prs.add_argument('-v', '--verbose', action='count', default=1,
+                                  dest='verbose', help='increase output verbosity'
+                                 )
+        self.arg_prs.add_argument('args', nargs=argparse.REMAINDER, default=[])
+
+    def exec_pgm(self):                                 #pylint: disable=no-self-use
+        """ Program Execution
+            Warning - Main should override this method and make certain that
+            it returns an exit code in self.result_code.
+        """
+        self.result_code = 24
+        print("ERROR: exec_pgm is NOT implemented!")
+
+    def run(self):
+        """ Run the program keeping track of how long that it takes.
+        """
+        start_time = time.time()
+        self.arg_parse_exec()
+        # arguments and options are in self.args.
+        if self.result_code == 0:
+            try:
+                self.exec_pgm()
+            except Exception as excp:  # pylint: disable=broad-except
+                print("Execption:", excp)
+                self.result_code = 20
+        end_time = time.time()
+        if self.args.verbose > 0 or self.args.flg_debug:
+            if int(self.result_code) == 0:
+                print("...Successful completion.")
+            else:
+                print("...Completion Failure of %d" % self.result_code)
+            print("Start Time: %s" % time.ctime(start_time))
+            print("End   Time: %s" % time.ctime(end_time))
+            diff_time = end_time - start_time      # float Time in seconds
+            secs = int(diff_time % 60.0)
+            mins = int((diff_time / 60.0) % 60.0)
+            hrs = int(diff_time / 3600.0)
+            print("run   Time: %d:%02d:%02d" % (hrs, mins, secs))
+        sys.exit(int(self.result_code) or 0)
 
 
 ################################################################################
 #                           Command-line interface
 ################################################################################
 
-if '__main__' == __name__:
+if __name__ == '__main__':
     print("Error: Sorry, util.py provides classes and functions for use by other scripts.")
     print("\tIt is not meant to be run by itself.")
     sys.exit(4)
