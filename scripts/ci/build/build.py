@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-[[- $dot := . ]]
-[[- $d   := .TD.Data ]]
-[[- $dn  := .TD.Data.TitledName ]]
-[[- $plg := $d.Plugin.Plugin ]]
-[[- $typ := $plg.Name ]]
 # vi:nu:et:sts=4 ts=4 sw=4
 
 ''' Build the Application(s)
@@ -89,7 +84,7 @@ def         parse_args(listArgV=None):
                          default='cmd', help='Set Application Source Subdirectory'
                          )
     cmd_prs.add_argument('--appname', action='store', dest='app_name',
-                         default='[[$d.Name]]', help='Set Application Base Name'
+                         default='app01sq', help='Set Application Base Name'
                          )
     cmd_prs.add_argument('--bindir', action='store', dest='bin_dir',
                          default='/tmp/bin', help='Set Binary Directory'
@@ -131,17 +126,7 @@ def         perform_actions():
     if not err == None:
         err.print()
         return 4
-    [[ if eq $typ "mariadb" -]]
-    err = util.go_get('github.com/go-sql-driver/mysql')
-    [[ else if eq $typ "mssql" -]]
-    err = util.go_get('github.com/denisenkom/go-mssqldb')
-    [[ else if eq $typ "mysql" -]]
-    err = util.go_get('github.com/go-sql-driver/mysql')
-    [[ else if eq $typ "postgres" -]]
-    err = util.go_get('github.com/lib/pq')
-    [[ else if eq $typ "sqlite" -]]
     err = util.go_get('github.com/mattn/go-sqlite3')
-    [[ end -]]
     if not err == None:
         err.print()
         return 4
@@ -163,7 +148,7 @@ def         perform_actions():
         return 4
 
     # Build the docker application.
-    di = util.DockerImage('[[$d.Name]]', force=True)
+    di = util.DockerImage('app01sq', force=True)
     if not di == None:
         # Since we were requested to build the application, the docker
         # container needs to be rebuilt as well.

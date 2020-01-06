@@ -124,6 +124,8 @@ class Main(util.MainBase):
                 self.result_code = 0
             else:
                 if not os.path.exists(self.args.bin_dir):
+                    if self.args.flg_debug:
+                        print("\tCreating dir:", self.args.bin_dir)
                     os.makedirs(self.args.bin_dir, 0o777)
                 print("\tExecuting:", cmd)
                 self.result_code = subprocess.call(cmd, shell=True)
@@ -144,12 +146,12 @@ class Main(util.MainBase):
             print('\tsrc_dir:', self.args.src_dir)
 
         # Set up base objects, files and directories.
-        if not os.path.exists(self.args.app_path):
-            print("\tCreating Directory:", self.args.app_path)
+        if not os.path.exists(self.args.app_dir):
+            print("\tCreating Directory:", self.args.app_dir)
             if self.args.flg_exec:
-                os.makedirs(self.args.app_path)
+                os.makedirs(self.args.app_dir)
             else:
-                print("\tWould have executed: mkdir -p", self.args.app_path)
+                print("\tWould have executed: mkdir -p", self.args.app_dir)
 
         # Perform the specified actions.
         try:

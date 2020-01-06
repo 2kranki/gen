@@ -6,6 +6,10 @@
 This module contains miscellaneous classes and functions used with in other
 scripts.
 
+Version:
+    1.1 - Added MainBase Class
+    1.2 - Added do_cmd to MainBase
+
 """
 
 
@@ -669,6 +673,16 @@ class MainBase:
                                   dest='verbose', help='increase output verbosity'
                                  )
         self.arg_prs.add_argument('args', nargs=argparse.REMAINDER, default=[])
+
+    def do_cmd(self, cmd_line, cwd='.'):
+        """ Execute an O/S command without capturing input or output.
+
+            Returns:
+                command return code
+        """
+        result = subprocess.run(cmd_line, cwd=cwd, shell=True, check=True)
+        self.result_code = result.returncode
+        return self.result_code
 
     def exec_pgm(self):                                 #pylint: disable=no-self-use
         """ Program Execution

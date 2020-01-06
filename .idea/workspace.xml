@@ -2,12 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/gen_sql.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/new_version.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_build.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_build_test.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_deploy.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_deploy_test.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_push.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_push_test.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_review.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_review_test.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_test.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_test_test.py.tmpl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/build/build.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/build/build_test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/deploy/deploy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/review/review.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/review/review_test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/test/test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/ci/test/test_test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/gen_sql_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/httpServer.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/httpServer.go.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/genSql01.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/genSql01_old.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/newVersion.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build_test.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_deploy.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_deploy_test.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_push.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_push_test.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_review.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_review_test.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_test.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_test_test.py.tmpl.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkinsfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkinsfile.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/genSql01_old.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/genSql01_test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/gen_sql.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/gen_sql.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/tag.txt" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tag.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/util.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -141,6 +172,12 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Go Build.go build " />
+      <item itemvalue="Go Test.go test genapp" />
+      <item itemvalue="Go Test.go test pkg" />
+      <item itemvalue="Go Test.TestGenFormDataDisplay in genapp/pkg/genSqlAppGo/dbGener" />
+      <item itemvalue="Go Test.TestNewFormWork in genapp/pkg/genSqlAppGo/dbForm" />
+      <item itemvalue="Go Test.TestReadJsonFile in genapp/pkg/genSqlAppGo/dbJson" />
       <item itemvalue="Python.genSql01" />
     </list>
   </component>
@@ -174,6 +211,8 @@
       <workItem from="1570988866147" duration="2604000" />
       <workItem from="1575948773394" duration="13198000" />
       <workItem from="1576013524661" duration="7288000" />
+      <workItem from="1578175777955" duration="37000" />
+      <workItem from="1578175821443" duration="1204000" />
     </task>
     <servers />
   </component>
@@ -200,9 +239,14 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="533" y="369" key="com.intellij.ide.util.TipDialog" timestamp="1576013527349">
-      <screen x="29" y="23" width="1651" height="1027" />
+    <state x="542" y="271" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1578175810008">
+      <screen x="28" y="23" width="1652" height="1027" />
     </state>
+    <state x="542" y="271" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/28.23.1652.1027@28.23.1652.1027" timestamp="1578175810008" />
+    <state x="532" y="369" key="com.intellij.ide.util.TipDialog" timestamp="1578175822707">
+      <screen x="28" y="23" width="1652" height="1027" />
+    </state>
+    <state x="532" y="369" key="com.intellij.ide.util.TipDialog/28.23.1652.1027@28.23.1652.1027" timestamp="1578175822707" />
     <state x="533" y="369" key="com.intellij.ide.util.TipDialog/29.23.1651.1027@29.23.1651.1027" timestamp="1576013527349" />
   </component>
   <component name="masterDetails">

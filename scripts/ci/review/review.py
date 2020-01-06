@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+# vi:nu:et:sts=4 ts=4 sw=4
+
+""" Perform various automated code reviews on the source.
+
+The module must be executed from the repository that contains the Jenkinsfile.
+
+"""
+
+
+#   This is free and unencumbered software released into the public domain.
+#
+#   Anyone is free to copy, modify, publish, use, compile, sell, or
+#   distribute this software, either in source code form or as a compiled
+#   binary, for any purpose, commercial or non-commercial, and by any
+#   means.
+#
+#   In jurisdictions that recognize copyright laws, the author or authors
+#   of this software dedicate any and all copyright interest in the
+#   software to the public domain. We make this dedication for the benefit
+#   of the public at large and to the detriment of our heirs and
+#   successors. We intend this dedication to be an overt act of
+#   relinquishment in perpetuity of all present and future rights to this
+#   software under copyright law.
+#
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#   IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+#   OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+#   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+#   OR OTHER DEALINGS IN THE SOFTWARE.
+#
+#   For more information, please refer to <http://unlicense.org/>
+
+
+import      argparse
+import      json
+import      os
+import      re
+import      subprocess
+import      sys
+import      time
+sys.path.append('./scripts')
+import      util
+
+
+oArgs       = None
+szAppName   = 'App01sq'
+
+szGoDir     = '${HOME}/go'
+
+
+################################################################################
+#                           Object Classes and Functions
+################################################################################
+
+#---------------------------------------------------------------------
+#               parse_args -- Parse the CLI Arguments
+#---------------------------------------------------------------------
+
+def         parse_args(listArgV=None):
+    '''
+    '''
+    global      oArgs
+
+    # Parse the command line.
+    szUsage = "usage: %prog [options] sourceDirectoryPath [destinationDirectoryPath]"
+    cmd_prs = argparse.ArgumentParser( )
+    cmd_prs.add_argument('-b', '--build', action='store_false', dest='fBuild',
+                         default=True, help='Do not build genapp before using it'
+                         )
+    cmd_prs.add_argument('-d', '--debug', action='store_true', dest='fDebug',
+                         default=False, help='Set debug mode'
+                         )
+    cmd_prs.add_argument('-f', '--force', action='store_true', dest='fForce',
+                         default=False, help='Set force mode'
+                         )
+    cmd_prs.add_argument('-v', '--verbose', action='count', default=1,
+                         dest='iVerbose', help='increase output verbosity'
+                         )
+    cmd_prs.add_argument('--appdir', action='store', dest='szAppDir',
+                         default='/tmp', help='Set Application Base Directory'
+                         )
+    cmd_prs.add_argument('--appname', action='store', dest='szAppName',
+                         default='app01sq', help='Set Application Base Name'
+                         )
+    cmd_prs.add_argument('--bindir', action='store', dest='szBinDir',
+                         default='/tmp/bin', help='Set Binary Directory'
+                         )
+    cmd_prs.add_argument('--mdldir', action='store', dest='szModelDir',
+                         default='./models', help='Set genapp Model Directory'
+                         )
+    cmd_prs.add_argument('args', nargs=argparse.REMAINDER, default=[])
+    oArgs = cmd_prs.parse_args(listArgV)
+    if oArgs.iVerbose:
+        print('*****************************************')
+        print('*        Linting the Application        *')
+        print('*****************************************')
+        print()
+    oArgs.szAppPath = os.path.join(oArgs.szAppDir, oArgs.szAppName)
+    if oArgs.fDebug:
+        print("In DEBUG Mode...")
+        print('Args:', oArgs)
+
+
+
+
+################################################################################
+#                           Main Program Processing
+################################################################################
+
+def         main_cli(listArgV=None):
+    """ Command-line interface. """
+    global      oArgs
+    
+    # Parse the command line.
+    parse_args(listArgV)
+
+    # Perform the specified actions.
+    iRc = 0
+    try:
+        print("Do something here!")
+    finally:
+        pass
+
+    return iRc
+
+
+
+
+################################################################################
+#                           Command-line interface
+################################################################################
+
+if '__main__' == __name__:
+    startTime = time.time()
+    iRc = main_cli(sys.argv[1:])
+    if oArgs.iVerbose or oArgs.fDebug:
+        if 0 == iRc:
+            print("...Successful completion.")
+        else:
+            print("...Completion Failure of %d" % (iRc))
+    endTime = time.time()
+    if oArgs.iVerbose or oArgs.fDebug:
+        print("Start Time: %s" % (time.ctime(startTime)))
+        print("End   Time: %s" % (time.ctime(endTime)))
+        diffTime = endTime - startTime      # float Time in seconds
+        iSecs = int(diffTime % 60.0)
+        iMins = int((diffTime / 60.0) % 60.0)
+        iHrs = int(diffTime / 3600.0)
+        print("run   Time: %d:%02d:%02d" % (iHrs, iMins, iSecs))
+    sys.exit(iRc or 0)
+
+

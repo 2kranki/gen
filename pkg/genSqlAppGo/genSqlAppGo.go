@@ -82,80 +82,80 @@ var FileDefs1 []genCmn.FileDefn = []genCmn.FileDefn{
 		"one",
 		0,
 	},
-	{"jenkins_app_build.py.tmpl.txt",
-		[]string{"jenkins", "build"},
+	{"ci_app_build.py.tmpl.txt",
+		[]string{"scripts", "ci", "build"},
 		"build.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_build_test.py.tmpl.txt",
-		[]string{"jenkins", "build"},
+	{"ci_app_build_test.py.tmpl.txt",
+		[]string{"scripts", "ci", "build"},
 		"build_test.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_deploy.py.tmpl.txt",
-		[]string{"jenkins", "deploy"},
+	{"ci_app_deploy.py.tmpl.txt",
+		[]string{"scripts", "ci", "deploy"},
 		"deploy.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_deploy_test.py.tmpl.txt",
-		[]string{"jenkins", "deploy"},
+	{"ci_app_deploy_test.py.tmpl.txt",
+		[]string{"scripts", "ci", "deploy"},
 		"deploy_test.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_review.py.tmpl.txt",
-		[]string{"jenkins", "review"},
+	{"ci_app_review.py.tmpl.txt",
+		[]string{"scripts", "ci", "review"},
 		"review.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_review_test.py.tmpl.txt",
-		[]string{"jenkins", "review"},
+	{"ci_app_review_test.py.tmpl.txt",
+		[]string{"scripts", "ci", "review"},
 		"review_test.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_push.py.tmpl.txt",
-		[]string{"jenkins", "push"},
+	{"ci_app_push.py.tmpl.txt",
+		[]string{"scripts", "ci", "push"},
 		"push.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_push_test.py.tmpl.txt",
-		[]string{"jenkins", "push"},
+	{"ci_app_push_test.py.tmpl.txt",
+		[]string{"scripts", "ci", "push"},
 		"push_test.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_test.py.tmpl.txt",
-		[]string{"jenkins", "test"},
+	{"ci_app_test.py.tmpl.txt",
+		[]string{"scripts", "ci", "test"},
 		"test.py",
 		"text",
 		0755,
 		"one",
 		0,
 	},
-	{"jenkins_app_test_test.py.tmpl.txt",
-		[]string{"jenkins", "test"},
+	{"ci_app_test_test.py.tmpl.txt",
+		[]string{"scripts", "ci", "test"},
 		"test_test.py",
 		"text",
 		0755,
@@ -497,7 +497,11 @@ func CreateOutputDir(dir []string, dn string, tn string) error {
 
 	if !outPath.IsPathDir() {
 		log.Printf("\t\tCreating directory: %s...\n", outPath.String())
-		err = outPath.CreateDir()
+		if sharedData.Noop() {
+			log.Printf("\t\t\tSkipped CreateDir because NOOP!\n")
+		} else {
+			err = outPath.CreateDir()
+		}
 	}
 
 	return err
@@ -551,6 +555,10 @@ func CreateOutputDirs(g *genCmn.GenData) error {
 		return err
 	}
 	// Static is used for CSS, HTML, JPG and any other static data
+	err = CreateOutputDir([]string{"scripts", "ci"}, dn, "")
+	if err != nil {
+		return err
+	}
 	err = CreateOutputDir([]string{"static"}, dn, "")
 	if err != nil {
 		return err
