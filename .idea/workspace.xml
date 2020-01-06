@@ -2,44 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ba7eb79-aa7c-4a7b-87bb-14a77cc34f20" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_build.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_build_test.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_deploy.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_deploy_test.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_push.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_push_test.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_review.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_review_test.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_test.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/sqlapp/ci_app_test_test.py.tmpl.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/build/build.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/build/build_test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/deploy/deploy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/review/review.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/review/review_test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/test/test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/ci/test/test_test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/gen_sql_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_build_test.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_deploy.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_deploy_test.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_push.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_push_test.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_review.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_review_test.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_test.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkins_app_test_test.py.tmpl.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/jenkinsfile.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/jenkinsfile.tmpl.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/util.py.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/sqlapp/handlers.table.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/models/sqlapp/handlers.table.go.tmpl.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/genSqlAppGo/genSqlAppGo_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/genSql01_old.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/genSql01_test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/gen_sql.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/gen_sql.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/tag.txt" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tag.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/util.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

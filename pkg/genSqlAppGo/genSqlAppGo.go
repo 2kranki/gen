@@ -502,6 +502,9 @@ func CreateOutputDir(dir []string, dn string, tn string) error {
 		} else {
 			err = outPath.CreateDir()
 		}
+		if err != nil {
+			log.Printf("\t\t\tError: %s\n", err.Error())
+		}
 	}
 
 	return err
